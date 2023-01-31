@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/solomon-base/solomon-base.iml" filepath="$PROJECT_DIR$/solomon-base/solomon-base.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-cache/solomon-cache.iml" filepath="$PROJECT_DIR$/solomon-cache/solomon-cache.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-common/solomon-common.iml" filepath="$PROJECT_DIR$/solomon-common/solomon-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-constant/solomon-constant.iml" filepath="$PROJECT_DIR$/solomon-constant/solomon-constant.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-data/solomon-data.iml" filepath="$PROJECT_DIR$/solomon-data/solomon-data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-exception/solomon-exception.iml" filepath="$PROJECT_DIR$/solomon-exception/solomon-exception.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-file/solomon-file.iml" filepath="$PROJECT_DIR$/solomon-file/solomon-file.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-i18n/solomon-i18n.iml" filepath="$PROJECT_DIR$/solomon-i18n/solomon-i18n.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-mongodb/solomon-mongodb.iml" filepath="$PROJECT_DIR$/solomon-mongodb/solomon-mongodb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-mq/solomon-mq.iml" filepath="$PROJECT_DIR$/solomon-mq/solomon-mq.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-mybatis/solomon-mybatis.iml" filepath="$PROJECT_DIR$/solomon-mybatis/solomon-mybatis.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-parent.iml" filepath="$PROJECT_DIR$/solomon-parent.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-utils/solomon-utils.iml" filepath="$PROJECT_DIR$/solomon-utils/solomon-utils.iml" />
+    </modules>
+  </component>
+</project>

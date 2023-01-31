@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.baidubce:bce-java-sdk:0.10.240">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.m2/repository/com/baidubce/bce-java-sdk/0.10.240/bce-java-sdk-0.10.240.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.m2/repository/com/baidubce/bce-java-sdk/0.10.240/bce-java-sdk-0.10.240-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.m2/repository/com/baidubce/bce-java-sdk/0.10.240/bce-java-sdk-0.10.240-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: com.adobe.xmp:xmpcore:6.1.11">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.m2/repository/com/adobe/xmp/xmpcore/6.1.11/xmpcore-6.1.11.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.m2/repository/com/adobe/xmp/xmpcore/6.1.11/xmpcore-6.1.11-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.m2/repository/com/adobe/xmp/xmpcore/6.1.11/xmpcore-6.1.11-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

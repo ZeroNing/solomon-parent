@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.steven</groupId>
+  <packaging>pom</packaging>
+  <version>1.0</version>
+  <artifactId>solomon-parent</artifactId>
+
+  <modules>
+    <module>solomon-base</module>
+    <module>solomon-common</module>
+    <module>solomon-constant</module>
+    <module>solomon-file</module>
+    <module>solomon-cache</module>
+    <module>solomon-mq</module>
+    <module>solomon-utils</module>
+    <module>solomon-exception</module>
+    <module>solomon-mongodb</module>
+    <module>solomon-i18n</module>
+    <module>solomon-mybatis</module>
+    <module>solomon-data</module>
+  </modules>
+
+  <properties>
+    <java.version>1.8</java.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <commons.lang.version>2.6</commons.lang.version>
+    <yauaa.version>6.0</yauaa.version>
+    <easy.excel.version>3.0.5</easy.excel.version>
+    <spring.boot.version>2.4.2</spring.boot.version>
+    <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
+    <javax.validation>2.0.1.Final</javax.validation>
+    <thumbnailator.version>0.4.3</thumbnailator.version>
+    <commons.collections4.version>4.4</commons.collections4.version>
+    <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
+    <persistence.api.version>1.0.2</persistence.api.version>
+    <jackson.version>2.11.4</jackson.version>
+    <exif.version>2.15.0</exif.version>
+    <spring.cloud.version>2020.0</spring.cloud.version>
+    <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
+    <commons.codec.version>1.13</commons.codec.version>
+    <fastJson.version>1.2.56</fastJson.version>
+    <dubbo.version>3.0.5</dubbo.version>
+    <dubbo-start.version>3.0.5</dubbo-start.version>
+    <strive.version>1.0</strive.version>
+    <Spring.cloud.gateway.version>3.0.4</Spring.cloud.gateway.version>
+    <Spring.cloud.loadbalancer.version>3.0.4</Spring.cloud.loadbalancer.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spring.context.support.version>1.0.11</spring.context.support.version>
+    <nacos.client.version>2.1.1</nacos.client.version>
+    <jedis.version>4.0.0</jedis.version>
+    <seata.version>1.4.2</seata.version>
+    <mybatis.plus.version>3.5.1</mybatis.plus.version>
+    <redisson.version>3.15.1</redisson.version>
+    <hutool.version>5.7.18</hutool.version>
+    <spring.loadbalancer.version>3.0.4</spring.loadbalancer.version>
+    <spring.bootstrap.version>3.0.4</spring.bootstrap.version>
+    <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
+    <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
+    <mysql.java.version>8.0.28</mysql.java.version>
+    <minio.version>8.2.1</minio.version>
+    <spring.context.version>5.3.1</spring.context.version>
+    <slf4j.version>1.7.30</slf4j.version>
+    <mybatis-plus.version>3.5.1</mybatis-plus.version>
+    <mysql.connector.java.version>8.0.16</mysql.connector.java.version>
+    <druid.version>1.2.8</druid.version>
+    <xmpcore.version>6.1.11</xmpcore.version>
+    <metadata.version>2.18.0</metadata.version>
+    <knife4j.version>3.0.3</knife4j.version>
+    <jwt.version>0.9.1</jwt.version>
+    <oss.version>3.15.1</oss.version>
+    <obs.version>3.22.3</obs.version>
+    <cos.version>5.6.97</cos.version>
+    <bos.version>0.10.240</bos.version>
+  </properties>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>2.4.2</version>
+  </parent>
+
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>com.baidubce</groupId>
+        <artifactId>bce-java-sdk</artifactId>
+        <version>${bos.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.qcloud</groupId>
+        <artifactId>cos_api</artifactId>
+        <version>${cos.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.huaweicloud</groupId>
+        <artifactId>esdk-obs-java-bundle</artifactId>
+        <version>${obs.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.aliyun.oss</groupId>
+        <artifactId>aliyun-sdk-oss</artifactId>
+        <version>${oss.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.jsonwebtoken</groupId>
+        <artifactId>jjwt</artifactId>
+        <version>${jwt.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
+      </dependency>
+
+      <!--解析图片exif 开始-->
+      <dependency>
+        <groupId>com.drewnoakes</groupId>
+        <artifactId>metadata-extractor</artifactId>
+        <version>${metadata.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.adobe.xmp</groupId>
+        <artifactId>xmpcore</artifactId>
+        <version>${xmpcore.version}</version>
+      </dependency>
+      <!--解析图片exif 结束-->
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.connector.java.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-extension</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-autoconfigure</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.context.version}</version>
+      </dependency>
+
+      <!--minio-->
+      <dependency>
+        <groupId>io.minio</groupId>
+        <artifactId>minio</artifactId>
+        <version>${minio.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus</artifactId>
+        <version>${mybatis.plus.version}</version>
+      </dependency>
+
+      <!-- mysql -->
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.java.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.seata</groupId>
+        <artifactId>seata-spring-boot-starter</artifactId>
+        <version>${seata.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-redis</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.nacos</groupId>
+        <artifactId>nacos-client</artifactId>
+        <version>${nacos.client.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba.spring</groupId>
+        <artifactId>spring-context-support</artifactId>
+        <version>${spring.context.support.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.dubbo</groupId>
+        <artifactId>dubbo-spring-boot-starter</artifactId>
+        <version>${dubbo-start.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.dubbo</groupId>
+        <artifactId>dubbo</artifactId>
+        <version>${dubbo-start.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-dependencies</artifactId>
+        <version>${spring.cloud.version}</version>
+        <type>pom</type>
+        <scope>runtime</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+        <version>${spring.cloud.alibab.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons.codec.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${commons.lang.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${commons.collections4.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId><!-- springMvc -->
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-aop</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-configuration-processor</artifactId>
+        <optional>true</optional>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <!-- userAgent解析用户 -->
+      <dependency>
+        <groupId>nl.basjes.parse.useragent</groupId>
+        <artifactId>yauaa</artifactId>
+        <version>${yauaa.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>easyexcel</artifactId>
+        <version>${easy.excel.version}</version>
+      </dependency>
+
+      <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-security</artifactId>
+        <version>${spring.boot.version}</version> </dependency> -->
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-amqp</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <!-- 校验注解所有需要jar包 开始 -->
+      <dependency>
+        <groupId>javax.validation</groupId>
+        <artifactId>validation-api</artifactId>
+        <version>${javax.validation}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-validator</artifactId>
+        <version>${hibernate.validator.version}</version>
+      </dependency>
+      <!-- 校验注解所有需要jar包 结束 -->
+
+      <!-- google图片处理 -->
+      <dependency>
+        <groupId>net.coobird</groupId>
+        <artifactId>thumbnailator</artifactId>
+        <version>${thumbnailator.version}</version>
+      </dependency>
+
+      <!-- websocket -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-websocket</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-core</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${fastJson.version}</version>
+      </dependency>
+      <!-- 去除图片Exif -->
+      <dependency>
+        <groupId>com.drewnoakes</groupId>
+        <artifactId>metadata-extractor</artifactId>
+        <version>${exif.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        <version>${spring.bootstrap.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-crypto</artifactId>
+        <version>${hutool.version}</version>
+      </dependency>
+    </dependencies>
+
+  </dependencyManagement>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
