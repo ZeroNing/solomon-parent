@@ -1,7 +1,5 @@
 package com.steven.solomon.enums;
 
-import org.omg.PortableInterceptor.ACTIVE;
-
 public enum MqChoiceEnum implements BaseEnum{
   RABBIT("RabbitMq","RabbitMq"),
   ACTIVE("ActiveMQ","ActiveMQ"),
