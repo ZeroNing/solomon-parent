@@ -58,7 +58,7 @@ public class FileTypeUtils {
       return TXT_TYPE+type;
     }
     if(ValidateUtils.isEmpty(type)){
-      return APPLICATION_TYPE+"file";
+      return "application/octet-stream";
     }
     return null;
   }
