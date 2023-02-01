@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <parent>
+    <artifactId>solomon-parent</artifactId>
+    <groupId>com.steven</groupId>
+    <version>1.0</version>
+  </parent>
+
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-gateway-sentinel</artifactId>
+  <version>1.0</version>
+  <modelVersion>4.0.0</modelVersion>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.alibaba.csp</groupId>
+      <artifactId>sentinel-datasource-nacos</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-base</artifactId>
+      <version>1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.csp</groupId>
+      <artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.alibaba.cloud</groupId>
+      <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+      <version>${spring.loadbalancer.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-gateway</artifactId>
+      <version>${Spring.cloud.gateway.version}</version>
+    </dependency>
+  </dependencies>
+
+</project>

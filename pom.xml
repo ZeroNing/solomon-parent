@@ -22,6 +22,7 @@
     <module>solomon-i18n</module>
     <module>solomon-mybatis</module>
     <module>solomon-data</module>
+    <module>solomon-gateway-sentinel</module>
   </modules>
 
   <properties>
