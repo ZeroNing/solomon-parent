@@ -32,12 +32,30 @@ public class NacosSentinelWritableUtils {
   private String password;
   
   private String namespace;
+
+  private ConfigService configService;
+
+  private ConfigService getConfigService() throws NacosException {
+    Properties properties = new Properties();
+    properties.setProperty(PropertyKeyConst.SERVER_ADDR,url);
+    if(ValidateUtils.isNotEmpty(userName)){
+      properties.setProperty(PropertyKeyConst.USERNAME,userName);
+    }
+    if(ValidateUtils.isNotEmpty(password)){
+      properties.setProperty(PropertyKeyConst.PASSWORD,password);
+    }
+    if(ValidateUtils.isNotEmpty(namespace)){
+      properties.setProperty(PropertyKeyConst.NAMESPACE,namespace);
+    }
+    return ConfigFactory.createConfigService(properties);
+  }
   
-  public NacosSentinelWritableUtils(String url,String userName,String password,String namespace){
+  public NacosSentinelWritableUtils(String url,String userName,String password,String namespace) throws NacosException {
     this.url = url;
     this.userName = userName;
     this.password = password;
     this.namespace = namespace;
+    this.configService = getConfigService();
   }
 
   /**
@@ -51,7 +69,6 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelFlowRule(String dataId,String groupId,List<FlowRule> obj, ConfigType type) throws Exception {
 
-    ConfigService configService = getConfigService();
     configService.publishConfig(dataId,groupId, JackJsonUtils.formatJsonByFilter(obj),type.getType());
 
     SentinelProperty<List<FlowRule>> sentinelProperty = getSentinelFlowRuleDataSource(groupId,dataId).getProperty();
@@ -69,7 +86,6 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelDegradeRule(String dataId,String groupId,List<DegradeRule> obj, ConfigType type) throws Exception {
 
-    ConfigService configService = getConfigService();
     configService.publishConfig(dataId,groupId, JackJsonUtils.formatJsonByFilter(obj),type.getType());
 
     SentinelProperty<List<DegradeRule>> sentinelProperty = getSentinelDegradeRuleDataSource(groupId,dataId).getProperty();
@@ -87,7 +103,6 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelParamFlowRule(String dataId,String groupId,List<ParamFlowRule> obj, ConfigType type) throws Exception {
 
-    ConfigService configService = getConfigService();
     configService.publishConfig(dataId,groupId, JackJsonUtils.formatJsonByFilter(obj),type.getType());
 
     SentinelProperty<List<ParamFlowRule>> sentinelProperty = getSentinelParamFlowRuleDataSource(groupId,dataId).getProperty();
@@ -105,26 +120,10 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelSystemRule(String dataId,String groupId,List<SystemRule> obj, ConfigType type) throws Exception {
 
-    ConfigService configService = getConfigService();
     configService.publishConfig(dataId,groupId, JackJsonUtils.formatJsonByFilter(obj),type.getType());
 
     SentinelProperty<List<SystemRule>> sentinelProperty = getSentinelSystemRuleDataSource(groupId,dataId).getProperty();
     SystemRuleManager.register2Property(sentinelProperty);
-  }
-
-  private ConfigService getConfigService() throws NacosException {
-    Properties properties = new Properties();
-    properties.setProperty(PropertyKeyConst.SERVER_ADDR,url);
-    if(ValidateUtils.isNotEmpty(userName)){
-      properties.setProperty(PropertyKeyConst.USERNAME,userName);
-    }
-    if(ValidateUtils.isNotEmpty(password)){
-      properties.setProperty(PropertyKeyConst.PASSWORD,password);
-    }
-    if(ValidateUtils.isNotEmpty(namespace)){
-      properties.setProperty(PropertyKeyConst.NAMESPACE,namespace);
-    }
-    return ConfigFactory.createConfigService(properties);
   }
 
   /**
