@@ -10,6 +10,7 @@ import com.steven.solomon.pojo.RabbitMqModel;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.IOException;
 import org.slf4j.Logger;
+import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -32,6 +33,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
     MessageProperties messageProperties = message.getMessageProperties();
     long              deliveryTag       = messageProperties.getDeliveryTag();
     String correlationId     = messageProperties.getHeader("spring_returned_message_correlation");
+    boolean isAutoAck = getIsAutoAck();
     try {
       // 消费者内容
       String json= new String(message.getBody(), StandardCharsets.UTF_8);
@@ -39,8 +41,10 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
       RabbitMqModel rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
       // 消费者消费消息
       this.handleMessage((T) rabbitMqModel.getBody());
-      // 手动确认消息
-      channel.basicAck(deliveryTag, false);
+      if(!isAutoAck){
+        // 手动确认消息
+        channel.basicAck(deliveryTag, false);
+      }
     } catch (Exception e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
       logger.info("AbstractConsumer:消费报错 异常为:{}", e.getMessage());
@@ -83,6 +87,16 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
   public int getRetryNumber() {
     RabbitMqRetry rabbitMqRetry = getClass().getAnnotation(RabbitMqRetry.class);
     return ValidateUtils.isEmpty(rabbitMqRetry) ? retryNumber : rabbitMqRetry.retryNumber();
+  }
+
+  /**
+   * 获取重试次数，默认为2
+   *
+   * @return
+   */
+  public boolean getIsAutoAck() {
+    RabbitMq rabbitMq = getClass().getAnnotation(RabbitMq.class);
+    return ValidateUtils.equalsIgnoreCase(AcknowledgeMode.MANUAL.toString(),rabbitMq.mode().toString()) ? false : true;
   }
 
   /**
