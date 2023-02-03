@@ -9,7 +9,16 @@ import java.util.Map;
 
 public class ClassUtils {
 
-  public static <T extends Annotation> void updateClassField(Class clazz,String fieldName,String value,String annotationName,Class<T> annotationClazz) throws Exception {
+  /**
+   * 更新Class内注解的值
+   * @param clazz class
+   * @param fieldName 字段名
+   * @param annotationClazz 注解类Class
+   * @param annotationNameAndValueMap 注解内值参数名以及对应修改的值
+   * @param <T>
+   * @throws Exception
+   */
+  public static <T extends Annotation> void updateClassField(Class clazz,String fieldName,Class<T> annotationClazz, Map<String,Object> annotationNameAndValueMap) throws Exception {
     Field field = clazz.getDeclaredField(fieldName);
     field.setAccessible(true);
     T excelProperty =  field.getAnnotation(annotationClazz);
@@ -22,6 +31,8 @@ public class ClassUtils {
     memberValues.setAccessible(true);
 
     Map<String, Object> values = (Map<String, Object>) memberValues.get(invocatiOnHandler);
-    values.put(annotationName,new String[]{value});
+    for(Map.Entry<String, Object> entry: annotationNameAndValueMap.entrySet()){
+      values.put(entry.getKey(),entry.getValue());
+    }
   }
 }
