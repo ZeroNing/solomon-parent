@@ -35,6 +35,7 @@ public class I18nConfig {
   public MessageSource init() {
     List<String> allLocale = Arrays.asList(ALL_LOCALE.split(","));
     List<String> allPath = Arrays.asList(PATH.split(","));
+    allPath.add("classpath*:i18n/messages");
     List<String> beanNames = new ArrayList<>();
     for(String path : allPath){
       ResourceBundle resourceBundle = initResources(allLocale,0,null,path);
