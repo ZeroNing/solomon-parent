@@ -34,6 +34,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.ServletOutputStream;
@@ -78,7 +79,9 @@ public class ExcelUtils {
 					if(ValidateUtils.isEmpty(i18nName)){
 						continue;
 					}
-					ClassUtils.updateClassField(clazz,filedName,i18nName,"value",ExcelProperty.class);
+					Map<String,Object> annotationNameAndValueMap = new HashMap<>();
+					annotationNameAndValueMap.put("value",i18nName);
+					ClassUtils.updateClassField(clazz,filedName,ExcelProperty.class,annotationNameAndValueMap);
 				}
 			}
 
