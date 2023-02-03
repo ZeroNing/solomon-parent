@@ -28,14 +28,20 @@ public class I18nConfig {
   @Value("${i18n.path}")
   private String PATH;
 
+  @Value("${i18n.is-scan-class:true}")
+  private boolean IS_SCAN_CLASS;
+
   /**
    * 初始化I18N国际化文件
    */
   @Bean("messageSource")
   public MessageSource init() {
     List<String> allLocale = Arrays.asList(ALL_LOCALE.split(","));
-    List<String> allPath = Arrays.asList(PATH.split(","));
-    allPath.add("classpath*:i18n/messages");
+    List<String> allPath = new ArrayList<>();
+    allPath.addAll(Arrays.asList(PATH.split(",")));
+    if(IS_SCAN_CLASS){
+      allPath.add("classpath*:i18n/messages");
+    }
     List<String> beanNames = new ArrayList<>();
     for(String path : allPath){
       ResourceBundle resourceBundle = initResources(allLocale,0,null,path);
