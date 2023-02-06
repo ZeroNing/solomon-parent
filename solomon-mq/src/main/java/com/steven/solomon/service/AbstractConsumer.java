@@ -47,7 +47,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
       }
     } catch (Exception e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
-      logger.info("AbstractConsumer:消费报错 异常为:{}", e.getMessage());
+      logger.info("AbstractConsumer:消费报错 异常为:", e);
       //将消费失败的记录保存到数据库或者不处理也可以
       this.saveFailMessage(message, e);
       //保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
@@ -90,7 +90,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
   }
 
   /**
-   * 获取重试次数，默认为2
+   * 获取是否是自动确认
    *
    * @return
    */
