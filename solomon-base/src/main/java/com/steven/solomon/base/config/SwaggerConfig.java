@@ -15,13 +15,13 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 @EnableSwagger2WebMvc
 public class SwaggerConfig {
 
-  @Value("${knife4j.package}")
+  @Value("${knife4j.package:}")
   private String packageName;
 
-  @Value("${knife4j.title}")
+  @Value("${knife4j.title:swagger文档}")
   private String title;
 
-  @Value("${knife4j.open}")
+  @Value("${knife4j.open:false}")
   private boolean open;
 
   @Bean

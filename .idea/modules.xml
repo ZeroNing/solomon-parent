@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/solomon-data/solomon-data.iml" filepath="$PROJECT_DIR$/solomon-data/solomon-data.iml" />
       <module fileurl="file://$PROJECT_DIR$/solomon-exception/solomon-exception.iml" filepath="$PROJECT_DIR$/solomon-exception/solomon-exception.iml" />
       <module fileurl="file://$PROJECT_DIR$/solomon-file/solomon-file.iml" filepath="$PROJECT_DIR$/solomon-file/solomon-file.iml" />
+      <module fileurl="file://$PROJECT_DIR$/solomon-gateway-sentinel/solomon-gateway-sentinel.iml" filepath="$PROJECT_DIR$/solomon-gateway-sentinel/solomon-gateway-sentinel.iml" />
       <module fileurl="file://$PROJECT_DIR$/solomon-i18n/solomon-i18n.iml" filepath="$PROJECT_DIR$/solomon-i18n/solomon-i18n.iml" />
       <module fileurl="file://$PROJECT_DIR$/solomon-mongodb/solomon-mongodb.iml" filepath="$PROJECT_DIR$/solomon-mongodb/solomon-mongodb.iml" />
       <module fileurl="file://$PROJECT_DIR$/solomon-mq/solomon-mq.iml" filepath="$PROJECT_DIR$/solomon-mq/solomon-mq.iml" />

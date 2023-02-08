@@ -26,7 +26,7 @@ public class SentinelGatewayBlockExceptionHandler implements WebExceptionHandler
   private List<ViewResolver>         viewResolvers;
   private List<HttpMessageWriter<?>> messageWriters;
 
-  @Value("${spring.application.id}")
+  @Value("${spring.application.id:default}")
   private String serverId;
 
   public SentinelGatewayBlockExceptionHandler(List<ViewResolver> viewResolvers, ServerCodecConfigurer serverCodecConfigurer) {

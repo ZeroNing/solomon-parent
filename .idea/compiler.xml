@@ -8,16 +8,17 @@
         <outputRelativeToContentRoot value="true" />
         <module name="solomon-constant" />
         <module name="solomon-base" />
-        <module name="solomon-file" />
+        <module name="solomon-mongodb" />
         <module name="solomon-mq" />
-        <module name="solomon-i18n" />
+        <module name="solomon-gateway-sentinel" />
+        <module name="solomon-cache" />
         <module name="solomon-utils" />
         <module name="solomon-exception" />
-        <module name="solomon-cache" />
-        <module name="solomon-data" />
         <module name="solomon-mybatis" />
+        <module name="solomon-i18n" />
+        <module name="solomon-data" />
         <module name="solomon-common" />
-        <module name="solomon-mongodb" />
+        <module name="solomon-file" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -28,6 +29,7 @@
       <module name="solomon-data" target="1.8" />
       <module name="solomon-exception" target="1.8" />
       <module name="solomon-file" target="1.8" />
+      <module name="solomon-gateway-sentinel" target="1.8" />
       <module name="solomon-i18n" target="1.8" />
       <module name="solomon-mongodb" target="1.8" />
       <module name="solomon-mq" target="1.8" />
@@ -45,6 +47,7 @@
       <module name="solomon-data" options="-parameters" />
       <module name="solomon-exception" options="-parameters" />
       <module name="solomon-file" options="-parameters" />
+      <module name="solomon-gateway-sentinel" options="-parameters" />
       <module name="solomon-i18n" options="-parameters" />
       <module name="solomon-mongodb" options="-parameters" />
       <module name="solomon-mq" options="-parameters" />

@@ -1,6 +1,8 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.condition.RedisCondition;
 import com.steven.solomon.enums.CacheModeEnum;
+import com.steven.solomon.enums.CacheTypeEnum;
 import com.steven.solomon.init.RedisInitUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
@@ -16,14 +18,18 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
@@ -35,18 +41,21 @@ public class RedisConfig extends CachingConfigurerSupport {
   private Logger logger = LoggerUtils.logger(getClass());
 
   @Resource
-  private RedisProperties redisProperties;
-
-  @Resource
   private CacheProfile cacheProfile;
+
+  @Value("${cache.type}")
+  private String cacheType;
   
   @PostConstruct
   public void afterPropertiesSet() {
+    if(!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),cacheType)){
+      return;
+    }
     List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
     List<RedisClientPropertiesService> abstractRedisClientPropertiesServices = new ArrayList<>(SpringUtil.getBeansOfType(RedisClientPropertiesService.class).values());
 
     if((ValidateUtils.isNotEmpty(cacheProfile) && CacheModeEnum.NORMAL.toString().equalsIgnoreCase(cacheProfile.getMode())) || (CacheModeEnum.TENANT_PREFIX.toString().equalsIgnoreCase(cacheProfile.getMode()))){
-      RedisInitUtils.init(new TenantRedisProperties(redisProperties));
+      RedisInitUtils.init(new TenantRedisProperties(cacheProfile.getRedisProfile()));
     }
 
     abstractRedisClientPropertiesServices.forEach(service -> {
@@ -56,6 +65,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   }
 
   @Bean(name = "redisTemplate")
+  @Conditional(value = RedisCondition.class)
   public DynamicRedisTemplate dynamicMongoTemplate() {
     logger.info("初始化redis start");
     DynamicRedisTemplate<String, Object> redisTemplate = new DynamicRedisTemplate<String, Object>();
@@ -79,11 +89,14 @@ public class RedisConfig extends CachingConfigurerSupport {
   }
 
   @Bean(name = "redisFactory")
+  @Conditional(value = RedisCondition.class)
   public RedisConnectionFactory redisFactory() {
     return RedisTenantContext.getFactoryMap().values().iterator().next();
   }
 
   @Bean
+  @Override
+  @Conditional(value = RedisCondition.class)
   public CacheManager cacheManager(){
     RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
     SpringRedisAutoManager springRedisAutoManager = new SpringRedisAutoManager(DynamicDefaultRedisCacheWriter.nonLockingRedisCacheWriter(

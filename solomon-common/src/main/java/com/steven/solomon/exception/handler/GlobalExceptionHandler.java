@@ -23,7 +23,7 @@ public class GlobalExceptionHandler {
 
   private Logger logger = LoggerUtils.logger(getClass());
 
-  @Value("${spring.application.id}")
+  @Value("${spring.application.id:default}")
   private String serverId;
 
   /**

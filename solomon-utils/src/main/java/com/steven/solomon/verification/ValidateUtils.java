@@ -239,6 +239,11 @@ public class ValidateUtils extends EmptyUtils {
     return matcher.matches();
   }
 
+  public static void main(String[] args) {
+    String a = "cust_filed_01";
+    System.out.println(camelName(a));
+  }
+
   public static String camelName(String name) {
     StringBuilder result = new StringBuilder();
     // 快速检查

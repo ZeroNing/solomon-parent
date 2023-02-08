@@ -35,7 +35,7 @@ public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandle
   private final ObjectProvider<ViewResolver> viewResolvers;
   private final ServerCodecConfigurer        serverCodecConfigurer;
 
-  @Value("${spring.application.id}")
+  @Value("${spring.application.id:default}")
   private String serverId;
 
   public GlobalExceptionConfiguration(ErrorAttributes errorAttributes, WebProperties.Resources resources,

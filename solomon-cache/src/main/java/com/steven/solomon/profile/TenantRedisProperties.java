@@ -1,5 +1,6 @@
 package com.steven.solomon.profile;
 
+import com.steven.solomon.profile.CacheProfile.RedisProfile;
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 
@@ -19,7 +20,7 @@ public class TenantRedisProperties extends RedisProperties {
     super();
   }
 
-  public TenantRedisProperties(RedisProperties properties){
+  public TenantRedisProperties(RedisProfile properties){
     super();
     BeanUtils.copyProperties(properties, this);
     this.tenantCode = "default";

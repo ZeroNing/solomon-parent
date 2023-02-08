@@ -14,6 +14,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: net.sf.ehcache:ehcache:2.10.6" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
     <orderEntry type="module" module-name="solomon-data" />
     <orderEntry type="module" module-name="solomon-constant" />
     <orderEntry type="module" module-name="solomon-utils" />
@@ -38,7 +40,6 @@
     <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.13" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.4" level="project" />
-    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.30" level="project" />
     <orderEntry type="library" name="Maven: cn.hutool:hutool-crypto:5.7.18" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.4" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.4" level="project" />
