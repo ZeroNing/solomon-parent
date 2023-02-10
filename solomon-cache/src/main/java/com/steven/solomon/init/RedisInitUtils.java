@@ -17,14 +17,14 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 
 public class RedisInitUtils {
 
-  public static void init(TenantRedisProperties properties) {
+  public static void init(TenantRedisProperties properties,RedisTenantContext context) {
     RedisConnectionFactory factory = initConnectionFactory(properties);
-    RedisTenantContext.setFactory(properties.getTenantCode(), factory);
+    context.setFactory(properties.getTenantCode(), factory);
   }
 
-  public static void init(List<TenantRedisProperties> propertiesList) {
+  public static void init(List<TenantRedisProperties> propertiesList,RedisTenantContext context) {
     propertiesList.forEach(properties -> {
-      init(properties);
+      init(properties,context);
     });
   }
 

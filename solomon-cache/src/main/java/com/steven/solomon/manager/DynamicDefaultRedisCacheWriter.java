@@ -1,5 +1,6 @@
 package com.steven.solomon.manager;
 import com.steven.solomon.config.RedisTenantContext;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -67,7 +68,7 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
   }
 
   public RedisConnectionFactory getRedisConnectionFactory(){
-    RedisConnectionFactory connectionFactory = RedisTenantContext.getFactory();
+    RedisConnectionFactory connectionFactory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
     return ValidateUtils.isEmpty(connectionFactory) ? this.connectionFactory : connectionFactory;
   }
 

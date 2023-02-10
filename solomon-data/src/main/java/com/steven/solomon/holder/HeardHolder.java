@@ -2,16 +2,12 @@ package com.steven.solomon.holder;
 
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.Serializable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 public class HeardHolder {
 
   private static final ThreadLocal<TenantHeard> tenantHeardThreadLocal = ThreadLocal.withInitial(() -> {
     TenantHeard header = new TenantHeard();
-    return header;
-  });
-
-  private static final ThreadLocal<RequestHeader> requestHeadThreadLocal = ThreadLocal.withInitial(() -> {
-    RequestHeader header = new RequestHeader();
     return header;
   });
 
@@ -43,88 +39,6 @@ public class HeardHolder {
   public static void setTenantName(String tenantName){
     TenantHeard tenantHeard = tenantHeardThreadLocal.get();
     tenantHeard.setTenantName(tenantName);
-  }
-
-  public static String getUserId(){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    return ValidateUtils.getOrDefault(requestHeader.getUserId(),"");
-  }
-
-  public static String getUserCode(){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    return ValidateUtils.getOrDefault(requestHeader.getUserCode(),"");
-  }
-
-  public static String getUserName(){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    return ValidateUtils.getOrDefault(requestHeader.getUserName(),"");
-  }
-
-  public static String getToken(){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    return ValidateUtils.getOrDefault(requestHeader.getToken(),"");
-  }
-
-  public static void setUserId(String userId){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    requestHeader.setUserId(userId);
-  }
-
-  public static void setUserCode(String userCode){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    requestHeader.setUserCode(userCode);
-  }
-
-  public static void setUserName(String userName){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    requestHeader.setUserName(userName);
-  }
-
-  public static void setToken(String token){
-    RequestHeader requestHeader = requestHeadThreadLocal.get();
-    requestHeader.setToken(token);
-  }
-
-  public static class RequestHeader implements Serializable {
-    private String userId;
-
-    private String userCode;
-
-    private String userName;
-
-    private String token;
-
-    public String getUserId() {
-      return userId;
-    }
-
-    public void setUserId(String userId) {
-      this.userId = userId;
-    }
-
-    public String getUserCode() {
-      return userCode;
-    }
-
-    public void setUserCode(String userCode) {
-      this.userCode = userCode;
-    }
-
-    public String getUserName() {
-      return userName;
-    }
-
-    public void setUserName(String userName) {
-      this.userName = userName;
-    }
-
-    public String getToken() {
-      return token;
-    }
-
-    public void setToken(String token) {
-      this.token = token;
-    }
   }
 
   public static class TenantHeard implements Serializable {

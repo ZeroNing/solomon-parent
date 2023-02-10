@@ -1,51 +1,100 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.context.TenantContext;
 import com.steven.solomon.profile.TenantRedisProperties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.stereotype.Component;
 
-public class RedisTenantContext {
+@Component
+public class RedisTenantContext extends TenantContext<RedisConnectionFactory, TenantRedisProperties> {
 
-  private static final ThreadLocal<RedisConnectionFactory> REDIS_FACTORY_THREAD_LOCAL = new ThreadLocal<>();
+  private ThreadLocal<RedisConnectionFactory> REDIS_FACTORY_THREAD_LOCAL = new ThreadLocal<>();
 
-  private static final Map<String, RedisConnectionFactory> REDIS_FACTORY_MAP = new ConcurrentHashMap<>();
+  private Map<String, RedisConnectionFactory> REDIS_FACTORY_MAP = new ConcurrentHashMap<>();
 
-  private static List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
+  private List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
 
-  public static RedisConnectionFactory getFactory() {
-    return RedisTenantContext.REDIS_FACTORY_THREAD_LOCAL.get();
+  @Override
+  public RedisConnectionFactory getFactory() {
+    return REDIS_FACTORY_THREAD_LOCAL.get();
   }
 
-  public static void removeFactory() {
-    RedisTenantContext.REDIS_FACTORY_THREAD_LOCAL.remove();
+  @Override
+  public void setFactory(String key) {
+    REDIS_FACTORY_THREAD_LOCAL.set(REDIS_FACTORY_MAP.get(key));
   }
 
-  public static void setFactory(String name) {
-    RedisTenantContext.REDIS_FACTORY_THREAD_LOCAL.set(REDIS_FACTORY_MAP.get(name));
+  @Override
+  public void removeFactory() {
+    REDIS_FACTORY_THREAD_LOCAL.remove();
   }
 
-  public static void setProperties(TenantRedisProperties properties) {
-    RedisTenantContext.redisPropertiesList.add(properties);
+  @Override
+  public Map<String, RedisConnectionFactory> getFactoryMap() {
+    return REDIS_FACTORY_MAP;
   }
 
-  public static List<TenantRedisProperties> getProperties() {
-    return RedisTenantContext.redisPropertiesList;
+  @Override
+  public void setFactory(Map<String, RedisConnectionFactory> factoryMap) {
+    REDIS_FACTORY_MAP.putAll(factoryMap);
   }
 
-  
-  public static Map<String, RedisConnectionFactory> getFactoryMap() {
-    return RedisTenantContext.REDIS_FACTORY_MAP;
+  @Override
+  public void setFactory(String key, RedisConnectionFactory factory) {
+    REDIS_FACTORY_MAP.put(key,factory);
   }
 
-  
-  public static void setFactoryMap(Map<String, RedisConnectionFactory> redisFactoryMap) {
-    RedisTenantContext.REDIS_FACTORY_MAP.putAll(redisFactoryMap);
+  @Override
+  public Map<String, TenantRedisProperties> getPropertiesMap() {
+    return null;
   }
 
-  public static void setFactory(String tenantCode, RedisConnectionFactory factory) {
-    RedisTenantContext.REDIS_FACTORY_MAP.put(tenantCode,factory);
+  @Override
+  public void setProperties(String key, TenantRedisProperties properties) {
+
   }
+
+  @Override
+  public void setProperties(Map<String, TenantRedisProperties> propertiesMap) {
+
+  }
+
+//  public static RedisConnectionFactory getFactory() {
+//    return REDIS_FACTORY_THREAD_LOCAL.get();
+//  }
+//
+//  public static void removeFactory() {
+//    REDIS_FACTORY_THREAD_LOCAL.remove();
+//  }
+//
+//  public static void setFactory(String name) {
+//    REDIS_FACTORY_THREAD_LOCAL.set(REDIS_FACTORY_MAP.get(name));
+//  }
+//
+//  public static void setProperties(TenantRedisProperties properties) {
+//    redisPropertiesList.add(properties);
+//  }
+//
+//  public static List<TenantRedisProperties> getProperties() {
+//    return redisPropertiesList;
+//  }
+//
+//
+//  public static Map<String, RedisConnectionFactory> getFactoryMap() {
+//    return REDIS_FACTORY_MAP;
+//  }
+//
+//
+//  public static void setFactoryMap(Map<String, RedisConnectionFactory> redisFactoryMap) {
+//    REDIS_FACTORY_MAP.putAll(redisFactoryMap);
+//  }
+//
+//  public static void setFactory(String tenantCode, RedisConnectionFactory factory) {
+//    REDIS_FACTORY_MAP.put(tenantCode,factory);
+//  }
 }
