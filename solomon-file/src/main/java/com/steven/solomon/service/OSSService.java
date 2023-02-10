@@ -19,59 +19,50 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.springframework.web.multipart.MultipartFile;
 
-public class OSSService implements FileServiceInterface{
+public class OSSService implements FileServiceInterface {
 
   private final OSSProperties properties;
+
+  private final OSS oss;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public OSSService(OSSProperties properties) {this.properties = properties;}
+  public OSSService(OSSProperties properties) {
+    this.properties = properties;
+    this.oss        = client();
+  }
 
-  public OSS client(){
+  public OSS client() {
     return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey());
   }
 
   @Override
   public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
-    OSS oss = client();
-    try {
-      //创建桶
-      makeBucket(bucketName);
+    //创建桶
+    makeBucket(bucketName);
 
-      String name = fileNamingRulesGenerationService.getFileName(file);
+    String name = fileNamingRulesGenerationService.getFileName(file);
 
-      String       filePath = getFilePath(name,properties);
-      oss.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
-      oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
-      return new FileUpload(bucketName,filePath,file.getInputStream());
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    String filePath = getFilePath(name, properties);
+    oss.putObject(new PutObjectRequest(bucketName, filePath, file.getInputStream()));
+    oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
+    return new FileUpload(bucketName, filePath, file.getInputStream());
   }
 
   @Override
   public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
-    OSS oss = client();
-    try {
-      //创建桶
-      makeBucket(bucketName);
+    //创建桶
+    makeBucket(bucketName);
 
-      String       filePath = getFilePath(fileName,properties);
+    String filePath = getFilePath(fileName, properties);
 
-      ByteArrayOutputStream bs    = new ByteArrayOutputStream();
-      ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
-      ImageIO.write(bi, "jpg", imOut);
-      oss.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray())));
-      oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
-      return new FileUpload(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()));
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    ByteArrayOutputStream bs    = new ByteArrayOutputStream();
+    ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
+    ImageIO.write(bi, "jpg", imOut);
+    oss.putObject(new PutObjectRequest(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray())));
+    oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
+    return new FileUpload(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray()));
   }
 
   @Override
@@ -80,70 +71,35 @@ public class OSSService implements FileServiceInterface{
     if (!flag) {
       return;
     }
-    OSS oss = client();
-    try {
-      String filePath = getFilePath(fileName,properties);
-      oss.deleteObject(bucketName,filePath);
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    String filePath = getFilePath(fileName, properties);
+    oss.deleteObject(bucketName, filePath);
   }
 
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    OSS oss = client();
-    try {
-      String filePath = getFilePath(fileName,properties);
-
-      return oss.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    String filePath = getFilePath(fileName, properties);
+    return oss.generatePresignedUrl(bucketName, filePath, new Date(System.currentTimeMillis() + unit.toMillis(expiry)))
+        .toString();
   }
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    OSS oss = client();
-    try {
-      String filePath = getFilePath(fileName,properties);
-      return oss.getObject(bucketName,filePath).getObjectContent();
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    String filePath = getFilePath(fileName, properties);
+    return oss.getObject(bucketName, filePath).getObjectContent();
   }
 
   @Override
   public boolean bucketExists(String bucketName) throws Exception {
-    OSS oss = client();
-    try {
-      return oss.doesBucketExist(bucketName);
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
-    }
+    return oss.doesBucketExist(bucketName);
   }
 
   @Override
   public void makeBucket(String bucketName) throws Exception {
-    OSS oss = client();
-    try {
-      boolean flag = bucketExists(bucketName);
-      if(flag){
-        return;
-      }
-      oss.createBucket(bucketName);
-    } finally {
-      if(ValidateUtils.isNotEmpty(oss)){
-        oss.shutdown();
-      }
+    boolean flag = bucketExists(bucketName);
+    if (flag) {
+      return;
     }
+    oss.createBucket(bucketName);
   }
 
 
