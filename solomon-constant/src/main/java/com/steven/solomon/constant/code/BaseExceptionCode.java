@@ -3,6 +3,13 @@ package com.steven.solomon.constant.code;
 public interface BaseExceptionCode {
 
   /**
+   * 切换数据源失败
+   */
+  String FAILED_TO_SWITCH_DATA_SOURCE = "FAILED_TO_SWITCH_DATA_SOURCE";
+
+
+
+  /**
    * 请求方式错误
    */
   String REQUEST_METHOD_ERROR = "S9991";
