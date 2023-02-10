@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.context.TenantContext;
 import com.steven.solomon.properties.TenantMongoProperties;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,54 +8,101 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.stereotype.Component;
 
-public class MongoTenantsContext {
+@Component
+public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabaseFactory,TenantMongoProperties> {
 
-  private static final ThreadLocal<SimpleMongoClientDatabaseFactory> MONGO_DB_FACTORY_THREAD_LOCAL = new ThreadLocal<>();
+  private  ThreadLocal<SimpleMongoClientDatabaseFactory> MONGO_DB_FACTORY_THREAD_LOCAL = new ThreadLocal<>();
 
-  private static final Map<String,SimpleMongoClientDatabaseFactory> MONGO_FACTORY_MAP = new ConcurrentHashMap<>();
+  private  Map<String,SimpleMongoClientDatabaseFactory> MONGO_FACTORY_MAP = new ConcurrentHashMap<>();
 
-  private static List<TenantMongoProperties> mongoClientList = new ArrayList<>();
+  private Map<String,TenantMongoProperties> mongoClientMap = new ConcurrentHashMap<>();
 
-  private static Map<String,Class<?>> CAPPED_COLLECTION_NAME_MAP = new HashMap<>();
+  private Map<String,Class<?>> CAPPED_COLLECTION_NAME_MAP = new HashMap<>();
 
-  public static void setCappedCollectionNameMap(Map<String,Class<?>> cappedCollectionNameMap){
-    MongoTenantsContext.CAPPED_COLLECTION_NAME_MAP.putAll(cappedCollectionNameMap);
+  public void setCappedCollectionNameMap(Map<String,Class<?>> cappedCollectionNameMap){
+    CAPPED_COLLECTION_NAME_MAP.putAll(cappedCollectionNameMap);
   }
 
-  public static Map<String,Class<?>> getCappedCollectionNameMap(){
-    return MongoTenantsContext.CAPPED_COLLECTION_NAME_MAP;
+  public Map<String,Class<?>> getCappedCollectionNameMap(){
+    return CAPPED_COLLECTION_NAME_MAP;
   }
 
-  public static  SimpleMongoClientDatabaseFactory getFactory() {
+  @Override
+  public SimpleMongoClientDatabaseFactory getFactory() {
     return MONGO_DB_FACTORY_THREAD_LOCAL.get();
   }
 
-  public static  void removeFactory() {
+  @Override
+  public void setFactory(String key) {
+    MONGO_DB_FACTORY_THREAD_LOCAL.set(MONGO_FACTORY_MAP.get(key));
+  }
+
+  @Override
+  public void removeFactory() {
     MONGO_DB_FACTORY_THREAD_LOCAL.remove();
   }
 
-  public static  void setFactory(String name) {
-    MONGO_DB_FACTORY_THREAD_LOCAL.set(MONGO_FACTORY_MAP.get(name));
+  @Override
+  public Map<String, SimpleMongoClientDatabaseFactory> getFactoryMap() {
+    return MONGO_FACTORY_MAP;
   }
 
-  
-  public static  void setProperties(TenantMongoProperties properties) {
-    MongoTenantsContext.mongoClientList.add(properties);
+  @Override
+  public void setFactory(Map<String, SimpleMongoClientDatabaseFactory> factoryMap) {
+    MONGO_FACTORY_MAP.putAll(factoryMap);
   }
 
-  public static  List<TenantMongoProperties> getProperties() {
-    return MongoTenantsContext.mongoClientList;
+  @Override
+  public void setFactory(String key, SimpleMongoClientDatabaseFactory factory) {
+    MONGO_FACTORY_MAP.put(key,factory);
   }
 
-  public static  Map<String, SimpleMongoClientDatabaseFactory> getFactoryMap() {
-    return MongoTenantsContext.MONGO_FACTORY_MAP;
+  @Override
+  public Map<String, TenantMongoProperties> getPropertiesMap() {
+    return mongoClientMap;
   }
 
-  public static  void setFactoryMap(Map<String, SimpleMongoClientDatabaseFactory> factoryMap) {
-    MongoTenantsContext.MONGO_FACTORY_MAP.putAll(factoryMap);
+  @Override
+  public void setProperties(String key, TenantMongoProperties properties) {
+    mongoClientMap.put(key, properties);
   }
-  public static  void setFactoryMap(String tenantCode, SimpleMongoClientDatabaseFactory factoryMap) {
-    MongoTenantsContext.MONGO_FACTORY_MAP.put(tenantCode,factoryMap);
+
+  @Override
+  public void setProperties(Map<String, TenantMongoProperties> propertiesMap) {
+    mongoClientMap.putAll(propertiesMap);
   }
+
+//  public static  SimpleMongoClientDatabaseFactory getFactory() {
+//    return MONGO_DB_FACTORY_THREAD_LOCAL.get();
+//  }
+//
+//  public static  void removeFactory() {
+//    MONGO_DB_FACTORY_THREAD_LOCAL.remove();
+//  }
+//
+//  public static  void setFactory(String name) {
+//    MONGO_DB_FACTORY_THREAD_LOCAL.set(MONGO_FACTORY_MAP.get(name));
+//  }
+//
+//  
+//  public static  void setProperties(TenantMongoProperties properties) {
+//    MongoTenantsContext.mongoClientList.add(properties);
+//  }
+//
+//  public static  List<TenantMongoProperties> getProperties() {
+//    return MongoTenantsContext.mongoClientList;
+//  }
+//
+//  public static  Map<String, SimpleMongoClientDatabaseFactory> getFactoryMap() {
+//    return MongoTenantsContext.MONGO_FACTORY_MAP;
+//  }
+//
+//  public static  void setFactoryMap(Map<String, SimpleMongoClientDatabaseFactory> factoryMap) {
+//    MongoTenantsContext.MONGO_FACTORY_MAP.putAll(factoryMap);
+//  }
+//  public static  void setFactoryMap(String tenantCode, SimpleMongoClientDatabaseFactory factoryMap) {
+//    MongoTenantsContext.MONGO_FACTORY_MAP.put(tenantCode,factoryMap);
+//  }
 }

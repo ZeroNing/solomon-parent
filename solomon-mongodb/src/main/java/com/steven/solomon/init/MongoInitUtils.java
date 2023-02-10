@@ -22,20 +22,20 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 public class MongoInitUtils {
 
-  public static void init(List<TenantMongoProperties> propertiesList){
+  public static void init(List<TenantMongoProperties> propertiesList,MongoTenantsContext context){
     propertiesList.forEach(properties ->{
-      init(properties);
+      init(properties,context);
     });
   }
 
-  public static void init(TenantMongoProperties properties){
+  public static void init(TenantMongoProperties properties,MongoTenantsContext context){
     MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
     MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
       builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
           ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
     }).build();
     SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),properties.getTenantCode());
-    MongoTenantsContext.setFactoryMap(properties.getTenantCode(),factory);
+    context.setFactory(properties.getTenantCode(),factory);
 
     List<String>  collectionNameList = new ArrayList<>();
     MongoDatabase mongoDatabase      = factory.getMongoDatabase();
@@ -43,7 +43,7 @@ public class MongoInitUtils {
       collectionNameList.add(name);
     });
 
-    MongoTenantsContext.getCappedCollectionNameMap().forEach((key,value)->{
+    context.getCappedCollectionNameMap().forEach((key,value)->{
       boolean isCreate = collectionNameList.contains(key);
       if(!isCreate){
         MongoDBCapped mongoDBCapped = AnnotationUtils.getAnnotation(value, MongoDBCapped.class);

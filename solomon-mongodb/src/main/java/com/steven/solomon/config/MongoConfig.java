@@ -67,6 +67,9 @@ public class MongoConfig {
     @Resource
     private MongoMappingContext mongoMappingContext;
 
+    @Resource
+    private MongoTenantsContext context;
+
     @PostConstruct
     public void afterPropertiesSet() {
         List<TenantMongoProperties>         mongoPropertiesList                          = new ArrayList<>();
@@ -81,15 +84,15 @@ public class MongoConfig {
             service.setCappedCollectionNameMap();
             mongoPropertiesList.addAll(service.getMongoClient());
         });
-        MongoInitUtils.init(mongoPropertiesList);
+        MongoInitUtils.init(mongoPropertiesList,context);
     }
 
     @Bean(name = "mongoTemplate")
     @Conditional(value = MongoCondition.class)
-    public DynamicMongoTemplate dynamicMongoTemplate(MongoMappingContext context, BeanFactory beanFactory) {
-        SimpleMongoClientDatabaseFactory factory = MongoTenantsContext.getFactoryMap().values().iterator().next();
+    public DynamicMongoTemplate dynamicMongoTemplate(MongoMappingContext mappingContext, BeanFactory beanFactory) {
+        SimpleMongoClientDatabaseFactory factory = context.getFactoryMap().values().iterator().next();
         DbRefResolver         dbRefResolver    = new DefaultDbRefResolver(factory);
-        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, context);
+        MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
         mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
         List<Object>          list      = new ArrayList<>();
         list.add(new LocalDateTimeToDateConverter());
@@ -103,7 +106,7 @@ public class MongoConfig {
     @Bean(name = "mongoDbFactory")
     @Conditional(value = MongoCondition.class)
     public MongoDatabaseFactory mongoDbFactory() {
-        return MongoTenantsContext.getFactoryMap().values().iterator().next();
+        return context.getFactoryMap().values().iterator().next();
     }
 
     public MongoTypeMapper defaultMongoTypeMapper() {
