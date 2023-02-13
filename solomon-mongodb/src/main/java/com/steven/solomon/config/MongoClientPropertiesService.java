@@ -7,5 +7,8 @@ public interface MongoClientPropertiesService {
 
   List<TenantMongoProperties> getMongoClient();
 
+  /**
+   * 设置Map Key:集合名,Value:集合对应的Class
+   */
   void setCappedCollectionNameMap();
 }
