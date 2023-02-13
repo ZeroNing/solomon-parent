@@ -41,8 +41,8 @@ public class MongoAspect {
     boolean isSwitch = ValidateUtils.equals(mode, MongoModeEnum.SWITCH_DB.toString());
     try {
       if(isSwitch){
-        logger.info("mongo,租户id为:{}",HeardHolder.getTenantId());
-        String tenantId = HeardHolder.getTenantId();
+        logger.info("mongo切换数据源,租户编码为:{}",HeardHolder.getTenantCode());
+        String tenantId = HeardHolder.getTenantCode();
         if(ValidateUtils.isNotEmpty(tenantId)){
           context.setFactory(tenantId);
           Object result = point.proceed();

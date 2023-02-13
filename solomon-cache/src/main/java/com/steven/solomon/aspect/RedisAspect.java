@@ -43,8 +43,8 @@ public class RedisAspect {
     boolean isSwitch = ValidateUtils.equals(mode, CacheModeEnum.SWITCH_DB.toString());
     try {
       if(isSwitch){
-        logger.info("redis切换数据源,租户id为:{}",HeardHolder.getTenantId());
-        String tenantId = HeardHolder.getTenantId();
+        logger.info("redis切换数据源,租户编码为:{}",HeardHolder.getTenantCode());
+        String tenantId = HeardHolder.getTenantCode();
         if(ValidateUtils.isNotEmpty(tenantId)){
           context.setFactory(tenantId);
           Object result = point.proceed();

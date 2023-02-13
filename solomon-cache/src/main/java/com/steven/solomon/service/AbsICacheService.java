@@ -19,11 +19,11 @@ public abstract class AbsICacheService implements  ICacheService {
   public String assembleKey(String group, String key) {
     StringBuilder sb = new StringBuilder();
     if(ValidateUtils.isNotEmpty(cacheProfile) && CacheModeEnum.TENANT_PREFIX.toString().equals(cacheProfile.getMode())){
-      String tenantId = HeardHolder.getTenantCode();
-      if(ValidateUtils.isEmpty(tenantId)){
+      String tenantCode = HeardHolder.getTenantCode();
+      if(ValidateUtils.isEmpty(tenantCode)){
         logger.error("当前模式是:{},但是缺乏租户信息,所以不拼接",CacheModeEnum.TENANT_PREFIX.getDesc());
       } else {
-        sb.append(tenantId).append(":");
+        sb.append(tenantCode).append(":");
       }
     }
     if (ValidateUtils.isNotEmpty(group)) {
