@@ -50,7 +50,7 @@ i18n:
   all-locale:         #目前用到的国际化语言
   language:           #设置默认国际化语言
   path:               #国际化文件路径
-   is-scan-class:      #是否扫描solomonJar内国际化文件(默认：true)
+  is-scan-class:      #是否扫描solomonJar内国际化文件(默认：true)
 ```
 
 ### mq配置说明
