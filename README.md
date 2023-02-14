@@ -118,7 +118,7 @@ file:
 
 ## 枚举国际化用例
 
-1.枚举类需要实现 implements BaseEnum 
+1.枚举类需要实现 BaseEnum 
 
 例：
 
