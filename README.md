@@ -168,3 +168,42 @@ ENUM_CODE_NOT_DELETE=未删除
 ENUM_CODE_DELETE=删除
 ```
 
+## Rabbit队列注册以及消费用例
+
+1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
+
+2.加上@RabbitMq注解，并填写队列名以及交换器名
+
+```java
+@RabbitMq(queues = "test1",exchange = "test1")
+public class TestMq extends AbstractConsumer<String> {
+
+  @Override
+  public void handleMessage(String body) throws Exception {
+  }
+
+  @Override
+  public void saveFailMessage(Message message, Exception e) {
+
+  }
+}
+```
+
+3.如果需要重试则加上@RabbitMqRetry注解，配置重试次数
+
+```java
+@RabbitMq(queues = "test1",exchange = "test1")
+@RabbitMqRetry(retryNumber = 5)
+public class TestMq extends AbstractConsumer<String> {
+
+  @Override
+  public void handleMessage(String body) throws Exception {
+  }
+
+  @Override
+  public void saveFailMessage(Message message, Exception e) {
+
+  }
+}
+```
+
