@@ -48,15 +48,15 @@
 ```yaml
 i18n:
   all-locale:         #目前用到的国际化语言
-  language: 		  #设置默认国际化语言
-  path: 			  #国际化文件路径
+  language:           #设置默认国际化语言
+  path:               #国际化文件路径
 ```
 
 ### mq配置说明
 
 ```yaml
 mq:
-  host: 			  #连接地址
+  host:               #连接地址
   port:               #端口 
   user-name:          #用户名
   password:           #密码
@@ -70,7 +70,7 @@ cache:
   mode:              #缓存模式（NORMAL:单库、SWITCH_DB:切换数据源,TENANT_PREFIX:单库模式在key前面增加租户编码）   
   type:              #缓存类型（REDIS）
   redis-profile:     #redis配置
-    host: 			 #连接地址
+    host:            #连接地址
     port:            #端口
     password:        #密码
 ```
@@ -79,40 +79,40 @@ cache:
 
 ```yaml
 file:
-  choice: 			  #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云）
+  choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云）
   file-naming-method: #文件命名选择器(ORIGINAL:原文件名称、DATE:文件名精确到毫秒并且以年月做为文件夹名、UUID:UUID命名、SNOWFLAKE:雪花id命名)
   obs:
     endpoint:        # 连接地址
     accessKey:       # 访问密钥
-    secretKey:		 # 密钥
-    bucket-name: 	 # 桶名 我这是给出了一个默认桶名
+    secretKey:       # 密钥
+    bucket-name:     # 桶名 我这是给出了一个默认桶名
     rootDirectory:   # 根目录
   oss:
     endpoint:        # 连接地址
     accessKey:       # 访问密钥
-    secretKey:		 # 密钥
-    bucket-name: 	 # 桶名 我这是给出了一个默认桶名
+    secretKey:       # 密钥
+    bucket-name:     # 桶名 我这是给出了一个默认桶名
     rootDirectory:   # 根目录
   bos:
     endpoint:        # 连接地址
     accessKey:       # 访问密钥
-    secretKey:		 # 密钥
-    bucket-name: 	 # 桶名 我这是给出了一个默认桶名
+    secretKey:       # 密钥
+    bucket-name:     # 桶名 我这是给出了一个默认桶名
     rootDirectory:   # 根目录
   cos:
-    endpoint:		 # 连接地址
+    endpoint:        # 连接地址
     accessKey:       # 访问密钥
     secretKey:       # 密钥
-    bucket-name:     # 桶名
+    bucket-name:     # 桶名 我这是给出了一个默认桶名
     region-name:     # 地区名
     rootDirectory:   # 根目录
   minio:
     endpoint:        # 连接地址
     accessKey:       # 访问密钥
-    secretKey:		 # 密钥
-    bucket-name: 	 # 桶名 我这是给出了一个默认桶名
-    image-size: 	 # 我在这里设定了 图片文件的最大大小
-    file-size:  	 # 此处是设定了文件的最大大小
+    secretKey:       # 密钥
+    bucket-name:     # 桶名 我这是给出了一个默认桶名
+    image-size:      # 我在这里设定了 图片文件的最大大小
+    file-size:       # 此处是设定了文件的最大大小
     rootDirectory:   # 根目录
 ```
 
