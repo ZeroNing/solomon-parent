@@ -116,3 +116,55 @@ file:
     rootDirectory:   # 根目录
 ```
 
+## 枚举国际化用例
+
+1.枚举类需要实现 implements BaseEnum 
+
+例：
+
+```java
+public enum DelFlagEnum implements BaseEnum {
+  /**
+   * 未删除
+   */
+  NOT_DELETE("0"),
+  /**
+   * 已删除
+   */
+  DELETE("1");
+
+  private final String label;
+
+  DelFlagEnum(String label) {
+    this.label = label;
+  }
+
+  @Override
+  public String label() {
+    return this.label;
+  }
+
+  @Override
+  public String key() {
+    return this.name();
+  }
+```
+
+2.在实体类中需要国际化的字段上加上@JsonEnum注解 
+
+例：
+
+```java
+  @JsonEnum(enumClass = DelFlagEnum.class)
+  private              String        delFlag;
+```
+
+3.添加国际化 "ENUM_CODE"是枚举国际化的前缀必须有，然后拼接的是枚举类中的label名称
+
+例：
+
+```properties
+ENUM_CODE_NOT_DELETE=未删除
+ENUM_CODE_DELETE=删除
+```
+
