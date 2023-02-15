@@ -21,19 +21,6 @@ public interface BaseService<T> extends IService<T> {
     }
 
     /**
-     * 查询（根据 columnMap 条件）
-     *
-     * @param columnMap 表字段 map 对象
-     */
-    @Override
-    default List<T> listByMap(Map<String, Object> columnMap) {
-        if(ValidateUtils.isEmpty(columnMap)){
-            return null;
-        }
-        return getBaseMapper().selectByMap(columnMap);
-    }
-
-    /**
      * 根据 Wrapper 条件，查询总记录数
      *
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
