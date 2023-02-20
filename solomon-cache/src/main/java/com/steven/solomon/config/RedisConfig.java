@@ -57,9 +57,9 @@ public class RedisConfig extends CachingConfigurerSupport {
     List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
     List<RedisClientPropertiesService> abstractRedisClientPropertiesServices = new ArrayList<>(SpringUtil.getBeansOfType(RedisClientPropertiesService.class).values());
 
-    if((ValidateUtils.isNotEmpty(cacheProfile) && CacheModeEnum.NORMAL.toString().equalsIgnoreCase(cacheProfile.getMode())) || (CacheModeEnum.TENANT_PREFIX.toString().equalsIgnoreCase(cacheProfile.getMode()))){
-      RedisInitUtils.init(new TenantRedisProperties(cacheProfile.getRedisProfile()),context);
-    }
+//    if((ValidateUtils.isNotEmpty(cacheProfile) && CacheModeEnum.NORMAL.toString().equalsIgnoreCase(cacheProfile.getMode())) || (CacheModeEnum.TENANT_PREFIX.toString().equalsIgnoreCase(cacheProfile.getMode()))){
+    RedisInitUtils.init(new TenantRedisProperties(cacheProfile.getRedisProfile()),context);
+//    }
 
     abstractRedisClientPropertiesServices.forEach(service -> {
       redisPropertiesList.addAll(service.getRedisClient());

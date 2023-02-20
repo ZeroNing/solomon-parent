@@ -20,12 +20,12 @@ public class I18nConfig {
 
   private Logger logger = LoggerFactory.getLogger(getClass());
 
-  @Value("${i18n.language}")
+  @Value("${i18n.language: zh}")
   public Locale DEFAULT_LOCALE;
-  @Value("${i18n.all-locale}")
+  @Value("${i18n.all-locale: zh}")
   private String ALL_LOCALE;
 
-  @Value("${i18n.path}")
+  @Value("${i18n.path:}")
   private String PATH;
 
   @Value("${i18n.is-scan-class:true}")
@@ -36,9 +36,11 @@ public class I18nConfig {
    */
   @Bean("messageSource")
   public MessageSource init() {
-    List<String> allLocale = Arrays.asList(ALL_LOCALE.split(","));
     List<String> allPath = new ArrayList<>();
-    allPath.addAll(Arrays.asList(PATH.split(",")));
+    List<String> allLocale = Arrays.asList(ALL_LOCALE.split(","));
+    if(!PATH.isEmpty()){
+      allPath.addAll(Arrays.asList(PATH.split(",")));
+    }
     if(IS_SCAN_CLASS){
       allPath.add("classpath*:i18n/messages");
     }
