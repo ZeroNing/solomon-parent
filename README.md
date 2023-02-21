@@ -22,6 +22,7 @@
 | Mysql                | 数据库服务器                             | 8.0+   |
 | Mybatis-plus         | MyBatis 增强工具包                       | 3.5.1  |
 | Easy-Excel           | Excel处理工具                            | 3.0.5  |
+| Swagger              | API接口文档                              | 3.0.0  |
 
 ## 项目描述
 
@@ -50,7 +51,6 @@ i18n:
   all-locale:         #目前用到的国际化语言
   language:           #设置默认国际化语言
   path:               #国际化文件路径
-  is-scan-class:      #是否扫描solomonJar内国际化文件(默认：true)
 ```
 
 ### mq配置说明
@@ -199,6 +199,40 @@ public class TestMq extends AbstractConsumer<String> {
 
   @Override
   public void handleMessage(String body) throws Exception {
+  }
+
+  @Override
+  public void saveFailMessage(Message message, Exception e) {
+
+  }
+}
+```
+
+4.死信队列使用，需要在@RabbitMq注解增加dlxClazz配置
+
+```java
+@RabbitMq(queues = "test1",exchange = "test1",dlxClazz = TestDlxMq.class)
+@RabbitMqRetry(retryNumber = 5)
+public class TestMq extends AbstractConsumer<String> {
+
+  @Override
+  public void handleMessage(String body) throws Exception {
+  }
+
+  @Override
+  public void saveFailMessage(Message message, Exception e) {
+
+  }
+}
+```
+
+```java
+@Component
+public class TestDlxMq extends AbstractConsumer<String> {
+
+  @Override
+  public void handleMessage(String body) throws Exception {
+
   }
 
   @Override
