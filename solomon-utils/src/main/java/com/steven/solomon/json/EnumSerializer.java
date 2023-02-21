@@ -24,14 +24,17 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
 
   private String[] methodNames;
 
+  private String fieldName;
+
   public EnumSerializer() {
     super();
   }
 
-  public EnumSerializer(Class<? extends Enum> enumClass,String prefix,String[] methodNames) {
+  public EnumSerializer(Class<? extends Enum> enumClass,String prefix,String[] methodNames,String fieldName) {
     this.enumClass = enumClass;
     this.prefix = prefix;
     this.methodNames = methodNames;
+    this.fieldName = fieldName;
   }
 
   @Override
@@ -47,7 +50,11 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
       }
       for (String methodName : methodNames) {
         String value    = (String) enumClass.getMethod(methodName).invoke(enums);
-        jsonGenerator.writeStringField(new StringBuilder(prefix).append(methodName).toString(), value);
+        if(ValidateUtils.isEmpty(fieldName)){
+          jsonGenerator.writeStringField(new StringBuilder(prefix).append(methodName).toString(), value);
+        } else {
+          jsonGenerator.writeStringField(fieldName,value);
+        }
       }
     } catch (Exception e) {
       logger.info("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodNames.toString(),e);
@@ -70,6 +77,6 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
     if (ValidateUtils.isEmpty(enumLabel) || enumLabel.ignore()) {
       return serializerProvider.findValueSerializer(beanProperty.getType(), beanProperty);
     }
-    return new EnumSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodNames());
+    return new EnumSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodNames(),enumLabel.fieldName());
   }
 }

@@ -49,7 +49,11 @@ public class FastJsonAfterFilter extends AfterFilter {
 
         for(String  methodName: methodNames){
           String value    = (String) enumClass.getMethod(methodName).invoke(enums);
-          super.writeKeyValue(new StringBuilder(prefix).append(methodName).toString(), value);
+          if(ValidateUtils.isEmpty(fastJsonEnum.fieldName())){
+            super.writeKeyValue(new StringBuilder(prefix).append(methodName).toString(), value);
+          } else {
+            super.writeKeyValue(fastJsonEnum.fieldName(),value);
+          }
         }
       } catch (Exception e) {
         logger.info("fastJson 转义注解失败,失败异常为 e:{}",e);
