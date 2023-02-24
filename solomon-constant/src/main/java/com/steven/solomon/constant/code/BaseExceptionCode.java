@@ -85,5 +85,8 @@ public interface BaseExceptionCode {
    */
   String FILE_TYPE_NOT_WITHIN_THE_ALLOWABLE_RANGE = "FILE_TYPE_NOT_WITHIN_THE_ALLOWABLE_RANGE";
 
-
+  /**
+   * 上传文件大小超过最大限制
+   */
+  String FILE_UPLOAD_MAX_SIZE = "FILE_UPLOAD_MAX_SIZE";
 }
