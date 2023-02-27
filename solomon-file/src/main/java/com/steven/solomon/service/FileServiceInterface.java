@@ -2,8 +2,10 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.entity.BaseFileProperties;
 import com.steven.solomon.graphics2D.entity.FileUpload;
+import com.steven.solomon.rsa.Md5Utils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,6 +47,13 @@ public interface FileServiceInterface {
    * 创建桶
    */
   void makeBucket(String bucketName) throws Exception;
+
+  /**
+   * 获取文件MD5
+   */
+  default String getMd5(MultipartFile file) throws IOException {
+    return Md5Utils.getFileMd5Code(file);
+  }
 
   default String getFilePath(String fileName, BaseFileProperties properties){
     return ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName : properties.getRootDirectory() + fileName;
