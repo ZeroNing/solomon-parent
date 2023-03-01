@@ -35,27 +35,28 @@ public class ControllerAspect {
   public Object doAroundService(ProceedingJoinPoint pjp) throws Throwable {
     StopWatch stopWatch = new StopWatch();
     Object             obj     = null;
-    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-    String url = request.getRequestURL().toString();
     try {
-      //获取请求参数
-      String targetMethodParams= Arrays.toString(pjp.getArgs());
-      logger.debug("请求Url:{},请求参数如下:{}",url,targetMethodParams);
       stopWatch.start();
       obj = pjp.proceed();
     } catch (Throwable e) {
       throw e;
     } finally {
-      saveLog(pjp,stopWatch,url);
+      saveLog(pjp,stopWatch);
     }
     return obj;
   }
 
-  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,String url) {
+  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch) {
+    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    String url = request.getRequestURL().toString();
     String proceedingJoinPoint = pjp.getSignature().toString();
+
+    //获取请求参数
+    String targetMethodParams= Arrays.toString(pjp.getArgs());
+
     stopWatch.stop();
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
     Double second      = Double.parseDouble(String.valueOf(millisecond)) / 1000;
-    logger.debug("请求Url:{},调用controller方法:{},执行耗时:{}毫秒,耗时:{}秒",url, proceedingJoinPoint, millisecond, second);
+    logger.debug("请求Url:{},调用controller方法:{},请求参数如下:{},执行耗时:{}毫秒,耗时:{}秒",url, proceedingJoinPoint,targetMethodParams, millisecond, second);
   }
 }
