@@ -7,7 +7,7 @@ import com.baidubce.services.bos.model.CannedAccessControlList;
 import com.baidubce.services.bos.model.PutObjectRequest;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
-import com.steven.solomon.properties.FileChoiceProperties.BOSProperties;
+import com.steven.solomon.properties.FileChoiceProperties;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,12 +23,12 @@ public class BOSService implements FileServiceInterface{
 
   private final BosClient client;
 
-  private final BOSProperties properties;
+  private final FileChoiceProperties properties;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public BOSService(BOSProperties properties) {
+  public BOSService(FileChoiceProperties properties) {
     BosClientConfiguration config = new BosClientConfiguration();
     config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
     config.setEndpoint(properties.getEndpoint());

@@ -6,7 +6,7 @@ import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
-import com.steven.solomon.properties.FileChoiceProperties.OBSProperties;
+import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -20,14 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class OBSService implements FileServiceInterface {
 
-  private final OBSProperties properties;
+  private final FileChoiceProperties properties;
 
   private final ObsClient obsClient;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public OBSService(OBSProperties properties) {
+  public OBSService(FileChoiceProperties properties) {
     this.properties = properties;
     this.obsClient  = client();
   }

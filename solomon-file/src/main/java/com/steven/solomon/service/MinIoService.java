@@ -1,12 +1,11 @@
 package com.steven.solomon.service;
 
+import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
-import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
-import com.steven.solomon.properties.FileChoiceProperties.MinioProperties;
+import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
@@ -30,14 +29,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class MinIoService implements FileServiceInterface{
 
-  public final MinioProperties mioProperties;
+  public final FileChoiceProperties mioProperties;
 
   public final MinioClient client;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public MinIoService(MinioProperties mioProperties) {
+  public MinIoService(FileChoiceProperties mioProperties) {
     this.mioProperties = mioProperties;
     client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();
   }

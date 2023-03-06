@@ -8,12 +8,21 @@ import java.io.Serializable;
 
 public class FileUpload implements Serializable {
 
+  /**
+   * 桶名
+   */
   String bucket;
-
+  /**
+   * 文件名
+   */
   String fileName;
-
+  /**
+   * 文件加密
+   */
   String md5;
-
+  /**
+   * 文件大小
+   */
   Long size;
 
   public FileUpload(){

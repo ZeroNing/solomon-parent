@@ -6,8 +6,7 @@ import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
-import com.steven.solomon.properties.FileChoiceProperties.OSSProperties;
-import com.steven.solomon.verification.ValidateUtils;
+import com.steven.solomon.properties.FileChoiceProperties;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -21,14 +20,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class OSSService implements FileServiceInterface {
 
-  private final OSSProperties properties;
+  private final FileChoiceProperties properties;
 
   private final OSS oss;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public OSSService(OSSProperties properties) {
+  public OSSService(FileChoiceProperties properties) {
     this.properties = properties;
     this.oss        = client();
   }

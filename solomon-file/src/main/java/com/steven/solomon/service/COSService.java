@@ -9,6 +9,7 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
+import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.properties.FileChoiceProperties.COSProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
@@ -24,21 +25,21 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class COSService implements FileServiceInterface{
 
-  private final COSProperties properties;
+  private final FileChoiceProperties properties;
 
   private final COSClient client;
 
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public COSService(COSProperties properties) {
+  public COSService(FileChoiceProperties properties) {
     this.properties = properties;
     this.client = initClient(properties);
   }
 
-  private static COSClient initClient(COSProperties properties){
+  private static COSClient initClient(FileChoiceProperties properties){
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    Region         region       = new Region(properties.getRegionName());
+    Region         region       = new Region(properties.getCos().getRegionName());
     ClientConfig   clientConfig = new ClientConfig(region);
     return new COSClient(credentials, clientConfig);
   }

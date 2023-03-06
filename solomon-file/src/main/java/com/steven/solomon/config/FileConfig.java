@@ -23,15 +23,15 @@ public class FileConfig {
   public FileServiceInterface fileService(FileChoiceProperties fileProperties){
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinIoService(fileProperties.getMinio());
+        return new MinIoService(fileProperties);
       case OSS:
-        return new OSSService(fileProperties.getOss());
+        return new OSSService(fileProperties);
       case OBS:
-        return new OBSService(fileProperties.getObs());
+        return new OBSService(fileProperties);
       case COS:
-        return new COSService(fileProperties.getCos());
+        return new COSService(fileProperties);
       case BOS:
-        return new BOSService(fileProperties.getBos());
+        return new BOSService(fileProperties);
       default:
         return new DefaultService();
     }

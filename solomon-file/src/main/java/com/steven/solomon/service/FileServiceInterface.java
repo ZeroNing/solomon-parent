@@ -2,6 +2,7 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.entity.BaseFileProperties;
 import com.steven.solomon.graphics2D.entity.FileUpload;
+import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.rsa.Md5Utils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
@@ -55,7 +56,7 @@ public interface FileServiceInterface {
     return Md5Utils.getFileMd5Code(file);
   }
 
-  default String getFilePath(String fileName, BaseFileProperties properties){
+  default String getFilePath(String fileName, FileChoiceProperties properties){
     return ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName : properties.getRootDirectory() + fileName;
   }
 }
