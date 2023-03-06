@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FileConfig {
 
-  @Bean("FileServiceInterface")
+  @Bean
   public FileServiceInterface fileService(FileChoiceProperties fileProperties){
     switch (fileProperties.getChoice()) {
       case MINIO:
@@ -37,7 +37,7 @@ public class FileConfig {
     }
   }
 
-  @Bean("FileNameGenerationService")
+  @Bean
   public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
     switch (fileProperties.getFileNamingMethod()) {
       case DATE:
