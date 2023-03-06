@@ -20,55 +20,35 @@ public class FileChoiceProperties {
    */
   private FileNamingMethodEnum fileNamingMethod = FileNamingMethodEnum.ORIGINAL;
 
-  private MinioProperties minio;
   /**
-   * 阿里云存储
+   * 是一个URL，域名，IPv4或者IPv6地址")
    */
-  private OSSProperties oss;
+  private String endpoint;
+
   /**
-   * 华为云存储
+   * "accessKey类似于用户ID，用于唯一标识你的账户"
    */
-  private OBSProperties obs;
+  private String accessKey;
+
+  /**
+   * "secretKey是你账户的密码"
+   */
+  private String secretKey;
+
+  /**
+   * "默认存储桶"
+   */
+  private String bucketName;
+
+  /**
+   * 根目录
+   */
+  private String rootDirectory;
+
   /**
    * 腾讯云存储
    */
   private COSProperties cos;
-  /**
-   * 百度云存储
-   */
-  private BOSProperties bos;
-
-  public BOSProperties getBos() {
-    return bos;
-  }
-
-  public void setBos(BOSProperties bos) {
-    this.bos = bos;
-  }
-
-  public COSProperties getCos() {
-    return cos;
-  }
-
-  public void setCos(COSProperties cos) {
-    this.cos = cos;
-  }
-
-  public OBSProperties getObs() {
-    return obs;
-  }
-
-  public void setObs(OBSProperties obs) {
-    this.obs = obs;
-  }
-
-  public OSSProperties getOss() {
-    return oss;
-  }
-
-  public void setOss(OSSProperties oss) {
-    this.oss = oss;
-  }
 
   public FileChoiceEnum getChoice() {
     return choice;
@@ -76,14 +56,6 @@ public class FileChoiceProperties {
 
   public void setChoice(FileChoiceEnum choice) {
     this.choice = choice;
-  }
-
-  public MinioProperties getMinio() {
-    return minio;
-  }
-
-  public void setMinio(MinioProperties minio) {
-    this.minio = minio;
   }
 
   public FileNamingMethodEnum getFileNamingMethod() {
@@ -94,17 +66,81 @@ public class FileChoiceProperties {
     this.fileNamingMethod = fileNamingMethod;
   }
 
-  public static class MinioProperties extends BaseFileProperties {
+  public String getEndpoint() {
+    return endpoint;
   }
 
-  public static class OSSProperties extends BaseFileProperties {
+  public void setEndpoint(String endpoint) {
+    this.endpoint = endpoint;
   }
 
-  public static class OBSProperties extends BaseFileProperties {
+  public String getAccessKey() {
+    return accessKey;
   }
 
-  public static class BOSProperties extends BaseFileProperties {
+  public void setAccessKey(String accessKey) {
+    this.accessKey = accessKey;
   }
+
+  public String getSecretKey() {
+    return secretKey;
+  }
+
+  public void setSecretKey(String secretKey) {
+    this.secretKey = secretKey;
+  }
+
+  public String getBucketName() {
+    return bucketName;
+  }
+
+  public void setBucketName(String bucketName) {
+    this.bucketName = bucketName;
+  }
+
+  public String getRootDirectory() {
+    return rootDirectory;
+  }
+
+  public void setRootDirectory(String rootDirectory) {
+    this.rootDirectory = rootDirectory;
+  }
+
+  public COSProperties getCos() {
+    return cos;
+  }
+
+  public void setCos(COSProperties cos) {
+    this.cos = cos;
+  }
+
+  //  private MinioProperties minio;
+//  /**
+//   * 阿里云存储
+//   */
+//  private OSSProperties oss;
+//  /**
+//   * 华为云存储
+//   */
+//  private OBSProperties obs;
+
+//  /**
+//   * 百度云存储
+//   */
+//  private BOSProperties bos;
+
+
+//  public static class MinioProperties extends BaseFileProperties {
+//  }
+//
+//  public static class OSSProperties extends BaseFileProperties {
+//  }
+//
+//  public static class OBSProperties extends BaseFileProperties {
+//  }
+//
+//  public static class BOSProperties extends BaseFileProperties {
+//  }
 
   public static class COSProperties extends BaseFileProperties {
 
