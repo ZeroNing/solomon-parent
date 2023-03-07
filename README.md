@@ -82,39 +82,13 @@ cache:
 file:
   choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云）
   file-naming-method: #文件命名选择器(ORIGINAL:原文件名称、DATE:文件名精确到毫秒并且以年月做为文件夹名、UUID:UUID命名、SNOWFLAKE:雪花id命名)
-  obs:
-    endpoint:        # 连接地址
-    accessKey:       # 访问密钥
-    secretKey:       # 密钥
-    bucket-name:     # 桶名 我这是给出了一个默认桶名
-    rootDirectory:   # 根目录
-  oss:
-    endpoint:        # 连接地址
-    accessKey:       # 访问密钥
-    secretKey:       # 密钥
-    bucket-name:     # 桶名 我这是给出了一个默认桶名
-    rootDirectory:   # 根目录
-  bos:
-    endpoint:        # 连接地址
-    accessKey:       # 访问密钥
-    secretKey:       # 密钥
-    bucket-name:     # 桶名 我这是给出了一个默认桶名
-    rootDirectory:   # 根目录
+  endpoint:        # 连接地址
+  accessKey:       # 访问密钥
+  secretKey:       # 密钥
+  bucket-name:     # 桶名 我这是给出了一个默认桶名
+  rootDirectory:   # 根目录
   cos:
-    endpoint:        # 连接地址
-    accessKey:       # 访问密钥
-    secretKey:       # 密钥
-    bucket-name:     # 桶名 我这是给出了一个默认桶名
     region-name:     # 地区名
-    rootDirectory:   # 根目录
-  minio:
-    endpoint:        # 连接地址
-    accessKey:       # 访问密钥
-    secretKey:       # 密钥
-    bucket-name:     # 桶名 我这是给出了一个默认桶名
-    image-size:      # 我在这里设定了 图片文件的最大大小
-    file-size:       # 此处是设定了文件的最大大小
-    rootDirectory:   # 根目录
 ```
 
 ## 枚举国际化用例
