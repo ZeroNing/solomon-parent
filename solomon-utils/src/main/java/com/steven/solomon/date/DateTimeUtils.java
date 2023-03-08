@@ -61,12 +61,30 @@ public class DateTimeUtils {
 	}
 
 	/**
+	 * 获取当前系统时间字符串
+	 *
+	 * @return
+	 */
+	public static String getLocalTimeString(LocalTime time,DateTimeFormatter formatter) {
+		return time.format(formatter);
+	}
+
+	/**
 	 * 获取当前系统日期字符串
 	 * 
 	 * @return
 	 */
 	public static String getLocalDateString() {
 		return LocalDate.now().format(DATE_FORMATTER);
+	}
+
+	/**
+	 * 获取当前系统日期字符串
+	 *
+	 * @return
+	 */
+	public static String getLocalDateString(LocalDate local,DateTimeFormatter formatter) {
+		return local.format(formatter);
 	}
 
 	/**
@@ -85,6 +103,15 @@ public class DateTimeUtils {
 	 */
 	public static String getLocalDateTimeString() {
 		return LocalDateTime.now().format(DATETIME_FORMATTER);
+	}
+
+	/**
+	 * 获取当前系统日期时间字符串
+	 *
+	 * @return
+	 */
+	public static String getLocalDateTimeString(LocalDateTime time,DateTimeFormatter dateTimeFormatter) {
+		return time.format(dateTimeFormatter);
 	}
 
 	/**
