@@ -11,6 +11,9 @@ import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
+/**
+ * RabbitMq延迟队列注册
+ */
 @Service("delayedMQService")
 public class DelayedMQService extends AbstractMQService {
 
@@ -24,7 +27,7 @@ public class DelayedMQService extends AbstractMQService {
 
   @Override
   public Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey) {
-    return BindingBuilder.bind(queue).to((Exchange) exchange).with(routingKey).noargs();
+    return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
 
   }
 }

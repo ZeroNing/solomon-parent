@@ -9,7 +9,9 @@ import org.springframework.amqp.core.BindingBuilder.GenericArgumentsConfigurer;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.stereotype.Service;
-
+/**
+ * RabbitMq主题队列注册
+ */
 @Service("topicMQService")
 public class TopicMQService extends AbstractMQService {
 

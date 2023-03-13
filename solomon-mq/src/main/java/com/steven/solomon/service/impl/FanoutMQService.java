@@ -9,7 +9,9 @@ import org.springframework.amqp.core.BindingBuilder.GenericArgumentsConfigurer;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
-
+/**
+ * RabbitMq广播队列注册
+ */
 @Service("fanoutMQService")
 public class FanoutMQService extends AbstractMQService {
 

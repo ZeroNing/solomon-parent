@@ -176,12 +176,7 @@ public class RabbitMQListenerConfig {
     }
 
     private Queue initBinding(Map<String, AbstractMQService> abstractMQMap,String queue,boolean isInitDlxMap, boolean isAddDlxPrefix,RabbitAdmin admin) {
-        AbstractMQService abstractMQService = null;
-        if(ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange()){
-            abstractMQService = abstractMQMap.get("delayedMQService");
-        } else {
-            abstractMQService = abstractMQMap.get(rabbitMq.exchangeTypes() + BaseMQService.SERVICE_NAME);
-        }
+        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange()) ? abstractMQMap.get("delayedMQService") : abstractMQMap.get(rabbitMq.exchangeTypes() + BaseMQService.SERVICE_NAME);
         return abstractMQService.initBinding(rabbitMq,queue, admin, isInitDlxMap, isAddDlxPrefix);
     }
 
