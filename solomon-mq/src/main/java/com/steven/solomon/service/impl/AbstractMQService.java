@@ -5,9 +5,6 @@ import com.steven.solomon.pojo.InitRabbitBinding;
 import com.steven.solomon.service.BaseMQService;
 import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.BindingBuilder.DestinationConfigurer;
-import org.springframework.amqp.core.BindingBuilder.GenericArgumentsConfigurer;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
@@ -32,11 +29,11 @@ public abstract class AbstractMQService implements BaseMQService {
   /**
    * 初始化交换机
    */
-  public abstract AbstractExchange initExchange(String exchange,RabbitMq rabbitMq);
+  protected abstract AbstractExchange initExchange(String exchange,RabbitMq rabbitMq);
 
   /**
    * 初始化绑定
    * @return
    */
-  public abstract Binding initBinding(Queue queue,AbstractExchange exchange,String routingKey);
+  protected abstract Binding initBinding(Queue queue,AbstractExchange exchange,String routingKey);
 }

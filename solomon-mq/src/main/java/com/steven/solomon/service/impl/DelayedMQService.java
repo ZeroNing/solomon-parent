@@ -7,7 +7,6 @@ import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.CustomExchange;
-import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class DelayedMQService extends AbstractMQService {
 
   @Override
-  public AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
+  protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
     Map<String, Object> props = new HashMap<>(1);
     //延迟交换器类型
     props.put("x-delayed-type", rabbitMq.exchangeTypes());
@@ -26,7 +25,7 @@ public class DelayedMQService extends AbstractMQService {
   }
 
   @Override
-  public Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey) {
+  protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
 
   }
