@@ -19,6 +19,10 @@ public class Sql extends BaseSql {
     return new Sql("SELECT *");
   }
 
+  public static Sql SelectAll(String table){
+    return new Sql("SELECT * FROM " + table);
+  }
+
   public Sql from(String table){
     this.sql = sql.append(" FROM ").append(table);
     return this;
