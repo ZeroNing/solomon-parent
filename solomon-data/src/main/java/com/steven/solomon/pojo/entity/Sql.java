@@ -125,12 +125,13 @@ public class Sql extends BaseSql {
     a.add("b");
     Sql sql = Sql.SelectAll().from("WAREHOUSE","a");
     sql.where();
-    sql.and(Condition.eq("a.code",null,false));
-    sql.and(Condition.like("a.code","aaaa",true));
-    sql.and(Condition.notLike("a.code","aaaa",true));
-    sql.or(Condition.ne("a.code",null,true).and(Condition.eq("a.code","b")),true);
-    sql.or(Condition.in("a.code",a,true));
-    sql.or(Condition.notIn("a.code",a,true));
+//    sql.and(Condition.eq("a.code",null,false));
+//    sql.and(Condition.like("a.code","aaaa",true));
+//    sql.and(Condition.notLike("a.code","aaaa",true));
+//    sql.or(Condition.ne("a.code",null,true).and(Condition.eq("a.code","b")),true);
+//    sql.or(Condition.in("a.code",a,true));
+//    sql.or(Condition.notIn("a.code",a,true));
+    sql.and(Condition.between("a","a","a"));
     System.out.println(sql.toString());
 
   }

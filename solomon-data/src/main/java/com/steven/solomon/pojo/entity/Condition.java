@@ -12,6 +12,153 @@ public class Condition extends BaseSql {
   }
 
   /**
+   * 条件范围
+   * @param field 字段
+   * @param value 值
+   * @return
+   */
+  public static Condition between(String field,Object value,Object value1){
+    if(ValidateUtils.isEmpty(value) && ValidateUtils.isEmpty(value1)){
+      return null;
+    }
+    if(ValidateUtils.isNotEmpty(value) && ValidateUtils.isEmpty(value1)){
+      return ge(field,value);
+    }
+    if(ValidateUtils.isEmpty(value) && ValidateUtils.isNotEmpty(value1)){
+      return le(field,value1);
+    }
+
+    String sql = new StringBuilder(" ").append(field).append(" BETWEEN '").append(value).append("' AND '").append(value1).append("'").toString();
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件大于等于
+   * @param field 字段
+   * @param value 值
+   * @return
+   */
+  public static Condition le(String field,Object value){
+    return le(field, value, false);
+  }
+
+  /**
+   * 条件大于等于
+   * @param field 字段
+   * @param value 值
+   * @param isRequired 是否必填(true 必填,false 非必填)
+   * @return
+   */
+  public static Condition le(String field,Object value,boolean isRequired){
+    String sql = new StringBuilder(" ").append(field).append(" <= '").append(value).append("'").toString();
+    if(!isRequired && ValidateUtils.isEmpty(value)){
+      return null;
+    }
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件大于
+   * @param field 字段
+   * @param value 值
+   * @return
+   */
+  public static Condition lt(String field,Object value){
+    return lt(field, value, false);
+  }
+
+  /**
+   * 条件大于
+   * @param field 字段
+   * @param value 值
+   * @param isRequired 是否必填(true 必填,false 非必填)
+   * @return
+   */
+  public static Condition lt(String field,Object value,boolean isRequired){
+    String sql = new StringBuilder(" ").append(field).append(" < '").append(value).append("'").toString();
+    if(!isRequired && ValidateUtils.isEmpty(value)){
+      return null;
+    }
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件大于等于
+   * @param field 字段
+   * @param value 值
+   * @return
+   */
+  public static Condition ge(String field,Object value){
+    return ge(field, value, false);
+  }
+
+  /**
+   * 条件大于等于
+   * @param field 字段
+   * @param value 值
+   * @param isRequired 是否必填(true 必填,false 非必填)
+   * @return
+   */
+  public static Condition ge(String field,Object value,boolean isRequired){
+    String sql = new StringBuilder(" ").append(field).append(" >= '").append(value).append("'").toString();
+    if(!isRequired && ValidateUtils.isEmpty(value)){
+      return null;
+    }
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件大于
+   * @param field 字段
+   * @param value 值
+   * @return
+   */
+  public static Condition gt(String field,Object value){
+    return gt(field, value, false);
+  }
+
+  /**
+   * 条件大于
+   * @param field 字段
+   * @param value 值
+   * @param isRequired 是否必填(true 必填,false 非必填)
+   * @return
+   */
+  public static Condition gt(String field,Object value,boolean isRequired){
+    String sql = new StringBuilder(" ").append(field).append(" > '").append(value).append("'").toString();
+    if(!isRequired && ValidateUtils.isEmpty(value)){
+      return null;
+    }
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件不为空
+   * @param field 字段
+   * @return
+   */
+  public static Condition isNotNull(String field){
+    if(ValidateUtils.isEmpty(field)){
+      return null;
+    }
+    String sql = new StringBuilder(" ").append(field).append(" IS NOT NULL ").toString();
+    return new Condition(sql);
+  }
+
+  /**
+   * 条件为空
+   * @param field 字段
+   * @return
+   */
+  public static Condition isNull(String field){
+    if(ValidateUtils.isEmpty(field)){
+      return null;
+    }
+    String sql = new StringBuilder(" ").append(field).append(" IS NULL ").toString();
+    return new Condition(sql);
+  }
+
+  /**
    * 条件模糊(不包含)
    * @param field 字段
    * @param value 值
