@@ -11,9 +11,10 @@ public class DoubleColorBallGenerator {
   private static final int MAX_RED_BALL_NUMBER = 33; // 红球最大号码
   private static final int MAX_BLUE_BALL_NUMBER = 16; // 蓝球最大号码
 
-  public static List<Integer> generateRedBalls() {
+  public static List<Integer> generateRedBalls() throws InterruptedException {
     List<Integer> redBalls = new ArrayList<>();
     for (int i = 1; i <= MAX_RED_BALL_NUMBER; i++) {
+      Thread.sleep(500L);
       redBalls.add(i);
     }
     Collections.shuffle(redBalls); // 随机排序
@@ -24,10 +25,11 @@ public class DoubleColorBallGenerator {
     return (int) (Math.random() * MAX_BLUE_BALL_NUMBER) + 1; // 随机生成1-16的整数
   }
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     for(int i = 1; i<=5;i++){
-      System.out.print("第一组号码: "+ "");
+      System.out.print("第"+i+"组号码: "+ "");
       List<Integer> redBalls = generateRedBalls();
+      Thread.sleep(5000L);
       int blueBall = generateBlueBall();
 
       System.out.print("红球：");
@@ -37,4 +39,5 @@ public class DoubleColorBallGenerator {
       System.out.println("蓝球：" + blueBall);
     }
   }
+
 }

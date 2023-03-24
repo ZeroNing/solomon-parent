@@ -2,6 +2,7 @@ package com.steven.solomon.verification;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.logger.LoggerUtils;
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.ObjectUtils;
@@ -25,11 +26,7 @@ public class ValidateUtils extends EmptyUtils {
   }
 
   public static boolean equals(String contrast, String var) {
-    boolean flag = false;
-    if (ObjectUtils.equals(contrast,var)) {
-      flag = true;
-    }
-    return flag;
+    return ObjectUtils.equals(contrast,var);
   }
 
   /**
@@ -112,12 +109,7 @@ public class ValidateUtils extends EmptyUtils {
   }
 
   public static boolean equals(Number contrast, Number var) {
-    boolean flag = false;
-    if (ObjectUtils.equals(contrast,var)) {
-      flag = true;
-    }
-
-    return flag;
+    return ObjectUtils.equals(contrast,var);
   }
 
   /**
@@ -155,12 +147,7 @@ public class ValidateUtils extends EmptyUtils {
   }
 
   public static boolean equals(Boolean contrast, Boolean var) {
-    boolean flag = false;
-    if (ObjectUtils.equals(contrast,var)) {
-      flag = true;
-    }
-
-    return flag;
+    return ObjectUtils.equals(contrast,var);
   }
 
   /**
@@ -240,8 +227,9 @@ public class ValidateUtils extends EmptyUtils {
   }
 
   public static void main(String[] args) {
-    String a = "cust_filed_01";
-    System.out.println(camelName(a));
+    BigDecimal a = new BigDecimal(12);
+    BigDecimal b = new BigDecimal(12);
+    System.out.println(ValidateUtils.equals(a,b));
   }
 
   public static String camelName(String name) {
