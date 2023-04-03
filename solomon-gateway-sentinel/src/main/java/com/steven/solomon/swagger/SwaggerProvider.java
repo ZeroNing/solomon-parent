@@ -1,6 +1,6 @@
 package com.steven.solomon.swagger;
 
-import com.steven.solomon.lambda.LambdaUtils;
+import com.steven.solomon.lambda.Lambda;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,7 +35,7 @@ public class SwaggerProvider implements SwaggerResourcesProvider {
   public List<SwaggerResource> get() {
     List<SwaggerResource> resources =new ArrayList<>();
     resources.add(createResource(applicationName, API_URI));
-    resources.addAll(LambdaUtils.toList(properties.getRoutes(),route -> createResource(route.getId(), getRouteLocation(route))));
+    resources.addAll(Lambda.toList(properties.getRoutes(), route -> createResource(route.getId(), getRouteLocation(route))));
     //添加gateway
     return resources;
   }
