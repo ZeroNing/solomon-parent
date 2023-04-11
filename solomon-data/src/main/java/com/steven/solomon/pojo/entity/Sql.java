@@ -77,36 +77,36 @@ public class Sql extends BaseSql {
     return this;
   }
 
-  public Sql and(Condition condition,boolean isMoreCond){
-    if(ValidateUtils.isEmpty(condition) || ValidateUtils.isEmpty(condition.getSql())){
+  public Sql and(Cond cond, boolean isMoreCond){
+    if(ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
       return this;
     }
     if(isMoreCond){
-      this.sql.append(" AND (").append(condition.getSql()).append(")");
+      this.sql.append(" AND (").append(cond.getSql()).append(")");
     } else {
-      this.sql.append(" AND").append(condition.getSql());
+      this.sql.append(" AND ").append(cond.getSql());
     }
     return this;
   }
 
-  public Sql and(Condition condition){
-    return and(condition,false);
+  public Sql and(Cond cond){
+    return and(cond,false);
   }
 
-  public Sql or(Condition condition,boolean isMoreCond){
-    if(ValidateUtils.isEmpty(condition) || ValidateUtils.isEmpty(condition.getSql())){
+  public Sql or(Cond cond, boolean isMoreCond){
+    if(ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
       return this;
     }
     if(isMoreCond){
-      this.sql.append(" OR (").append(condition.getSql()).append(")");
+      this.sql.append(" OR (").append(cond.getSql()).append(")");
     } else {
-      this.sql.append(" OR").append(condition.getSql());
+      this.sql.append(" OR ").append(cond.getSql());
     }
     return this;
   }
 
-  public Sql or(Condition condition){
-    return or(condition,false);
+  public Sql or(Cond cond){
+    return or(cond,false);
   }
 
   public Sql orderBy(String fields){
@@ -129,13 +129,13 @@ public class Sql extends BaseSql {
     a.add("b");
     Sql sql = Sql.SelectAll().from("WAREHOUSE","a");
     sql.where();
-//    sql.and(Condition.eq("a.code",null,false));
-//    sql.and(Condition.like("a.code","aaaa",true));
-//    sql.and(Condition.notLike("a.code","aaaa",true));
-//    sql.or(Condition.ne("a.code",null,true).and(Condition.eq("a.code","b")),true);
-//    sql.or(Condition.in("a.code",a,true));
-//    sql.or(Condition.notIn("a.code",a,true));
-    sql.and(Condition.between("a","a","a"));
+    sql.and(Cond.eq("a.code",null,false));
+    sql.and(Cond.like("a.code","aaaa",true));
+    sql.and(Cond.notLike("a.code","aaaa",true));
+    sql.or(Cond.ne("a.code",null,true).and(Cond.eq("a.code","b")),true);
+    sql.or(Cond.in("a.code",a,true));
+    sql.or(Cond.notIn("a.code",a,true));
+    sql.and(Cond.between("a.code","a","a"));
     System.out.println(sql.toString());
 
   }
