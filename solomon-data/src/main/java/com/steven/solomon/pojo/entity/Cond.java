@@ -3,11 +3,11 @@ package com.steven.solomon.pojo.entity;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.Collection;
 
-public class Condition extends BaseSql {
+public class Cond extends BaseSql {
 
-  private Condition() {}
+  private Cond() {}
 
-  private Condition(String sql) {
+  private Cond(String sql) {
     super(sql);
   }
 
@@ -17,7 +17,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition between(String field,Object value,Object value1){
+  public static Cond between(String field, Object value, Object value1){
     if(ValidateUtils.isEmpty(value) && ValidateUtils.isEmpty(value1)){
       return null;
     }
@@ -29,7 +29,7 @@ public class Condition extends BaseSql {
     }
 
     String sql = new StringBuilder(" ").append(field).append(" BETWEEN '").append(value).append("' AND '").append(value1).append("'").toString();
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -38,7 +38,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition le(String field,Object value){
+  public static Cond le(String field, Object value){
     return le(field, value, false);
   }
 
@@ -49,12 +49,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition le(String field,Object value,boolean isRequired){
+  public static Cond le(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" <= '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -63,7 +63,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition lt(String field,Object value){
+  public static Cond lt(String field, Object value){
     return lt(field, value, false);
   }
 
@@ -74,12 +74,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition lt(String field,Object value,boolean isRequired){
+  public static Cond lt(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" < '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -88,7 +88,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition ge(String field,Object value){
+  public static Cond ge(String field, Object value){
     return ge(field, value, false);
   }
 
@@ -99,12 +99,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition ge(String field,Object value,boolean isRequired){
+  public static Cond ge(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" >= '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -113,7 +113,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition gt(String field,Object value){
+  public static Cond gt(String field, Object value){
     return gt(field, value, false);
   }
 
@@ -124,12 +124,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition gt(String field,Object value,boolean isRequired){
+  public static Cond gt(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" > '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -137,12 +137,12 @@ public class Condition extends BaseSql {
    * @param field 字段
    * @return
    */
-  public static Condition isNotNull(String field){
+  public static Cond isNotNull(String field){
     if(ValidateUtils.isEmpty(field)){
       return null;
     }
     String sql = new StringBuilder(" ").append(field).append(" IS NOT NULL ").toString();
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -150,12 +150,12 @@ public class Condition extends BaseSql {
    * @param field 字段
    * @return
    */
-  public static Condition isNull(String field){
+  public static Cond isNull(String field){
     if(ValidateUtils.isEmpty(field)){
       return null;
     }
     String sql = new StringBuilder(" ").append(field).append(" IS NULL ").toString();
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -164,7 +164,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition notLike(String field,Object value){
+  public static Cond notLike(String field, Object value){
     return notLike(field, value, false);
   }
 
@@ -175,12 +175,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition notLike(String field,Object value,boolean isRequired){
+  public static Cond notLike(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" NOT LIKE '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -189,7 +189,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition notIn(String field,Collection value){
+  public static Cond notIn(String field, Collection value){
     return notIn(field, value, false);
   }
 
@@ -200,7 +200,7 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition notIn(String field, Collection value,boolean isRequired){
+  public static Cond notIn(String field, Collection value, boolean isRequired){
     if(ValidateUtils.isNotEmpty(value) && value.size() == 1){
       return eq(field,value.iterator().next(),isRequired);
     }
@@ -209,7 +209,7 @@ public class Condition extends BaseSql {
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -218,7 +218,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition like(String field,Object value){
+  public static Cond like(String field, Object value){
     return like(field, value, false);
   }
 
@@ -229,12 +229,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition like(String field,Object value,boolean isRequired){
+  public static Cond like(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" LIKE '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -243,7 +243,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition in(String field,Collection value){
+  public static Cond in(String field, Collection value){
     return in(field, value, false);
   }
 
@@ -254,7 +254,7 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition in(String field, Collection value,boolean isRequired){
+  public static Cond in(String field, Collection value, boolean isRequired){
     if(ValidateUtils.isNotEmpty(value) && value.size() == 1){
       return eq(field,value.iterator().next(),isRequired);
     }
@@ -263,7 +263,7 @@ public class Condition extends BaseSql {
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
 
@@ -274,12 +274,12 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition ne(String field,Object value,boolean isRequired){
+  public static Cond ne(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" <> '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
   /**
@@ -288,7 +288,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition ne(String field,Object value){
+  public static Cond ne(String field, Object value){
     return ne(field, value, false);
   }
 
@@ -299,15 +299,15 @@ public class Condition extends BaseSql {
    * @param isRequired 是否必填(true 必填,false 非必填)
    * @return
    */
-  public static Condition eq(String field,Object value,boolean isRequired){
+  public static Cond eq(String field, Object value, boolean isRequired){
     String sql = new StringBuilder(" ").append(field).append(" = '").append(value).append("'").toString();
     if(!isRequired && ValidateUtils.isEmpty(value)){
       return null;
     }
-    return new Condition(sql);
+    return new Cond(sql);
   }
 
-  public Condition and(Condition cond){
+  public Cond and(Cond cond){
     if (ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
       return this;
     }
@@ -315,7 +315,7 @@ public class Condition extends BaseSql {
     return this;
   }
 
-  public Condition or(Condition cond){
+  public Cond or(Cond cond){
     if (ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
       return this;
     }
@@ -329,7 +329,7 @@ public class Condition extends BaseSql {
    * @param value 值
    * @return
    */
-  public static Condition eq(String field,Object value){
+  public static Cond eq(String field, Object value){
     return eq(field, value, false);
   }
 

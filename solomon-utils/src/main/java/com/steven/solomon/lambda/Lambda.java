@@ -11,7 +11,7 @@ import java.util.function.ToIntFunction;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
-public class LambdaUtils {
+public class Lambda {
 
   /**
    * 转list
