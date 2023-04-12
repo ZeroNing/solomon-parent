@@ -14,6 +14,8 @@ public class ExceptionUtil {
 
   private static final Logger logger = LoggerUtils.logger(ExceptionUtil.class);
 
+  public static ThreadLocal<String> requestId = new ThreadLocal<>();
+
   public static AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
     if (ValidateUtils.isEmpty(AbstractExceptionHandler.exceptionHandlerMap)) {
       AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(AbstractExceptionHandler.class);

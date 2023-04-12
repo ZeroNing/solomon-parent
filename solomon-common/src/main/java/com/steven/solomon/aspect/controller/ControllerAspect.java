@@ -44,6 +44,7 @@ public class ControllerAspect {
     Object             obj     = null;
     Exception ex = null;
     String uuid = UUID.randomUUID().toString();
+    ExceptionUtil.requestId.set(uuid);
     try {
       stopWatch.start();
       obj = pjp.proceed();
@@ -70,6 +71,8 @@ public class ControllerAspect {
     String message = "";
     if(ValidateUtils.isNotEmpty(ex)){
       message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
+    } else {
+      ExceptionUtil.requestId.remove();
     }
     logger.debug("请求id:{},请求Url:{},调用controller方法:{},请求参数如下:{},执行耗时:{}毫秒,耗时:{}秒,异常为:{}",uuid,url, proceedingJoinPoint,targetMethodParams, millisecond, second,message);
   }
