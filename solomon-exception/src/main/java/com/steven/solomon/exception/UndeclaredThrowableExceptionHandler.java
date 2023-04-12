@@ -10,7 +10,6 @@ public class UndeclaredThrowableExceptionHandler extends AbstractExceptionHandle
 
   @Override
   public BaseExceptionVO handleBaseException(Exception ex) {
-    UndeclaredThrowableException e = (UndeclaredThrowableException) ex;
     Throwable t = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
     if(t instanceof BaseException){
       BaseException baseException = (BaseException) t;
