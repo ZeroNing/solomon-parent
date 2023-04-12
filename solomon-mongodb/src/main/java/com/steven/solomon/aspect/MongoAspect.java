@@ -44,7 +44,7 @@ public class MongoAspect {
         logger.info("mongo切换数据源,租户编码为:{}",HeardHolder.getTenantCode());
         String tenantId = HeardHolder.getTenantCode();
         if(ValidateUtils.isEmpty(tenantId)){
-          throw new BaseException(I18nUtils.getErrorMessage(BaseExceptionCode.FAILED_TO_SWITCH_DATA_SOURCE));
+          throw new BaseException(BaseExceptionCode.FAILED_TO_SWITCH_DATA_SOURCE);
         }
         context.setFactory(tenantId);
       }
