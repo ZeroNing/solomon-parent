@@ -2,6 +2,7 @@ package com.steven.solomon.aspect.controller;
 
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.exception.ExceptionUtil;
+import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.Arrays;
@@ -63,7 +64,7 @@ public class ControllerAspect {
     String proceedingJoinPoint = pjp.getSignature().toString();
 
     //获取请求参数
-    String targetMethodParams= Arrays.toString(pjp.getArgs());
+    String targetMethodParams= JackJsonUtils.formatJsonByFilter(pjp.getArgs());
 
     stopWatch.stop();
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
