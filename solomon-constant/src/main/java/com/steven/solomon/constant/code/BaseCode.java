@@ -23,4 +23,6 @@ public interface BaseCode {
   String BASE_ENUM_CODE = "ENUM_CODE_";
 
   String HEADER_PREFIX = "Bearer ";
+
+  String REQUEST_ID = "requestId";
 }
