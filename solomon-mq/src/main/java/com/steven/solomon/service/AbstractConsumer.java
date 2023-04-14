@@ -34,7 +34,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
   public void onMessage(Message message, Channel channel) throws Exception {
     MessageProperties messageProperties = message.getMessageProperties();
     long              deliveryTag       = messageProperties.getDeliveryTag();
-    String correlationId     = messageProperties.getHeader("spring_returned_message_correlation");
+    String correlationId  = messageProperties.getHeader("spring_returned_message_correlation");
     boolean isAutoAck = getIsAutoAck();
     try {
       if(checkMessageKey(messageProperties)){
