@@ -3,7 +3,9 @@ package com.steven.solomon.service;
 import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.annotation.RabbitMqRetry;
+import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.constant.code.BaseICacheCode;
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.pojo.RabbitMqModel;
@@ -35,6 +37,9 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
     String correlationId     = messageProperties.getHeader("spring_returned_message_correlation");
     boolean isAutoAck = getIsAutoAck();
     try {
+      if(checkMessageKey(messageProperties)){
+        throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+      }
       // 消费者内容
       String json= new String(message.getBody(), StandardCharsets.UTF_8);
       logger.info("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
@@ -113,4 +118,11 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
    */
   public abstract void saveFailMessage(Message message, Exception e);
 
+  /**
+   * 判断是否重复消费
+   * @return true 重复消费 false 不重复消费
+   */
+  public boolean checkMessageKey(MessageProperties messageProperties){
+    return false;
+  }
 }
