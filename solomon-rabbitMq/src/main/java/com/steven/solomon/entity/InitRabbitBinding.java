@@ -1,9 +1,10 @@
-package com.steven.solomon.pojo;
+package com.steven.solomon.entity;
 
 
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.constant.code.BaseRabbitMqCode;
 import com.steven.solomon.verification.ValidateUtils;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;

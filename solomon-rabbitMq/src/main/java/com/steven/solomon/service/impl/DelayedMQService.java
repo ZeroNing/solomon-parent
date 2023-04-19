@@ -1,14 +1,11 @@
 package com.steven.solomon.service.impl;
 
 import com.steven.solomon.annotation.RabbitMq;
+import org.springframework.amqp.core.*;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 import java.util.Map;
-import org.springframework.amqp.core.AbstractExchange;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.CustomExchange;
-import org.springframework.amqp.core.Queue;
-import org.springframework.stereotype.Service;
 
 /**
  * RabbitMq延迟队列注册

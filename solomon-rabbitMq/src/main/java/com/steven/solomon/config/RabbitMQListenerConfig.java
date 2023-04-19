@@ -5,16 +5,12 @@ import com.steven.solomon.annotation.RabbitMqRetry;
 import com.steven.solomon.constant.code.BaseCode;
 import com.steven.solomon.init.RabbitMQInitConfig;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.profile.BaseMQProfile;
+import com.steven.solomon.profile.RabbitMQProfile;
 import com.steven.solomon.service.AbstractConsumer;
 import com.steven.solomon.service.BaseMQService;
 import com.steven.solomon.service.impl.AbstractMQService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
@@ -28,6 +24,11 @@ import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class RabbitMQListenerConfig {
 
@@ -54,7 +55,7 @@ public class RabbitMQListenerConfig {
             logger.info("MessageListenerConfig:没有rabbitMq消费者");
             return;
         }
-        BaseMQProfile rabbitProfile = SpringUtil.getBean(BaseMQProfile.class);
+        RabbitMQProfile rabbitProfile = SpringUtil.getBean(RabbitMQProfile.class);
         List<String> notEnableQueueList = ValidateUtils.isEmpty(rabbitProfile) || ValidateUtils.isEmpty(rabbitProfile.getNotEnabledQueue()) ?
                                           null : Arrays.asList(rabbitProfile.getNotEnabledQueue().split(","));
 

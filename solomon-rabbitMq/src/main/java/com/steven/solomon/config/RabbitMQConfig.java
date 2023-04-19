@@ -3,17 +3,16 @@ package com.steven.solomon.config;
 import com.steven.solomon.condition.RabbitCondition;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.profile.BaseMQProfile;
+import com.steven.solomon.profile.RabbitMQProfile;
 import com.steven.solomon.service.AbstractRabbitCallBack;
 import com.steven.solomon.spring.SpringUtil;
 import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,7 @@ public class RabbitMQConfig {
 	private Logger logger = LoggerUtils.logger(RabbitMQConfig.class);
 
 	@Autowired
-	private BaseMQProfile mqProfile;
+	private RabbitMQProfile mqProfile;
 
 	@Bean("cachingConnectionFactory")
 	@Conditional(value = RabbitCondition.class)

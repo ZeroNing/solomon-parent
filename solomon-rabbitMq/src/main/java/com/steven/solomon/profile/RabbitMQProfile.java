@@ -1,12 +1,11 @@
 package com.steven.solomon.profile;
 
-import com.steven.solomon.enums.MqChoiceEnum;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties("mq")
+@ConfigurationProperties("rabbit")
 @Component
-public class BaseMQProfile {
+public class RabbitMQProfile {
   /**
    * 不启用的队列名，用逗号隔开
    */
@@ -31,19 +30,6 @@ public class BaseMQProfile {
    * 密码
    */
   String password;
-
-  /**
-   * mq选择器
-   */
-  MqChoiceEnum choice;
-
-  public MqChoiceEnum getChoice() {
-    return choice;
-  }
-
-  public void setChoice(MqChoiceEnum choice) {
-    this.choice = choice;
-  }
 
   public String getHost() {
     return host;

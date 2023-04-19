@@ -1,9 +1,13 @@
-package com.steven.solomon.pojo;
+package com.steven.solomon.entity;
+
+import com.steven.solomon.pojo.BaseMq;
+
+import java.io.Serializable;
 
 /**
  * 基础发送MQ基类
  */
-public class RabbitMqModel<T> extends BaseMq {
+public class RabbitMqModel<T> extends BaseMq<T> {
 
   private static final long   serialVersionUID = -5799719724717056583L;
   /**
@@ -14,31 +18,25 @@ public class RabbitMqModel<T> extends BaseMq {
    * 路由规则
    */
   private              String routingKey;
-  /**
-   * 消费者数据
-   */
-  private              T body;
+
 
   public RabbitMqModel() {
     super();
   }
 
   public RabbitMqModel(T body) {
-    super();
-    this.body = body;
+    super(body);
   }
 
   public RabbitMqModel(String exchange, T body) {
-    super();
-    this.body = body;
+    super(body);
     this.exchange = exchange;
   }
 
   public RabbitMqModel(String exchange, String routingKey, T body) {
-    super();
+    super(body);
     this.exchange   = exchange;
     this.routingKey = routingKey;
-    this.body       = body;
   }
 
   public String getExchange() {
@@ -55,14 +53,6 @@ public class RabbitMqModel<T> extends BaseMq {
 
   public void setRoutingKey(String routingKey) {
     this.routingKey = routingKey;
-  }
-
-  public T getBody() {
-    return body;
-  }
-
-  public void setBody(T body) {
-    this.body = body;
   }
 
 }

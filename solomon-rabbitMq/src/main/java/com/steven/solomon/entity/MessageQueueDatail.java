@@ -1,8 +1,9 @@
-package com.steven.solomon.pojo;
+package com.steven.solomon.entity;
 
-import java.io.Serializable;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.util.ObjectUtils;
+
+import java.io.Serializable;
 
 public class MessageQueueDatail implements Serializable {
 

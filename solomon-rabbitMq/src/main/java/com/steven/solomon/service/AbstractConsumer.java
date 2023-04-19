@@ -4,13 +4,11 @@ import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.annotation.RabbitMqRetry;
 import com.steven.solomon.code.MqErrorCode;
-import com.steven.solomon.constant.code.BaseICacheCode;
+import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.pojo.RabbitMqModel;
 import com.steven.solomon.verification.ValidateUtils;
-import java.io.IOException;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
@@ -18,8 +16,6 @@ import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * RabbitMq消费器
