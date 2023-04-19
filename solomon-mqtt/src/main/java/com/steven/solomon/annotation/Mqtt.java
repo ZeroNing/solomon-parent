@@ -15,4 +15,13 @@ import java.lang.annotation.Target;
 @Component
 public @interface Mqtt {
 
+  /**
+   * 主题
+   */
+  String topics();
+
+  /**
+   * 消息质量
+   */
+  int qos() default 0;
 }
