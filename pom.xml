@@ -23,7 +23,8 @@
     <module>solomon-mybatis</module>
     <module>solomon-data</module>
     <module>solomon-gateway-sentinel</module>
-      <module>solomon-mqtt</module>
+    <module>solomon-mqtt</module>
+    <module>solomon-rabbitMq</module>
   </modules>
 
   <properties>
