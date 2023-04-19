@@ -32,7 +32,7 @@ public class MqttProfile {
   /**
    * 连接超时
    */
-  private int completionTimeout;
+  private int completionTimeout = 30;
 
   /**
    * 是否自动重连

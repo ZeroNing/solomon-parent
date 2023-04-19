@@ -56,27 +56,30 @@ public class MqttConfig {
     return factory;
   }
 
+  @Bean
+  public MqttClient client(MqttConnectOptions options) throws MqttException {
+    MqttClient mqttClient = new MqttClient(profile.getUrl(),profile.getClientId());
+    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+
+    if(ValidateUtils.isNotEmpty(clazzList)){
+      for(Object abstractConsumer : clazzList){
+        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
+
+        if(ValidateUtils.isEmpty(mqtt)){
+          continue;
+        }
+        mqttClient.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
+      }
+    }
+    mqttClient.connect(options);
+
+    return mqttClient;
+  }
+
 
   @Bean
   public MessageChannel mqttInputChannel() {
     return new DirectChannel();
   }
 
-  @PostConstruct
-  public void init(MqttClient client) throws MqttException {
-    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
-
-    if(ValidateUtils.isEmpty(clazzList)){
-      return;
-    }
-
-    for(Object abstractConsumer : clazzList){
-      Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-
-      if(ValidateUtils.isEmpty(mqtt)){
-        continue;
-      }
-      client.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
-    }
-  }
 }
