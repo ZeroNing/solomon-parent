@@ -7,7 +7,10 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
@@ -63,6 +66,10 @@ public class MqttConfig {
         }
         mqttClient.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
       }
+    }
+    Collection<MqttCallback> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallback.class).values();
+    if(ValidateUtils.isNotEmpty(mqttCallbacks)){
+      mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
     }
     return mqttClient;
   }
