@@ -23,6 +23,7 @@
     <module>solomon-mybatis</module>
     <module>solomon-data</module>
     <module>solomon-gateway-sentinel</module>
+      <module>solomon-mqtt</module>
   </modules>
 
   <properties>
@@ -78,6 +79,8 @@
     <obs.version>3.22.3</obs.version>
     <cos.version>5.6.97</cos.version>
     <bos.version>0.10.240</bos.version>
+    <rocketMq.version>2.2.3</rocketMq.version>
+    <mqtt.version>6.0.4</mqtt.version>
   </properties>
 
   <parent>
@@ -89,6 +92,18 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-mqtt</artifactId>
+        <version>${mqtt.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.rocketmq</groupId>
+        <artifactId>rocketmq-spring-boot-starter</artifactId>
+        <version>${rocketMq.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.baidubce</groupId>
