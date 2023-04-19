@@ -1,7 +1,7 @@
 package com.steven.solomon.consumer;
 
 import com.steven.solomon.code.MqErrorCode;
-import com.steven.solomon.entity.RabbitMqModel;
+import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
@@ -23,9 +23,9 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
       String        json          = new String(message.getPayload(), StandardCharsets.UTF_8);
       logger.info("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
 
-      RabbitMqModel rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
+      MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
       // 消费者消费消息
-      this.handleMessage((T) rabbitMqModel.getBody());
+      this.handleMessage((T) mqttModel.getBody());
     } catch (Exception e){
       logger.info("AbstractConsumer:消费报错 异常为:", e);
       saveFailMessage(topic,message,e);

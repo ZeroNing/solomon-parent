@@ -3,18 +3,18 @@ package com.steven.solomon.entity;
 /**
  * 基础发送MQ基类
  */
-public class RabbitMqModel<T>  {
+public class MqttModel<T>  {
 
   /**
    * 消费者数据
    */
   private              T body;
 
-  public RabbitMqModel() {
+  public MqttModel() {
     super();
   }
 
-  public RabbitMqModel(T body) {
+  public MqttModel(T body) {
     super();
     this.body = body;
   }
