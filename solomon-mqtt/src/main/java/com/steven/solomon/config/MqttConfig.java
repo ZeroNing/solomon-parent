@@ -8,23 +8,22 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
-import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
 @Component
 @IntegrationComponentScan
+@Order(2)
+@DependsOn("springUtil")
 public class MqttConfig {
 
   private final MqttProfile profile;
@@ -50,16 +49,10 @@ public class MqttConfig {
   }
 
   @Bean
-  public MqttPahoClientFactory mqttClientFactory(MqttConnectOptions options) throws UnsupportedEncodingException, MqttException {
-    DefaultMqttPahoClientFactory factory = new DefaultMqttPahoClientFactory();
-    factory.setConnectionOptions(options);
-    return factory;
-  }
-
-  @Bean
   public MqttClient client(MqttConnectOptions options) throws MqttException {
     MqttClient mqttClient = new MqttClient(profile.getUrl(),profile.getClientId());
     List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+    mqttClient.connect(options);
 
     if(ValidateUtils.isNotEmpty(clazzList)){
       for(Object abstractConsumer : clazzList){
@@ -71,8 +64,6 @@ public class MqttConfig {
         mqttClient.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
       }
     }
-    mqttClient.connect(options);
-
     return mqttClient;
   }
 
