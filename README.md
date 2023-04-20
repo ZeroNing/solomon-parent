@@ -38,7 +38,9 @@
 | solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
 | solomon-i18n             | 国际化配置，支持扫描Jar包内国际化文件                        |
 | solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方法 |
-| solomon-mq               | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
+| solomon-mq               | 封装一些基础MQ类                                             |
+| solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
+| solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-mybatis          | 主要是加入了一个通用实体类，未来或许考虑加入动态切换数据源   |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
 
@@ -53,16 +55,31 @@ i18n:
   path:               #国际化文件路径
 ```
 
-### mq配置说明
+### RabbitMq配置说明
 
 ```yaml
-mq:
+rabbit:
   host:               #连接地址
   port:               #端口 
   user-name:          #用户名
   password:           #密码
-  choice:             #选择用哪个MQ 目前只支持（RABBIT）
 ```
+
+### Mqtt配置说明
+
+```yaml
+mqtt：
+  user-name：		#用户名
+  password：         #密码
+  url:               #连接
+  client-id:		 #客户端的标识(不可重复,为空时侯用uuid)
+  completion-timeout: #连接超时
+  automatic-reconnect: #是否自动重连
+  clean-session:	 #客户端掉线后,是否自动清除session
+  keep-alive-interval: #心跳时间
+```
+
+
 
 ### 缓存配置说明
 
@@ -211,6 +228,31 @@ public class TestDlxMq extends AbstractConsumer<String> {
 
   @Override
   public void saveFailMessage(Message message, Exception e) {
+
+  }
+}
+```
+
+## MQTT消费用力
+
+1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
+
+2.加上@Mqtt注解，并填写主题以及消息质量
+
+```java
+@Mqtt(topics = "topic",qos = 2)
+public class Test extends AbstractConsumer<String> {
+
+  private Logger logger = LoggerUtils.logger(Test.class);
+
+
+  @Override
+  public void handleMessage(String body) throws Exception {
+    logger.info("消息为:{}",body);
+  }
+
+  @Override
+  public void saveFailMessage(String topic, MqttMessage message, Exception e) {
 
   }
 }
