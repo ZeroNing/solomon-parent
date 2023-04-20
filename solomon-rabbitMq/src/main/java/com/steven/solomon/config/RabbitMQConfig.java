@@ -1,8 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.condition.RabbitCondition;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.profile.BaseMQProfile;
 import com.steven.solomon.profile.RabbitMQProfile;
 import com.steven.solomon.service.AbstractRabbitCallBack;
 import com.steven.solomon.spring.SpringUtil;
@@ -12,9 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
@@ -22,17 +18,17 @@ public class RabbitMQConfig {
 
 	private Logger logger = LoggerUtils.logger(RabbitMQConfig.class);
 
-	@Autowired
-	private RabbitMQProfile mqProfile;
+	private final RabbitMQProfile profile;
+
+	public RabbitMQConfig(RabbitMQProfile profile) {this.profile = profile;}
 
 	@Bean("cachingConnectionFactory")
-	@Conditional(value = RabbitCondition.class)
 	public CachingConnectionFactory cachingConnectionFactory(){
 		CachingConnectionFactory factory = new CachingConnectionFactory();
-		factory.setUsername(mqProfile.getUserName());
-		factory.setPassword(mqProfile.getPassword());
-		factory.setHost(mqProfile.getHost());
-		factory.setPort(mqProfile.getPort());
+		factory.setUsername(profile.getUserName());
+		factory.setPassword(profile.getPassword());
+		factory.setHost(profile.getHost());
+		factory.setPort(profile.getPort());
 		return factory;
 	}
 
@@ -40,13 +36,11 @@ public class RabbitMQConfig {
 	 * 接受数据自动的转换为Json
 	 */
 	@Bean("messageConverter")
-	@Conditional(value = RabbitCondition.class)
 	public MessageConverter messageConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
 
 	@Bean("rabbitTemplate")
-	@Conditional(value = RabbitCondition.class)
 	public RabbitTemplate rabbitTemplate(CachingConnectionFactory cachingConnectionFactory) {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter());
@@ -63,7 +57,6 @@ public class RabbitMQConfig {
 	}
 
 	@Bean("rabbitAdmin")
-	@Conditional(value = RabbitCondition.class)
 	public RabbitAdmin rabbitAdmin(CachingConnectionFactory cachingConnectionFactory) {
 		RabbitAdmin rabbitAdmin = new RabbitAdmin(cachingConnectionFactory);
 		logger.info("RabbitAdmin启动了。。。");

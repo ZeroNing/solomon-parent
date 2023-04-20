@@ -43,7 +43,6 @@
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
     <jackson.version>2.11.4</jackson.version>
-    <exif.version>2.15.0</exif.version>
     <spring.cloud.version>2020.0</spring.cloud.version>
     <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
@@ -70,7 +69,6 @@
     <spring.context.version>5.3.1</spring.context.version>
     <slf4j.version>1.7.30</slf4j.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
-    <mysql.connector.java.version>8.0.16</mysql.connector.java.version>
     <druid.version>1.2.8</druid.version>
     <xmpcore.version>6.1.11</xmpcore.version>
     <metadata.version>2.18.0</metadata.version>
@@ -143,6 +141,7 @@
       </dependency>
 
       <!--解析图片exif 开始-->
+      <!-- 去除图片Exif -->
       <dependency>
         <groupId>com.drewnoakes</groupId>
         <artifactId>metadata-extractor</artifactId>
@@ -160,12 +159,6 @@
         <groupId>com.alibaba</groupId>
         <artifactId>druid-spring-boot-starter</artifactId>
         <version>${druid.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${mysql.connector.java.version}</version>
       </dependency>
 
       <dependency>
@@ -385,12 +378,6 @@
         <groupId>com.alibaba</groupId>
         <artifactId>fastjson</artifactId>
         <version>${fastJson.version}</version>
-      </dependency>
-      <!-- 去除图片Exif -->
-      <dependency>
-        <groupId>com.drewnoakes</groupId>
-        <artifactId>metadata-extractor</artifactId>
-        <version>${exif.version}</version>
       </dependency>
 
       <dependency>
