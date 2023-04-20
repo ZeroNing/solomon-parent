@@ -234,7 +234,7 @@ public class TestDlxMq extends AbstractConsumer<String> {
 }
 ```
 
-## MQTT消费用力
+## MQTT消费用例
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
@@ -259,3 +259,16 @@ public class Test extends AbstractConsumer<String> {
 }
 ```
 
+## Redis多租户配置方式
+
+1.需要实现RedisClientPropertiesService接口的getRedisClient方法，将所有租户的redis配置信息都在这里返回，然后再项目启动时侯就会自动初始化
+
+2.也可以手动初始化数据，调用RedisInitUtils此类中的init方法，就可以手动将多租户redis加入到当前项目中
+
+## MongoDB多租户配置方式
+
+1.需要实现MongoClientPropertiesService接口的getMongoClient方法，将所有租户的mongoDB配置信息都在这里返回，然后再项目启动时侯就会自动初始化
+
+2.也可以手动初始化数据，调用MongoInitUtils此类中的init方法，就可以手动将多租户mongoDB加入到当前项目中
+
+3.通过实现MongoClientPropertiesService接口的setCappedCollectionNameMap方法，可以实现MongoDB的限制大小和行数，并且在类中加上@MongoDBCapped注解配置大小和行数，在项目启动时候初始化，也可以手动初始化

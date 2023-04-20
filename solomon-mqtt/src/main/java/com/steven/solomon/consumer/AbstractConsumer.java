@@ -21,7 +21,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
       String        json          = new String(message.getPayload(), StandardCharsets.UTF_8);
-      logger.info("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
+      logger.info("线程名:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),topic, json);
 
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
       // 消费者消费消息
