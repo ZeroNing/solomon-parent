@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.lang.UUID;
 import com.steven.solomon.annotation.Mqtt;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.profile.MqttProfile;
@@ -53,7 +54,7 @@ public class MqttConfig {
 
   @Bean
   public MqttClient client(MqttConnectOptions options) throws MqttException {
-    MqttClient mqttClient = new MqttClient(profile.getUrl(),profile.getClientId());
+    MqttClient mqttClient = new MqttClient(profile.getUrl(), ValidateUtils.isEmpty(profile.getClientId()) ? UUID.randomUUID().toString() : profile.getClientId());
     List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
     mqttClient.connect(options);
 
