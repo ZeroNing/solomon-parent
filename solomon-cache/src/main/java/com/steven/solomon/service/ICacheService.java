@@ -52,33 +52,6 @@ public interface ICacheService {
   <T> T get(String group, String key);
 
   /**
-   * 数组缓存获取
-   *
-   * @param group 组
-   * @param key   键
-   * @return 值
-   */
-  <T> T getList(String group, String key);
-
-  /**
-   * 数组缓存获取
-   *
-   * @param group 组
-   * @param key   键
-   * @return 值
-   */
-  <T> T getSet(String group, String key);
-
-  /**
-   * Map缓存获取
-   *
-   * @param group 组
-   * @param key   键
-   * @return 值
-   */
-  <T> T getMap(String group, String key);
-
-  /**
    * 普通缓存放入
    *
    * @param group 组

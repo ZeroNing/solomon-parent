@@ -84,32 +84,32 @@ public class RedisService extends AbsICacheService {
     return (T) redisTemplate.opsForValue().get(k);
   }
 
-  @Override
-  public <T> T getList(String group, String key) {
-    String k = assembleKey(group, key);
-    if(ValidateUtils.isEmpty(k)){
-      return null;
-    }
-    return (T)redisTemplate.opsForList().leftPop(k);
-  }
-
-  @Override
-  public <T> T getSet(String group, String key) {
-    String k = assembleKey(group, key);
-    if(ValidateUtils.isEmpty(k)){
-      return null;
-    }
-    return (T)redisTemplate.opsForSet().members(k);
-  }
-
-  @Override
-  public <T> T getMap(String group, String key) {
-    String k = assembleKey(group, key);
-    if(ValidateUtils.isEmpty(k)){
-      return null;
-    }
-    return (T)redisTemplate.opsForHash().entries(k);
-  }
+//  @Override
+//  public <T> T getList(String group, String key) {
+//    String k = assembleKey(group, key);
+//    if(ValidateUtils.isEmpty(k)){
+//      return null;
+//    }
+//    return (T)redisTemplate.opsForList().leftPop(k);
+//  }
+//
+//  @Override
+//  public <T> T getSet(String group, String key) {
+//    String k = assembleKey(group, key);
+//    if(ValidateUtils.isEmpty(k)){
+//      return null;
+//    }
+//    return (T)redisTemplate.opsForSet().members(k);
+//  }
+//
+//  @Override
+//  public <T> T getMap(String group, String key) {
+//    String k = assembleKey(group, key);
+//    if(ValidateUtils.isEmpty(k)){
+//      return null;
+//    }
+//    return (T)redisTemplate.opsForHash().entries(k);
+//  }
 
   @Override
   public <T> T set(String group, String key, T value) {
