@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+package com.steven.solomon.consumer;
 
 import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.RabbitMq;

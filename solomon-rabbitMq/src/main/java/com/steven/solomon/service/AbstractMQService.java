@@ -1,17 +1,16 @@
-package com.steven.solomon.service.impl;
+package com.steven.solomon.service;
 
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.entity.InitRabbitBinding;
-import com.steven.solomon.service.BaseMQService;
 import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
-public abstract class AbstractMQService implements BaseMQService {
+public abstract class AbstractMQService  {
 
+  public static String SERVICE_NAME = "MQService";
 
-  @Override
   public Queue initBinding(RabbitMq rabbitMq,String queueName, RabbitAdmin admin, boolean isInitDlxMap, boolean isAddDlxPrefix) {
     InitRabbitBinding initRabbitBinding = new InitRabbitBinding(rabbitMq,queueName, isInitDlxMap, isAddDlxPrefix);
     // 初始化队列

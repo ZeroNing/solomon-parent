@@ -2,7 +2,6 @@ package com.steven.solomon.config;
 
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.profile.RabbitMQProfile;
-import com.steven.solomon.service.AbstractRabbitCallBack;
 import com.steven.solomon.spring.SpringUtil;
 import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;

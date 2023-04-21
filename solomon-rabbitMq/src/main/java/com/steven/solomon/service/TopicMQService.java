@@ -1,4 +1,4 @@
-package com.steven.solomon.service.impl;
+package com.steven.solomon.service;
 
 import com.steven.solomon.annotation.RabbitMq;
 import org.springframework.amqp.core.*;

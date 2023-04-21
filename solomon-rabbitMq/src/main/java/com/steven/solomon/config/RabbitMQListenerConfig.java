@@ -6,9 +6,8 @@ import com.steven.solomon.constant.code.BaseCode;
 import com.steven.solomon.init.RabbitMQInitConfig;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.profile.RabbitMQProfile;
-import com.steven.solomon.service.AbstractConsumer;
-import com.steven.solomon.service.BaseMQService;
-import com.steven.solomon.service.impl.AbstractMQService;
+import com.steven.solomon.consumer.AbstractConsumer;
+import com.steven.solomon.service.AbstractMQService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
@@ -177,7 +176,7 @@ public class RabbitMQListenerConfig {
     }
 
     private Queue initBinding(Map<String, AbstractMQService> abstractMQMap,String queue,boolean isInitDlxMap, boolean isAddDlxPrefix,RabbitAdmin admin) {
-        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange()) ? abstractMQMap.get("delayedMQService") : abstractMQMap.get(rabbitMq.exchangeTypes() + BaseMQService.SERVICE_NAME);
+        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange()) ? abstractMQMap.get("delayedMQService") : abstractMQMap.get(rabbitMq.exchangeTypes() + AbstractMQService.SERVICE_NAME);
         return abstractMQService.initBinding(rabbitMq,queue, admin, isInitDlxMap, isAddDlxPrefix);
     }
 
