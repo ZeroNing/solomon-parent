@@ -1,6 +1,5 @@
 package com.steven.solomon.properties;
 
-import com.steven.solomon.entity.BaseFileProperties;
 import com.steven.solomon.enums.FileChoiceEnum;
 import com.steven.solomon.enums.FileNamingMethodEnum;
 import com.tencentcloudapi.common.profile.Region;
@@ -46,9 +45,17 @@ public class FileChoiceProperties {
   private String rootDirectory;
 
   /**
-   * 腾讯云存储
+   * 地区（默认腾讯的广州）
    */
-  private COSProperties cos;
+  private String regionName = Region.Guangzhou.getValue();
+
+  public String getRegionName() {
+    return regionName;
+  }
+
+  public void setRegionName(String regionName) {
+    this.regionName = regionName;
+  }
 
   public FileChoiceEnum getChoice() {
     return choice;
@@ -106,52 +113,4 @@ public class FileChoiceProperties {
     this.rootDirectory = rootDirectory;
   }
 
-  public COSProperties getCos() {
-    return cos;
-  }
-
-  public void setCos(COSProperties cos) {
-    this.cos = cos;
-  }
-
-  //  private MinioProperties minio;
-//  /**
-//   * 阿里云存储
-//   */
-//  private OSSProperties oss;
-//  /**
-//   * 华为云存储
-//   */
-//  private OBSProperties obs;
-
-//  /**
-//   * 百度云存储
-//   */
-//  private BOSProperties bos;
-
-
-//  public static class MinioProperties extends BaseFileProperties {
-//  }
-//
-//  public static class OSSProperties extends BaseFileProperties {
-//  }
-//
-//  public static class OBSProperties extends BaseFileProperties {
-//  }
-//
-//  public static class BOSProperties extends BaseFileProperties {
-//  }
-
-  public static class COSProperties extends BaseFileProperties {
-
-    private String regionName = Region.Guangzhou.getValue();
-
-    public String getRegionName() {
-      return regionName;
-    }
-
-    public void setRegionName(String regionName) {
-      this.regionName = regionName;
-    }
-  }
 }
