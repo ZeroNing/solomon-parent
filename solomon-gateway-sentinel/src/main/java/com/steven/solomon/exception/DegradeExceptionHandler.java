@@ -1,7 +1,8 @@
 package com.steven.solomon.exception;
 
 import com.steven.solomon.constant.code.BaseExceptionCode;
-import com.steven.solomon.vo.BaseExceptionVO;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import org.springframework.stereotype.Component;
 
 @Component("DegradeExceptionProcessor")

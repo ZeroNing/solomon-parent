@@ -1,11 +1,10 @@
 package com.steven.solomon.base.excetion;
 
 import com.steven.solomon.constant.code.BaseCode;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.ExceptionUtil;
-import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.utils.I18nUtils;
 import com.steven.solomon.verification.ValidateUtils;
-import com.steven.solomon.vo.BaseExceptionVO;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;

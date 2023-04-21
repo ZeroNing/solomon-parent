@@ -1,4 +1,4 @@
-package com.steven.solomon.vo;
+package com.steven.solomon.constant.pojo.vo;
 
 
 import java.io.Serializable;

@@ -1,8 +1,8 @@
 package com.steven.solomon.base.excetion;
 
-import com.steven.solomon.exception.AbstractExceptionHandler;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.vo.BaseExceptionVO;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;

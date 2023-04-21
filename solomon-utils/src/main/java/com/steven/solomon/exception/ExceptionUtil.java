@@ -1,11 +1,12 @@
 package com.steven.solomon.exception;
 
 import com.steven.solomon.constant.code.BaseExceptionCode;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.I18nUtils;
 import com.steven.solomon.verification.ValidateUtils;
-import com.steven.solomon.vo.BaseExceptionVO;
 import java.util.Locale;
 import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -16,12 +17,13 @@ public class ExceptionUtil {
 
   public static ThreadLocal<String> requestId = new ThreadLocal<>();
 
-  public static AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
-    if (ValidateUtils.isEmpty(AbstractExceptionHandler.exceptionHandlerMap)) {
-      AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(AbstractExceptionHandler.class);
+  public static com.steven.solomon.exception.handler.AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
+    if (ValidateUtils.isEmpty(com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap)) {
+      com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(
+          com.steven.solomon.exception.handler.AbstractExceptionHandler.class);
     }
-    String exceptionHandlerName = exceptionSimpleName + AbstractExceptionHandler.HANDLER_NAME;
-    return AbstractExceptionHandler.exceptionHandlerMap.get(exceptionHandlerName);
+    String exceptionHandlerName = exceptionSimpleName + com.steven.solomon.exception.handler.AbstractExceptionHandler.HANDLER_NAME;
+    return com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap.get(exceptionHandlerName);
   }
 
   public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName,Exception ex){

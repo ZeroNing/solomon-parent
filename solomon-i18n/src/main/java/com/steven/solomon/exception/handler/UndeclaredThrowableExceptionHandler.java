@@ -1,7 +1,8 @@
-package com.steven.solomon.exception;
+package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.constant.code.BaseExceptionCode;
-import com.steven.solomon.vo.BaseExceptionVO;
+import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import java.lang.reflect.UndeclaredThrowableException;
 import org.springframework.stereotype.Component;
 

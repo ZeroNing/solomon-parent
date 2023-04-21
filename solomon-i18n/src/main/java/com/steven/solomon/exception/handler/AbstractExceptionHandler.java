@@ -1,6 +1,6 @@
-package com.steven.solomon.exception;
+package com.steven.solomon.exception.handler;
 
-import com.steven.solomon.vo.BaseExceptionVO;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import java.io.IOException;
 import java.util.Map;
 

@@ -1,6 +1,7 @@
-package com.steven.solomon.exception;
+package com.steven.solomon.exception.handler;
 
-import com.steven.solomon.vo.BaseExceptionVO;
+import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.exception.BaseException;
 import org.springframework.stereotype.Component;
 
 @Component("BaseExceptionProcessor")

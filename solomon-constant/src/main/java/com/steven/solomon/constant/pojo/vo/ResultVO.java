@@ -1,10 +1,9 @@
-package com.steven.solomon.base.model;
+package com.steven.solomon.constant.pojo.vo;
 
 import com.steven.solomon.constant.code.BaseCode;
 import java.io.Serializable;
-import org.springframework.http.HttpStatus;
 
-public class Result<T> implements Serializable {
+public class ResultVO<T> implements Serializable {
 
   private String message;
 
@@ -12,26 +11,26 @@ public class Result<T> implements Serializable {
 
   private T data;
 
-  public static<T> Result<T> success(T data){
-    return new Result<>(data);
+  public static<T> ResultVO<T> success(T data){
+    return new ResultVO<>(data);
   }
 
-  public static<T> Result<T> success(){
-    return new Result<>();
+  public static<T> ResultVO<T> success(){
+    return new ResultVO<>();
   }
 
-  public Result(T data){
+  public ResultVO(T data){
     super();
     this.message = BaseCode.DEFAULT_SUCCESS_PHRASE;
     this.data = data;
-    this.status = HttpStatus.OK.value();
+    this.status = 200;
   }
 
-  public Result(){
+  public ResultVO(){
     super();
     this.message = BaseCode.DEFAULT_SUCCESS_PHRASE;
     this.data = null;
-    this.status = HttpStatus.OK.value();
+    this.status = 200;
   }
 
   public String getMessage() {
