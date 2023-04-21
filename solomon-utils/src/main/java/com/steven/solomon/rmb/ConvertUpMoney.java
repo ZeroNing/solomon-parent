@@ -104,9 +104,9 @@ public class ConvertUpMoney {
     for(int i=0;i<length;i++) {
       String key = "";
       if(integers[i] == 0) {
-        if((length - i) == 13)//万（亿）
+        if((length - i) == 13) {//万（亿）
           key = IUNIT[4];
-        else if((length - i) == 9) {//亿
+        }else if((length - i) == 9) {//亿
           key = IUNIT[8];
         }else if((length - i) == 5 && isWan) {//万
           key = IUNIT[4];

@@ -226,12 +226,6 @@ public class ValidateUtils extends EmptyUtils {
     return matcher.matches();
   }
 
-  public static void main(String[] args) {
-    BigDecimal a = new BigDecimal(12);
-    BigDecimal b = new BigDecimal(12);
-    System.out.println(ValidateUtils.equals(a,b));
-  }
-
   public static String camelName(String name) {
     StringBuilder result = new StringBuilder();
     // 快速检查

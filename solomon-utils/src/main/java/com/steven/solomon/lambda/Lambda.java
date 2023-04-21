@@ -300,7 +300,7 @@ public class Lambda {
   public static <K, T> Map<K, Long> groupBySum(Collection<T> list, Function<T, K> groupByFunc, Predicate<T> predicate,
       ToLongFunction<T> sumFunc) {
     if (ValidateUtils.isEmpty(list)) {
-      return null;
+      return new HashMap<>();
     }
     return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.summingLong(sumFunc)));
   }
