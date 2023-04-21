@@ -1,6 +1,7 @@
 package com.steven.solomon.profile;
 
 import com.steven.solomon.config.MqttConfig;
+import java.io.Serializable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.stereotype.Component;
@@ -48,6 +49,71 @@ public class MqttProfile {
    * 心跳时间
    */
   private int keepAliveInterval = 60;
+  /**
+   * 遗嘱消息
+   */
+  private MqttWill will;
+
+  public static class MqttWill implements Serializable {
+
+    /**
+     * 遗嘱主题
+     */
+    private String topic;
+    /**
+     * 遗嘱消息
+     */
+    private String message;
+    /**
+     * 遗嘱消息质量
+     */
+    private int qos;
+
+    /**
+     * 是否保留消息
+     */
+    private boolean retained;
+
+    public boolean getRetained() {
+      return retained;
+    }
+
+    public void setRetained(boolean retained) {
+      this.retained = retained;
+    }
+
+    public String getTopic() {
+      return topic;
+    }
+
+    public void setTopic(String topic) {
+      this.topic = topic;
+    }
+
+    public String getMessage() {
+      return message;
+    }
+
+    public void setMessage(String message) {
+      this.message = message;
+    }
+
+    public int getQos() {
+      return qos;
+    }
+
+    public void setQos(int qos) {
+      this.qos = qos;
+    }
+  }
+
+  public MqttWill getWill() {
+    return will;
+  }
+
+  public void setWill(MqttWill will) {
+    this.will = will;
+  }
 
   public int getKeepAliveInterval() {
     return keepAliveInterval;

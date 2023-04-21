@@ -4,6 +4,7 @@ import cn.hutool.core.lang.UUID;
 import com.steven.solomon.annotation.Mqtt;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.profile.MqttProfile;
+import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.UnsupportedEncodingException;
@@ -49,6 +50,11 @@ public class MqttConfig {
     mqttConnectOptions.setCleanSession(profile.getCleanSession());
     // 设置会话心跳时间 单位为秒   设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
     mqttConnectOptions.setKeepAliveInterval(profile.getKeepAliveInterval());
+    //设置遗嘱消息
+    if(ValidateUtils.isNotEmpty(profile.getWill())){
+      MqttWill will = profile.getWill();
+      mqttConnectOptions.setWill(will.getTopic(),will.getMessage().getBytes(),will.getQos(),will.getRetained());
+    }
     return mqttConnectOptions;
   }
 
