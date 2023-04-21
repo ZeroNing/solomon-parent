@@ -2,11 +2,19 @@ package com.steven.solomon.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.steven.solomon.annotation.Mqtt;
+import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import javax.annotation.Resource;
+import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -19,6 +27,18 @@ public class MqttUtils {
 
   @Resource
   private MqttClient client;
+
+  private MqttConnectOptions options;
+
+  private Map<String, Map<AbstractConsumer,Mqtt>> consumer = new HashMap<>();
+
+  public void setOptions(MqttConnectOptions options) {
+    this.options = options;
+  }
+
+  public void setConsumer(Map<String, Map<AbstractConsumer,Mqtt>> consumer){
+    this.consumer.putAll(consumer);
+  }
 
   /**
    *   发送消息
@@ -36,6 +56,52 @@ public class MqttUtils {
       logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", topic));
     } catch (MqttException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息失败", topic));
+    }
+  }
+
+  /**
+   * 订阅消息
+   * @param topic 主题
+   * @param qos 消息质量
+   * @param consumer 消费者
+   */
+  public void subscribe(String topic,int qos, AbstractConsumer consumer) throws MqttException {
+    if(ValidateUtils.isEmpty(topic)){
+      return;
+    }
+    client.subscribe(topic, qos,consumer);
+  }
+
+  /**
+   * 取消订阅
+   * @param topic 主题
+   */
+  public void unsubscribe(String[] topic) throws MqttException {
+    if(ValidateUtils.isEmpty(topic)){
+      return;
+    }
+    client.unsubscribe(topic);
+  }
+
+  /**
+   * 关闭连接
+   */
+  public void disconnect() throws MqttException {
+    client.disconnect();
+  }
+
+  /**
+   * 重新连接
+   */
+  public void reconnect() throws MqttException {
+    if(!client.isConnected()){
+      client.connect(this.options);
+      Map<String, Map<AbstractConsumer,Mqtt>> consumer = this.consumer;
+      for(Map<AbstractConsumer,Mqtt> map : consumer.values()){
+        for(Entry<AbstractConsumer,Mqtt> entry: map.entrySet()){
+          client.subscribe(entry.getValue().topics(),entry.getValue().qos(),entry.getKey());
+        }
+      }
     }
   }
 }

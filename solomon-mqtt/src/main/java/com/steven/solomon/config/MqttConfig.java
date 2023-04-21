@@ -6,12 +6,15 @@ import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
+import java.util.Map;
 import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -33,7 +36,12 @@ public class MqttConfig {
 
   private final MqttProfile profile;
 
-  public MqttConfig(MqttProfile profile) {this.profile = profile;}
+  private final MqttUtils utils;
+
+  public MqttConfig(MqttProfile profile, MqttUtils utils) {
+    this.profile = profile;
+    this.utils   = utils;
+  }
 
   @Bean
   public MqttConnectOptions getMqttConnectOptions() throws UnsupportedEncodingException, MqttException {
@@ -55,6 +63,7 @@ public class MqttConfig {
       MqttWill will = profile.getWill();
       mqttConnectOptions.setWill(will.getTopic(),will.getMessage().getBytes(),will.getQos(),will.getRetained());
     }
+    utils.setOptions(mqttConnectOptions);
     return mqttConnectOptions;
   }
 
@@ -65,13 +74,18 @@ public class MqttConfig {
     mqttClient.connect(options);
 
     if(ValidateUtils.isNotEmpty(clazzList)){
+      Map<String, Map<AbstractConsumer,Mqtt>> consumer = new HashMap<>();
       for(Object abstractConsumer : clazzList){
+        Map<AbstractConsumer,Mqtt> map = new HashMap<>();
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
 
         if(ValidateUtils.isEmpty(mqtt)){
           continue;
         }
         mqttClient.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
+        map.put((AbstractConsumer)abstractConsumer,mqtt);
+        consumer.put(mqtt.topics(),map);
+        utils.setConsumer(consumer);
       }
     }
     Collection<MqttCallback> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallback.class).values();
