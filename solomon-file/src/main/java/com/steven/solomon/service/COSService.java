@@ -10,7 +10,6 @@ import com.qcloud.cos.region.Region;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.properties.FileChoiceProperties.COSProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -39,7 +38,7 @@ public class COSService implements FileServiceInterface{
 
   private static COSClient initClient(FileChoiceProperties properties){
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    Region         region       = new Region(properties.getCos().getRegionName());
+    Region         region       = new Region(properties.getRegionName());
     ClientConfig   clientConfig = new ClientConfig(region);
     return new COSClient(credentials, clientConfig);
   }
