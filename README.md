@@ -97,13 +97,13 @@ rabbit:
 
 ```yaml
 mqtt：
-  user-name：		#用户名
-  password：         #密码
-  url:               #连接
-  client-id:		 #客户端的标识(不可重复,为空时侯用uuid)
-  completion-timeout: #连接超时
+  user-name:           #用户名
+  password:            #密码
+  url:                 #连接
+  client-id:           #客户端的标识(不可重复,为空时侯用uuid)
+  completion-timeout:  #连接超时
   automatic-reconnect: #是否自动重连
-  clean-session:	 #客户端掉线后,是否自动清除session
+  clean-session:       #客户端掉线后,是否自动清除session
   keep-alive-interval: #心跳时间
 ```
 
@@ -132,8 +132,7 @@ file:
   secretKey:       # 密钥
   bucket-name:     # 桶名 我这是给出了一个默认桶名
   rootDirectory:   # 根目录
-  cos:
-    region-name:     # 地区名
+  region-name:     # 地区名
 ```
 
 ## 枚举国际化用例
