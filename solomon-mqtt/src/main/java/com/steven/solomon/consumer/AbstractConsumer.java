@@ -16,18 +16,18 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
 
   @Override
   public void messageArrived(String topic, MqttMessage message) throws Exception {
+    String json          = new String(message.getPayload(), StandardCharsets.UTF_8);
     try {
       if(checkMessageKey(topic,message)){
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
-      String        json          = new String(message.getPayload(), StandardCharsets.UTF_8);
       logger.info("线程名:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),topic, json);
 
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
       // 消费者消费消息
       this.handleMessage((T) mqttModel.getBody());
     } catch (Exception e){
-      logger.info("AbstractConsumer:消费报错 异常为:", e);
+      logger.info("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
     }
   }
