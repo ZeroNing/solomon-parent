@@ -99,6 +99,7 @@ public class MqttUtils {
       Map<String, Map<AbstractConsumer,Mqtt>> consumer = this.consumer;
       for(Map<AbstractConsumer,Mqtt> map : consumer.values()){
         for(Entry<AbstractConsumer,Mqtt> entry: map.entrySet()){
+          logger.info("重新连接,重新订阅主题:{}",entry.getValue().topics());
           client.subscribe(entry.getValue().topics(),entry.getValue().qos(),entry.getKey());
         }
       }
