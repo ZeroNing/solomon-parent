@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 public class DateTimeUtils {
 
@@ -23,6 +25,40 @@ public class DateTimeUtils {
 	public static final DateTimeFormatter DATETIME_FORMATTER  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	public static final DateTimeFormatter YEAR_FORMATTER      = DateTimeFormatter.ofPattern("yyyy");
 	public static final DateTimeFormatter MONTH_FORMATTER     = DateTimeFormatter.ofPattern("MM");
+
+	/**
+	 * 获取LocalTime所有时区
+	 * @return
+	 */
+	public static Set<String> getZoneIds(){
+		 return ZoneId.getAvailableZoneIds();
+	}
+
+	/**
+	 * 获取Localtime时区
+	 */
+	public static ZoneId getZoneId(String zoneId){
+		return ZoneId.of(zoneId);
+	}
+
+	/**
+	 * 获取当前系统时间
+	 *
+	 * @return
+	 */
+	public static LocalTime getLocalTime(String zoneId) {
+		return LocalTime.now(getZoneId(zoneId));
+	}
+
+	/**
+	 * 获取当前系统时间
+	 *
+	 * @return
+	 */
+	public static LocalTime getLocalTime(ZoneId zoneId) {
+		return LocalTime.now(zoneId);
+	}
+
 
 	/**
 	 * 获取当前系统时间
@@ -35,11 +71,47 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期
+	 *
+	 * @return
+	 */
+	public static LocalDate getLocalDate(String zoneId) {
+		return LocalDate.now(getZoneId(zoneId));
+	}
+
+	/**
+	 * 获取当前系统日期
+	 *
+	 * @return
+	 */
+	public static LocalDate getLocalDate(ZoneId zoneId) {
+		return LocalDate.now(zoneId);
+	}
+
+	/**
+	 * 获取当前系统日期
 	 * 
 	 * @return
 	 */
 	public static LocalDate getLocalDate() {
 		return LocalDate.now();
+	}
+
+	/**
+	 * 获取当前系统日期时间
+	 *
+	 * @return
+	 */
+	public static LocalDateTime getLocalDateTime(String zoneId) {
+		return LocalDateTime.now(getZoneId(zoneId));
+	}
+
+	/**
+	 * 获取当前系统日期时间
+	 *
+	 * @return
+	 */
+	public static LocalDateTime getLocalDateTime(ZoneId zoneId) {
+		return LocalDateTime.now(zoneId);
 	}
 
 	/**
