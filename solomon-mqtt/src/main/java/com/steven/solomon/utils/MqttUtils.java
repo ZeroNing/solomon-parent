@@ -42,20 +42,19 @@ public class MqttUtils {
 
   /**
    *   发送消息
-   *   @param topic 主题
    *   @param data 消息内容
    */
-  public void send(String topic, MqttModel data) {
+  public void send(MqttModel data) {
     // 获取客户端实例
     ObjectMapper mapper = new ObjectMapper();
     try {
       // 转换消息为json字符串
       String json = mapper.writeValueAsString(data);
-      client.publish(topic, new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
+      client.publish(data.getTopic(), new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
     } catch (JsonProcessingException e) {
-      logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", topic));
+      logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", data.getTopic()));
     } catch (MqttException e) {
-      logger.error(String.format("MQTT: 主题[%s]发送消息失败", topic));
+      logger.error(String.format("MQTT: 主题[%s]发送消息失败", data.getTopic()));
     }
   }
 

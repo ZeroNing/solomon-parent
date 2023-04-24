@@ -7,12 +7,23 @@ import com.steven.solomon.pojo.BaseMq;
  */
 public class MqttModel<T> extends BaseMq<T> {
 
+  private String topic;
+
+  public String getTopic() {
+    return topic;
+  }
+
+  public void setTopic(String topic) {
+    this.topic = topic;
+  }
+
   public MqttModel() {
     super();
   }
 
-  public MqttModel(T body) {
+  public MqttModel(String topic,T body) {
     super(body);
+    this.topic = topic;
   }
 
 }
