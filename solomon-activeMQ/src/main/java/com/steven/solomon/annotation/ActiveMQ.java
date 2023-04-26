@@ -21,6 +21,11 @@ public @interface ActiveMQ {
   String name();
 
   /**
+   * 是否是队列模式 默认队列模式 false则是主题模式
+   */
+  boolean isQueue() default true;
+
+  /**
    * 是否开启事务
    */
   boolean sessionTransacted() default true;
