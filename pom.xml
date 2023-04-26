@@ -24,7 +24,7 @@
     <module>solomon-gateway-sentinel</module>
     <module>solomon-mqtt</module>
     <module>solomon-rabbitMq</module>
-    <module>solomon-activeMQ</module>
+    <module>solomon-activeMq</module>
   </modules>
 
   <properties>

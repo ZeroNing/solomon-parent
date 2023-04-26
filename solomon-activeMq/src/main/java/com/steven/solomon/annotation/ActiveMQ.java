@@ -45,4 +45,9 @@ public @interface ActiveMQ {
    * INDIVIDUAL_ACKNOWLEDGE = 4：单条消息确认
    */
   int sessionAcknowledgeMode() default 2;
+
+  /**
+   * 默认使用queue模式，使用topic则需要设置为true
+   */
+  boolean pubSubDomain() default false;
 }
