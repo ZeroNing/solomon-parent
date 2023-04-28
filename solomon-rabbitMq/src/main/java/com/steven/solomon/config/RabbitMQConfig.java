@@ -10,6 +10,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
@@ -31,14 +32,11 @@ public class RabbitMQConfig {
 	}
 
 	@Bean("rabbitTemplate")
-	public RabbitTemplate rabbitTemplate(CachingConnectionFactory cachingConnectionFactory,MessageConverter messageConverter) {
+	public RabbitTemplate rabbitTemplate(CachingConnectionFactory cachingConnectionFactory,MessageConverter messageConverter,
+			RabbitProperties properties) {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter);
-		// 开启发送确认
-		cachingConnectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);
-		// 开启发送失败退回
-		cachingConnectionFactory.setPublisherReturns(true);
-		rabbitTemplate.setMandatory(true);
+		rabbitTemplate.setMandatory(properties.getTemplate().getMandatory());
 		Map<String,AbstractRabbitCallBack> callBackMap = SpringUtil.getBeansOfType(AbstractRabbitCallBack.class);
 		if(ValidateUtils.isNotEmpty(callBackMap)){
 			RabbitCallBack                     rabbitCallBack = new RabbitCallBack(callBackMap.values());
