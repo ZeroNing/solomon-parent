@@ -6,6 +6,8 @@ import com.steven.solomon.annotation.Mqtt;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.pojo.BaseMq;
+import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -21,7 +23,7 @@ import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MqttUtils {
+public class MqttUtils implements SendService<MqttModel> {
 
   private Logger logger = LoggerUtils.logger(MqttUtils.class);
 
@@ -44,6 +46,7 @@ public class MqttUtils {
    *   发送消息
    *   @param data 消息内容
    */
+  @Override
   public void send(MqttModel data) {
     // 获取客户端实例
     ObjectMapper mapper = new ObjectMapper();
@@ -56,6 +59,16 @@ public class MqttUtils {
     } catch (MqttException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息失败", data.getTopic()));
     }
+  }
+
+  @Override
+  public void sendDelay(MqttModel data, long delay) throws Exception {
+    send(data);
+  }
+
+  @Override
+  public void sendExpiration(MqttModel data, long expiration) throws Exception {
+    send(data);
   }
 
   /**

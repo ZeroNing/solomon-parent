@@ -37,6 +37,12 @@ public class RabbitMQConfig {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter);
 		rabbitTemplate.setMandatory(properties.getTemplate().getMandatory());
+		if(ValidateUtils.isNotEmpty(properties.getTemplate().getReceiveTimeout())){
+			rabbitTemplate.setReceiveTimeout(properties.getTemplate().getReceiveTimeout().toMillis());
+		}
+		if(ValidateUtils.isNotEmpty(properties.getTemplate().getReplyTimeout())){
+			rabbitTemplate.setReplyTimeout(properties.getTemplate().getReplyTimeout().toMillis());
+		}
 		Map<String,AbstractRabbitCallBack> callBackMap = SpringUtil.getBeansOfType(AbstractRabbitCallBack.class);
 		if(ValidateUtils.isNotEmpty(callBackMap)){
 			RabbitCallBack                     rabbitCallBack = new RabbitCallBack(callBackMap.values());

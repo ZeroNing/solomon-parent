@@ -1,5 +1,6 @@
 package com.steven.solomon.utils;
 
+import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.constant.code.BaseExceptionCode;
 import com.steven.solomon.entity.MessageQueueDatail;
 import com.steven.solomon.entity.RabbitMqModel;
@@ -7,6 +8,7 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.pojo.BaseMq;
+import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -24,17 +26,19 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class RabbitUtils {
+public class RabbitUtils implements SendService<RabbitMqModel> {
 
   private Logger logger = LoggerUtils.logger(RabbitUtils.class);
 
-  @Resource
-  private RabbitTemplate rabbitTemplate;
+  private final RabbitTemplate rabbitTemplate;
+
+  public RabbitUtils(RabbitTemplate rabbitTemplate) {this.rabbitTemplate = rabbitTemplate;}
 
   /**
    * 发送消息
    */
-  public void send(BaseMq mq) throws Exception {
+  @Override
+  public void send(RabbitMqModel mq) throws Exception {
     if (!convertAndSend(mq,0,false)) {
       throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
     }
@@ -43,7 +47,8 @@ public class RabbitUtils {
   /**
    * 发送延缓信息
    */
-  public void sendDelay(BaseMq mq, long delay) throws Exception {
+  @Override
+  public void sendDelay(RabbitMqModel mq, long delay) throws Exception {
     if (!convertAndSend(mq,delay,true)) {
       throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
     }
@@ -55,7 +60,8 @@ public class RabbitUtils {
    * @param expiration
    * @throws Exception
    */
-  public void sendExpiration(BaseMq mq, long expiration) throws Exception {
+  @Override
+  public void sendExpiration(RabbitMqModel mq, long expiration) throws Exception {
     if (!convertAndSend(mq,expiration,false)) {
       throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
     }
