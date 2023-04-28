@@ -24,7 +24,7 @@ public @interface ActiveMQRetry {
   /**
    * 重发时间间隔,默认为1000ms（1秒）
    */
-  long initialRedeliveryDelay() default 1000L;
+  long redeliveryDelay() default 1000L;
 
   /**
    * 重发时长递增的时间倍数
@@ -40,4 +40,9 @@ public @interface ActiveMQRetry {
    * 设置重发最大拖延时间-1表示无延迟限制
    */
   long maximumRedeliveryDelay() default -1;
+
+  /**
+   * 首次重试时间间隔，默认为0毫秒
+   */
+  long initialRedeliveryDelay()default 0;
 }

@@ -16,13 +16,6 @@ import org.springframework.stereotype.Component;
 public class ActiveMQConfig {
 
   @Bean
-  public Connection connection(ConnectionFactory connectionFactory) throws JMSException {
-    Connection connection = connectionFactory.createConnection();
-    connection.start();
-    return connection;
-  }
-
-  @Bean
   public JmsPoolConnectionFactoryFactory factory(ActiveMQProperties properties){
     return new JmsPoolConnectionFactoryFactory(properties.getPool());
   }
