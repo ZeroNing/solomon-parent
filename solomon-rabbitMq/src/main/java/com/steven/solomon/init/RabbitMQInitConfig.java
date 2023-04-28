@@ -5,13 +5,13 @@ import com.steven.solomon.annotation.RabbitMqRetry;
 import com.steven.solomon.constant.code.BaseCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.profile.RabbitMQProfile;
 import com.steven.solomon.service.AbstractMQService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
@@ -30,9 +30,6 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Order(2)
@@ -65,9 +62,6 @@ public class RabbitMQInitConfig implements CommandLineRunner {
             logger.info("MessageListenerConfig:没有rabbitMq消费者");
             return;
         }
-        RabbitMQProfile rabbitProfile = SpringUtil.getBean(RabbitMQProfile.class);
-        List<String> notEnableQueueList = ValidateUtils.isEmpty(rabbitProfile) || ValidateUtils.isEmpty(rabbitProfile.getNotEnabledQueue()) ?
-                                          null : Arrays.asList(rabbitProfile.getNotEnabledQueue().split(","));
 
         Map<String, AbstractMQService> abstractMQMap = SpringUtil.getBeansOfType(AbstractMQService.class);
         // 遍历消费者队列进行初始化绑定以及监听
@@ -75,15 +69,6 @@ public class RabbitMQInitConfig implements CommandLineRunner {
             // 根据反射获取rabbitMQ注解信息
             rabbitMq = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RabbitMq.class);
             String[] queues = rabbitMq.queues();
-            for (String queue : queues) {
-                /**
-                 * 判断配置文件中是否存在去除启动的rabbitmq队列
-                 */
-                if(ValidateUtils.isNotEmpty(notEnableQueueList) && notEnableQueueList.contains(queue)){
-                    logger.info("MessageListenerConfig:不启用队列为:{} 不启用的队列名包含 {} 队列",notEnableQueueList, rabbitMq.queues());
-                    continue initMq;
-                }
-            }
 
             for (String queueName : queues) {
                 // 初始化队列绑定

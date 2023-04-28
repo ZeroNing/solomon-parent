@@ -1,7 +1,6 @@
 package com.steven.solomon.config;
 
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.profile.RabbitMQProfile;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.Map;
@@ -23,20 +22,6 @@ public class RabbitMQConfig {
 
 	private Logger logger = LoggerUtils.logger(RabbitMQConfig.class);
 
-	private final RabbitMQProfile profile;
-
-	public RabbitMQConfig(RabbitMQProfile profile) {this.profile = profile;}
-
-	@Bean("cachingConnectionFactory")
-	public CachingConnectionFactory cachingConnectionFactory(){
-		CachingConnectionFactory factory = new CachingConnectionFactory();
-		factory.setUsername(profile.getUserName());
-		factory.setPassword(profile.getPassword());
-		factory.setHost(profile.getHost());
-		factory.setPort(profile.getPort());
-		return factory;
-	}
-
 	/**
 	 * 接受数据自动的转换为Json
 	 */
@@ -54,7 +39,6 @@ public class RabbitMQConfig {
 		// 开启发送失败退回
 		cachingConnectionFactory.setPublisherReturns(true);
 		rabbitTemplate.setMandatory(true);
-		rabbitTemplate.setMessageConverter(messageConverter);
 		Map<String,AbstractRabbitCallBack> callBackMap = SpringUtil.getBeansOfType(AbstractRabbitCallBack.class);
 		if(ValidateUtils.isNotEmpty(callBackMap)){
 			RabbitCallBack                     rabbitCallBack = new RabbitCallBack(callBackMap.values());
