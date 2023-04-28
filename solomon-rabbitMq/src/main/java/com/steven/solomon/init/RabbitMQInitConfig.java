@@ -40,15 +40,24 @@ public class RabbitMQInitConfig implements CommandLineRunner {
 
     private RabbitMq rabbitMq;
 
+    private final RabbitAdmin admin;
+
+    private final CachingConnectionFactory connectionFactory;
+
     /**
      * 所有的队列监听容器MAP
      */
     public final static Map<String, AbstractMessageListenerContainer> allQueueContainerMap = new ConcurrentHashMap<>();
 
+    public RabbitMQInitConfig(RabbitAdmin admin, CachingConnectionFactory connectionFactory) {
+        this.admin             = admin;
+        this.connectionFactory = connectionFactory;
+    }
+
     @Override
     public void run(String... args) throws Exception {
         //根据RabbitMq注解找出使用这个注解的类并初始化消费队列
-        this.init(new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values()),SpringUtil.getBean(RabbitAdmin.class),SpringUtil.getBean(CachingConnectionFactory.class));
+        this.init(new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values()));
     }
 
     /**
@@ -56,7 +65,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
      *
      * @param clazzList 消费者集合数组
      */
-    private void init(List<Object> clazzList,RabbitAdmin admin, CachingConnectionFactory rabbitConnectionFactory) {
+    private void init(List<Object> clazzList) {
         // 判断消费者队列是否存在
         if (ValidateUtils.isEmpty(clazzList)) {
             logger.info("MessageListenerConfig:没有rabbitMq消费者");
@@ -74,9 +83,9 @@ public class RabbitMQInitConfig implements CommandLineRunner {
                 // 初始化队列绑定
                 Queue queue = initBinding(abstractMQMap,queueName,true, false,admin);
                 // 启动监听器并保存已启动的MQ
-                RabbitMQInitConfig.allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue,admin,rabbitConnectionFactory));
+                RabbitMQInitConfig.allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue,admin,connectionFactory));
                 // 初始化死信队列
-                this.initDlx(queue,admin,rabbitConnectionFactory,abstractMQMap);
+                this.initDlx(queue,admin,connectionFactory,abstractMQMap);
             }
 
         }
