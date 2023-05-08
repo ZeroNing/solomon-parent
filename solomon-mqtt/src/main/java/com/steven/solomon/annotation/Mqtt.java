@@ -18,7 +18,7 @@ public @interface Mqtt {
   /**
    * 主题
    */
-  String topics();
+  String[] topics();
 
   /**
    * 消息质量

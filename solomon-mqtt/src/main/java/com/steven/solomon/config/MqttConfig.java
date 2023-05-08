@@ -82,7 +82,9 @@ public class MqttConfig {
         if (ValidateUtils.isEmpty(mqtt)) {
           continue;
         }
-        mqttClient.subscribe(mqtt.topics(), mqtt.qos(), (AbstractConsumer) abstractConsumer);
+        for(String topic : mqtt.topics()){
+          mqttClient.subscribe(topic, mqtt.qos(), (AbstractConsumer) abstractConsumer);
+        }
         map.put((AbstractConsumer) abstractConsumer, mqtt);
       }
       utils.setConsumer(map);
