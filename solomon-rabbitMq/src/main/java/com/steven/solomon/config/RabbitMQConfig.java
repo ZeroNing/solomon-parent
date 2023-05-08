@@ -34,6 +34,7 @@ public class RabbitMQConfig {
 	}
 
 	@Bean("rabbitTemplate")
+	@ConditionalOnMissingBean(RabbitTemplate.class)
 	public RabbitTemplate rabbitTemplate(CachingConnectionFactory cachingConnectionFactory,MessageConverter messageConverter,
 			RabbitProperties properties) {
 		final RabbitTemplate rabbitTemplate = new RabbitTemplate(cachingConnectionFactory);
@@ -55,6 +56,7 @@ public class RabbitMQConfig {
 	}
 
 	@Bean("rabbitAdmin")
+	@ConditionalOnMissingBean(RabbitAdmin.class)
 	public RabbitAdmin rabbitAdmin(CachingConnectionFactory cachingConnectionFactory) {
 		RabbitAdmin rabbitAdmin = new RabbitAdmin(cachingConnectionFactory);
 		logger.info("RabbitAdmin启动了。。。");
