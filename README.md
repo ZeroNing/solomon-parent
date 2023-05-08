@@ -142,7 +142,7 @@ file:
 
 ## 枚举国际化用例
 
-1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型
+1.枚举类需要实现 BaseEnum 其中的 T 是数据库里的值的类型
 
 ```java
 public interface BaseEnum<T> {
