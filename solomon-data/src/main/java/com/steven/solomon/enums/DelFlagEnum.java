@@ -4,7 +4,7 @@ package com.steven.solomon.enums;
  * 删除枚举
  */
 
-public enum DelFlagEnum implements BaseEnum {
+public enum DelFlagEnum implements BaseEnum<String> {
   /**
    * 未删除
    */

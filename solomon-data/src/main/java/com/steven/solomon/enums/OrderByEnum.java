@@ -1,6 +1,6 @@
 package com.steven.solomon.enums;
 
-public enum OrderByEnum implements BaseEnum{
+public enum OrderByEnum implements BaseEnum<String>{
     DESCEND("DESC"),
     ASC("ASC"),
     ;

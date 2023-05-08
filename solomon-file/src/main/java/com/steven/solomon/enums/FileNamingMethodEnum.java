@@ -2,7 +2,7 @@ package com.steven.solomon.enums;
 
 import com.steven.solomon.enums.BaseEnum;
 
-public enum FileNamingMethodEnum implements BaseEnum {
+public enum FileNamingMethodEnum implements BaseEnum<String> {
   ORIGINAL("ORIGINAL"),
   DATE("DATE"),
   UUID("UUID"),

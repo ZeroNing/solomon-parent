@@ -1,7 +1,7 @@
 package com.steven.solomon.enums;
 import com.steven.solomon.utils.I18nUtils;
 
-public interface BaseEnum {
+public interface BaseEnum<T> {
 
   /**
    * 获取I8N国际化key
@@ -15,7 +15,7 @@ public interface BaseEnum {
    *
    * @return label
    */
-  String label();
+  T label();
 
   /**
    * 获取I18N国际化信息
@@ -31,7 +31,7 @@ public interface BaseEnum {
    *
    * @return label
    */
-  default String Value() {
+  default T Value() {
     return label();
   }
 }
