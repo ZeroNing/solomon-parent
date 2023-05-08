@@ -32,13 +32,13 @@ public class MqttUtils implements SendService<MqttModel> {
 
   private MqttConnectOptions options;
 
-  private Map<String, Map<AbstractConsumer,Mqtt>> consumer = new HashMap<>();
+  private Map<AbstractConsumer,Mqtt> consumer = new HashMap<>();
 
   public void setOptions(MqttConnectOptions options) {
     this.options = options;
   }
 
-  public void setConsumer(Map<String, Map<AbstractConsumer,Mqtt>> consumer){
+  public void setConsumer(Map<AbstractConsumer,Mqtt> consumer){
     this.consumer.putAll(consumer);
   }
 
@@ -108,12 +108,11 @@ public class MqttUtils implements SendService<MqttModel> {
   public void reconnect() throws MqttException {
     if(!client.isConnected()){
       client.connect(this.options);
-      Map<String, Map<AbstractConsumer,Mqtt>> consumer = this.consumer;
-      for(Map<AbstractConsumer,Mqtt> map : consumer.values()){
-        for(Entry<AbstractConsumer,Mqtt> entry: map.entrySet()){
-          logger.info("重新连接,重新订阅主题:{}",entry.getValue().topics());
-          client.subscribe(entry.getValue().topics(),entry.getValue().qos(),entry.getKey());
-        }
+      Map<AbstractConsumer,Mqtt> consumer = this.consumer;
+      for(Entry<AbstractConsumer,Mqtt> map : consumer.entrySet()){
+        Mqtt mqtt = map.getValue();
+        logger.info("重新连接,重新订阅主题:{}",mqtt.topics());
+        client.subscribe(mqtt.topics(),mqtt.qos(),map.getKey());
       }
     }
   }

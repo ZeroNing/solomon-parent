@@ -44,7 +44,7 @@ public class MqttConfig {
   }
 
   @Bean
-  public MqttConnectOptions getMqttConnectOptions() throws UnsupportedEncodingException, MqttException {
+  public MqttConnectOptions getMqttConnectOptions() {
     MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
     mqttConnectOptions.setUserName(profile.getUserName());
     mqttConnectOptions.setPassword(profile.getPassword().toCharArray());
@@ -59,9 +59,9 @@ public class MqttConfig {
     // 设置会话心跳时间 单位为秒   设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
     mqttConnectOptions.setKeepAliveInterval(profile.getKeepAliveInterval());
     //设置遗嘱消息
-    if(ValidateUtils.isNotEmpty(profile.getWill())){
+    if (ValidateUtils.isNotEmpty(profile.getWill())) {
       MqttWill will = profile.getWill();
-      mqttConnectOptions.setWill(will.getTopic(),will.getMessage().getBytes(),will.getQos(),will.getRetained());
+      mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
     }
     utils.setOptions(mqttConnectOptions);
     return mqttConnectOptions;
@@ -69,27 +69,26 @@ public class MqttConfig {
 
   @Bean
   public MqttClient client(MqttConnectOptions options) throws MqttException {
-    MqttClient mqttClient = new MqttClient(profile.getUrl(), ValidateUtils.isEmpty(profile.getClientId()) ? UUID.randomUUID().toString() : profile.getClientId());
-    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+    MqttClient   mqttClient = new MqttClient(profile.getUrl(),
+        ValidateUtils.isEmpty(profile.getClientId()) ? UUID.randomUUID().toString() : profile.getClientId());
+    List<Object> clazzList  = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
     mqttClient.connect(options);
 
-    if(ValidateUtils.isNotEmpty(clazzList)){
-      Map<String, Map<AbstractConsumer,Mqtt>> consumer = new HashMap<>();
-      for(Object abstractConsumer : clazzList){
-        Map<AbstractConsumer,Mqtt> map = new HashMap<>();
+    if (ValidateUtils.isNotEmpty(clazzList)) {
+      Map<AbstractConsumer, Mqtt> map = new HashMap<>(clazzList.size());
+      for (Object abstractConsumer : clazzList) {
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
 
-        if(ValidateUtils.isEmpty(mqtt)){
+        if (ValidateUtils.isEmpty(mqtt)) {
           continue;
         }
-        mqttClient.subscribe(mqtt.topics(),mqtt.qos(),(AbstractConsumer)abstractConsumer);
-        map.put((AbstractConsumer)abstractConsumer,mqtt);
-        consumer.put(mqtt.topics(),map);
-        utils.setConsumer(consumer);
+        mqttClient.subscribe(mqtt.topics(), mqtt.qos(), (AbstractConsumer) abstractConsumer);
+        map.put((AbstractConsumer) abstractConsumer, mqtt);
       }
+      utils.setConsumer(map);
     }
     Collection<MqttCallback> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallback.class).values();
-    if(ValidateUtils.isNotEmpty(mqttCallbacks)){
+    if (ValidateUtils.isNotEmpty(mqttCallbacks)) {
       mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
     }
     return mqttClient;
