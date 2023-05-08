@@ -142,12 +142,48 @@ file:
 
 ## 枚举国际化用例
 
-1.枚举类需要实现 BaseEnum 
+1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型
+
+```java
+public interface BaseEnum<T> {
+
+  /**
+   * 获取I8N国际化key
+   *
+   * @return code
+   */
+  String key();
+
+  /**
+   * 获取存入数据库的值
+   *
+   * @return label
+   */
+  T label();
+
+  /**
+   * 获取I18N国际化信息
+   *
+   * @return 国际化信息
+   */
+  default String Desc() {
+    return I18nUtils.getEnumMessage(getClass().getSimpleName()+"."+key());
+  }
+
+  /**
+   * 获取存入数据库的值
+   *
+   * @return label
+   */
+  default T Value() {
+    return label();
+  }
+```
 
 例：
 
 ```java
-public enum DelFlagEnum implements BaseEnum {
+public enum DelFlagEnum implements BaseEnum<String> {
   /**
    * 未删除
    */
@@ -174,7 +210,7 @@ public enum DelFlagEnum implements BaseEnum {
   }
 ```
 
-2.在实体类中需要国际化的字段上加上@JsonEnum注解 
+2.在实体类中需要国际化的字段上加上@JsonEnum注解 ，并且可以支持自定义返回值的名称用fieldName指定，不指定的时候就在该字段后面增加Desc
 
 例：
 
@@ -183,13 +219,13 @@ public enum DelFlagEnum implements BaseEnum {
   private              String        delFlag;
 ```
 
-3.添加国际化 "ENUM_CODE"是枚举国际化的前缀必须有，然后拼接的是枚举类中的label名称
+3.添加国际化 枚举类名是枚举国际化的前缀必须有，然后拼接的是枚举类中的label名称
 
 例：
 
 ```properties
-ENUM_CODE_NOT_DELETE=未删除
-ENUM_CODE_DELETE=删除
+DelFlagEnum.NOT_DELETE=未删除
+DelFlagEnum.DELETE=删除
 ```
 
 ## Rabbit队列注册以及消费用例
