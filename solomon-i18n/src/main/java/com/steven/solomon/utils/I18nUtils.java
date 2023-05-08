@@ -57,6 +57,13 @@ public class I18nUtils {
     return getMessage(BaseCode.BASE_ENUM_CODE + code, args);
   }
 
+  public static String getEnumMessage(String code) {
+    if(code == null || code.length() == 0){
+      return null;
+    }
+    return getMessage(BaseCode.BASE_ENUM_CODE + code, null);
+  }
+
   /**
    * 获取报错信息
    *
