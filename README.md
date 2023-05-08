@@ -105,6 +105,11 @@ mqtt：
   automatic-reconnect: #是否自动重连
   clean-session:       #客户端掉线后,是否自动清除session
   keep-alive-interval: #心跳时间
+  will:                #遗嘱消息
+    topic:             #遗嘱主题
+    message:           #遗嘱消息
+    qos:               #遗嘱消息质量
+    retained:          #遗嘱是否保留消息
 ```
 
 
@@ -264,7 +269,7 @@ public class TestDlxMq extends AbstractConsumer<String> {
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
-2.加上@Mqtt注解，并填写主题以及消息质量
+2.加上@Mqtt注解，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题
 
 ```java
 @Mqtt(topics = "topic",qos = 2)
