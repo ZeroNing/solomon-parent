@@ -47,14 +47,14 @@ public class I18nUtils {
    * 获取枚举参数信息
    *
    * @param code 枚举编码
-   * @param args 可替换参数
+   * @param enumClazz 枚举Class
    * @return
    */
-  public static String getEnumMessage(String code, String... args) {
+  public static String getEnumMessage(String code, Class enumClazz) {
     if(code == null || code.length() == 0){
       return null;
     }
-    return getMessage(code, args);
+    return getEnumMessage(enumClazz.getSimpleName()+"."+code);
   }
 
   public static String getEnumMessage(String code) {
