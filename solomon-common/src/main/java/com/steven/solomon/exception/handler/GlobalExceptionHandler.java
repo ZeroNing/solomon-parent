@@ -1,9 +1,9 @@
 package com.steven.solomon.exception.handler;
 
-import com.steven.solomon.ajax.AjaxResultUtils;
 import com.steven.solomon.base.excetion.BaseGlobalExceptionHandler;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.ExceptionUtil;
+import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import java.io.IOException;
 import java.util.Locale;
@@ -37,6 +37,6 @@ public class GlobalExceptionHandler {
     logger.info("GlobalExceptionHandler处理全局异常,请求ID:{},当前异常是:", ExceptionUtil.requestId.get(), ex);
     BaseExceptionVO baseExceptionVO = BaseGlobalExceptionHandler.handler(ex,null,serverId,locale);
     response.setStatus(baseExceptionVO.getStatusCode());
-    return AjaxResultUtils.responseErrorJson(baseExceptionVO);
+    return JackJsonUtils.formatJsonByFilter(baseExceptionVO);
   }
 }
