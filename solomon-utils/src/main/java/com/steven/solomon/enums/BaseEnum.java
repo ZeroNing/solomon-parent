@@ -23,7 +23,7 @@ public interface BaseEnum {
    * @return 国际化信息
    */
   default String Desc() {
-    return I18nUtils.getEnumMessage(key());
+    return I18nUtils.getEnumMessage(getClass().getSimpleName()+"."+key());
   }
 
   /**

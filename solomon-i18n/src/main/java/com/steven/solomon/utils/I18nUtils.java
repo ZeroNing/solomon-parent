@@ -54,14 +54,14 @@ public class I18nUtils {
     if(code == null || code.length() == 0){
       return null;
     }
-    return getMessage(BaseCode.BASE_ENUM_CODE + code, args);
+    return getMessage(code, args);
   }
 
   public static String getEnumMessage(String code) {
     if(code == null || code.length() == 0){
       return null;
     }
-    return getMessage(BaseCode.BASE_ENUM_CODE + code, null);
+    return getMessage(code, null);
   }
 
   /**
