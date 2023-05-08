@@ -13,6 +13,7 @@ import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.MinIoService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 public class FileConfig {
 
   @Bean
+  @ConditionalOnMissingBean(FileServiceInterface.class)
   public FileServiceInterface fileService(FileChoiceProperties fileProperties){
     switch (fileProperties.getChoice()) {
       case MINIO:
@@ -38,6 +40,7 @@ public class FileConfig {
   }
 
   @Bean
+  @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
   public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
     switch (fileProperties.getFileNamingMethod()) {
       case DATE:

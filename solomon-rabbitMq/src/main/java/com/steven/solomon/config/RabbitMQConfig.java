@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
@@ -27,6 +28,7 @@ public class RabbitMQConfig {
 	 * 接受数据自动的转换为Json
 	 */
 	@Bean("messageConverter")
+	@ConditionalOnMissingBean(MessageConverter.class)
 	public MessageConverter messageConverter() {
 		return new Jackson2JsonMessageConverter();
 	}
