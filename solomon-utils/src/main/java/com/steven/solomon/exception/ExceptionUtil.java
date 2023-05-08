@@ -17,7 +17,7 @@ public class ExceptionUtil {
 
   public static ThreadLocal<String> requestId = new ThreadLocal<>();
 
-  public static com.steven.solomon.exception.handler.AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
+  public static AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
     if (ValidateUtils.isEmpty(com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap)) {
       com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(
           com.steven.solomon.exception.handler.AbstractExceptionHandler.class);
