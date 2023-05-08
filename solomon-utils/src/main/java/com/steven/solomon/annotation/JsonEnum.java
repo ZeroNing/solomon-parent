@@ -37,5 +37,5 @@ public @interface JsonEnum {
    * 是否输出这个结果
    * @return
    */
-  boolean ignore() default false;
+  boolean ignore() default true;
 }
