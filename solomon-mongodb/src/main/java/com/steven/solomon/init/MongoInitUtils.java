@@ -12,13 +12,14 @@ import com.mongodb.connection.ClusterType;
 import com.steven.solomon.annotation.MongoDBCapped;
 import com.steven.solomon.config.MongoTenantsContext;
 import com.steven.solomon.properties.TenantMongoProperties;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.bson.Document;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 public class MongoInitUtils {
 
@@ -42,27 +43,29 @@ public class MongoInitUtils {
     mongoDatabase.listCollectionNames().forEach(name->{
       collectionNameList.add(name);
     });
+    ;
+    for(Object obj : SpringUtil.getBeansWithAnnotation(MongoDBCapped.class).values()){
+      MongoDBCapped mongoDBCapped = AnnotationUtils.getAnnotation(obj.getClass(), MongoDBCapped.class);
+      Document      document = AnnotationUtils.getAnnotation(obj.getClass(), Document.class);
 
-    context.getCappedCollectionNameMap().forEach((key,value)->{
-      boolean isCreate = collectionNameList.contains(key);
+      String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : "";
+      boolean isCreate = collectionNameList.contains(name);
       if(!isCreate){
-        MongoDBCapped mongoDBCapped = AnnotationUtils.getAnnotation(value, MongoDBCapped.class);
         if(ValidateUtils.isNotEmpty(mongoDBCapped)){
-          mongoDatabase.createCollection(key,new CreateCollectionOptions().capped(true).maxDocuments(mongoDBCapped.maxDocuments()).sizeInBytes(mongoDBCapped.size()));
+          mongoDatabase.createCollection(name,new CreateCollectionOptions().capped(true).maxDocuments(mongoDBCapped.maxDocuments()).sizeInBytes(mongoDBCapped.size()));
         } else {
-          mongoDatabase.createCollection(key);
+          mongoDatabase.createCollection(name);
         }
       } else {
-        MongoDBCapped mongoDBCapped = AnnotationUtils.getAnnotation(value, MongoDBCapped.class);
         if(ValidateUtils.isNotEmpty(mongoDBCapped)){
-          Document command  = new Document("collStats", key);
+          org.bson.Document command  = new org.bson.Document("collStats", name);
           Boolean  isCapped = mongoDatabase.runCommand(command, ReadPreference.primary()).getBoolean("capped");
           if(!isCapped){
-            command = new Document("convertToCapped", key).append("maxSize", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments()).append("capped",true);
+            command = new org.bson.Document("convertToCapped", name).append("max",mongoDBCapped.maxDocuments()).append("size", mongoDBCapped.size()).append("capped",true);
             mongoDatabase.runCommand(command, ReadPreference.primary());
           }
         }
       }
-    });
+    }
   }
 }
