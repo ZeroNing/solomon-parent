@@ -38,19 +38,6 @@ public class DynamicMongoTemplate extends MongoTemplate {
 
   @Override
   protected MongoCollection<Document> doCreateCollection(String collectionName, Document collectionOptions) {
-    MongoCollection<Document> createCollection = super.doCreateCollection(collectionName, collectionOptions);
-
-    Map<String,Class<?>> cappedCollectionNameMap = SpringUtil.getBean(MongoTenantsContext.class).getCappedCollectionNameMap();
-    if(cappedCollectionNameMap.containsKey(collectionName)){
-      Document command = new Document("collStats", collectionName);
-      Boolean isCapped = this.doGetDatabase().runCommand(command, ReadPreference.primary()).getBoolean("capped");
-      if (!isCapped) {
-        Class<?> clazz = cappedCollectionNameMap.get(collectionName);
-        MongoDBCapped mongoDBCapped = AnnotationUtils.getAnnotation(clazz, MongoDBCapped.class);
-        command = new Document("convertToCapped", collectionName).append("maxSize", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments()).append("capped",true);
-        this.doGetDatabase().runCommand(command, ReadPreference.primary());
-      }
-    }
-    return createCollection;
+    return super.doCreateCollection(collectionName,collectionOptions);
   }
 }
