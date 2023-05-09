@@ -33,7 +33,7 @@ public class MongoDbUtils {
       Boolean isCapped = database.runCommand(command, ReadPreference.primary()).getBoolean("capped");
 
       if (!isCapped) {
-        command = new Document("convertToCapped", collectionName).append("maxSize", size).append("max",maxDocuments).append("capped",true);
+        command = new Document("convertToCapped", collectionName).append("size", size).append("max",maxDocuments).append("capped",true);
         database.runCommand(command, ReadPreference.primary());
       }
     } else {
