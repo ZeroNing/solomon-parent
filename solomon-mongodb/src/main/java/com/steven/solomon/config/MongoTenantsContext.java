@@ -21,14 +21,6 @@ public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabase
 
   private Map<String,Class<?>> CAPPED_COLLECTION_NAME_MAP = new HashMap<>();
 
-  public void setCappedCollectionNameMap(Map<String,Class<?>> cappedCollectionNameMap){
-    CAPPED_COLLECTION_NAME_MAP.putAll(cappedCollectionNameMap);
-  }
-
-  public Map<String,Class<?>> getCappedCollectionNameMap(){
-    return CAPPED_COLLECTION_NAME_MAP;
-  }
-
   @Override
   public SimpleMongoClientDatabaseFactory getFactory() {
     return MONGO_DB_FACTORY_THREAD_LOCAL.get();
@@ -74,35 +66,4 @@ public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabase
     mongoClientMap.putAll(propertiesMap);
   }
 
-//  public static  SimpleMongoClientDatabaseFactory getFactory() {
-//    return MONGO_DB_FACTORY_THREAD_LOCAL.get();
-//  }
-//
-//  public static  void removeFactory() {
-//    MONGO_DB_FACTORY_THREAD_LOCAL.remove();
-//  }
-//
-//  public static  void setFactory(String name) {
-//    MONGO_DB_FACTORY_THREAD_LOCAL.set(MONGO_FACTORY_MAP.get(name));
-//  }
-//
-//  
-//  public static  void setProperties(TenantMongoProperties properties) {
-//    MongoTenantsContext.mongoClientList.add(properties);
-//  }
-//
-//  public static  List<TenantMongoProperties> getProperties() {
-//    return MongoTenantsContext.mongoClientList;
-//  }
-//
-//  public static  Map<String, SimpleMongoClientDatabaseFactory> getFactoryMap() {
-//    return MongoTenantsContext.MONGO_FACTORY_MAP;
-//  }
-//
-//  public static  void setFactoryMap(Map<String, SimpleMongoClientDatabaseFactory> factoryMap) {
-//    MongoTenantsContext.MONGO_FACTORY_MAP.putAll(factoryMap);
-//  }
-//  public static  void setFactoryMap(String tenantCode, SimpleMongoClientDatabaseFactory factoryMap) {
-//    MongoTenantsContext.MONGO_FACTORY_MAP.put(tenantCode,factoryMap);
-//  }
 }
