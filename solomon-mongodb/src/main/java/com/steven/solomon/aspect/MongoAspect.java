@@ -29,7 +29,7 @@ public class MongoAspect {
   @Resource
   private MongoTenantsContext context;
 
-  @Value("${mongo.mode}")
+  @Value("${spring.data.mongodb.mode}")
   private String mode;
 
   @Pointcut("execution(* org.springframework.data.mongodb.core.MongoTemplate.*(..)) ||"

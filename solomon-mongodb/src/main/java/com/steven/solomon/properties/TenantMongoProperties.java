@@ -1,31 +1,50 @@
 package com.steven.solomon.properties;
 
+import com.steven.solomon.enums.MongoModeEnum;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-public class TenantMongoProperties extends MongoProperties {
+@ConfigurationProperties(prefix = "spring.data.mongodb")
+@Component
+public class TenantMongoProperties {
 
-  private String tenantCode;
+  public Map<String,MongoProperties> tenant;
 
-  public String getTenantCode() {
-    return tenantCode;
+  /**
+   * mongo缓存模式（默认单库）
+   */
+  private String mode = MongoModeEnum.NORMAL.toString();
+
+  public String getMode() {
+    return mode;
   }
 
-  public void setTenantCode(String tenantCode) {
-    this.tenantCode = tenantCode;
+  public void setMode(String mode) {
+    this.mode = mode;
   }
 
-  public TenantMongoProperties(MongoProperties properties){
-    setAutoIndexCreation(properties.isAutoIndexCreation());
-    setUuidRepresentation(properties.getUuidRepresentation());
-    setFieldNamingStrategy(properties.getFieldNamingStrategy());
-    setReplicaSetName(properties.getReplicaSetName());
-    setPassword(properties.getPassword());
-    setUsername(properties.getUsername());
-    setGridFsDatabase(properties.getGridFsDatabase());
-    setAuthenticationDatabase(properties.getAuthenticationDatabase());
-    setDatabase(properties.getDatabase());
-    setUri(properties.getUri());
-    setPort(properties.getPort());
-    setHost(properties.getHost());
+  public Map<String, MongoProperties> getTenant() {
+    return tenant;
   }
+
+  public void setTenant(Map<String, MongoProperties> tenant) {
+    this.tenant = tenant;
+  }
+
+//  public TenantMongoProperties(MongoProperties properties){
+//    setAutoIndexCreation(properties.isAutoIndexCreation());
+//    setUuidRepresentation(properties.getUuidRepresentation());
+//    setFieldNamingStrategy(properties.getFieldNamingStrategy());
+//    setReplicaSetName(properties.getReplicaSetName());
+//    setPassword(properties.getPassword());
+//    setUsername(properties.getUsername());
+//    setGridFsDatabase(properties.getGridFsDatabase());
+//    setAuthenticationDatabase(properties.getAuthenticationDatabase());
+//    setDatabase(properties.getDatabase());
+//    setUri(properties.getUri());
+//    setPort(properties.getPort());
+//    setHost(properties.getHost());
+//  }
 }
