@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -44,6 +45,16 @@ public class MongoInitUtils {
     }).build();
     SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),tenantCode);
     context.setFactory(tenantCode,factory);
+
+    List<String>  collectionNameList = new ArrayList<>();
+    MongoDatabase mongoDatabase      = factory.getMongoDatabase();
+    mongoDatabase.listCollectionNames().forEach(name->{
+      collectionNameList.add(name);
+    });
+    initDocument(factory);
+  }
+
+  public static void initDocument(MongoDatabaseFactory factory){
 
     List<String>  collectionNameList = new ArrayList<>();
     MongoDatabase mongoDatabase      = factory.getMongoDatabase();

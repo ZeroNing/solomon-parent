@@ -30,7 +30,7 @@ public class RedisInitUtils {
     }
   }
 
-  private static LettuceConnectionFactory initConnectionFactory(RedisProperties redisProperties) {
+  public static LettuceConnectionFactory initConnectionFactory(RedisProperties redisProperties) {
     GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
     Pool                    pool                    = redisProperties.getLettuce().getPool();
     if (ValidateUtils.isNotEmpty(pool)) {

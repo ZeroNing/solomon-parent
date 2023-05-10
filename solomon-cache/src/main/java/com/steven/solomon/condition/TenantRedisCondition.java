@@ -9,15 +9,14 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-public class RedisCondition implements Condition {
+public class TenantRedisCondition implements Condition {
 
   @Override
   public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
 
     Environment environment = conditionContext.getEnvironment();
     String type = environment.getProperty("spring.redis.type");
-
-    return ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),type) && !ValidateUtils.equalsIgnoreCase(
+    return ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),type) && ValidateUtils.equalsIgnoreCase(
         SwitchModeEnum.SWITCH_DB.toString(),environment.getProperty("spring.redis.mode"));
   }
 }

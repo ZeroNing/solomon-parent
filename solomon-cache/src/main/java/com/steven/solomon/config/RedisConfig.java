@@ -1,6 +1,7 @@
 package com.steven.solomon.config;
 
 import com.steven.solomon.condition.RedisCondition;
+import com.steven.solomon.condition.TenantRedisCondition;
 import com.steven.solomon.enums.CacheTypeEnum;
 import com.steven.solomon.init.RedisInitUtils;
 import com.steven.solomon.logger.LoggerUtils;
@@ -8,15 +9,13 @@ import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.serializer.BaseRedisSerializer;
-import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.verification.ValidateUtils;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +24,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
@@ -46,15 +46,15 @@ public class RedisConfig extends CachingConfigurerSupport {
   
   @PostConstruct
   public void afterPropertiesSet() {
-    if(!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),cacheType)){
+    if(!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),cacheType) || ValidateUtils.isEmpty(properties.getTenant())){
       return;
     }
     RedisInitUtils.init(properties.getTenant(),context);
   }
 
   @Bean(name = "redisTemplate")
-  @Conditional(value = RedisCondition.class)
-  public DynamicRedisTemplate dynamicMongoTemplate() {
+  @Conditional(value = TenantRedisCondition.class)
+  public DynamicRedisTemplate dynamicRedisTemplate() {
     logger.info("初始化redis start");
     DynamicRedisTemplate<String, Object> redisTemplate = new DynamicRedisTemplate<String, Object>();
     // 注入数据源
@@ -76,21 +76,52 @@ public class RedisConfig extends CachingConfigurerSupport {
     return redisTemplate;
   }
 
+  @Bean(name = "redisTemplate")
+  @Conditional(value = RedisCondition.class)
+  public RedisTemplate redisTemplate(RedisConnectionFactory factory) {
+    logger.info("初始化redis start");
+    RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+    // 注入数据源
+    redisTemplate.setConnectionFactory(factory);
+    // 使用Jackson2JsonRedisSerialize 替换默认序列化
+    StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
+    BaseRedisSerializer   baseRedisSerializer   = new BaseRedisSerializer();
+    // key-value结构序列化数据结构
+    redisTemplate.setKeySerializer(stringRedisSerializer);
+    redisTemplate.setValueSerializer(baseRedisSerializer);
+    // hash数据结构序列化方式,必须这样否则存hash 就是基于jdk序列化的
+    redisTemplate.setHashKeySerializer(stringRedisSerializer);
+    redisTemplate.setHashValueSerializer(baseRedisSerializer);
+    // 启用默认序列化方式
+    redisTemplate.setEnableDefaultSerializer(true);
+    redisTemplate.setEnableTransactionSupport(true);
+    redisTemplate.afterPropertiesSet();
+    context.setFactory("default",factory);
+    return redisTemplate;
+  }
+
+  @Bean(name = "redisFactory")
+  @Conditional(value = TenantRedisCondition.class)
+  public RedisConnectionFactory tenantRedisFactory() {
+    return context.getFactoryMap().values().iterator().next();
+  }
+
   @Bean(name = "redisFactory")
   @Conditional(value = RedisCondition.class)
-  public RedisConnectionFactory redisFactory() {
-    return context.getFactoryMap().values().iterator().next();
+  public RedisConnectionFactory redisFactory(RedisProperties redisProperties) {
+    return RedisInitUtils.initConnectionFactory(redisProperties);
   }
 
   @Bean
   @Override
-  @Conditional(value = RedisCondition.class)
   public CacheManager cacheManager(){
     RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
     SpringRedisAutoManager springRedisAutoManager = new SpringRedisAutoManager(DynamicDefaultRedisCacheWriter.nonLockingRedisCacheWriter(
         context.getFactoryMap().values().iterator().next()), defaultCacheConfig);
     return springRedisAutoManager;
   }
+
+
 }
 
 
