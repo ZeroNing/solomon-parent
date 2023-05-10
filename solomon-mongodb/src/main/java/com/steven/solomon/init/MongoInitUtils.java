@@ -38,12 +38,7 @@ public class MongoInitUtils {
   }
 
   public static void init(String tenantCode,MongoProperties properties,MongoTenantsContext context){
-    MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
-    MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
-      builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
-          ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
-    }).build();
-    SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),tenantCode);
+    SimpleMongoClientDatabaseFactory factory = initFactory(properties);
     context.setFactory(tenantCode,factory);
 
     List<String>  collectionNameList = new ArrayList<>();
@@ -52,6 +47,15 @@ public class MongoInitUtils {
       collectionNameList.add(name);
     });
     initDocument(factory);
+  }
+
+  public static SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties){
+    MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
+    MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
+      builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
+          ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
+    }).build();
+    return new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),properties.getDatabase());
   }
 
   public static void initDocument(MongoDatabaseFactory factory){

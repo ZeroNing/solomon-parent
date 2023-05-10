@@ -62,15 +62,9 @@ public class MongoConfig {
     if (ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode())) {
       MongoInitUtils.init(mongoProperties.getTenant(), context);
     } else {
-      MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
-      MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
-        builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
-            ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
-      }).build();
-      MongoClient                      client  = MongoClients.create(settings);
-      SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(client,properties.getDatabase());
-      this.factory = factory;
+      SimpleMongoClientDatabaseFactory factory = MongoInitUtils.initFactory(properties);
       MongoInitUtils.initDocument(factory);
+      this.factory = factory;
     }
   }
 
@@ -111,7 +105,7 @@ public class MongoConfig {
 
   @Bean(name = "mongoDbFactory")
   @Conditional(value = MongoDbCondition.class)
-  public MongoDatabaseFactory mongoDbFactory(MongoProperties properties) {
+  public MongoDatabaseFactory mongoDbFactory() {
     return this.factory;
   }
 }
