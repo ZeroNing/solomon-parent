@@ -50,7 +50,7 @@ public class MongoConfig {
         SimpleMongoClientDatabaseFactory factory = context.getFactoryMap().values().iterator().next();
         DbRefResolver         dbRefResolver    = new DefaultDbRefResolver(factory);
         MappingMongoConverter mappingConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
-        mappingConverter.setCustomConversions(beanFactory.getBean(CustomConversions.class));
+
         List<Object>          list      = new ArrayList<>();
         list.add(new LocalDateTimeToDateConverter());
         list.add(new DateToLocalDateTimeConverter());

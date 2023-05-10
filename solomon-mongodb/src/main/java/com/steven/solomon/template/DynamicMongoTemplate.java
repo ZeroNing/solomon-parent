@@ -1,14 +1,10 @@
 package com.steven.solomon.template;
 
-import com.mongodb.ReadPreference;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.steven.solomon.annotation.MongoDBCapped;
 import com.steven.solomon.config.MongoTenantsContext;
 import com.steven.solomon.spring.SpringUtil;
-import java.util.Map;
 import org.bson.Document;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.convert.MongoConverter;

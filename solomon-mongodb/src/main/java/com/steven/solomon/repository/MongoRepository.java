@@ -1,5 +1,6 @@
 package com.steven.solomon.repository;
 
+import com.steven.solomon.template.DynamicMongoTemplate;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,9 +25,9 @@ public class MongoRepository<T, I> {
 
   protected static String ID = "_id";
 
-  private final MongoTemplate mongoTemplate;
+  private final DynamicMongoTemplate mongoTemplate;
 
-  public MongoRepository(MongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
+  public MongoRepository(DynamicMongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
 
   /**
    * 获取一条记录
