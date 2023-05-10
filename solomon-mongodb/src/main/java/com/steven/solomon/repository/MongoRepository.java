@@ -25,9 +25,9 @@ public class MongoRepository<T, I> {
 
   protected static String ID = "_id";
 
-  private final DynamicMongoTemplate mongoTemplate;
+  private final MongoTemplate mongoTemplate;
 
-  public MongoRepository(DynamicMongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
+  public MongoRepository(MongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
 
   /**
    * 获取一条记录

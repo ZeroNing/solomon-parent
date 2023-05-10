@@ -33,8 +33,7 @@ public class MongoAspect {
   private String mode;
 
   @Pointcut("execution(* org.springframework.data.mongodb.core.MongoTemplate.*(..)) ||"
-      + "execution(* org.springframework.data.mongodb.core.MongoOperations.*(..)) ||"
-      + "execution(* com.steven.solomon.template.DynamicMongoTemplate.*(..)) ")
+      + "execution(* org.springframework.data.mongodb.core.MongoOperations.*(..)) ")
   void cutPoint() {}
 
   @Around("cutPoint()")
@@ -43,11 +42,8 @@ public class MongoAspect {
     try {
       if(isSwitch){
         logger.info("mongo切换数据源,租户编码为:{}",HeardHolder.getTenantCode());
-        String tenantId = HeardHolder.getTenantCode();
-        if(ValidateUtils.isEmpty(tenantId)){
-          throw new BaseException(BaseExceptionCode.FAILED_TO_SWITCH_DATA_SOURCE);
-        }
-        context.setFactory(tenantId);
+        String tenantCode = HeardHolder.getTenantCode();
+        context.setFactory(tenantCode);
       }
       Object result = point.proceed();
       return result;
