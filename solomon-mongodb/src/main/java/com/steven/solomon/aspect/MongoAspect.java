@@ -1,12 +1,9 @@
 package com.steven.solomon.aspect;
 
 import com.steven.solomon.config.MongoTenantsContext;
-import com.steven.solomon.constant.code.BaseExceptionCode;
-import com.steven.solomon.enums.MongoModeEnum;
-import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.enums.SwitchModeEnum;
 import com.steven.solomon.holder.HeardHolder;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.utils.I18nUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import javax.annotation.Resource;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -38,7 +35,7 @@ public class MongoAspect {
 
   @Around("cutPoint()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
-    boolean isSwitch = ValidateUtils.equals(mode, MongoModeEnum.SWITCH_DB.toString());
+    boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     try {
       if(isSwitch){
         logger.info("mongo切换数据源,租户编码为:{}",HeardHolder.getTenantCode());

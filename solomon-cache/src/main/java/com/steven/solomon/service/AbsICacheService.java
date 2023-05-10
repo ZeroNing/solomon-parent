@@ -1,6 +1,6 @@
 package com.steven.solomon.service;
 
-import com.steven.solomon.enums.CacheModeEnum;
+import com.steven.solomon.enums.SwitchModeEnum;
 import com.steven.solomon.holder.HeardHolder;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.profile.TenantRedisProperties;
@@ -18,10 +18,10 @@ public abstract class AbsICacheService implements  ICacheService {
 
   public String assembleKey(String group, String key) {
     StringBuilder sb = new StringBuilder();
-    if(ValidateUtils.isNotEmpty(properties) && CacheModeEnum.TENANT_PREFIX.toString().equals(properties.getMode())){
+    if(ValidateUtils.isNotEmpty(properties) && SwitchModeEnum.TENANT_PREFIX.toString().equals(properties.getMode())){
       String tenantCode = HeardHolder.getTenantCode();
       if(ValidateUtils.isEmpty(tenantCode)){
-        logger.error("当前模式是:{},但是缺乏租户信息,所以不拼接",CacheModeEnum.TENANT_PREFIX.getDesc());
+        logger.error("当前模式是:{},但是缺乏租户信息,所以不拼接",SwitchModeEnum.TENANT_PREFIX.getDesc());
       } else {
         sb.append(tenantCode).append(":");
       }

@@ -1,6 +1,6 @@
 package com.steven.solomon.properties;
 
-import com.steven.solomon.enums.MongoModeEnum;
+import com.steven.solomon.enums.SwitchModeEnum;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,7 +15,7 @@ public class TenantMongoProperties {
   /**
    * mongo缓存模式（默认单库）
    */
-  private String mode = MongoModeEnum.NORMAL.toString();
+  private String mode = SwitchModeEnum.NORMAL.toString();
 
   public String getMode() {
     return mode;

@@ -1,7 +1,7 @@
 package com.steven.solomon.profile;
 
-import com.steven.solomon.enums.CacheModeEnum;
 import com.steven.solomon.enums.CacheTypeEnum;
+import com.steven.solomon.enums.SwitchModeEnum;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -16,7 +16,7 @@ public class TenantRedisProperties {
   /**
    * redis缓存模式（默认单库）
    */
-  private String mode = CacheModeEnum.NORMAL.toString();
+  private String mode = SwitchModeEnum.NORMAL.toString();
 
   /**
    * 缓存类型
