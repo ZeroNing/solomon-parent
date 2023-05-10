@@ -5,6 +5,8 @@ import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Pool;
@@ -17,15 +19,15 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 
 public class RedisInitUtils {
 
-  public static void init(TenantRedisProperties properties,RedisTenantContext context) {
+  public static void init(String tenantCode,RedisProperties properties,RedisTenantContext context) {
     RedisConnectionFactory factory = initConnectionFactory(properties);
-    context.setFactory(properties.getTenantCode(), factory);
+    context.setFactory(tenantCode, factory);
   }
 
-  public static void init(List<TenantRedisProperties> propertiesList,RedisTenantContext context) {
-    propertiesList.forEach(properties -> {
-      init(properties,context);
-    });
+  public static void init(Map<String,RedisProperties> propertiesMap,RedisTenantContext context) {
+    for(Entry<String,RedisProperties> entry : propertiesMap.entrySet()){
+      init(entry.getKey(),entry.getValue(),context);
+    }
   }
 
   private static LettuceConnectionFactory initConnectionFactory(RedisProperties redisProperties) {

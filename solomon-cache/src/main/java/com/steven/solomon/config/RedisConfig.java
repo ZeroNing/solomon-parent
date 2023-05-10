@@ -1,13 +1,11 @@
 package com.steven.solomon.config;
 
 import com.steven.solomon.condition.RedisCondition;
-import com.steven.solomon.enums.CacheModeEnum;
 import com.steven.solomon.enums.CacheTypeEnum;
 import com.steven.solomon.init.RedisInitUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
-import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.serializer.BaseRedisSerializer;
 import com.steven.solomon.spring.SpringUtil;
@@ -19,7 +17,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
@@ -28,8 +25,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +36,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   private Logger logger = LoggerUtils.logger(getClass());
 
   @Resource
-  private CacheProfile cacheProfile;
+  private TenantRedisProperties properties;
 
   @Value("${cache.type}")
   private String cacheType;
@@ -54,17 +49,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     if(!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),cacheType)){
       return;
     }
-    List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
-    List<RedisClientPropertiesService> abstractRedisClientPropertiesServices = new ArrayList<>(SpringUtil.getBeansOfType(RedisClientPropertiesService.class).values());
-
-//    if((ValidateUtils.isNotEmpty(cacheProfile) && CacheModeEnum.NORMAL.toString().equalsIgnoreCase(cacheProfile.getMode())) || (CacheModeEnum.TENANT_PREFIX.toString().equalsIgnoreCase(cacheProfile.getMode()))){
-    RedisInitUtils.init(new TenantRedisProperties(cacheProfile.getRedisProfile()),context);
-//    }
-
-    abstractRedisClientPropertiesServices.forEach(service -> {
-      redisPropertiesList.addAll(service.getRedisClient());
-    });
-    RedisInitUtils.init(redisPropertiesList,context);
+    RedisInitUtils.init(properties.getTenant(),context);
   }
 
   @Bean(name = "redisTemplate")

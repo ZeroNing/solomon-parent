@@ -13,7 +13,7 @@ public class RedisCondition implements Condition {
   public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
 
     Environment environment = conditionContext.getEnvironment();
-    String type = environment.getProperty("cache.type");
+    String type = environment.getProperty("spring.redis.type");
     return ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(),type);
   }
 }

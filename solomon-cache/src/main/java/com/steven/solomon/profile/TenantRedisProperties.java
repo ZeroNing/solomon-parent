@@ -1,28 +1,50 @@
 package com.steven.solomon.profile;
 
-import com.steven.solomon.profile.CacheProfile.RedisProfile;
-import org.springframework.beans.BeanUtils;
+import com.steven.solomon.enums.CacheModeEnum;
+import com.steven.solomon.enums.CacheTypeEnum;
+import java.util.Map;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-public class TenantRedisProperties extends RedisProperties {
+@ConfigurationProperties(prefix = "spring.redis")
+@Component
+public class TenantRedisProperties {
 
-  private String tenantCode;
+  private Map<String,RedisProperties> tenant;
 
-  public String getTenantCode() {
-    return tenantCode;
+  /**
+   * redis缓存模式（默认单库）
+   */
+  private String mode = CacheModeEnum.NORMAL.toString();
+
+  /**
+   * 缓存类型
+   */
+  private String type = CacheTypeEnum.REDIS.toString();
+
+  public Map<String, RedisProperties> getTenant() {
+    return tenant;
   }
 
-  public void setTenantCode(String tenantCode) {
-    this.tenantCode = tenantCode;
+  public void setTenant(
+      Map<String, RedisProperties> tenant) {
+    this.tenant = tenant;
   }
 
-  public TenantRedisProperties() {
-    super();
+  public String getMode() {
+    return mode;
   }
 
-  public TenantRedisProperties(RedisProfile properties){
-    super();
-    BeanUtils.copyProperties(properties, this);
-    this.tenantCode = "default";
+  public void setMode(String mode) {
+    this.mode = mode;
+  }
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 }

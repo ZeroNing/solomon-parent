@@ -17,8 +17,6 @@ public class RedisTenantContext extends TenantContext<RedisConnectionFactory, Te
 
   private Map<String, RedisConnectionFactory> REDIS_FACTORY_MAP = new ConcurrentHashMap<>();
 
-  private List<TenantRedisProperties> redisPropertiesList = new ArrayList<>();
-
   @Override
   public RedisConnectionFactory getFactory() {
     return REDIS_FACTORY_THREAD_LOCAL.get();

@@ -29,7 +29,7 @@ public class RedisAspect {
   @Resource
   private RedisTenantContext context;
 
-  @Value("${cache.mode}")
+  @Value("${spring.redis.mode}")
   private String mode;
 
   @Pointcut("@annotation(org.springframework.cache.annotation.CachePut) ||"

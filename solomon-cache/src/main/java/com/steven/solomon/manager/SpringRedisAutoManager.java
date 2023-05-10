@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.enums.CacheModeEnum;
 import com.steven.solomon.holder.HeardHolder;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.profile.CacheProfile;
+import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ public class SpringRedisAutoManager extends RedisCacheManager {
   private Logger log = LoggerUtils.logger(SpringRedisAutoManager.class);
 
   @Resource
-  private CacheProfile cacheProfile;
+  private TenantRedisProperties cacheProfile;
 
   /**
    * 缓存参数的分隔符
