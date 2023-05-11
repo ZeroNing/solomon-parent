@@ -73,11 +73,7 @@ public class MongoConfig {
     list.add(new DateToLocalDateTimeConverter());
     mappingConverter.setCustomConversions(new MongoCustomConversions(list));
     mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-    if(ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(),mongoProperties.getMode())){
-      return new DynamicMongoTemplate(factory, mappingConverter);
-    } else {
-      return new MongoTemplate(factory, mappingConverter);
-    }
+    return isSwitchDb ? new DynamicMongoTemplate(factory, mappingConverter) : new MongoTemplate(factory, mappingConverter);
   }
 
   @Bean(name = "mongoDbFactory")
