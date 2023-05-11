@@ -1,14 +1,5 @@
 package com.steven.solomon.config;
 
-import com.mongodb.MongoClientSettings;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.connection.ClusterConnectionMode;
-import com.mongodb.connection.ClusterType;
-import com.steven.solomon.condition.MongoDbCondition;
-import com.steven.solomon.condition.TenantMongoDbCondition;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
 import com.steven.solomon.enums.SwitchModeEnum;
@@ -18,14 +9,12 @@ import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.template.DynamicMongoTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -46,31 +35,35 @@ public class MongoConfig {
 
   private Logger logger = LoggerUtils.logger(getClass());
 
-  @Resource
-  private TenantMongoProperties mongoProperties;
+  private final TenantMongoProperties mongoProperties;
 
-  @Resource
-  private MongoTenantsContext context;
+  private final MongoTenantsContext context;
 
-  private MongoDatabaseFactory factory;
+  private final MongoProperties properties;
 
-  @Resource
-  private MongoProperties properties;
+  private boolean isSwitchDb = false;
+
+  public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantsContext context,
+      MongoProperties properties) {
+    this.mongoProperties = mongoProperties;
+    this.context         = context;
+    this.properties      = properties;
+    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode());
+  }
 
   @PostConstruct
   public void afterPropertiesSet() {
-    if (ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode())) {
+    if (isSwitchDb) {
       MongoInitUtils.init(mongoProperties.getTenant(), context);
     } else {
       SimpleMongoClientDatabaseFactory factory = MongoInitUtils.initFactory(properties);
       MongoInitUtils.initDocument(factory);
-      this.factory = factory;
+      context.setFactory("default",factory);
     }
   }
 
   @Bean(name = "mongoTemplate")
-  @Conditional(value = TenantMongoDbCondition.class)
-  public DynamicMongoTemplate dynamicMongoTemplate(MongoMappingContext mappingContext) {
+  public MongoTemplate dynamicMongoTemplate(MongoMappingContext mappingContext) {
     SimpleMongoClientDatabaseFactory factory          = context.getFactoryMap().values().iterator().next();
     DbRefResolver                    dbRefResolver    = new DefaultDbRefResolver(factory);
     MappingMongoConverter            mappingConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
@@ -80,32 +73,15 @@ public class MongoConfig {
     list.add(new DateToLocalDateTimeConverter());
     mappingConverter.setCustomConversions(new MongoCustomConversions(list));
     mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-    return new DynamicMongoTemplate(factory, mappingConverter);
+    if(ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(),mongoProperties.getMode())){
+      return new DynamicMongoTemplate(factory, mappingConverter);
+    } else {
+      return new MongoTemplate(factory, mappingConverter);
+    }
   }
 
   @Bean(name = "mongoDbFactory")
-  @Conditional(value = TenantMongoDbCondition.class)
   public MongoDatabaseFactory tenantMongoDbFactory() {
     return context.getFactoryMap().values().iterator().next();
-  }
-
-  @Bean(name = "mongoTemplate")
-  @Conditional(value = MongoDbCondition.class)
-  public MongoTemplate mongoTemplate(MongoMappingContext mappingContext,MongoDatabaseFactory factory) {
-    DbRefResolver                    dbRefResolver    = new DefaultDbRefResolver(factory);
-    MappingMongoConverter            mappingConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
-
-    List<Object> list = new ArrayList<>();
-    list.add(new LocalDateTimeToDateConverter());
-    list.add(new DateToLocalDateTimeConverter());
-    mappingConverter.setCustomConversions(new MongoCustomConversions(list));
-    mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-    return new MongoTemplate(factory, mappingConverter);
-  }
-
-  @Bean(name = "mongoDbFactory")
-  @Conditional(value = MongoDbCondition.class)
-  public MongoDatabaseFactory mongoDbFactory() {
-    return this.factory;
   }
 }
