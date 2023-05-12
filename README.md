@@ -83,16 +83,6 @@ i18n:
   path:               #国际化文件路径
 ```
 
-### RabbitMq配置说明
-
-```yaml
-rabbit:
-  host:               #连接地址
-  port:               #端口 
-  user-name:          #用户名
-  password:           #密码
-```
-
 ### Mqtt配置说明
 
 ```yaml
@@ -114,18 +104,6 @@ mqtt：
 
 
 
-### 缓存配置说明
-
-```yaml
-cache:
-  mode:              #缓存模式（NORMAL:单库、SWITCH_DB:切换数据源,TENANT_PREFIX:单库模式在key前面增加租户编码）   
-  type:              #缓存类型（REDIS）
-  redis-profile:     #redis配置
-    host:            #连接地址
-    port:            #端口
-    password:        #密码
-```
-
 ### 文件配置说明
 
 ```yaml
@@ -142,7 +120,7 @@ file:
 
 ## 枚举国际化用例
 
-1.枚举类需要实现 BaseEnum 其中的 T 是数据库里的值的类型
+1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型
 
 ```java
 public interface BaseEnum<T> {
@@ -328,14 +306,60 @@ public class Test extends AbstractConsumer<String> {
 
 ## Redis多租户配置方式
 
-1.需要实现RedisClientPropertiesService接口的getRedisClient方法，将所有租户的redis配置信息都在这里返回，然后再项目启动时侯就会自动初始化
+1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");type是选择缓存类型目前只支持REDIS
 
-2.也可以手动初始化数据，调用RedisInitUtils此类中的init方法，就可以手动将多租户redis加入到当前项目中
+```properties
+spring:
+  redis:
+    mode: SWITCH_DB
+    type: REDIS
+    host: 
+    port: 6379
+    password: 
+    database: 
+```
+
+2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
+
+```properties
+spring:
+  redis:
+    mode: SWITCH_DB
+    type: REDIS
+    host: 
+    port: 6379
+    password: 
+    database: 
+    tenant:
+    	租户编码:
+    		host: 
+            port: 6379
+            password: 
+            database: 
+```
+
+3.如果不想选择配置文件配置的话也可以用代码方面调用 RedisInitUtils.init的方法，传入租户编码和redis配置以及注入一个RedisTenantContext对象
+
+
 
 ## MongoDB多租户配置方式
 
-1.需要实现MongoClientPropertiesService接口的getMongoClient方法，将所有租户的mongoDB配置信息都在这里返回，然后再项目启动时侯就会自动初始化
+1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源");
 
-2.也可以手动初始化数据，调用MongoInitUtils此类中的init方法，就可以手动将多租户mongoDB加入到当前项目中
+2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
 
-3.通过实现MongoClientPropertiesService接口的setCappedCollectionNameMap方法，可以实现MongoDB的限制大小和行数，并且在类中加上@MongoDBCapped注解配置大小和行数，在项目启动时候初始化，也可以手动初始化
+```properties
+spring:
+  data:
+    mongodb:
+      mode: SWITCH_DB
+      host: 106.52.186.166
+      port: 27017
+      username: steven
+      password: 31863199a
+      database: default
+      uri: mongodb://106.52.186.166:27017/default
+```
+
+3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
+
