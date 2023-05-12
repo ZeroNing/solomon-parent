@@ -353,12 +353,12 @@ spring:
   data:
     mongodb:
       mode: SWITCH_DB
-      host: 106.52.186.166
-      port: 27017
-      username: steven
-      password: 31863199a
-      database: default
-      uri: mongodb://106.52.186.166:27017/default
+      host:
+      port:
+      username:
+      password:
+      database:
+      uri:
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
