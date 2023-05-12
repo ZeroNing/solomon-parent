@@ -9,10 +9,13 @@ import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.template.DynamicMongoTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.DependsOn;
@@ -54,6 +57,11 @@ public class MongoConfig {
   @PostConstruct
   public void afterPropertiesSet() {
     if (isSwitchDb) {
+      Map<String, MongoProperties> tenantMap = ValidateUtils.isEmpty(mongoProperties.getTenant()) ? new HashMap<>() : mongoProperties.getTenant();
+      if(!tenantMap.containsKey("default")){
+        tenantMap.put("default", properties);
+        mongoProperties.setTenant(tenantMap);
+      }
       MongoInitUtils.init(mongoProperties.getTenant(), context);
     } else {
       SimpleMongoClientDatabaseFactory factory = MongoInitUtils.initFactory(properties);

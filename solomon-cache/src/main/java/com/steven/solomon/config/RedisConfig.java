@@ -10,6 +10,8 @@ import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.serializer.BaseRedisSerializer;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.verification.ValidateUtils;
+import java.util.HashMap;
+import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import org.slf4j.Logger;
@@ -42,17 +44,24 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private boolean isSwitchDb = false;
 
-  public RedisConfig(TenantRedisProperties properties, RedisTenantContext context) {
-    this.properties = properties;
-    this.context    = context;
-    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), properties.getMode());
+  private final RedisProperties redisProperties;
+
+  public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties) {
+    this.properties      = properties;
+    this.context         = context;
+    this.isSwitchDb      = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), properties.getMode());
+    this.redisProperties = redisProperties;
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
-    if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), cacheType) || ValidateUtils
-        .isEmpty(properties.getTenant())) {
+    if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), cacheType)) {
       return;
+    }
+    Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
+    if(!tenantMap.containsKey("default")){
+      tenantMap.put("default", redisProperties);
+      properties.setTenant(tenantMap);
     }
     RedisInitUtils.init(properties.getTenant(), context);
   }
