@@ -16,12 +16,12 @@ public class TenantRedisProperties {
   /**
    * redis缓存模式（默认单库）
    */
-  private String mode = SwitchModeEnum.NORMAL.toString();
+  private SwitchModeEnum mode = SwitchModeEnum.NORMAL;
 
   /**
    * 缓存类型
    */
-  private String type = CacheTypeEnum.REDIS.toString();
+  private CacheTypeEnum type = CacheTypeEnum.REDIS;
 
   public Map<String, RedisProperties> getTenant() {
     return tenant;
@@ -32,19 +32,19 @@ public class TenantRedisProperties {
     this.tenant = tenant;
   }
 
-  public String getMode() {
+  public SwitchModeEnum getMode() {
     return mode;
   }
 
-  public void setMode(String mode) {
+  public void setMode(SwitchModeEnum mode) {
     this.mode = mode;
   }
 
-  public String getType() {
+  public CacheTypeEnum getType() {
     return type;
   }
 
-  public void setType(String type) {
+  public void setType(CacheTypeEnum type) {
     this.type = type;
   }
 }

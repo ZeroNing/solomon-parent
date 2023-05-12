@@ -51,11 +51,12 @@ public class MongoConfig {
     this.mongoProperties = mongoProperties;
     this.context         = context;
     this.properties      = properties;
-    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode());
+    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
+    logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.isEmpty(mongoProperties.getTenant()) ? new HashMap<>() : mongoProperties.getTenant();
       if(!tenantMap.containsKey("default")){

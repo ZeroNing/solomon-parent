@@ -15,13 +15,13 @@ public class TenantMongoProperties {
   /**
    * mongo缓存模式（默认单库）
    */
-  private String mode = SwitchModeEnum.NORMAL.toString();
+  private SwitchModeEnum mode = SwitchModeEnum.NORMAL;
 
-  public String getMode() {
+  public SwitchModeEnum getMode() {
     return mode;
   }
 
-  public void setMode(String mode) {
+  public void setMode(SwitchModeEnum mode) {
     this.mode = mode;
   }
 

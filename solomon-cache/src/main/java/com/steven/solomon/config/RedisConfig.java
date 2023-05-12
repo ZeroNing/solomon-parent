@@ -49,7 +49,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties) {
     this.properties      = properties;
     this.context         = context;
-    this.isSwitchDb      = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), properties.getMode());
+    this.isSwitchDb      = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), properties.getMode().toString());
     this.redisProperties = redisProperties;
   }
 
@@ -58,6 +58,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), cacheType)) {
       return;
     }
+    logger.info("Cache当前类型为:{}",properties.getType().getDesc());
+    logger.info("Redis当前模式为:{}",properties.getMode().getDesc());
     Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
     if(!tenantMap.containsKey("default")){
       tenantMap.put("default", redisProperties);
