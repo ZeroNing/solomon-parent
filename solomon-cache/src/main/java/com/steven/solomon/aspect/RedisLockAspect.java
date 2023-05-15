@@ -1,17 +1,14 @@
 package com.steven.solomon.aspect;
 
-import cn.hutool.crypto.digest.MD5;
 import com.steven.solomon.annotation.Lock;
 import com.steven.solomon.constant.code.BaseICacheCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.rsa.Md5Utils;
-import com.steven.solomon.rsa.RSAUtils;
 import com.steven.solomon.service.ICacheService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import javax.annotation.Resource;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -20,18 +17,19 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * Redis Lock的AOP实现类
  */
 @Aspect
-@Component
+@Configuration(proxyBeanMethods = false)
 public class RedisLockAspect {
 
   private final Logger logger = LoggerUtils.logger(getClass());
 
-  @Resource(name="redisService")
+  @Resource
   private ICacheService iCacheService;
 
   /**

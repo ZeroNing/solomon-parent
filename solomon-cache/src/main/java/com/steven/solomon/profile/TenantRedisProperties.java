@@ -5,10 +5,10 @@ import com.steven.solomon.enums.SwitchModeEnum;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "spring.redis")
-@Component
 public class TenantRedisProperties {
 
   private Map<String,RedisProperties> tenant;

@@ -8,29 +8,31 @@ import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.serializer.BaseRedisSerializer;
+import com.steven.solomon.service.impl.RedisService;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 @Order(2)
-@DependsOn({"springUtil"})
+@EnableConfigurationProperties(value={RedisProperties.class,TenantRedisProperties.class})
+@Import(value = {RedisTenantContext.class,RedisService.class})
 public class RedisConfig extends CachingConfigurerSupport {
 
   private Logger logger = LoggerUtils.logger(getClass());
@@ -69,17 +71,16 @@ public class RedisConfig extends CachingConfigurerSupport {
   }
 
   @Bean(name = "redisTemplate")
-  public RedisTemplate dynamicRedisTemplate(RedisConnectionFactory factory) {
+  public RedisTemplate dynamicRedisTemplate() {
     logger.info("初始化redis start");
     RedisTemplate<String, Object> redisTemplate;
     if (isSwitchDb) {
-      redisTemplate = new DynamicRedisTemplate<String, Object>();
-      factory       = context.getFactoryMap().values().iterator().next();
+      redisTemplate = new DynamicRedisTemplate<String, Object>(context);
     } else {
       redisTemplate = new RedisTemplate<String, Object>();
     }
     // 注入数据源
-    redisTemplate.setConnectionFactory(factory);
+    redisTemplate.setConnectionFactory(context.getFactoryMap().values().iterator().next());
     // 使用Jackson2JsonRedisSerialize 替换默认序列化
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
     BaseRedisSerializer   baseRedisSerializer   = new BaseRedisSerializer();

@@ -1,0 +1,6 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.aspect.RedisAspect,\
+com.steven.solomon.aspect.RedisLockAspect,\
+com.steven.solomon.config.RedisConfig,\
+com.steven.solomon.config.RedisTenantContext

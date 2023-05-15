@@ -12,13 +12,14 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
  * Redis 租户切换的AOP实现类
  */
 @Aspect
-@Component
+@Configuration(proxyBeanMethods = false)
 public class RedisAspect {
 
   private final Logger logger = LoggerUtils.logger(getClass());

@@ -8,13 +8,21 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 public class DynamicRedisTemplate<K,V> extends RedisTemplate<K,V> {
 
-  public DynamicRedisTemplate(){
+  private final RedisTenantContext context;
+
+  public DynamicRedisTemplate(RedisTenantContext context){
     super();
+    this.context = context;
   }
 
   @Override
   public RedisConnectionFactory getConnectionFactory() {
-    RedisConnectionFactory factory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
+    RedisConnectionFactory factory = null;
+    if(ValidateUtils.isEmpty(SpringUtil.getApplicationContext())){
+      factory  = context.getFactory();
+    } else {
+      factory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
+    }
     return ValidateUtils.isEmpty(factory) ? super.getConnectionFactory() : factory;
   }
 }

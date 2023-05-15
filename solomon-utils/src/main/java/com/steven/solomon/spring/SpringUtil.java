@@ -22,6 +22,10 @@ public class SpringUtil implements ApplicationContextAware {
 
 	private static ApplicationContext context;
 
+	public SpringUtil(ApplicationContext applicationContext){
+		SpringUtil.context = applicationContext;
+	}
+
 	/**
 	 * Spring在bean初始化后会判断是不是ApplicationContextAware的子类
 	 * 如果该类是,setApplicationContext()方法,会将容器中ApplicationContext作为参数传入进去
