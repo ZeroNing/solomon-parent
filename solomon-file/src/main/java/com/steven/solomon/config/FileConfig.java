@@ -1,9 +1,5 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.code.FileErrorCode;
-import com.steven.solomon.constant.code.BaseCode;
-import com.steven.solomon.constant.code.BaseExceptionCode;
-import com.steven.solomon.enums.FileChoiceEnum;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
@@ -18,13 +14,16 @@ import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.MinIoService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
-import com.steven.solomon.utils.I18nUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
-@Component
+@Configuration(proxyBeanMethods = false)
+@Order(2)
+@EnableConfigurationProperties(value={FileChoiceProperties.class})
 public class FileConfig {
 
   private final Logger logger = LoggerUtils.logger(FileConfig.class);

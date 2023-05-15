@@ -9,12 +9,13 @@ import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Coordinate;
 import net.coobird.thumbnailator.geometry.Positions;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
 /**
  * 图片处理工具类
  */
-@Component
+@Configuration(proxyBeanMethods = false)
 public class ImageUtils {
 
   @Resource

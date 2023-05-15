@@ -1,0 +1,4 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.config.FileConfig,\
+com.steven.solomon.utils.ImageUtils
