@@ -14,37 +14,23 @@ import org.springframework.lang.Nullable;
 
 public class DynamicMongoTemplate extends MongoTemplate {
 
-  private final MongoTenantsContext context;
-
-  public DynamicMongoTemplate(MongoDatabaseFactory mongoDbFactory, MongoTenantsContext context) {
+  public DynamicMongoTemplate(MongoDatabaseFactory mongoDbFactory) {
     super(mongoDbFactory);
-    this.context = context;
   }
 
-  public DynamicMongoTemplate(MongoDatabaseFactory mongoDbFactory, @Nullable MongoConverter mongoConverter, MongoTenantsContext context) {
+  public DynamicMongoTemplate(MongoDatabaseFactory mongoDbFactory, @Nullable MongoConverter mongoConverter) {
     super(mongoDbFactory,mongoConverter);
-    this.context = context;
   }
 
   @Override
   protected MongoDatabase doGetDatabase() {
-    MongoDatabaseFactory mongoDbFactory = null;
-    if(ValidateUtils.isNotEmpty(SpringUtil.getApplicationContext())){
-      mongoDbFactory = SpringUtil.getBean(MongoTenantsContext.class).getFactory();
-    } else {
-      mongoDbFactory = context.getFactory();
-    }
+    MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantsContext.class).getFactory();
     return mongoDbFactory == null ? super.doGetDatabase() : mongoDbFactory.getMongoDatabase();
   }
 
   @Override
   public MongoDatabaseFactory getMongoDbFactory() {
-    MongoDatabaseFactory mongoDbFactory = null;
-    if(ValidateUtils.isNotEmpty(SpringUtil.getApplicationContext())){
-      mongoDbFactory = SpringUtil.getBean(MongoTenantsContext.class).getFactory();
-    } else {
-      mongoDbFactory = context.getFactory();
-    }
+    MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantsContext.class).getFactory();
     return mongoDbFactory == null ? super.getMongoDbFactory() : mongoDbFactory;
   }
 

@@ -9,6 +9,7 @@ import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.serializer.BaseRedisSerializer;
 import com.steven.solomon.service.impl.RedisService;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -48,15 +50,20 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private final RedisProperties redisProperties;
 
-  public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties) {
+  private final ApplicationContext applicationContext;
+
+  public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties,
+      ApplicationContext applicationContext) {
     this.properties      = properties;
     this.context         = context;
     this.isSwitchDb      = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), properties.getMode().toString());
     this.redisProperties = redisProperties;
+    this.applicationContext = applicationContext;
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
+    SpringUtil.setContext(applicationContext);
     if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), cacheType)) {
       return;
     }
@@ -75,7 +82,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     logger.info("初始化redis start");
     RedisTemplate<String, Object> redisTemplate;
     if (isSwitchDb) {
-      redisTemplate = new DynamicRedisTemplate<String, Object>(context);
+      redisTemplate = new DynamicRedisTemplate<String, Object>();
     } else {
       redisTemplate = new RedisTemplate<String, Object>();
     }
