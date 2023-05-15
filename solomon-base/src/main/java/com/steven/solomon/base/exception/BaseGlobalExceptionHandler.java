@@ -1,4 +1,4 @@
-package com.steven.solomon.base.excetion;
+package com.steven.solomon.base.exception;
 
 import com.steven.solomon.constant.code.BaseCode;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
@@ -8,7 +8,6 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import org.slf4j.Logger;
 import org.springframework.http.HttpStatus;
 
 public class BaseGlobalExceptionHandler {

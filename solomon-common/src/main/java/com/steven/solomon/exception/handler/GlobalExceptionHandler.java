@@ -1,6 +1,6 @@
 package com.steven.solomon.exception.handler;
 
-import com.steven.solomon.base.excetion.BaseGlobalExceptionHandler;
+import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.constant.code.BaseCode;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.ExceptionUtil;

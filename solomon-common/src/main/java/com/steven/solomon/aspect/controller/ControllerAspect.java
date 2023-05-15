@@ -16,12 +16,13 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
-@Component
+@Configuration(proxyBeanMethods = false)
 public class ControllerAspect {
 
   private static final Logger logger = LoggerUtils.logger(ControllerAspect.class);

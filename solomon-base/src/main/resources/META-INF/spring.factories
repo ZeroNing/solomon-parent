@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.base.config.SwaggerConfig,\
+com.steven.solomon.base.exception.ConstraintViolationExceptionHandler,\
+com.steven.solomon.base.exception.MethodArgumentNotValidExceptionHandler
