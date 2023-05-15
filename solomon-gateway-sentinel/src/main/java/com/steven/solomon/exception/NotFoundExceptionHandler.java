@@ -4,9 +4,10 @@ import com.steven.solomon.constant.code.BaseExceptionCode;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import org.springframework.cloud.gateway.support.NotFoundException;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Component("NotFoundExceptionProcessor")
+@Configuration(value = "NotFoundExceptionProcessor",proxyBeanMethods = false)
 public class NotFoundExceptionHandler extends AbstractExceptionHandler {
 
   @Override

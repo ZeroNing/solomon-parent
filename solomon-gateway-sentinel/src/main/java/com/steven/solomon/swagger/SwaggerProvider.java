@@ -7,12 +7,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.config.GatewayProperties;
 import org.springframework.cloud.gateway.route.RouteDefinition;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import springfox.documentation.swagger.web.SwaggerResource;
 import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 @Primary
 public class SwaggerProvider implements SwaggerResourcesProvider {
 

@@ -3,7 +3,7 @@ package com.steven.solomon.exception.handler;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.util.function.Supplier;
-import com.steven.solomon.base.excetion.BaseGlobalExceptionHandler;
+import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
 import java.nio.charset.StandardCharsets;

@@ -1,6 +1,6 @@
 package com.steven.solomon.exception.handler;
 
-import com.steven.solomon.base.excetion.BaseGlobalExceptionHandler;
+import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
 import java.util.stream.Collectors;
