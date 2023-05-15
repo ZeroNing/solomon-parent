@@ -6,6 +6,7 @@ import com.steven.solomon.enums.SwitchModeEnum;
 import com.steven.solomon.init.MongoInitUtils;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.properties.TenantMongoProperties;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicMongoTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
@@ -13,12 +14,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,9 +36,10 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
+@Import(value = {MongoTenantsContext.class})
 @Order(2)
-@DependsOn({"springUtil"})
 public class MongoConfig {
 
   private Logger logger = LoggerUtils.logger(getClass());
@@ -46,17 +52,21 @@ public class MongoConfig {
 
   private boolean isSwitchDb = false;
 
+  private final ApplicationContext applicationContext;
+
   public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantsContext context,
-      MongoProperties properties) {
+      MongoProperties properties, ApplicationContext applicationContext) {
     this.mongoProperties = mongoProperties;
     this.context         = context;
     this.properties      = properties;
     this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
+    this.applicationContext = applicationContext;
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
+    SpringUtil.setContext(applicationContext);
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.isEmpty(mongoProperties.getTenant()) ? new HashMap<>() : mongoProperties.getTenant();
       if(!tenantMap.containsKey("default")){
@@ -72,17 +82,17 @@ public class MongoConfig {
   }
 
   @Bean(name = "mongoTemplate")
-  public MongoTemplate dynamicMongoTemplate(MongoMappingContext mappingContext) {
+  public MongoTemplate dynamicMongoTemplate() {
     SimpleMongoClientDatabaseFactory factory          = context.getFactoryMap().values().iterator().next();
     DbRefResolver                    dbRefResolver    = new DefaultDbRefResolver(factory);
-    MappingMongoConverter            mappingConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
+    MappingMongoConverter            mappingConverter = new MappingMongoConverter(dbRefResolver, new MongoMappingContext());
 
     List<Object> list = new ArrayList<>();
     list.add(new LocalDateTimeToDateConverter());
     list.add(new DateToLocalDateTimeConverter());
     mappingConverter.setCustomConversions(new MongoCustomConversions(list));
     mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
-    return isSwitchDb ? new DynamicMongoTemplate(factory, mappingConverter) : new MongoTemplate(factory, mappingConverter);
+    return isSwitchDb ? new DynamicMongoTemplate(factory, mappingConverter, context) : new MongoTemplate(factory, mappingConverter);
   }
 
   @Bean(name = "mongoDbFactory")

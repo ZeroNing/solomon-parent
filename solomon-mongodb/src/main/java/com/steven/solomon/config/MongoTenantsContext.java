@@ -7,10 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabaseFactory,TenantMongoProperties> {
 
   private  ThreadLocal<SimpleMongoClientDatabaseFactory> MONGO_DB_FACTORY_THREAD_LOCAL = new ThreadLocal<>();

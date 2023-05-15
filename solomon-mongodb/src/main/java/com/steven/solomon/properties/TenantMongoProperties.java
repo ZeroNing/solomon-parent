@@ -7,7 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "spring.data.mongodb")
-@Component
 public class TenantMongoProperties {
 
   public Map<String,MongoProperties> tenant;
