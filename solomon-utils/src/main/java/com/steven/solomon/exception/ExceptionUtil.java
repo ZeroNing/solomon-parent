@@ -18,12 +18,12 @@ public class ExceptionUtil {
   public static ThreadLocal<String> requestId = new ThreadLocal<>();
 
   public static AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
-    if (ValidateUtils.isEmpty(com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap)) {
-      com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(
-          com.steven.solomon.exception.handler.AbstractExceptionHandler.class);
+    if (ValidateUtils.isEmpty(AbstractExceptionHandler.exceptionHandlerMap)) {
+      AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(
+          AbstractExceptionHandler.class);
     }
-    String exceptionHandlerName = exceptionSimpleName + com.steven.solomon.exception.handler.AbstractExceptionHandler.HANDLER_NAME;
-    return com.steven.solomon.exception.handler.AbstractExceptionHandler.exceptionHandlerMap.get(exceptionHandlerName);
+    String exceptionHandlerName = exceptionSimpleName + AbstractExceptionHandler.HANDLER_NAME;
+    return AbstractExceptionHandler.exceptionHandlerMap.get(exceptionHandlerName);
   }
 
   public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName,Exception ex){
