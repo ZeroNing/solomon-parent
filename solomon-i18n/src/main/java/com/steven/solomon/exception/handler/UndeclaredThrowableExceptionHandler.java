@@ -4,9 +4,10 @@ import com.steven.solomon.constant.code.BaseExceptionCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import java.lang.reflect.UndeclaredThrowableException;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Component("UndeclaredThrowableExceptionProcessor")
+@Configuration(proxyBeanMethods=false,value = "UndeclaredThrowableExceptionProcessor")
 public class UndeclaredThrowableExceptionHandler extends AbstractExceptionHandler {
 
   @Override

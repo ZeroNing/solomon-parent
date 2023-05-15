@@ -2,9 +2,9 @@ package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.constant.code.BaseExceptionCode;
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
-
-@Component("HttpRequestMethodNotSupportedExceptionProcessor")
+@Configuration(proxyBeanMethods=false,value = "HttpRequestMethodNotSupportedExceptionProcessor")
 public class HttpRequestMethodNotSupportedExceptionHandler extends AbstractExceptionHandler {
 
   @Override

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-@Component
+@Configuration(proxyBeanMethods=false)
 public class I18nConfig {
 
   private Logger logger = LoggerFactory.getLogger(getClass());

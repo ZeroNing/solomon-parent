@@ -2,9 +2,10 @@ package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.BaseException;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Component("BaseExceptionProcessor")
+@Configuration(proxyBeanMethods=false,value = "BaseExceptionProcessor")
 public class BaseExceptionHandler extends AbstractExceptionHandler {
 
   @Override

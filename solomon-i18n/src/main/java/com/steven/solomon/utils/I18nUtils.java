@@ -3,10 +3,11 @@ package com.steven.solomon.utils;
 import com.steven.solomon.constant.code.BaseCode;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods=false)
 public class I18nUtils {
 
   private static MessageSource messageSource;
