@@ -16,6 +16,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -25,7 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 public class RabbitUtils implements SendService<RabbitMqModel> {
 
   private Logger logger = LoggerUtils.logger(RabbitUtils.class);

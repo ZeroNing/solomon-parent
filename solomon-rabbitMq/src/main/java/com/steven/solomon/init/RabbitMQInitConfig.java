@@ -22,6 +22,9 @@ import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
@@ -31,9 +34,8 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.stereotype.Component;
 
-@Component
-@Order(2)
-@DependsOn("springUtil")
+@Configuration(proxyBeanMethods = false)
+@EnableConfigurationProperties(value={RabbitProperties.class})
 public class RabbitMQInitConfig implements CommandLineRunner {
 
     private final Logger logger = LoggerUtils.logger(getClass());
