@@ -20,9 +20,10 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 public class MqttUtils implements SendService<MqttModel> {
 
   private Logger logger = LoggerUtils.logger(MqttUtils.class);

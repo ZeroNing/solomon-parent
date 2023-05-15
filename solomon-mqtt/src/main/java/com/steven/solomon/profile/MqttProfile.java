@@ -7,7 +7,6 @@ import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties("mqtt")
-@Component
 public class MqttProfile {
 
   /**

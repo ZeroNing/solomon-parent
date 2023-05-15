@@ -19,8 +19,12 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -28,10 +32,10 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
-@Component
+@Configuration(proxyBeanMethods = false)
 @IntegrationComponentScan
-@Order(2)
-@DependsOn("springUtil")
+@EnableConfigurationProperties(value={MqttProfile.class,})
+@Import(value = {MqttUtils.class})
 public class MqttConfig {
 
   private final MqttProfile profile;
