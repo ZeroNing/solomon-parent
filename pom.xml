@@ -47,8 +47,7 @@
     <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
     <fastJson.version>1.2.56</fastJson.version>
-    <dubbo.version>3.0.5</dubbo.version>
-    <dubbo-start.version>3.0.5</dubbo-start.version>
+    <dubbo.version>3.2.0</dubbo.version>
     <strive.version>1.0</strive.version>
     <Spring.cloud.gateway.version>3.0.4</Spring.cloud.gateway.version>
     <Spring.cloud.loadbalancer.version>3.0.4</Spring.cloud.loadbalancer.version>
@@ -242,12 +241,12 @@
       <dependency>
         <groupId>org.apache.dubbo</groupId>
         <artifactId>dubbo-spring-boot-starter</artifactId>
-        <version>${dubbo-start.version}</version>
+        <version>${dubbo.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.dubbo</groupId>
         <artifactId>dubbo</artifactId>
-        <version>${dubbo-start.version}</version>
+        <version>${dubbo.version}</version>
       </dependency>
 
       <dependency>
