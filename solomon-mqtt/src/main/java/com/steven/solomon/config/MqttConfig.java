@@ -21,6 +21,7 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -42,9 +43,14 @@ public class MqttConfig {
 
   private final MqttUtils utils;
 
-  public MqttConfig(MqttProfile profile, MqttUtils utils) {
+  private final ApplicationContext applicationContext;
+
+  public MqttConfig(MqttProfile profile, MqttUtils utils,
+      ApplicationContext applicationContext) {
     this.profile = profile;
     this.utils   = utils;
+    this.applicationContext = applicationContext;
+    SpringUtil.setContext(applicationContext);
   }
 
   @Bean
@@ -96,6 +102,10 @@ public class MqttConfig {
     Collection<MqttCallback> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallback.class).values();
     if (ValidateUtils.isNotEmpty(mqttCallbacks)) {
       mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
+    }
+    Map<String,MqttCallback> callbackMap = SpringUtil.getBeansOfType(MqttCallback.class);
+    if(ValidateUtils.isNotEmpty(callbackMap)){
+      mqttClient.setCallback(callbackMap.values().stream().findFirst().get());
     }
     return mqttClient;
   }
