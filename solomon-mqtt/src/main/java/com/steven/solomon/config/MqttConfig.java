@@ -19,6 +19,7 @@ import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -54,6 +55,7 @@ public class MqttConfig {
   }
 
   @Bean
+  @ConditionalOnMissingBean(MqttConnectOptions.class)
   public MqttConnectOptions getMqttConnectOptions() {
     MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
     mqttConnectOptions.setUserName(profile.getUserName());
@@ -78,6 +80,7 @@ public class MqttConfig {
   }
 
   @Bean
+  @ConditionalOnMissingBean(MqttClient.class)
   public MqttClient client(MqttConnectOptions options) throws MqttException {
     MqttClient   mqttClient = new MqttClient(profile.getUrl(),
         ValidateUtils.isEmpty(profile.getClientId()) ? UUID.randomUUID().toString() : profile.getClientId());
@@ -108,6 +111,7 @@ public class MqttConfig {
 
 
   @Bean
+  @ConditionalOnMissingBean(MessageChannel.class)
   public MessageChannel mqttInputChannel() {
     return new DirectChannel();
   }
