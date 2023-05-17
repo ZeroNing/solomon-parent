@@ -103,10 +103,6 @@ public class MqttConfig {
     if (ValidateUtils.isNotEmpty(mqttCallbacks)) {
       mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
     }
-    Map<String,MqttCallback> callbackMap = SpringUtil.getBeansOfType(MqttCallback.class);
-    if(ValidateUtils.isNotEmpty(callbackMap)){
-      mqttClient.setCallback(callbackMap.values().stream().findFirst().get());
-    }
     return mqttClient;
   }
 
