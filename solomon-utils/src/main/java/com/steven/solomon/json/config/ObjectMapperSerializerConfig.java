@@ -1,5 +1,6 @@
 package com.steven.solomon.json.config;
 
+import ch.qos.logback.classic.pattern.MessageConverter;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,13 +24,15 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration(proxyBeanMethods = false)
 public class ObjectMapperSerializerConfig {
 
-  @Bean("ObjectMapper")
+  @Bean
+  @ConditionalOnMissingBean(ObjectMapper.class)
   public ObjectMapper customJackson() {
     JavaTimeModule javaTimeModule = new JavaTimeModule();
     /** 序列化配置,针对java8 时间 **/
