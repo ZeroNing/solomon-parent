@@ -1,13 +1,12 @@
 package com.steven.solomon.utils;
 
-import com.steven.solomon.annotation.RabbitMq;
-import com.steven.solomon.constant.code.BaseExceptionCode;
+import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.entity.MessageQueueDatail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.pojo.BaseMq;
+import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import org.apache.commons.lang.StringUtils;
@@ -17,10 +16,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -133,7 +130,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
 //    return allQueueContainerMap;
 //  }
 
-  private boolean convertAndSend(BaseMq baseMq, long expiration,boolean isDelayed) {
+  private boolean convertAndSend(BaseMq baseMq, long expiration, boolean isDelayed) {
     RabbitMqModel rabbitMQModel = (RabbitMqModel) baseMq;
     if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
       return false;

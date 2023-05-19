@@ -14,14 +14,14 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.steven</groupId>
-      <artifactId>solomon-data</artifactId>
-      <version>1.0</version>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-redis</artifactId>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-utils</artifactId>
+      <version>1.0</version>
     </dependency>
 
     <dependency>

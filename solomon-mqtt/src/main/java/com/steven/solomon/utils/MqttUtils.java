@@ -6,7 +6,6 @@ import com.steven.solomon.annotation.Mqtt;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.logger.LoggerUtils;
-import com.steven.solomon.pojo.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;

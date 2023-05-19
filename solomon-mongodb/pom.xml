@@ -19,8 +19,9 @@
 
     <dependency>
       <groupId>com.steven</groupId>
-      <artifactId>solomon-data</artifactId>
+      <artifactId>solomon-utils</artifactId>
       <version>1.0</version>
     </dependency>
+
   </dependencies>
 </project>

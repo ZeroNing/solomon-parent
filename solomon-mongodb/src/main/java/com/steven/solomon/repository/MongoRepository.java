@@ -1,12 +1,12 @@
 package com.steven.solomon.repository;
 
+import com.steven.solomon.pojo.enums.OrderByEnum;
 import com.steven.solomon.template.DynamicMongoTemplate;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.steven.solomon.enums.OrderByEnum;
 import com.steven.solomon.pojo.param.BasePageParam;
 import com.steven.solomon.pojo.vo.PageVO;
 import com.steven.solomon.verification.ValidateUtils;

@@ -1,10 +1,9 @@
 package com.steven.solomon.exception;
 
-import com.steven.solomon.constant.code.BaseExceptionCode;
-import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 @Configuration(value = "DegradeExceptionProcessor",proxyBeanMethods = false)
 public class DegradeExceptionHandler extends AbstractExceptionHandler {

@@ -2,7 +2,7 @@ package com.steven.solomon.init;
 
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.annotation.RabbitMqRetry;
-import com.steven.solomon.constant.code.BaseCode;
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.service.AbstractMQService;
@@ -25,14 +25,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.core.annotation.Order;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
-import org.springframework.stereotype.Component;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(value={RabbitProperties.class})

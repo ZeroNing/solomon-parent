@@ -1,6 +1,6 @@
 package com.steven.solomon.annotation;
 
-import com.steven.solomon.constant.code.BaseExceptionCode;
+import com.steven.solomon.code.BaseExceptionCode;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -1,6 +1,6 @@
 package com.steven.solomon.base.exception;
 
-import com.steven.solomon.constant.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import javax.validation.ConstraintViolationException;
 import org.springframework.context.annotation.Configuration;

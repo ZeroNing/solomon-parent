@@ -3,7 +3,7 @@ package com.steven.solomon.annotation;
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.steven.solomon.json.EnumSerializer;
-import com.steven.solomon.constant.code.BaseMethodNameEnum;
+import com.steven.solomon.code.BaseMethodNameEnum;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

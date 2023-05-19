@@ -1,6 +1,6 @@
 package com.steven.solomon.enums;
 
-import com.steven.solomon.enums.BaseEnum;
+import com.steven.solomon.pojo.enums.BaseEnum;
 
 public enum FileNamingMethodEnum implements BaseEnum<String> {
   ORIGINAL("ORIGINAL"),

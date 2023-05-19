@@ -2,9 +2,9 @@ package com.steven.solomon.config;
 
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
-import com.steven.solomon.enums.SwitchModeEnum;
 import com.steven.solomon.init.MongoInitUtils;
 import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicMongoTemplate;

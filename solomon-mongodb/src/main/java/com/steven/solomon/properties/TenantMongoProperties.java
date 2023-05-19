@@ -1,7 +1,8 @@
 package com.steven.solomon.properties;
 
-import com.steven.solomon.enums.SwitchModeEnum;
 import java.util.Map;
+
+import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

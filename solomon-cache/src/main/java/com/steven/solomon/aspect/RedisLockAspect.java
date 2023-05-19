@@ -1,7 +1,7 @@
 package com.steven.solomon.aspect;
 
 import com.steven.solomon.annotation.Lock;
-import com.steven.solomon.constant.code.BaseICacheCode;
+import com.steven.solomon.code.BaseICacheCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.logger.LoggerUtils;
@@ -17,7 +17,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 /**

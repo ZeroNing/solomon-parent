@@ -1,6 +1,7 @@
 package com.steven.solomon.entity;
 
-import com.steven.solomon.pojo.BaseMq;
+
+import com.steven.solomon.pojo.entity.BaseMq;
 
 /**
  * 基础发送MQ基类

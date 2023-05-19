@@ -1,8 +1,8 @@
 package com.steven.solomon.service;
 
-import com.steven.solomon.enums.SwitchModeEnum;
 import com.steven.solomon.holder.HeardHolder;
 import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.verification.ValidateUtils;
 

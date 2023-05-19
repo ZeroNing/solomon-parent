@@ -15,12 +15,9 @@
     <module>solomon-constant</module>
     <module>solomon-file</module>
     <module>solomon-cache</module>
-    <module>solomon-mq</module>
     <module>solomon-utils</module>
     <module>solomon-mongodb</module>
-    <module>solomon-i18n</module>
     <module>solomon-mybatis</module>
-    <module>solomon-data</module>
     <module>solomon-gateway-sentinel</module>
     <module>solomon-mqtt</module>
     <module>solomon-rabbitMq</module>

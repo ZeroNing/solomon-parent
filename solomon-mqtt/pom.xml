@@ -21,8 +21,9 @@
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-mq</artifactId>
+            <artifactId>solomon-utils</artifactId>
             <version>1.0</version>
         </dependency>
+
     </dependencies>
 </project>

@@ -81,11 +81,11 @@ public class MongoInitUtils {
       } else {
         if(ValidateUtils.isNotEmpty(mongoDBCapped)){
           org.bson.Document command  = new org.bson.Document("collStats", name);
-          Boolean  isCapped = mongoDatabase.runCommand(command, ReadPreference.primary()).getBoolean("capped");
+          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");
           if(!isCapped){
             logger.info("修改集合{}为固定集合,限制字节为:{},记录数:{}",name,mongoDBCapped.size(),mongoDBCapped.maxDocuments());
             command = new org.bson.Document("convertToCapped", name).append("capped",true).append("size", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments());
-            mongoDatabase.runCommand(command, ReadPreference.primary());
+            mongoDatabase.runCommand(command);
           }
         }
       }

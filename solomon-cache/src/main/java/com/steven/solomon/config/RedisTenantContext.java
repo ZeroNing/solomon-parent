@@ -2,14 +2,10 @@ package com.steven.solomon.config;
 
 import com.steven.solomon.context.TenantContext;
 import com.steven.solomon.profile.TenantRedisProperties;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.stereotype.Component;
 @Configuration(proxyBeanMethods = false)
 public class RedisTenantContext extends TenantContext<RedisConnectionFactory, TenantRedisProperties> {
 
