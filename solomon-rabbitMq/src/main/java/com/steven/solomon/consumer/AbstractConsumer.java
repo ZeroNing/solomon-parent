@@ -7,7 +7,7 @@ import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AcknowledgeMode;

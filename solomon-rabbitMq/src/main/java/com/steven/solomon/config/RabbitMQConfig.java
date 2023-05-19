@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.service.DelayedMQService;
 import com.steven.solomon.service.DirectMQService;
 import com.steven.solomon.service.FanoutMQService;

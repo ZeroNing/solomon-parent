@@ -5,7 +5,7 @@ import com.steven.solomon.entity.MessageQueueDatail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;

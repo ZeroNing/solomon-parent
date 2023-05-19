@@ -12,13 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(2)
-@DependsOn({"springUtil"})
+@DependsOn({"SpringUtil"})
 public class ActiveMQConfig {
-
-  @Bean
-  public JmsPoolConnectionFactoryFactory factory(ActiveMQProperties properties){
-    return new JmsPoolConnectionFactoryFactory(properties.getPool());
-  }
-
 
 }

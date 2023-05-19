@@ -4,7 +4,7 @@ import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.annotation.RabbitMqRetry;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.consumer.AbstractConsumer;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.service.AbstractMQService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;

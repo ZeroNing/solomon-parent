@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.ReturnedMessage;

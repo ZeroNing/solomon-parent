@@ -4,7 +4,7 @@ import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;

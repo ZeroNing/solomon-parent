@@ -2,7 +2,7 @@ package com.steven.solomon.init;
 
 import com.steven.solomon.annotation.ActiveMQ;
 import com.steven.solomon.annotation.ActiveMQRetry;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
 
 import java.util.ArrayList;
@@ -34,13 +34,13 @@ public class ActiveMQInitConfig implements CommandLineRunner {
   private final Logger logger = LoggerUtils.logger(getClass());
 
 
-  private final ActiveMQConnectionFactory connectionFactory;
+  private final ConnectionFactory connectionFactory;
 
   private ActiveMQ activeMQ;
 
   private ActiveMQRetry activeMQRetry;
 
-  public ActiveMQInitConfig(ActiveMQConnectionFactory connectionFactory) {
+  public ActiveMQInitConfig(ConnectionFactory connectionFactory) {
     this.connectionFactory = connectionFactory;
   }
 
@@ -91,7 +91,8 @@ public class ActiveMQInitConfig implements CommandLineRunner {
       redeliveryPolicy.setInitialRedeliveryDelay(activeMQRetry.initialRedeliveryDelay());
       redeliveryPolicyMap.put(isQueue ? new ActiveMQQueue(activeMQ.name()) : new ActiveMQTopic(activeMQ.name()),redeliveryPolicy);
     }
-    connectionFactory.setRedeliveryPolicyMap(redeliveryPolicyMap);
+    ActiveMQConnectionFactory activeMQConnectionFactory = (ActiveMQConnectionFactory)connectionFactory;
+    activeMQConnectionFactory.setRedeliveryPolicyMap(redeliveryPolicyMap);
 
   }
 }

@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;

@@ -2,7 +2,7 @@ package com.steven.solomon.config;
 
 import com.steven.solomon.enums.CacheTypeEnum;
 import com.steven.solomon.init.RedisInitUtils;
-import com.steven.solomon.logger.LoggerUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
