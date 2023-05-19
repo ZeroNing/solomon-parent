@@ -1,5 +1,5 @@
 package com.steven.solomon.pojo.enums;
-import com.steven.solomon.utils.I18nUtils;
+import com.steven.solomon.utils.i18n.I18nUtils;
 
 public interface BaseEnum<T> {
 

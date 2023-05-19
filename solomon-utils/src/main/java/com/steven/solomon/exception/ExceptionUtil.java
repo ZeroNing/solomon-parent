@@ -5,7 +5,7 @@ import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.utils.I18nUtils;
+import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.Locale;
 import org.slf4j.Logger;

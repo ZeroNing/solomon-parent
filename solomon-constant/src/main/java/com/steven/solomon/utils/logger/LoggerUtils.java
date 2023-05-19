@@ -1,4 +1,4 @@
-package com.steven.solomon.logger;
+package com.steven.solomon.utils.logger;
 
 
 import org.slf4j.Logger;

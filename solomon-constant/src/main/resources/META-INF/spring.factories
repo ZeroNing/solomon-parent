@@ -1,10 +1,10 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.steven.solomon.config.I18nConfig,\
+com.steven.solomon.config.i18n.I18nConfig,\
 com.steven.solomon.exception.handler.BaseExceptionHandler,\
 com.steven.solomon.exception.handler.BindExceptionHandler,\
 com.steven.solomon.exception.handler.HttpRequestMethodNotSupportedExceptionHandler,\
 com.steven.solomon.exception.handler.MaxUploadSizeExceededExceptionHandler,\
 com.steven.solomon.exception.handler.MethodNotAllowedExceptionHandler,\
 com.steven.solomon.exception.handler.UndeclaredThrowableExceptionHandler,\
-com.steven.solomon.utils.I18nUtils  
+com.steven.solomon.utils.i18n.I18nUtils  

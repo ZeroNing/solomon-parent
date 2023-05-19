@@ -1,6 +1,8 @@
 package com.steven.solomon.config.i18n;
 
 import com.steven.solomon.code.BaseCode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +13,8 @@ import java.util.*;
 
 @Configuration(proxyBeanMethods=false)
 public class I18nConfig {
+
+  private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Value("${i18n.language: zh}")
   public Locale DEFAULT_LOCALE;
@@ -48,6 +52,7 @@ public class I18nConfig {
     bundleMessageSource.setBasenames(beanNames.toArray(new String[]{}));
     bundleMessageSource.setDefaultLocale(DEFAULT_LOCALE == null ? Locale.CHINESE : DEFAULT_LOCALE);
     bundleMessageSource.setDefaultEncoding("UTF-8");
+    logger.info("BaseI18nConfig初始化I18N国际化文件成功,国际化默认语言为:{},国际化文件路径为:{}",DEFAULT_LOCALE.toString(), beanNames.toString());
     return bundleMessageSource;
   }
 

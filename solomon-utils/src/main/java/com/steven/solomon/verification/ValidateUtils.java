@@ -1,16 +1,10 @@
 package com.steven.solomon.verification;
 
-import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.logger.LoggerUtils;
-import java.io.File;
-import java.util.Collection;
-import java.util.Map;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.ObjectUtils;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 public class ValidateUtils {
@@ -31,7 +25,7 @@ public class ValidateUtils {
   }
 
   public static boolean equals(String contrast, String var) {
-    return ObjectUtils.equals(contrast,var);
+    return ObjectUtil.equals(contrast,var);
   }
 
   /**
@@ -114,7 +108,7 @@ public class ValidateUtils {
   }
 
   public static boolean equals(Number contrast, Number var) {
-    return ObjectUtils.equals(contrast,var);
+    return ObjectUtil.equals(contrast,var);
   }
 
   /**
@@ -152,7 +146,7 @@ public class ValidateUtils {
   }
 
   public static boolean equals(Boolean contrast, Boolean var) {
-    return ObjectUtils.equals(contrast,var);
+    return ObjectUtil.equals(contrast,var);
   }
 
   /**
@@ -268,33 +262,7 @@ public class ValidateUtils {
    * @return
    */
   public static final Boolean isEmpty(Object obj) {
-    Boolean flag = false;
-
-    if(obj instanceof Map && MapUtil.isEmpty((Map) obj)){
-      return true;
-    }
-
-    if (obj instanceof String && StringUtils.isBlank((String) obj)) {
-      return true;
-    }
-
-    if (obj instanceof Collection<?> && CollectionUtils.isEmpty((Collection<?>) obj)) {
-      return true;
-    }
-
-    if (obj instanceof File && !((File) obj).exists()) {
-      return true;
-    }
-
-    if (obj instanceof Number && obj == null) {
-      return true;
-    }
-
-    if (obj instanceof Boolean && obj == null) {
-      return true;
-    }
-
-    if(obj == null){
+    if(ObjectUtil.isEmpty(obj)){
       return true;
     }
     return false;

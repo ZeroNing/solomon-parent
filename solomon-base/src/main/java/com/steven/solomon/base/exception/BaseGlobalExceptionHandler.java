@@ -3,7 +3,7 @@ package com.steven.solomon.base.exception;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.ExceptionUtil;
-import com.steven.solomon.utils.I18nUtils;
+import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.HashMap;
 import java.util.Locale;
