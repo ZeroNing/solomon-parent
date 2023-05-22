@@ -1,6 +1,6 @@
 package com.steven.solomon.namingRules;
 
-import com.steven.solomon.date.DateTimeUtils;
+import com.steven.solomon.utils.date.DateTimeUtils;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import org.springframework.web.multipart.MultipartFile;

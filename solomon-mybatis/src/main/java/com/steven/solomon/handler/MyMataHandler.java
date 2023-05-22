@@ -3,7 +3,7 @@ package com.steven.solomon.handler;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.steven.solomon.date.DateTimeUtils;
+import com.steven.solomon.utils.date.DateTimeUtils;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

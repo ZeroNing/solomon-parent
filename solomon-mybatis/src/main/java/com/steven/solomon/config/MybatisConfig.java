@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Order(2)
-@DependsOn({"springUtil"})
+@DependsOn({"SpringUtil"})
 public class MybatisConfig {
 }
