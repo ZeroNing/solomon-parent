@@ -28,21 +28,47 @@
 ## 项目描述
 
 | 项目名                   | 说明                                                         |
-| ------------------------ | ------------------------------------------------------------ |
+| :----------------------- | ------------------------------------------------------------ |
 | solomon-base             | 主要是封装了底层的异常捕获以及通用返回实体类                 |
 | solomon-cache            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
 | solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获 |
-| solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值             |
-| solomon-data             | 主要用于底层数据实体类以及动态切换数据源模板                 |
+| solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值，底层数据实体类以及动态切换数据源模板，国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
 | solomon-file             | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云等等 |
 | solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
-| solomon-i18n             | 国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
 | solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方法 |
 | solomon-mq               | 封装一些基础MQ类                                             |
 | solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-mybatis          | 主要是加入了一个通用实体类，未来或许考虑加入动态切换数据源   |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
+
+## 注意事项
+
+1.项目启动时侯需要扫描Jar包路径（"com.steven"）如：
+
+```java
+@SpringBootApplication(scanBasePackages = {"com.test","com.steven"})
+public class TestApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(TestApplication.class, args);
+  }
+
+}
+```
+
+```java
+@ComponentScan(value = {"com.steven"})
+public class TestApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(TestApplication.class, args);
+  }
+
+}
+```
+
+
 
 ## 自定义配置说明
 
@@ -331,6 +357,14 @@ spring:
       password:
       database:
       uri:
+      tenant:
+        租户编码:
+          host: 
+          port: 
+          username: 
+          password: 
+          database: 
+          uri: 
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
