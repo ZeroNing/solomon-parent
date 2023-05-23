@@ -40,32 +40,32 @@
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
     <jackson.version>2.11.4</jackson.version>
-    <spring.cloud.version>2020.0</spring.cloud.version>
-    <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
+    <spring.cloud.version>2022.0.2</spring.cloud.version>
+    <spring.cloud.alibab.version>2022.0.0.0-RC2</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
     <fastJson.version>1.2.56</fastJson.version>
-    <dubbo.version>3.2.0</dubbo.version>
+    <dubbo.version>3.2.1</dubbo.version>
     <strive.version>1.0</strive.version>
     <Spring.cloud.gateway.version>3.0.4</Spring.cloud.gateway.version>
     <Spring.cloud.loadbalancer.version>3.0.4</Spring.cloud.loadbalancer.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.context.support.version>1.0.11</spring.context.support.version>
-    <nacos.client.version>2.1.1</nacos.client.version>
+    <nacos.client.version>2.2.2</nacos.client.version>
     <jedis.version>4.0.0</jedis.version>
-    <seata.version>1.4.2</seata.version>
+    <seata.version>1.7.0-native-rc2</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
     <redisson.version>3.15.1</redisson.version>
-    <hutool.version>5.7.18</hutool.version>
+    <hutool.version>5.8.18</hutool.version>
     <spring.loadbalancer.version>3.0.4</spring.loadbalancer.version>
     <spring.bootstrap.version>3.0.4</spring.bootstrap.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>8.0.28</mysql.java.version>
-    <minio.version>8.2.1</minio.version>
+    <minio.version>8.5.3</minio.version>
     <spring.context.version>5.3.1</spring.context.version>
     <slf4j.version>1.7.30</slf4j.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
-    <druid.version>1.2.8</druid.version>
+    <druid.version>1.2.18</druid.version>
     <xmpcore.version>6.1.11</xmpcore.version>
     <metadata.version>2.18.0</metadata.version>
     <knife4j.version>3.0.3</knife4j.version>
@@ -75,7 +75,10 @@
     <cos.version>5.6.97</cos.version>
     <bos.version>0.10.240</bos.version>
     <rocketMq.version>2.2.3</rocketMq.version>
-    <mqtt.version>6.0.4</mqtt.version>
+    <mqtt.version>6.1.0</mqtt.version>
+    <druid.version>1.2.18</druid.version>
+    <okhttp.version>4.10.0</okhttp.version>
+    <okio.version>3.3.0</okio.version>
   </properties>
 
   <parent>
@@ -87,6 +90,25 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>com.squareup.okio</groupId>
+        <artifactId>okio</artifactId>
+        <version>${okio.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${okhttp.version}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>org.springframework.integration</groupId>
