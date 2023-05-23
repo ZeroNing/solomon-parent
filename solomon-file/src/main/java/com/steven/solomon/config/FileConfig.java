@@ -12,7 +12,7 @@ import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.FileServiceInterface;
-import com.steven.solomon.service.MinIoService;
+import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
 import org.slf4j.Logger;
@@ -35,7 +35,7 @@ public class FileConfig {
     logger.info("选择 {} 文件服务", fileProperties.getChoice());
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinIoService(fileProperties);
+        return new MinioService(fileProperties);
       case OSS:
         return new OSSService(fileProperties);
       case OBS:

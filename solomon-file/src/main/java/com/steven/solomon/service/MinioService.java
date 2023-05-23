@@ -27,7 +27,7 @@ import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.springframework.web.multipart.MultipartFile;
 
-public class MinIoService implements FileServiceInterface{
+public class MinioService implements FileServiceInterface{
 
   public final FileChoiceProperties mioProperties;
 
@@ -36,7 +36,7 @@ public class MinIoService implements FileServiceInterface{
   @Resource
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public MinIoService(FileChoiceProperties mioProperties) {
+  public MinioService(FileChoiceProperties mioProperties) {
     this.mioProperties = mioProperties;
     client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();
   }
