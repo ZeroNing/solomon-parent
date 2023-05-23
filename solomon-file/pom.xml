@@ -60,11 +60,6 @@
       <artifactId>spring-boot-autoconfigure</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-    </dependency>
-
     <!--解析图片exif 开始-->
     <dependency>
       <groupId>com.drewnoakes</groupId>
