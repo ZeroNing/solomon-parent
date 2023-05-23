@@ -65,6 +65,10 @@ public class BOSService implements FileServiceInterface{
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
+    boolean flag = bucketExists(bucketName);
+    if (!flag) {
+      return;
+    }
     String filePath = getFilePath(fileName,properties);
     client.deleteObject(bucketName,filePath);
   }

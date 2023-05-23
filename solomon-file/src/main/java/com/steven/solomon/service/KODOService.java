@@ -81,6 +81,10 @@ public class KODOService implements FileServiceInterface{
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
+    boolean flag = bucketExists(bucketName);
+    if (!flag) {
+      return;
+    }
     bucketManager.delete(bucketName, fileName);
   }
 

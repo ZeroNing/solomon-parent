@@ -38,6 +38,9 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
+    //创建桶
+    makeBucket(bucketName);
+
     String    fileName  = fileNamingRulesGenerationService.getFileName(file);
     String    filePath  = getFilePath(fileName, properties);
     obsClient.putObject(bucketName, filePath, file.getInputStream());
@@ -46,6 +49,9 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
+    //创建桶
+    makeBucket(bucketName);
+
     String    filePath  = getFilePath(fileName, properties);
 
     ByteArrayOutputStream bs    = new ByteArrayOutputStream();
@@ -58,6 +64,10 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
+    boolean flag = bucketExists(bucketName);
+    if (!flag) {
+      return;
+    }
     String    filePath  = getFilePath(fileName, properties);
     obsClient.deleteObject(bucketName, filePath);
   }
