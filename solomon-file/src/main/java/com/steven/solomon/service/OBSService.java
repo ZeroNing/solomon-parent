@@ -38,7 +38,6 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
-    ObsClient obsClient = null;
     String    fileName  = fileNamingRulesGenerationService.getFileName(file);
     String    filePath  = getFilePath(fileName, properties);
     obsClient.putObject(bucketName, filePath, file.getInputStream());
@@ -47,7 +46,6 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
-    ObsClient obsClient = null;
     String    filePath  = getFilePath(fileName, properties);
 
     ByteArrayOutputStream bs    = new ByteArrayOutputStream();
@@ -60,14 +58,12 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
-    ObsClient obsClient = null;
     String    filePath  = getFilePath(fileName, properties);
     obsClient.deleteObject(bucketName, filePath);
   }
 
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    ObsClient obsClient = null;
     String filePath = ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName :
                       properties.getRootDirectory() + fileName;
     TemporarySignatureRequest request = new TemporarySignatureRequest(HttpMethodEnum.GET, unit.toSeconds(expiry));
@@ -79,7 +75,6 @@ public class OBSService implements FileServiceInterface {
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    ObsClient obsClient = null;
     String    filePath  = getFilePath(fileName, properties);
     return obsClient.getObject(bucketName, filePath).getObjectContent();
   }
