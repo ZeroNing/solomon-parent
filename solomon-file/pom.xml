@@ -14,6 +14,11 @@
   <dependencies>
 
     <dependency>
+      <groupId>com.qiniu</groupId>
+      <artifactId>qiniu-java-sdk</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.baidubce</groupId>
       <artifactId>bce-java-sdk</artifactId>
       <exclusions>

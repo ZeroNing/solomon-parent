@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.service.KODOService;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
@@ -43,6 +44,8 @@ public class FileConfig {
         return new COSService(fileProperties);
       case BOS:
         return new BOSService(fileProperties);
+      case KODO:
+        return new KODOService(fileProperties);
       default:
         return new DefaultService();
     }
