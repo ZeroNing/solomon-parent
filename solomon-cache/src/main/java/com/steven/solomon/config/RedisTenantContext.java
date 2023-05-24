@@ -43,21 +43,6 @@ public class RedisTenantContext extends TenantContext<RedisConnectionFactory, Te
     REDIS_FACTORY_MAP.put(key,factory);
   }
 
-  @Override
-  public Map<String, TenantRedisProperties> getPropertiesMap() {
-    return null;
-  }
-
-  @Override
-  public void setProperties(String key, TenantRedisProperties properties) {
-
-  }
-
-  @Override
-  public void setProperties(Map<String, TenantRedisProperties> propertiesMap) {
-
-  }
-
 //  public static RedisConnectionFactory getFactory() {
 //    return REDIS_FACTORY_THREAD_LOCAL.get();
 //  }

@@ -14,8 +14,6 @@ public class MyBatisTenantsContext extends TenantContext<PooledDataSourceFactory
 
   private  Map<String,PooledDataSourceFactory> MYBATIS_FACTORY_MAP = new ConcurrentHashMap<>();
 
-  private Map<String,TenantDataSourceProperties> mybatisClientMap = new ConcurrentHashMap<>();
-
   @Override
   public PooledDataSourceFactory getFactory() {
     return MYBATIS_DB_FACTORY_THREAD_LOCAL.get();
@@ -44,20 +42,5 @@ public class MyBatisTenantsContext extends TenantContext<PooledDataSourceFactory
   @Override
   public void setFactory(String key, PooledDataSourceFactory factory) {
     MYBATIS_FACTORY_MAP.put(key, factory);
-  }
-
-  @Override
-  public Map<String, TenantDataSourceProperties> getPropertiesMap() {
-    return mybatisClientMap;
-  }
-
-  @Override
-  public void setProperties(String key, TenantDataSourceProperties properties) {
-    mybatisClientMap.put(key, properties);
-  }
-
-  @Override
-  public void setProperties(Map<String, TenantDataSourceProperties> propertiesMap) {
-    mybatisClientMap.putAll(propertiesMap);
   }
 }

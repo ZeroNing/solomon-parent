@@ -18,10 +18,6 @@ public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabase
 
   private  Map<String,SimpleMongoClientDatabaseFactory> MONGO_FACTORY_MAP = new ConcurrentHashMap<>();
 
-  private Map<String,TenantMongoProperties> mongoClientMap = new ConcurrentHashMap<>();
-
-  private Map<String,Class<?>> CAPPED_COLLECTION_NAME_MAP = new HashMap<>();
-
   @Override
   public SimpleMongoClientDatabaseFactory getFactory() {
     return MONGO_DB_FACTORY_THREAD_LOCAL.get();
@@ -51,20 +47,4 @@ public class MongoTenantsContext extends TenantContext<SimpleMongoClientDatabase
   public void setFactory(String key, SimpleMongoClientDatabaseFactory factory) {
     MONGO_FACTORY_MAP.put(key,factory);
   }
-
-  @Override
-  public Map<String, TenantMongoProperties> getPropertiesMap() {
-    return mongoClientMap;
-  }
-
-  @Override
-  public void setProperties(String key, TenantMongoProperties properties) {
-    mongoClientMap.put(key, properties);
-  }
-
-  @Override
-  public void setProperties(Map<String, TenantMongoProperties> propertiesMap) {
-    mongoClientMap.putAll(propertiesMap);
-  }
-
 }

@@ -44,19 +44,4 @@ public abstract class TenantContext<F,P> {
    * @param factory
    */
   public abstract void setFactory(String key,F factory);
-
-  /**
-   * 获取全部配置
-   */
-  public abstract Map<String,P> getPropertiesMap();
-
-  /**
-   * 设置配置
-   */
-  public abstract void setProperties(String key,P properties);
-
-  /**
-   * 设置配置
-   */
-  public abstract void setProperties(Map<String, P> propertiesMap);
 }
