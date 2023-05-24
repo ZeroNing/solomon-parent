@@ -72,6 +72,17 @@ public class TestApplication {
 
 ## 自定义配置说明
 
+### Swagger配置说明
+
+```yaml
+knife4j:
+  package:         #需要扫描的包路径
+  title:           #swagger文档名字
+  open:            #是否开启swagger 线上环境建议为false
+```
+
+
+
 ### 国际化配置说明
 
 ```yaml
