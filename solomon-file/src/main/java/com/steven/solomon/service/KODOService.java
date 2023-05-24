@@ -1,17 +1,10 @@
 package com.steven.solomon.service;
 
-import com.baidubce.auth.DefaultBceCredentials;
-import com.baidubce.services.bos.BosClient;
-import com.baidubce.services.bos.BosClientConfiguration;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
-import com.qiniu.storage.DownloadUrl;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
-import com.qiniu.storage.model.BucketInfo;
 import com.qiniu.util.Auth;
-import com.steven.solomon.code.FileErrorCode;
-import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -19,6 +12,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -101,7 +96,9 @@ public class KODOService implements FileServiceInterface{
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+    URL           url  = new URL(share(fileName,bucketName,3600L,TimeUnit.SECONDS));
+    URLConnection conn = url.openConnection();
+    return conn.getInputStream();
   }
 
   @Override
