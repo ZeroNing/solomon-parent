@@ -165,6 +165,7 @@ public interface BaseEnum<T> {
   default T Value() {
     return label();
   }
+}
 ```
 
 例：
@@ -195,6 +196,7 @@ public enum DelFlagEnum implements BaseEnum<String> {
   public String key() {
     return this.name();
   }
+}
 ```
 
 2.在实体类中需要国际化的字段上加上@JsonEnum注解 ，并且可以支持自定义返回值的名称用fieldName指定，不指定的时候就在该字段后面增加Desc
@@ -325,7 +327,7 @@ spring:
     host: 
     port: 6379
     password: 
-    database: 
+    database:
 ```
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
