@@ -43,37 +43,4 @@ public class RedisTenantContext extends TenantContext<RedisConnectionFactory, Te
     REDIS_FACTORY_MAP.put(key,factory);
   }
 
-//  public static RedisConnectionFactory getFactory() {
-//    return REDIS_FACTORY_THREAD_LOCAL.get();
-//  }
-//
-//  public static void removeFactory() {
-//    REDIS_FACTORY_THREAD_LOCAL.remove();
-//  }
-//
-//  public static void setFactory(String name) {
-//    REDIS_FACTORY_THREAD_LOCAL.set(REDIS_FACTORY_MAP.get(name));
-//  }
-//
-//  public static void setProperties(TenantRedisProperties properties) {
-//    redisPropertiesList.add(properties);
-//  }
-//
-//  public static List<TenantRedisProperties> getProperties() {
-//    return redisPropertiesList;
-//  }
-//
-//
-//  public static Map<String, RedisConnectionFactory> getFactoryMap() {
-//    return REDIS_FACTORY_MAP;
-//  }
-//
-//
-//  public static void setFactoryMap(Map<String, RedisConnectionFactory> redisFactoryMap) {
-//    REDIS_FACTORY_MAP.putAll(redisFactoryMap);
-//  }
-//
-//  public static void setFactory(String tenantCode, RedisConnectionFactory factory) {
-//    REDIS_FACTORY_MAP.put(tenantCode,factory);
-//  }
 }
