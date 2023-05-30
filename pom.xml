@@ -40,8 +40,8 @@
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
     <jackson.version>2.11.4</jackson.version>
-    <spring.cloud.version>2022.0.2</spring.cloud.version>
-    <spring.cloud.alibab.version>2022.0.0.0-RC2</spring.cloud.alibab.version>
+    <spring.cloud.version>2020.0</spring.cloud.version>
+    <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
     <fastJson.version>1.2.56</fastJson.version>
     <dubbo.version>3.2.1</dubbo.version>
