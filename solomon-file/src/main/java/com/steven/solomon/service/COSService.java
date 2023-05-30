@@ -20,16 +20,21 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 public class COSService implements FileServiceInterface{
 
-  private final FileChoiceProperties properties;
+  private FileChoiceProperties properties;
 
-  private final COSClient client;
+  private COSClient client;
 
-  @Resource
+  @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
+
+  public COSService() {
+
+  }
 
   public COSService(FileChoiceProperties properties) {
     this.properties = properties;

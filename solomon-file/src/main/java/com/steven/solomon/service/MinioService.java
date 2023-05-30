@@ -25,17 +25,21 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 public class MinioService implements FileServiceInterface{
 
-  public final FileChoiceProperties mioProperties;
+  public FileChoiceProperties mioProperties;
 
-  public final MinioClient client;
+  public MinioClient client;
 
-  @Resource
+  @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
+  public MinioService() {
+
+  }
   public MinioService(FileChoiceProperties mioProperties) {
     this.mioProperties = mioProperties;
     client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();

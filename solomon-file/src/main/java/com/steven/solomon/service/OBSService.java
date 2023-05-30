@@ -16,16 +16,22 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 public class OBSService implements FileServiceInterface {
 
-  private final FileChoiceProperties properties;
+  private FileChoiceProperties properties;
 
-  private final ObsClient obsClient;
+  private ObsClient obsClient;
 
-  @Resource
+  @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
+
+
+  public OBSService() {
+
+  }
 
   public OBSService(FileChoiceProperties properties) {
     this.properties = properties;

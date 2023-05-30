@@ -10,6 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class DefaultService implements FileServiceInterface{
 
+  public DefaultService() {
+
+  }
+
   @Override
   public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);

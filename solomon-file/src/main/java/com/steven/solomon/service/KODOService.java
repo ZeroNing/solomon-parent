@@ -22,22 +22,27 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
 public class KODOService implements FileServiceInterface{
 
-  private final UploadManager uploadManager;
+  private UploadManager uploadManager;
 
-  private final Auth auth;
+  private Auth auth;
 
-  private final BucketManager bucketManager;
+  private BucketManager bucketManager;
 
-  private final Configuration conf;
+  private Configuration conf;
 
-  private final FileChoiceProperties properties;
+  private FileChoiceProperties properties;
 
-  @Resource
+  @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
+
+  public KODOService() {
+
+  }
 
   public KODOService(FileChoiceProperties properties) {
     this.properties = properties;
