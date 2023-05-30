@@ -18,8 +18,9 @@ import org.springframework.stereotype.Component;
 @Configuration(proxyBeanMethods = false)
 public class ImageUtils {
 
-  @Resource
-  protected FileServiceInterface fileService;
+  protected final FileServiceInterface fileService;
+
+  public ImageUtils(FileServiceInterface fileService) {this.fileService = fileService;}
 
   /**
    * 对图片进行指定比例的压缩

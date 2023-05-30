@@ -30,6 +30,22 @@ public class FileConfig {
   private final Logger logger = LoggerUtils.logger(FileConfig.class);
 
   @Bean
+  @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
+  public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
+    logger.info("选择 {} 命名规则", fileProperties.getFileNamingMethod());
+    switch (fileProperties.getFileNamingMethod()) {
+      case DATE:
+        return new DateNamingRulesGenerationService();
+      case UUID:
+        return new UUIDNamingRulesGenerationService();
+      case SNOWFLAKE:
+        return new SnowflakeNamingRulesGenerationService();
+      default:
+        return new OriginalNamingRulesGenerationService();
+    }
+  }
+
+  @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   public FileServiceInterface fileService(FileChoiceProperties fileProperties){
     logger.info("选择 {} 文件服务", fileProperties.getChoice());
@@ -48,22 +64,6 @@ public class FileConfig {
         return new KODOService(fileProperties);
       default:
         return new DefaultService();
-    }
-  }
-
-  @Bean
-  @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
-  public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
-    logger.info("选择 {} 命名规则", fileProperties.getFileNamingMethod());
-    switch (fileProperties.getFileNamingMethod()) {
-      case DATE:
-        return new DateNamingRulesGenerationService();
-      case UUID:
-        return new UUIDNamingRulesGenerationService();
-      case SNOWFLAKE:
-        return new SnowflakeNamingRulesGenerationService();
-      default:
-        return new OriginalNamingRulesGenerationService();
     }
   }
 }
