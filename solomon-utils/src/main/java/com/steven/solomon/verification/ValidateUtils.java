@@ -326,4 +326,56 @@ public class ValidateUtils {
     }
     return obj;
   }
+
+  /**
+   * 检查枚举是否不符合
+   * @param value 枚举名称
+   * @param clazz 枚举class
+   * @return
+   */
+  public static boolean checkEnumValueIsEmpty(String value,Class clazz){
+    Enum enums = Enum.valueOf(clazz,value);
+    return isEmpty(enums) ? true : false;
+  }
+
+  /**
+   * 检查枚举是否不符合
+   * @param value 枚举名称
+   * @param clazz 枚举class
+   * @return
+   */
+  public static void checkEnumValueIsEmpty(String value,Class clazz,String errorCode,String[] args) throws BaseException {
+    if(checkEnumValueIsEmpty(value,clazz)){
+      throw new BaseException(errorCode, args);
+    }
+  }
+
+  public static void checkEnumValueIsEmpty(String value,Class clazz,String errorCode) throws BaseException {
+    if(checkEnumValueIsEmpty(value,clazz)){
+      throw new BaseException(errorCode, (String) null);
+    }
+  }
+
+  /**
+   * 检查枚举是否符合
+   * @param value 枚举名称
+   * @param clazz 枚举class
+   * @return
+   */
+  public static boolean checkEnumValueIsNotEmpty(String value,Class clazz){
+    return !checkEnumValueIsEmpty(value,clazz);
+  }
+
+  public static void checkEnumValueIsNotEmpty(String value,Class clazz,String errorCode,String[] args) throws BaseException {
+    if(checkEnumValueIsNotEmpty(value,clazz)){
+      throw new BaseException(errorCode, args);
+    }
+  }
+
+  public static void checkEnumValueIsNotEmpty(String value,Class clazz,String errorCode) throws BaseException {
+    if(checkEnumValueIsNotEmpty(value,clazz)){
+      throw new BaseException(errorCode, (String) null);
+    }
+  }
+
 }

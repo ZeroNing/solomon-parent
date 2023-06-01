@@ -251,6 +251,16 @@ public class DateTimeUtils {
 	}
 
 	/**
+	 * 字符串转LocalDateTime
+	 *
+	 * @param dateTime
+	 * @return
+	 */
+	public static LocalDateTime string2LocalDateTime(String dateTime,DateTimeFormatter dateTimeFormatter) {
+		return LocalDateTime.parse(dateTime, dateTimeFormatter);
+	}
+
+	/**
 	 * 字符串转LocalDate
 	 * 
 	 * @param date

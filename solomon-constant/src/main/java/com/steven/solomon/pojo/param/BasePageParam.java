@@ -1,10 +1,14 @@
 package com.steven.solomon.pojo.param;
 
 
+import ch.qos.logback.core.util.StringCollectionUtil;
 import com.steven.solomon.pojo.enums.OrderByEnum;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 public class BasePageParam implements Serializable {
 
@@ -34,6 +38,13 @@ public class BasePageParam implements Serializable {
         public Sort(String  orderByField,OrderByEnum orderByMethod){
             this.orderByField = orderByField;
             this.orderByMethod = orderByMethod;
+        }
+
+        public String getSort(){
+            if(orderByField == null || orderByField == ""){
+                return "";
+            }
+            return orderByField + " " + orderByMethod.label();
         }
 
         public String getOrderByField() {
@@ -84,4 +95,16 @@ public class BasePageParam implements Serializable {
     public void setSorted(List<Sort> sorted) {
         this.sorted = sorted;
     }
+
+    public String getSort(){
+        if(CollectionUtils.isEmpty(getSorted())){
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for(Sort sort : getSorted()){
+            sb.append(sort.getSort()).append(",");
+        }
+        return sb.substring(0,sb.lastIndexOf(","));
+    }
+
 }

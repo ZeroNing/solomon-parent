@@ -43,7 +43,7 @@ public class EnumUtils {
     }
     E[] enumConstants = (E[]) enumClass.getEnumConstants();
     for (E e : enumConstants) {
-      if (e.label().equals(String.valueOf(value))) {
+      if (e.label().equals(String.valueOf(value)) || e.name().equals(String.valueOf(value))) {
         return e;
       }
     }
