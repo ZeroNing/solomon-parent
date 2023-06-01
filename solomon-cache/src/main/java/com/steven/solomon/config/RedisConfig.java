@@ -41,9 +41,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private final TenantRedisProperties properties;
 
-  @Value("${cache.type}")
-  private String cacheType;
-
   private final RedisTenantContext context;
 
   private boolean isSwitchDb = false;
@@ -64,7 +61,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   @PostConstruct
   public void afterPropertiesSet() {
     SpringUtil.setContext(applicationContext);
-    if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), cacheType)) {
+    if (!ValidateUtils.equalsIgnoreCase(CacheTypeEnum.REDIS.toString(), properties.getType().name())) {
       return;
     }
     logger.info("Cache当前类型为:{}",properties.getType().getDesc());
