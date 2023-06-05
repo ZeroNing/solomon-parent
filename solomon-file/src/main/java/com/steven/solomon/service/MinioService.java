@@ -22,13 +22,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import javax.ws.rs.ext.ParamConverter.Lazy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-public class MinioService implements FileServiceInterface{
+public class MinioService implements FileService {
 
   public FileChoiceProperties mioProperties;
 
@@ -38,8 +39,8 @@ public class MinioService implements FileServiceInterface{
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
   public MinioService() {
-
   }
+
   public MinioService(FileChoiceProperties mioProperties) {
     this.mioProperties = mioProperties;
     client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();

@@ -32,7 +32,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration(proxyBeanMethods = false)
-@Order(2)
 @EnableConfigurationProperties(value={RedisProperties.class,TenantRedisProperties.class})
 @Import(value = {RedisTenantContext.class,RedisService.class})
 public class RedisConfig extends CachingConfigurerSupport {

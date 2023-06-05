@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
-public interface FileServiceInterface {
+public interface FileService {
   /**
    * 上传
    * @return

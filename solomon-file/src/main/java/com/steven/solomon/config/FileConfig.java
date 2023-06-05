@@ -1,7 +1,5 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.service.KODOService;
-import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
@@ -11,19 +9,21 @@ import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
-import com.steven.solomon.service.FileServiceInterface;
+import com.steven.solomon.service.FileService;
+import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import com.steven.solomon.utils.logger.LoggerUtils;
+import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
 
 @Configuration(proxyBeanMethods = false)
-@Order(2)
 @EnableConfigurationProperties(value={FileChoiceProperties.class})
 public class FileConfig {
 
@@ -46,8 +46,9 @@ public class FileConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(FileServiceInterface.class)
-  public FileServiceInterface fileService(FileChoiceProperties fileProperties){
+  @ConditionalOnMissingBean(FileService.class)
+  @ConditionalOnClass(OkHttpClient.Builder.class)
+  public FileService fileService(FileChoiceProperties fileProperties){
     logger.info("选择 {} 文件服务", fileProperties.getChoice());
     switch (fileProperties.getChoice()) {
       case MINIO:

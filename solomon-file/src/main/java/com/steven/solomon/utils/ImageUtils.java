@@ -1,16 +1,13 @@
 package com.steven.solomon.utils;
 
-import com.steven.solomon.service.FileServiceInterface;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Coordinate;
 import net.coobird.thumbnailator.geometry.Positions;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * 图片处理工具类
@@ -18,9 +15,9 @@ import org.springframework.stereotype.Component;
 @Configuration(proxyBeanMethods = false)
 public class ImageUtils {
 
-  protected final FileServiceInterface fileService;
-
-  public ImageUtils(FileServiceInterface fileService) {this.fileService = fileService;}
+//  protected final FileServiceInterface fileService;
+//
+//  public ImageUtils(FileServiceInterface fileService) {this.fileService = fileService;}
 
   /**
    * 对图片进行指定比例的压缩
@@ -33,7 +30,7 @@ public class ImageUtils {
   public void compress(InputStream originalInputStream ,float scale,float outputQuality,String bucketName,String newFileName) throws Exception {
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).outputQuality(outputQuality).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -48,7 +45,7 @@ public class ImageUtils {
   public void compressSize(InputStream originalInputStream,int width,int height,float outputQuality,String bucketName,String newFileName) throws Exception {
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).size(width,height).outputQuality(outputQuality).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -63,7 +60,7 @@ public class ImageUtils {
   public final void rotate(InputStream originalInputStream,float scale,double rotate,String bucketName,String newFileName) throws Exception {
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).rotate(rotate).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -77,7 +74,7 @@ public class ImageUtils {
   public final void conversion(InputStream originalInputStream,float scale,String outputFormat,String bucketName,String newFileName) throws Exception {
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).outputFormat(outputFormat).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -95,7 +92,7 @@ public class ImageUtils {
   public final void tailoring(InputStream originalInputStream,float scale,int x,int y,int width,int height,String bucketName,String newFileName) throws Exception {
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).sourceRegion(x,y,width,height).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -115,7 +112,7 @@ public class ImageUtils {
 
     BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).watermark(positions,bufferedImage,transparency).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
 
   }
 
@@ -138,7 +135,7 @@ public class ImageUtils {
 
     BufferedImage bufferingImage = Thumbnails.of(watermarkIntInputStream).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -162,7 +159,7 @@ public class ImageUtils {
 
     BufferedImage bufferingImage = Thumbnails.of(filePath).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
+//    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**

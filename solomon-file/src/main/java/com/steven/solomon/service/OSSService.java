@@ -13,13 +13,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class OSSService implements FileServiceInterface {
+public class OSSService implements FileService {
 
   private FileChoiceProperties properties;
 
