@@ -45,8 +45,6 @@ public class ControllerAspect {
     StopWatch stopWatch = new StopWatch();
     Object             obj     = null;
     Exception ex = null;
-    String uuid = UUID.randomUUID().toString();
-    ExceptionUtil.requestId.set(uuid);
     try {
       stopWatch.start();
       obj = pjp.proceed();
@@ -54,7 +52,7 @@ public class ControllerAspect {
       ex = e;
       throw e;
     } finally {
-      saveLog(pjp,stopWatch,ex,uuid);
+      saveLog(pjp,stopWatch,ex,ExceptionUtil.requestId.get());
     }
     return obj;
   }
