@@ -112,7 +112,9 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
    * @param message mq所包含的信息
    * @param e 异常
    */
-  public abstract void saveFailMessage(Message message, Exception e);
+  public void saveFailMessage(Message message, Exception e){
+
+  }
 
   /**
    * 判断是否重复消费
