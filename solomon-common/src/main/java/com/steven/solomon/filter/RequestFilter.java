@@ -12,14 +12,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.ContentCachingRequestWrapper;
 
 @Configuration(proxyBeanMethods = false)
-public class RequestFilter implements Filter {
+public class RequestFilter extends OncePerRequestFilter {
 
   @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-      throws IOException, ServletException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
     ExceptionUtil.requestId.set(UUID.randomUUID().toString());
-    chain.doFilter(request, response);
+    chain.doFilter(new ContentCachingRequestWrapper(request), response);
   }
 }
