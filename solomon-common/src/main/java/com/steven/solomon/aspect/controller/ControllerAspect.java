@@ -3,8 +3,10 @@ package com.steven.solomon.aspect.controller;
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.json.JackJsonUtils;
+import com.steven.solomon.utils.date.DateTimeUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.UUID;
@@ -45,6 +47,7 @@ public class ControllerAspect {
     StopWatch stopWatch = new StopWatch();
     Object             obj     = null;
     Exception ex = null;
+    String startTime = DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     try {
       stopWatch.start();
       obj = pjp.proceed();
@@ -52,25 +55,39 @@ public class ControllerAspect {
       ex = e;
       throw e;
     } finally {
-      saveLog(pjp,stopWatch,ex,ExceptionUtil.requestId.get());
+      saveLog(pjp,stopWatch,ex,ExceptionUtil.requestId.get(),obj,startTime);
     }
     return obj;
   }
 
-  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Exception ex,String uuid) {
+  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Exception ex,String uuid,Object obj,String startTime) {
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-    String proceedingJoinPoint = pjp.getSignature().toString();
+    String url = request.getRequestURL().toString();
+//    String proceedingJoinPoint = pjp.getSignature().toString();
+
+    //获取请求参数
+    String targetMethodParams= JackJsonUtils.formatJsonByFilter(pjp.getArgs());
 
     stopWatch.stop();
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
     Double second      = Double.parseDouble(String.valueOf(millisecond)) / 1000;
-    String message = "";
+    StringBuilder sb = new StringBuilder();
+    sb.append("==========================================="+System.lineSeparator());
+    sb.append("开始时间:"+startTime+System.lineSeparator());
+    sb.append("请求ID:"+uuid+System.lineSeparator());
+    sb.append("请求URL:"+url+System.lineSeparator());
+    sb.append("请求参数:"+targetMethodParams+System.lineSeparator());
+//    sb.append("调用controller方法::"+proceedingJoinPoint+System.lineSeparator());
+    sb.append("执行耗时:"+millisecond+"毫秒"+System.lineSeparator());
+    sb.append("执行耗时:"+second+"秒"+System.lineSeparator());
+    sb.append("响应数据:"+JackJsonUtils.formatJsonByFilter(obj)+System.lineSeparator());
     if(ValidateUtils.isNotEmpty(ex)){
-      message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
-      logger.info("请求ID:{},调用controller方法:{},执行耗时:{}毫秒,耗时:{}秒,异常为:{}",uuid, proceedingJoinPoint, millisecond, second,message);
-    } else {
-      logger.info("请求ID:{},调用controller方法:{},执行耗时:{}毫秒,耗时:{}秒",uuid, proceedingJoinPoint, millisecond, second);
+      String message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
+      sb.append("异常为:"+message+System.lineSeparator());
     }
-    ExceptionUtil.requestId.remove();
+    sb.append("结束时间:"+DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))+System.lineSeparator());
+    sb.append("===========================================");
+    logger.info(System.lineSeparator()+sb.toString());
+
   }
 }
