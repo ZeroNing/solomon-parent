@@ -59,11 +59,7 @@ public class ControllerAspect {
 
   private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Exception ex,String uuid) {
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-    String url = request.getRequestURL().toString();
     String proceedingJoinPoint = pjp.getSignature().toString();
-
-    //获取请求参数
-    String targetMethodParams= JackJsonUtils.formatJsonByFilter(pjp.getArgs());
 
     stopWatch.stop();
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
@@ -71,11 +67,10 @@ public class ControllerAspect {
     String message = "";
     if(ValidateUtils.isNotEmpty(ex)){
       message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
-      logger.info("请求ID:{},请求Url:{},调用controller方法:{},请求参数如下:{},执行耗时:{}毫秒,耗时:{}秒,异常为:{}",uuid,url, proceedingJoinPoint,targetMethodParams, millisecond, second,message);
+      logger.info("请求ID:{},调用controller方法:{},执行耗时:{}毫秒,耗时:{}秒,异常为:{}",uuid, proceedingJoinPoint, millisecond, second,message);
     } else {
-      ExceptionUtil.requestId.remove();
-      logger.info("请求ID:{},请求Url:{},调用controller方法:{},请求参数如下:{},执行耗时:{}毫秒,耗时:{}秒",uuid,url, proceedingJoinPoint,targetMethodParams, millisecond, second);
+      logger.info("请求ID:{},调用controller方法:{},执行耗时:{}毫秒,耗时:{}秒",uuid, proceedingJoinPoint, millisecond, second);
     }
-
+    ExceptionUtil.requestId.remove();
   }
 }
