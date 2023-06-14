@@ -18,7 +18,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class OBSService implements FileService {
+public class OBSServiceInterface implements FileServiceInterface {
 
   private FileChoiceProperties properties;
 
@@ -28,11 +28,11 @@ public class OBSService implements FileService {
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
 
-  public OBSService() {
+  public OBSServiceInterface() {
 
   }
 
-  public OBSService(FileChoiceProperties properties) {
+  public OBSServiceInterface(FileChoiceProperties properties) {
     this.properties = properties;
     this.obsClient  = client();
   }

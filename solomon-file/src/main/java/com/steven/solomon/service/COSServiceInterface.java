@@ -21,7 +21,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class COSService implements FileService {
+public class COSServiceInterface implements FileServiceInterface {
 
   private FileChoiceProperties properties;
 
@@ -30,11 +30,11 @@ public class COSService implements FileService {
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public COSService() {
+  public COSServiceInterface() {
 
   }
 
-  public COSService(FileChoiceProperties properties) {
+  public COSServiceInterface(FileChoiceProperties properties) {
     this.properties = properties;
     this.client = initClient(properties);
   }

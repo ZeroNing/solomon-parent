@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
-public class DefaultService implements FileService {
+public class DefaultServiceInterface implements FileServiceInterface {
 
-  public DefaultService() {
+  public DefaultServiceInterface() {
 
   }
 

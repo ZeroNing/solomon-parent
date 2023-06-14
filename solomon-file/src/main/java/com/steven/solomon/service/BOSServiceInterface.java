@@ -19,7 +19,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class BOSService implements FileService {
+public class BOSServiceInterface implements FileServiceInterface {
 
   private BosClient client;
 
@@ -28,11 +28,11 @@ public class BOSService implements FileService {
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public BOSService() {
+  public BOSServiceInterface() {
 
   }
 
-  public BOSService(FileChoiceProperties properties) {
+  public BOSServiceInterface(FileChoiceProperties properties) {
     BosClientConfiguration config = new BosClientConfiguration();
     config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
     config.setEndpoint(properties.getEndpoint());

@@ -2,7 +2,7 @@ package com.steven.solomon.graphics2D;
 
 import com.steven.solomon.graphics2D.entity.BaseReceipt;
 import com.steven.solomon.graphics2D.entity.FileUpload;
-import com.steven.solomon.service.FileService;
+import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -25,9 +25,10 @@ public abstract class AbsReceiptService<T extends BaseReceipt>{
   protected Integer imageWidth;
 
 
-  protected final FileService fileService;
+  protected final FileServiceInterface fileServiceInterface;
 
-  protected AbsReceiptService(FileService fileService) {this.fileService = fileService;}
+  protected AbsReceiptService(
+      FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
 
   public FileUpload drawReceipt(T receipt) throws Exception {
     return drawReceipt(BufferedImage.TYPE_INT_RGB, Color.white,receipt);

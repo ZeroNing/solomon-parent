@@ -6,14 +6,14 @@ import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
 import com.steven.solomon.namingRules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.namingRules.UUIDNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.service.BOSService;
-import com.steven.solomon.service.COSService;
-import com.steven.solomon.service.DefaultService;
-import com.steven.solomon.service.FileService;
-import com.steven.solomon.service.KODOService;
-import com.steven.solomon.service.MinioService;
-import com.steven.solomon.service.OBSService;
-import com.steven.solomon.service.OSSService;
+import com.steven.solomon.service.BOSServiceInterface;
+import com.steven.solomon.service.COSServiceInterface;
+import com.steven.solomon.service.DefaultServiceInterface;
+import com.steven.solomon.service.FileServiceInterface;
+import com.steven.solomon.service.KODOServiceInterface;
+import com.steven.solomon.service.MinioServiceInterface;
+import com.steven.solomon.service.OBSServiceInterface;
+import com.steven.solomon.service.OSSServiceInterface;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -46,25 +46,25 @@ public class FileConfig {
   }
 
   @Bean
-  @ConditionalOnMissingBean(FileService.class)
+  @ConditionalOnMissingBean(FileServiceInterface.class)
   @ConditionalOnClass(OkHttpClient.Builder.class)
-  public FileService fileService(FileChoiceProperties fileProperties){
+  public FileServiceInterface fileService(FileChoiceProperties fileProperties){
     logger.info("选择 {} 文件服务", fileProperties.getChoice());
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinioService(fileProperties);
+        return new MinioServiceInterface(fileProperties);
       case OSS:
-        return new OSSService(fileProperties);
+        return new OSSServiceInterface(fileProperties);
       case OBS:
-        return new OBSService(fileProperties);
+        return new OBSServiceInterface(fileProperties);
       case COS:
-        return new COSService(fileProperties);
+        return new COSServiceInterface(fileProperties);
       case BOS:
-        return new BOSService(fileProperties);
+        return new BOSServiceInterface(fileProperties);
       case KODO:
-        return new KODOService(fileProperties);
+        return new KODOServiceInterface(fileProperties);
       default:
-        return new DefaultService();
+        return new DefaultServiceInterface();
     }
   }
 }
