@@ -23,7 +23,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    * @return
    */
-  public static String getErrorMessage(String code, String... args) {
+  public static String getErrorMessage(String code, Object... args) {
     if(code == null || code.length() == 0){
       return null;
     }
@@ -37,7 +37,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    * @return
    */
-  public static String getErrorMessage(String code,Locale locale, String... args) {
+  public static String getErrorMessage(String code,Locale locale, Object... args) {
     if(code == null || code.length() == 0){
       return null;
     }
@@ -82,12 +82,12 @@ public class I18nUtils {
    * @param args 参数
    * @return
    */
-  private static String getMessage(String code, String... args) {
+  private static String getMessage(String code, Object... args) {
     Locale locale = LocaleContextHolder.getLocale();
     return getMessage(code,locale,args);
   }
 
-  private static String getMessage(String code,Locale locale, String... args) {
+  private static String getMessage(String code,Locale locale, Object... args) {
     try {
       return messageSource.getMessage(code, args, locale);
     }catch (Exception e) {

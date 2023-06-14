@@ -38,7 +38,7 @@ public class ValidateUtils {
   /**
    * 判断值相等报错
    */
-  public static void equals(String contrast, String var, String errorCode, String... args) throws BaseException {
+  public static void equals(String contrast, String var, String errorCode, Object... args) throws BaseException {
     check(equals(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -59,7 +59,7 @@ public class ValidateUtils {
   /**
    * 判断值不相等报错
    */
-  public static void notEquals(String contrast, String var, String errorCode, String... args) throws BaseException {
+  public static void notEquals(String contrast, String var, String errorCode, Object... args) throws BaseException {
     check(notEquals(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -84,7 +84,7 @@ public class ValidateUtils {
   /**
    * 判断值相等报错（忽略大小写）
    */
-  public static void equalsIgnoreCase(String contrast, String var, String errorCode, String... args)
+  public static void equalsIgnoreCase(String contrast, String var, String errorCode, Object... args)
       throws BaseException {
     check(equalsIgnoreCase(contrast, var),new BaseException(errorCode, args));
   }
@@ -103,7 +103,7 @@ public class ValidateUtils {
   /**
    * 判断值不相等报错（忽略大小写）
    */
-  public static void notEqualsIgnoreCase(String contrast, String var, String errorCode, String... args) throws BaseException {
+  public static void notEqualsIgnoreCase(String contrast, String var, String errorCode, Object... args) throws BaseException {
     check(notEqualsIgnoreCase(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -121,7 +121,7 @@ public class ValidateUtils {
   /**
    * 判断值相等报错
    */
-  public static void equals(Number contrast, Number var, String errorCode, String... args) throws BaseException {
+  public static void equals(Number contrast, Number var, String errorCode, Object... args) throws BaseException {
     check(equals(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -139,7 +139,7 @@ public class ValidateUtils {
   /**
    * 判断值不相等报错
    */
-  public static void notEquals(Number contrast, Number var, String errorCode, String... args) throws BaseException {
+  public static void notEquals(Number contrast, Number var, String errorCode, Object... args) throws BaseException {
     if (notEquals(contrast, var)) {
       throw new BaseException(errorCode, args);
     }
@@ -159,7 +159,7 @@ public class ValidateUtils {
   /**
    * 判断值相等报错
    */
-  public static void equals(Boolean contrast, Boolean var, String errorCode, String... args) throws BaseException {
+  public static void equals(Boolean contrast, Boolean var, String errorCode, Object... args) throws BaseException {
     check(equals(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -177,7 +177,7 @@ public class ValidateUtils {
   /**
    * 判断值不相等报错
    */
-  public static void notEquals(Boolean contrast, Boolean var, String errorCode, String... args) throws BaseException {
+  public static void notEquals(Boolean contrast, Boolean var, String errorCode, Object... args) throws BaseException {
     check(notEquals(contrast, var),new BaseException(errorCode, args));
   }
 
@@ -285,7 +285,7 @@ public class ValidateUtils {
    * @param errorCode 报错异常
    * @param args      可替换的信息
    */
-  public static <T> T isEmpty(T obj, String errorCode, String... args) throws BaseException {
+  public static <T> T isEmpty(T obj, String errorCode, Object... args) throws BaseException {
     if (isEmpty(obj)) {
       throw new BaseException(errorCode, args);
     }
@@ -320,7 +320,7 @@ public class ValidateUtils {
    * @param code 报错异常
    * @param args 可替换的信息
    */
-  public static <T> T isNotEmpty(T obj, String code, String... args) throws BaseException {
+  public static <T> T isNotEmpty(T obj, String code, Object... args) throws BaseException {
     if (!isEmpty(obj)) {
       throw new BaseException(code, args);
     }

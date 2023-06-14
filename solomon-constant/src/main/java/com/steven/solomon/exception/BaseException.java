@@ -8,7 +8,7 @@ public class BaseException extends Exception {
 
   protected String code;
 
-  protected String[] args;
+  protected Object[] args;
 
   public BaseException(String code, String message){
     super(message);
@@ -20,13 +20,13 @@ public class BaseException extends Exception {
     this.code = code;
   }
 
-  public BaseException(String code, String... args) {
+  public BaseException(String code, Object... args) {
     super(I18nUtils.getErrorMessage(code,args));
     this.code = code;
     this.args = args;
   }
 
-  public BaseException(String code, Throwable e, String... args) {
+  public BaseException(String code, Throwable e, Object... args) {
     super(I18nUtils.getErrorMessage(code,args),e);
     this.code = code;
     this.args = args;
@@ -40,7 +40,7 @@ public class BaseException extends Exception {
     return code;
   }
 
-  public String[] getArgs() {
+  public Object[] getArgs() {
     return args;
   }
 
