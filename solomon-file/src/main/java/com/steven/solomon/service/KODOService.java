@@ -24,7 +24,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class KODOServiceInterface implements FileServiceInterface {
+public class KODOService implements FileServiceInterface {
 
   private UploadManager uploadManager;
 
@@ -39,11 +39,11 @@ public class KODOServiceInterface implements FileServiceInterface {
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public KODOServiceInterface() {
+  public KODOService() {
 
   }
 
-  public KODOServiceInterface(FileChoiceProperties properties) {
+  public KODOService(FileChoiceProperties properties) {
     this.properties = properties;
     this.conf = new Configuration(Region.autoRegion());
     this.auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());

@@ -1,12 +1,10 @@
 package com.steven.solomon.service;
 
-import com.qcloud.cos.COSClient;
-import com.qcloud.cos.ClientConfig;
-import com.qcloud.cos.auth.BasicCOSCredentials;
-import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.CannedAccessControlList;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.region.Region;
+import com.baidubce.auth.DefaultBceCredentials;
+import com.baidubce.services.bos.BosClient;
+import com.baidubce.services.bos.BosClientConfiguration;
+import com.baidubce.services.bos.model.CannedAccessControlList;
+import com.baidubce.services.bos.model.PutObjectRequest;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -21,29 +19,25 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class COSServiceInterface implements FileServiceInterface {
+public class BOSService implements FileServiceInterface {
+
+  private BosClient client;
 
   private FileChoiceProperties properties;
-
-  private COSClient client;
 
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public COSServiceInterface() {
+  public BOSService() {
 
   }
 
-  public COSServiceInterface(FileChoiceProperties properties) {
+  public BOSService(FileChoiceProperties properties) {
+    BosClientConfiguration config = new BosClientConfiguration();
+    config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
+    config.setEndpoint(properties.getEndpoint());
+    this.client = new BosClient(config);
     this.properties = properties;
-    this.client = initClient(properties);
-  }
-
-  private static COSClient initClient(FileChoiceProperties properties){
-    COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    Region         region       = new Region(properties.getRegionName());
-    ClientConfig   clientConfig = new ClientConfig(region);
-    return new COSClient(credentials, clientConfig);
   }
 
   @Override
@@ -51,10 +45,9 @@ public class COSServiceInterface implements FileServiceInterface {
     //创建桶
     makeBucket(bucketName);
 
-    String name = fileNamingRulesGenerationService.getFileName(file);
-
+    String       name     = fileNamingRulesGenerationService.getFileName(file);
     String       filePath = getFilePath(name,properties);
-    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream(),null));
+    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
     client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName,filePath,file.getInputStream());
   }
@@ -69,7 +62,7 @@ public class COSServiceInterface implements FileServiceInterface {
     ByteArrayOutputStream bs    = new ByteArrayOutputStream();
     ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
     ImageIO.write(bi, "jpg", imOut);
-    client.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()),null));
+    client.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray())));
     client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()));
   }
@@ -87,7 +80,7 @@ public class COSServiceInterface implements FileServiceInterface {
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
     String filePath = getFilePath(fileName,properties);
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
+    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry)).getSeconds()).toString();
   }
 
   @Override

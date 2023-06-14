@@ -1,10 +1,12 @@
 package com.steven.solomon.service;
 
-import com.baidubce.auth.DefaultBceCredentials;
-import com.baidubce.services.bos.BosClient;
-import com.baidubce.services.bos.BosClientConfiguration;
-import com.baidubce.services.bos.model.CannedAccessControlList;
-import com.baidubce.services.bos.model.PutObjectRequest;
+import com.qcloud.cos.COSClient;
+import com.qcloud.cos.ClientConfig;
+import com.qcloud.cos.auth.BasicCOSCredentials;
+import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.region.Region;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -19,25 +21,29 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class BOSServiceInterface implements FileServiceInterface {
-
-  private BosClient client;
+public class COSService implements FileServiceInterface {
 
   private FileChoiceProperties properties;
+
+  private COSClient client;
 
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-  public BOSServiceInterface() {
+  public COSService() {
 
   }
 
-  public BOSServiceInterface(FileChoiceProperties properties) {
-    BosClientConfiguration config = new BosClientConfiguration();
-    config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
-    config.setEndpoint(properties.getEndpoint());
-    this.client = new BosClient(config);
+  public COSService(FileChoiceProperties properties) {
     this.properties = properties;
+    this.client = initClient(properties);
+  }
+
+  private static COSClient initClient(FileChoiceProperties properties){
+    COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
+    Region         region       = new Region(properties.getRegionName());
+    ClientConfig   clientConfig = new ClientConfig(region);
+    return new COSClient(credentials, clientConfig);
   }
 
   @Override
@@ -45,9 +51,10 @@ public class BOSServiceInterface implements FileServiceInterface {
     //创建桶
     makeBucket(bucketName);
 
-    String       name     = fileNamingRulesGenerationService.getFileName(file);
+    String name = fileNamingRulesGenerationService.getFileName(file);
+
     String       filePath = getFilePath(name,properties);
-    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
+    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream(),null));
     client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName,filePath,file.getInputStream());
   }
@@ -62,7 +69,7 @@ public class BOSServiceInterface implements FileServiceInterface {
     ByteArrayOutputStream bs    = new ByteArrayOutputStream();
     ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
     ImageIO.write(bi, "jpg", imOut);
-    client.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray())));
+    client.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()),null));
     client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()));
   }
@@ -80,7 +87,7 @@ public class BOSServiceInterface implements FileServiceInterface {
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
     String filePath = getFilePath(fileName,properties);
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry)).getSeconds()).toString();
+    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
   }
 
   @Override

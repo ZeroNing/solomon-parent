@@ -1,44 +1,43 @@
 package com.steven.solomon.service;
 
-import com.obs.services.ObsClient;
-import com.obs.services.model.HttpMethodEnum;
-import com.obs.services.model.TemporarySignatureRequest;
-import com.obs.services.model.TemporarySignatureResponse;
+import com.aliyun.oss.OSS;
+import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.model.CannedAccessControlList;
+import com.aliyun.oss.model.PutObjectRequest;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class OBSServiceInterface implements FileServiceInterface {
+public class OSSService implements FileServiceInterface {
 
   private FileChoiceProperties properties;
 
-  private ObsClient obsClient;
+  private OSS oss;
 
   @Autowired
   private FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
-
-  public OBSServiceInterface() {
+  public OSSService() {
 
   }
 
-  public OBSServiceInterface(FileChoiceProperties properties) {
+  public OSSService(FileChoiceProperties properties) {
     this.properties = properties;
-    this.obsClient  = client();
+    this.oss        = client();
   }
 
-  private ObsClient client() {
-    return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), properties.getEndpoint());
+  public OSS client() {
+    return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey());
   }
 
   @Override
@@ -46,9 +45,11 @@ public class OBSServiceInterface implements FileServiceInterface {
     //创建桶
     makeBucket(bucketName);
 
-    String    fileName  = fileNamingRulesGenerationService.getFileName(file);
-    String    filePath  = getFilePath(fileName, properties);
-    obsClient.putObject(bucketName, filePath, file.getInputStream());
+    String name = fileNamingRulesGenerationService.getFileName(file);
+
+    String filePath = getFilePath(name, properties);
+    oss.putObject(new PutObjectRequest(bucketName, filePath, file.getInputStream()));
+    oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName, filePath, file.getInputStream());
   }
 
@@ -57,13 +58,13 @@ public class OBSServiceInterface implements FileServiceInterface {
     //创建桶
     makeBucket(bucketName);
 
-    String    filePath  = getFilePath(fileName, properties);
+    String filePath = getFilePath(fileName, properties);
 
     ByteArrayOutputStream bs    = new ByteArrayOutputStream();
     ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
     ImageIO.write(bi, "jpg", imOut);
-
-    obsClient.putObject(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray()));
+    oss.putObject(new PutObjectRequest(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray())));
+    oss.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
     return new FileUpload(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray()));
   }
 
@@ -73,38 +74,35 @@ public class OBSServiceInterface implements FileServiceInterface {
     if (!flag) {
       return;
     }
-    String    filePath  = getFilePath(fileName, properties);
-    obsClient.deleteObject(bucketName, filePath);
+    String filePath = getFilePath(fileName, properties);
+    oss.deleteObject(bucketName, filePath);
   }
 
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    String filePath = ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName :
-                      properties.getRootDirectory() + fileName;
-    TemporarySignatureRequest request = new TemporarySignatureRequest(HttpMethodEnum.GET, unit.toSeconds(expiry));
-    request.setBucketName(bucketName);
-    request.setObjectKey(filePath);
-    TemporarySignatureResponse response = obsClient.createTemporarySignature(request);
-    return response.getSignedUrl();
+    String filePath = getFilePath(fileName, properties);
+    return oss.generatePresignedUrl(bucketName, filePath, new Date(System.currentTimeMillis() + unit.toMillis(expiry)))
+        .toString();
   }
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    String    filePath  = getFilePath(fileName, properties);
-    return obsClient.getObject(bucketName, filePath).getObjectContent();
+    String filePath = getFilePath(fileName, properties);
+    return oss.getObject(bucketName, filePath).getObjectContent();
   }
 
   @Override
   public boolean bucketExists(String bucketName) throws Exception {
-    return obsClient.headBucket(bucketName);
+    return oss.doesBucketExist(bucketName);
   }
 
   @Override
   public void makeBucket(String bucketName) throws Exception {
-    if (bucketExists(bucketName)) {
+    boolean flag = bucketExists(bucketName);
+    if (flag) {
       return;
     }
-    obsClient.createBucket(bucketName);
+    oss.createBucket(bucketName);
   }
 
 

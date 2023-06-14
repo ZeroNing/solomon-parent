@@ -6,14 +6,14 @@ import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
 import com.steven.solomon.namingRules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.namingRules.UUIDNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.service.BOSServiceInterface;
-import com.steven.solomon.service.COSServiceInterface;
-import com.steven.solomon.service.DefaultServiceInterface;
+import com.steven.solomon.service.BOSService;
+import com.steven.solomon.service.COSService;
+import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.FileServiceInterface;
-import com.steven.solomon.service.KODOServiceInterface;
-import com.steven.solomon.service.MinioServiceInterface;
-import com.steven.solomon.service.OBSServiceInterface;
-import com.steven.solomon.service.OSSServiceInterface;
+import com.steven.solomon.service.KODOService;
+import com.steven.solomon.service.MinioService;
+import com.steven.solomon.service.OBSService;
+import com.steven.solomon.service.OSSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -52,19 +52,19 @@ public class FileConfig {
     logger.info("选择 {} 文件服务", fileProperties.getChoice());
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinioServiceInterface(fileProperties);
+        return new MinioService(fileProperties);
       case OSS:
-        return new OSSServiceInterface(fileProperties);
+        return new OSSService(fileProperties);
       case OBS:
-        return new OBSServiceInterface(fileProperties);
+        return new OBSService(fileProperties);
       case COS:
-        return new COSServiceInterface(fileProperties);
+        return new COSService(fileProperties);
       case BOS:
-        return new BOSServiceInterface(fileProperties);
+        return new BOSService(fileProperties);
       case KODO:
-        return new KODOServiceInterface(fileProperties);
+        return new KODOService(fileProperties);
       default:
-        return new DefaultServiceInterface();
+        return new DefaultService();
     }
   }
 }
