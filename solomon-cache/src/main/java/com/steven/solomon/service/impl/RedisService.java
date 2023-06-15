@@ -1,21 +1,15 @@
 package com.steven.solomon.service.impl;
 
-import cn.hutool.core.util.TypeUtil;
 import com.steven.solomon.service.AbsICacheService;
-import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
 
 /**
  * Redis工具类
@@ -23,7 +17,6 @@ import org.springframework.stereotype.Service;
  * @author ZENG.XIAO.YAN
  * @date 2018年6月7日
  */
-@Service("redisService")
 public class RedisService extends AbsICacheService {
 
   @Autowired

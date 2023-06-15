@@ -1,9 +1,9 @@
 package com.steven.solomon.service;
 
 import com.steven.solomon.holder.HeardHolder;
+import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
-import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.verification.ValidateUtils;
 
 import javax.annotation.Resource;
@@ -14,7 +14,7 @@ public abstract class AbsICacheService implements  ICacheService {
   private Logger logger = LoggerUtils.logger(AbsICacheService.class);
 
   @Resource
-  private TenantRedisProperties properties;
+  private CacheProfile properties;
 
   public String assembleKey(String group, String key) {
     StringBuilder sb = new StringBuilder();

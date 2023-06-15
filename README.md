@@ -127,6 +127,17 @@ file:
   region-name:     # 地区名
 ```
 
+### 缓存配置说明
+
+```yaml
+spring:
+  cache:
+    mode: NORMAL #NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");
+    type: NONE   #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
+```
+
+
+
 ## 枚举国际化用例
 
 1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型

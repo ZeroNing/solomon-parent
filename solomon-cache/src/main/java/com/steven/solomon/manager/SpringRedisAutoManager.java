@@ -2,9 +2,9 @@ package com.steven.solomon.manager;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.holder.HeardHolder;
+import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
-import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import javax.annotation.Resource;
@@ -21,7 +21,7 @@ public class SpringRedisAutoManager extends RedisCacheManager {
   private Logger log = LoggerUtils.logger(SpringRedisAutoManager.class);
 
   @Resource
-  private TenantRedisProperties cacheProfile;
+  private CacheProfile cacheProfile;
 
   /**
    * 缓存参数的分隔符
