@@ -1,10 +1,10 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.service.ICacheService;
 import com.steven.solomon.service.impl.DefaultService;
 import com.steven.solomon.service.impl.RedisService;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 public class CacheConfig {
 
   @Bean
+  @ConditionalOnMissingBean(ICacheService.class)
   public ICacheService cacheService(CacheProperties cacheProperties){
     switch (cacheProperties.getType()) {
       case REDIS:
