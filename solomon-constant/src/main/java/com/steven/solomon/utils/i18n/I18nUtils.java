@@ -58,6 +58,20 @@ public class I18nUtils {
     return getEnumMessage(enumClazz.getSimpleName()+"."+code);
   }
 
+  /**
+   * 获取枚举参数信息
+   *
+   * @param enumCode 枚举名
+   * @param enumClazz 枚举Class
+   * @return
+   */
+  public static String getEnumMessage(Enum enumCode, Class enumClazz) {
+    if(enumCode == null){
+      return null;
+    }
+    return getEnumMessage(enumClazz.getSimpleName()+"."+enumCode.name());
+  }
+
   public static String getEnumMessage(String code) {
     if(code == null || code.length() == 0){
       return null;
