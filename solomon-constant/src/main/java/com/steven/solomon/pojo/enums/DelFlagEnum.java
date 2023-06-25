@@ -8,16 +8,24 @@ public enum DelFlagEnum implements BaseEnum<String> {
   /**
    * 未删除
    */
-  NOT_DELETE("0"),
+  NOT_DELETE("0","未删除"),
   /**
    * 已删除
    */
-  DELETE("1");
+  DELETE("1","已删除");
 
-  private final String label;
+  private String label;
 
-  DelFlagEnum(String label) {
+  private String desc;
+
+  DelFlagEnum(String label,String desc) {
     this.label = label;
+    this.desc = desc;
+  }
+
+  @Override
+  public String getDesc() {
+    return desc;
   }
 
   @Override

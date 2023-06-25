@@ -19,11 +19,9 @@ public class ExceptionUtil {
 
   public static AbstractExceptionHandler getExceptionHandler(String exceptionSimpleName){
     if (ValidateUtils.isEmpty(AbstractExceptionHandler.exceptionHandlerMap)) {
-      AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(
-          AbstractExceptionHandler.class);
+      AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(AbstractExceptionHandler.class);
     }
-    String exceptionHandlerName = exceptionSimpleName + AbstractExceptionHandler.HANDLER_NAME;
-    return AbstractExceptionHandler.exceptionHandlerMap.get(exceptionHandlerName);
+    return AbstractExceptionHandler.exceptionHandlerMap.get(new StringBuilder(exceptionSimpleName).append(AbstractExceptionHandler.HANDLER_NAME).toString());
   }
 
   public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName,Exception ex){
@@ -40,7 +38,6 @@ public class ExceptionUtil {
 
   public static String getMessage(String exceptionSimpleName,Exception ex, Locale locale){
     BaseExceptionVO baseExceptionVO = getBaseExceptionVO(exceptionSimpleName, ex);
-    return ValidateUtils.isEmpty(baseExceptionVO.getMessage()) ? I18nUtils
-        .getErrorMessage(baseExceptionVO.getCode(),locale,baseExceptionVO.getArg()) : baseExceptionVO.getMessage();
+    return ValidateUtils.isEmpty(baseExceptionVO.getMessage()) ? I18nUtils.getErrorMessage(baseExceptionVO.getCode(),locale,baseExceptionVO.getArg()) : baseExceptionVO.getMessage();
   }
 }

@@ -12,17 +12,18 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   KODO("KODO","七牛云对象存储"),
   ;
 
-  private final String label;
+  private String label;
 
-  private final String description;
+  private String desc;
 
-  FileChoiceEnum(String label,String description) {
+  FileChoiceEnum(String label,String desc) {
     this.label = label;
-    this.description = description;
+    this.desc = desc;
   }
 
-  public String getDescription() {
-    return description;
+  @Override
+  public String getDesc() {
+    return desc;
   }
 
   @Override

@@ -5,17 +5,18 @@ public interface BaseEnum<T> {
 
   /**
    * 获取I8N国际化key
-   *
-   * @return code
    */
   String key();
 
   /**
    * 获取存入数据库的值
-   *
-   * @return label
    */
   T label();
+
+  /**
+   * 获取描述
+   */
+  String getDesc();
 
   /**
    * 获取I18N国际化信息
@@ -34,4 +35,5 @@ public interface BaseEnum<T> {
   default T Value() {
     return label();
   }
+
 }
