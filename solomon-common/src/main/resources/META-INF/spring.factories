@@ -2,4 +2,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.aspect.controller.ControllerAspect,\
 com.steven.solomon.exception.handler.GlobalExceptionHandler,\
-com.steven.solomon.filter.RequestFilter
+com.steven.solomon.filter.RequestFilter,\
+com.steven.solomon.config.WebConfig
