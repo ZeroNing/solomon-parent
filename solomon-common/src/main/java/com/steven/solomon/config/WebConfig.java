@@ -3,7 +3,6 @@ package com.steven.solomon.config;
 import com.steven.solomon.json.config.JacksonObjectMapper;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -15,8 +14,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Import(value = {JacksonObjectMapper.class})
 public class WebConfig extends WebMvcConfigurationSupport {
 
-  @Autowired
-  private JacksonObjectMapper jacksonObjectMapper;
+  private final JacksonObjectMapper jacksonObjectMapper;
+
+  public WebConfig(JacksonObjectMapper jacksonObjectMapper) {this.jacksonObjectMapper = jacksonObjectMapper;}
 
   @Override
   protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
