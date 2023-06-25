@@ -21,7 +21,8 @@ public class DoubleColorBallGenerator {
     return redBalls.subList(0, RED_BALL_COUNT); // 取前6个
   }
 
-  public static int generateBlueBall() {
+  public static int generateBlueBall() throws InterruptedException {
+    Thread.sleep(500L);
     return (int) (Math.random() * MAX_BLUE_BALL_NUMBER) + 1; // 随机生成1-16的整数
   }
 
@@ -29,9 +30,7 @@ public class DoubleColorBallGenerator {
     for(int i = 1; i<=5;i++){
       System.out.print("第"+i+"组号码: "+ "");
       List<Integer> redBalls = generateRedBalls();
-      Thread.sleep(5000L);
       int blueBall = generateBlueBall();
-
       System.out.print("红球：");
       for (int ball : redBalls) {
         System.out.print(ball + " ");
