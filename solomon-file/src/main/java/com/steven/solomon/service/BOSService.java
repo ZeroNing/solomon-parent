@@ -8,6 +8,7 @@ import com.baidubce.services.bos.model.PutObjectRequest;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -70,7 +71,7 @@ public class BOSService implements FileServiceInterface {
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
     boolean flag = bucketExists(bucketName);
-    if (!flag) {
+    if (!flag || ValidateUtils.isEmpty(fileName)) {
       return;
     }
     String filePath = getFilePath(fileName,properties);

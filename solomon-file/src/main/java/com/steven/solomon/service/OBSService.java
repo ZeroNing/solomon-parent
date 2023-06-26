@@ -70,7 +70,7 @@ public class OBSService implements FileServiceInterface {
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
     boolean flag = bucketExists(bucketName);
-    if (!flag) {
+    if (!flag || ValidateUtils.isEmpty(fileName)) {
       return;
     }
     String    filePath  = getFilePath(fileName, properties);

@@ -6,6 +6,7 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;
 import io.minio.GetPresignedObjectUrlArgs;
@@ -78,7 +79,7 @@ public class MinioService implements FileServiceInterface {
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
     boolean flag = bucketExists(bucketName);
-    if (!flag) {
+    if (!flag || ValidateUtils.isEmpty(fileName)) {
       return;
     }
     String filePath = getFilePath(fileName,mioProperties);
