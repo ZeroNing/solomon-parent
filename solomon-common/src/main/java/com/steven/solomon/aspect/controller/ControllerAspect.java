@@ -45,11 +45,11 @@ public class ControllerAspect {
   @Around("pointCutMethodService()")
   public Object doAroundService(ProceedingJoinPoint pjp) throws Throwable {
     StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
     Object             obj     = null;
     Exception ex = null;
     String startTime = DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     try {
-      stopWatch.start();
       obj = pjp.proceed();
     } catch (Exception e) {
       ex = e;

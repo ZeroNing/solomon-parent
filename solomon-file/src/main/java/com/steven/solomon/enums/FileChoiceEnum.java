@@ -35,8 +35,4 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   public String key() {
     return this.name();
   }
-
-  public String getLabel() {
-    return label;
-  }
 }

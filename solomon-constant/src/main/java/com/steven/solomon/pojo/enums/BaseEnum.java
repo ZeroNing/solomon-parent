@@ -26,14 +26,4 @@ public interface BaseEnum<T> {
   default String Desc() {
     return I18nUtils.getEnumMessage(getClass().getSimpleName()+"."+key());
   }
-
-  /**
-   * 获取存入数据库的值
-   *
-   * @return label
-   */
-  default T Value() {
-    return label();
-  }
-
 }

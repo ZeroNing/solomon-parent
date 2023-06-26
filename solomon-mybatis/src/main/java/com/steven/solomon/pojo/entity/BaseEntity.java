@@ -69,7 +69,7 @@ public class BaseEntity<I> implements Serializable {
   public void create() {
     this.createDate = DateTimeUtils.getLocalDateTime();
     this.updateDate = DateTimeUtils.getLocalDateTime();
-    this.delFlag    = DelFlagEnum.NOT_DELETE.Value();
+    this.delFlag    = DelFlagEnum.NOT_DELETE.label();
   }
 
   public void create(I createId) {
@@ -94,7 +94,7 @@ public class BaseEntity<I> implements Serializable {
 
   public void delete() {
     this.updateDate = DateTimeUtils.getLocalDateTime();
-    this.delFlag    = DelFlagEnum.DELETE.Value();
+    this.delFlag    = DelFlagEnum.DELETE.label();
   }
 
   public LocalDateTime getCreateDate() {
