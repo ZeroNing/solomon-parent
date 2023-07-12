@@ -548,4 +548,16 @@ public class DateTimeUtils {
 		return dateTime.isAfter(LocalDateTime.now());
 	}
 
+	/**
+	 * 时区转换
+	 *
+	 * @param localDateTime
+	 * @param originZoneId
+	 * @param targetZoneId
+	 * @return
+	 */
+	public static LocalDateTime convertLocalDateTime(LocalDateTime localDateTime, ZoneId originZoneId,
+			ZoneId targetZoneId) {
+		return localDateTime.atZone(originZoneId).withZoneSameInstant(targetZoneId).toLocalDateTime();
+	}
 }

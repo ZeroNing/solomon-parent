@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.steven.solomon.json.config.JacksonObjectMapper;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
@@ -16,7 +17,7 @@ public class JackJsonUtils {
 
   private static final Logger logger = LoggerUtils.logger(JackJsonUtils.class);
 
-  private static final ObjectMapper mapper = SpringUtil.getBean(ObjectMapper.class);
+  private static final JacksonObjectMapper mapper = SpringUtil.getBean(JacksonObjectMapper.class);
 
   public static <T> T convertValue(Object obj,Class<T> clazz){
     return convertValue(obj, clazz,false);
