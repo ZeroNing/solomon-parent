@@ -35,13 +35,13 @@ public class JacksonObjectMapper extends ObjectMapper {
     super();
     JavaTimeModule javaTimeModule = new JavaTimeModule();
     /** 序列化配置,针对java8 时间 **/
-    javaTimeModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")));
+    javaTimeModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
     javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
     javaTimeModule.addSerializer(Date.class,new DateSerializer(false,new SimpleDateFormat("yyyy-MM-dd HH:mm:ss:SSS")));
 
     /** 反序列化配置,针对java8 时间 **/
-    javaTimeModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")));
+    javaTimeModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
     javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
     javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
     javaTimeModule.addDeserializer(Date.class,new DateDeserializers.DateDeserializer());
