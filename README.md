@@ -399,3 +399,7 @@ spring:
 HeardHolder.setTenantCode("租户编码");
 ```
 
+## 切换时区主要设置
+
+需要在请求头中添加"Timezone"然后value值就是时区例：UTC+8或者GMT+8，如果不填则默认是系统时区，然后切换时区逻辑为：将传入的参数转换为"Timezone"时区时间后转换为系统默认时区，返回的时候就将返回参数中的时间转换为"Timezone"的时区时间
+
