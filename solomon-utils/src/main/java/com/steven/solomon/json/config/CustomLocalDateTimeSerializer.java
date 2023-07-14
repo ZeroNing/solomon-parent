@@ -21,7 +21,7 @@ public class CustomLocalDateTimeSerializer extends JsonSerializer<LocalDateTime>
 
   @Override
   public void serialize(LocalDateTime value, JsonGenerator generator, SerializerProvider provider) throws IOException {
-    generator.writeString(DateTimeUtils.convertLocalDateTime(value, ZoneId.systemDefault(), ZoneId.of(RequestHeaderHolder.getServerTimeZone())).format(formatter));
+    generator.writeString(DateTimeUtils.convertLocalDateTime(value, ZoneId.of(RequestHeaderHolder.getServerTimeZone()), ZoneId.systemDefault()).format(formatter));
   }
 
 }
