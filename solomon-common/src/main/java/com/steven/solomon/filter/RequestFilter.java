@@ -1,6 +1,7 @@
 package com.steven.solomon.filter;
 
 import cn.hutool.core.lang.UUID;
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.header.RequestHeaderHolder;
 import java.io.IOException;
@@ -21,7 +22,7 @@ public class RequestFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
     ExceptionUtil.requestId.set(UUID.randomUUID().toString());
-    RequestHeaderHolder.setServerTimeZone(request.getHeader("serverTimeZone"));
+    RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
     chain.doFilter(new ContentCachingRequestWrapper(request), response);
   }
 }

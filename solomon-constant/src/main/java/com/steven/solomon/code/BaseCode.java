@@ -25,4 +25,6 @@ public interface BaseCode {
   String HEADER_PREFIX = "Bearer ";
 
   String REQUEST_ID = "requestId";
+
+  String TIMEZONE = "Timezone";
 }

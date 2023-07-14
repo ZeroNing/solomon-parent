@@ -54,7 +54,7 @@ public class WebConfig implements WebMvcConfigurer {
       public LocalDateTime convert(String source) {
         return convertLocalDateTime(
             LocalDateTime.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")),
-            ZoneId.of(RequestHeaderHolder.getServerTimeZone()), ZoneId.systemDefault());
+            ZoneId.of(RequestHeaderHolder.getTimeZone()), ZoneId.systemDefault());
       }
     });
   }

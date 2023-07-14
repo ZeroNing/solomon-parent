@@ -10,8 +10,8 @@ public class RequestHeaderHolder {
     return header;
   });
 
-  public static String getServerTimeZone(){
-    String serverTimeZone = threadLocal.get().getServerTimeZone();
+  public static String getTimeZone(){
+    String serverTimeZone = threadLocal.get().getTimezone();
     serverTimeZone = ValidateUtils.getOrDefault(serverTimeZone,ZoneId.systemDefault().getId());
     try {
       ZoneId.of(serverTimeZone);
@@ -20,7 +20,7 @@ public class RequestHeaderHolder {
     }
     return serverTimeZone;
   }
-  public static void setServerTimeZone(String serverTimeZone) {
-    threadLocal.get().setServerTimeZone(serverTimeZone);
+  public static void setTimeZone(String serverTimeZone) {
+    threadLocal.get().setTimezone(serverTimeZone);
   }
 }

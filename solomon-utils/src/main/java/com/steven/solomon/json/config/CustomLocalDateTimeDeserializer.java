@@ -23,7 +23,7 @@ public class CustomLocalDateTimeDeserializer extends JsonDeserializer<LocalDateT
   public LocalDateTime deserialize(JsonParser parser, DeserializationContext context)
       throws IOException {
     return DateTimeUtils.convertLocalDateTime(LocalDateTime.parse(parser.getText(), formatter),
-        ZoneId.of(RequestHeaderHolder.getServerTimeZone()), ZoneId.systemDefault());
+        ZoneId.of(RequestHeaderHolder.getTimeZone()), ZoneId.systemDefault());
   }
 
 }

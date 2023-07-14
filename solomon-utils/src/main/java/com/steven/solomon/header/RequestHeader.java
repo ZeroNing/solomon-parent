@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class RequestHeader implements Serializable {
 
-  private String serverTimeZone;
+  private String timezone;
 
-  public String getServerTimeZone() {
-    return serverTimeZone;
+  public String getTimezone() {
+    return timezone;
   }
 
-  public void setServerTimeZone(String serverTimeZone) {
-    this.serverTimeZone = serverTimeZone;
+  public void setTimezone(String timezone) {
+    this.timezone = timezone;
   }
 }
