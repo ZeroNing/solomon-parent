@@ -97,6 +97,9 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
    */
   public boolean getIsAutoAck() {
     RabbitMq rabbitMq = getClass().getAnnotation(RabbitMq.class);
+    if(ValidateUtils.isEmpty(rabbitMq)){
+      return false;
+    }
     return ValidateUtils.equalsIgnoreCase(AcknowledgeMode.MANUAL.toString(),rabbitMq.mode().toString()) ? false : true;
   }
 

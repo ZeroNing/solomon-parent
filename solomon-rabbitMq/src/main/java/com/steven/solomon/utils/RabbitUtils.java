@@ -1,21 +1,32 @@
 package com.steven.solomon.utils;
 
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.GetResponse;
+import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MessageQueueDatail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -171,5 +182,31 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
     String                         key       = StringUtils.trim(queueName);
     AbstractMessageListenerContainer container = RabbitMQInitConfig.allQueueContainerMap.get(key);
     return container;
+  }
+
+  /**
+   * 手动拉去消息消费,根据队列名找到对应消费器消费
+   * @param transactional 是否开启事务
+   * @param queueName     队列名
+   * @throws Exception
+   */
+  public void handleQueueMessageManually(boolean transactional,String queueName) throws Exception {
+    Channel     channel  = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
+    GetResponse response = channel.basicGet(queueName, false);
+    if (ValidateUtils.isEmpty(response)) {
+      logger.info("没有从{}队列中获取到消息",queueName);
+      return;
+    }
+    Map<String,Object> annotationMap = SpringUtil.getBeansWithAnnotation(RabbitMq.class);
+    for(Object obj : annotationMap.values()){
+      RabbitMq     rabbitMq = AnnotationUtils.findAnnotation(obj.getClass(), RabbitMq.class);
+      List<String> queues   = Arrays.asList(rabbitMq.queues());
+      if(!queues.contains(queueName)){
+        continue;
+      }
+      logger.info("从{}队列找到消费者类:{}",queueName,obj.getClass().getSimpleName());
+      AbstractConsumer abstractConsumer = (AbstractConsumer) obj;
+      abstractConsumer.onMessage(new Message(response.getBody(), new MessageProperties()),channel);
+    }
   }
 }

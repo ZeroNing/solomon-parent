@@ -51,7 +51,7 @@ public class RabbitMQConfig {
 			RabbitProperties properties) {
 		final RabbitTemplate        rabbitTemplate = new RabbitTemplate(connectionFactory);
 		rabbitTemplate.setMessageConverter(messageConverter);
-		rabbitTemplate.setMandatory(properties.getTemplate().getMandatory());
+		rabbitTemplate.setMandatory(ValidateUtils.getOrDefault(properties.getTemplate().getMandatory(),true));
 		if(ValidateUtils.isNotEmpty(properties.getTemplate().getReceiveTimeout())){
 			rabbitTemplate.setReceiveTimeout(properties.getTemplate().getReceiveTimeout().toMillis());
 		}
