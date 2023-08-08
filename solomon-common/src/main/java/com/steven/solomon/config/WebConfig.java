@@ -40,22 +40,4 @@ public class WebConfig implements WebMvcConfigurer {
     //将上面的消息转换器对象追加到mvc框架的转换器集合中
     converters.add(0, messageConverter);
   }
-
-  @Override
-  public void addFormatters(FormatterRegistry registry) {
-    registry.addConverter(new Converter<String, LocalDateTime>() {
-
-      private LocalDateTime convertLocalDateTime(LocalDateTime localDateTime, ZoneId originZoneId,
-          ZoneId targetZoneId) {
-        return localDateTime.atZone(originZoneId).withZoneSameInstant(targetZoneId).toLocalDateTime();
-      }
-
-      @Override
-      public LocalDateTime convert(String source) {
-        return convertLocalDateTime(
-            LocalDateTime.parse(source, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss:SSS")),
-            ZoneId.of(RequestHeaderHolder.getTimeZone()), ZoneId.systemDefault());
-      }
-    });
-  }
 }
