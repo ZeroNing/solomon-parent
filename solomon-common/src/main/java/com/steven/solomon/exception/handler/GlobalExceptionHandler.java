@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler({Exception.class})
   @ResponseBody
-  public String handleException(HttpServletRequest request, HttpServletResponse response, Exception ex, Locale locale) throws IOException {
+  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Exception ex, Locale locale) throws IOException {
     //获取异常名字
     String requestParameter = null;
     if(request instanceof ContentCachingRequestWrapper){
@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
     logger.info("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), FastJsonUtils.conversionJsonArray(requestParameter), ex);
     BaseExceptionVO baseExceptionVO = BaseGlobalExceptionHandler.handler(ex, null, serverId, locale);
     response.setStatus(baseExceptionVO.getStatusCode());
-    return JackJsonUtils.formatJsonByFilter(handlerMap(baseExceptionVO));
+    return handlerMap(baseExceptionVO);
   }
 
   public static Map<String, Object> handlerMap(BaseExceptionVO baseExceptionVO) {
