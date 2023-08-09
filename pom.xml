@@ -31,7 +31,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
     <yauaa.version>6.0</yauaa.version>
-    <easy.excel.version>3.0.5</easy.excel.version>
+    <easy.excel.version>3.3.2</easy.excel.version>
     <spring.boot.version>2.4.2</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
     <javax.validation>2.0.1.Final</javax.validation>
@@ -80,6 +80,8 @@
 <!--    <okhttp.version>4.11.0</okhttp.version>-->
 <!--    <okio.version>2.10.0</okio.version>-->
     <qiniuyun.version>7.13.0</qiniuyun.version>
+    <elasticsearch.version>5.1.0</elasticsearch.version>
+    <elasticsearch-java>8.8.1</elasticsearch-java>
   </properties>
 
   <parent>

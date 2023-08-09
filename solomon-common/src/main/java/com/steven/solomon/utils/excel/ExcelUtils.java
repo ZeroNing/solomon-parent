@@ -7,6 +7,7 @@ import com.alibaba.excel.metadata.Head;
 import com.alibaba.excel.metadata.data.WriteCellData;
 import com.alibaba.excel.write.builder.ExcelWriterBuilder;
 import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
+import com.alibaba.excel.write.handler.WriteHandler;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
 import com.alibaba.excel.write.metadata.style.WriteCellStyle;
@@ -53,12 +54,27 @@ public class ExcelUtils {
 	 * @throws Exception
 	 */
 	public static MultipartFile exportUpload(HttpServletResponse response, String excelName, String sheetName,List<String> includeColumnFieldNames,Map<String,String> excelPropertyValueMap, Class<?> clazz,List<?> data) throws Exception {
+		return exportUpload(response, excelName, sheetName, includeColumnFieldNames,excelPropertyValueMap, clazz, data,null);
+	}
+
+	/**
+	 * 导出Excel(07版.xlsx)到web
+	 *
+	 * @param response  响应
+	 * @param excelName Excel名称
+	 * @param sheetName sheet页名称
+	 * @param clazz     Excel要转换的类型
+	 * @param data      要导出的数据
+	 * @throws Exception
+	 */
+	public static MultipartFile exportUpload(HttpServletResponse response, String excelName, String sheetName,List<String> includeColumnFieldNames,Map<String,String> excelPropertyValueMap, Class<?> clazz,List<?> data,
+			WriteHandler writeHandler) throws Exception {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
 			setHead(response, excelName);
-			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(formatExcel()).registerWriteHandler(new ExcelWidthStyleStrategy());
+			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(writeHandler,formatExcel())).registerWriteHandler(new ExcelWidthStyleStrategy());
 
 			if(ValidateUtils.isNotEmpty(includeColumnFieldNames)){
-				excelWriterBuilder.includeColumnFiledNames(includeColumnFieldNames);
+				excelWriterBuilder.includeColumnFieldNames(includeColumnFieldNames);
 				for(String filedName : includeColumnFieldNames){
 					String i18nName = excelPropertyValueMap.get(filedName);
 					if(ValidateUtils.isEmpty(i18nName)){
