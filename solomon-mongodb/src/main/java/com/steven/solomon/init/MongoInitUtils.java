@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.CollectionOptions;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -79,15 +81,16 @@ public class MongoInitUtils {
           mongoDatabase.createCollection(name);
         }
       } else {
-        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
-          org.bson.Document command  = new org.bson.Document("collStats", name);
-          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");
-          if(!isCapped){
-            logger.info("修改集合{}为固定集合,限制字节为:{},记录数:{}",name,mongoDBCapped.size(),mongoDBCapped.maxDocuments());
-            command = new org.bson.Document("convertToCapped", name).append("capped",true).append("size", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments());
-            mongoDatabase.runCommand(command);
-          }
-        }
+        logger.info("集合{}已存在,不允许修改为固定集合,防止数据丢失,请先备份数据后,手动创建固定集合",name);
+//        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
+//          org.bson.Document command  = new org.bson.Document("collStats", name);
+//          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");
+//          if(!isCapped){
+//            logger.info("修改集合{}为固定集合,限制字节为:{},记录数:{}",name,mongoDBCapped.size(),mongoDBCapped.maxDocuments());
+//            command = new org.bson.Document("convertToCapped", name).append("capped",true).append("size", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments());
+//            mongoDatabase.runCommand(command);
+//          }
+//        }
       }
     }
   }
