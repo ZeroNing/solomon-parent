@@ -391,6 +391,14 @@ public class DateTimeUtils {
 	 * 获取某天0点0分0秒
 	 * @return
 	 */
+	public static LocalDateTime getNowZeroDayTime(LocalDateTime date){
+		return date.toLocalDate().atStartOfDay();
+	}
+
+	/**
+	 * 获取某天0点0分0秒
+	 * @return
+	 */
 	public static LocalDateTime getNowZeroDayTime(Date date){
 		LocalDateTime nowZeroDayTime = LocalDateTime.of(date2LocalDate(date),LocalTime.MIN);
 		return nowZeroDayTime;
@@ -410,6 +418,24 @@ public class DateTimeUtils {
 	 */
 	public static String getNowZeroDayTimeStr(Date date,DateTimeFormatter dateTimeFormatter){
 		return dateTimeFormatter.format(getNowZeroDayTime(date));
+	}
+
+	/**
+	 * 获取某天23点59分59秒
+	 * @return
+	 */
+	public static LocalDateTime getNowMaxDayTime(LocalDate date){
+		LocalDateTime nowZeroDayTime = LocalDateTime.of(date,LocalTime.MAX);
+		return nowZeroDayTime;
+	}
+
+	/**
+	 * 获取某天23点59分59秒
+	 * @return
+	 */
+	public static LocalDateTime getNowMaxDayTime(LocalDateTime date){
+		LocalDateTime nowZeroDayTime = LocalDateTime.of(date.toLocalDate(),LocalTime.MAX);
+		return nowZeroDayTime;
 	}
 
 	/**
@@ -550,14 +576,31 @@ public class DateTimeUtils {
 
 	/**
 	 * 时区转换
-	 *
-	 * @param localDateTime
-	 * @param originZoneId
-	 * @param targetZoneId
+	 * @param localDateTime 时间
+	 * @param originZoneId  原时区
+	 * @param targetZoneId	需要转换的时区
 	 * @return
 	 */
 	public static LocalDateTime convertLocalDateTime(LocalDateTime localDateTime, ZoneId originZoneId,
 			ZoneId targetZoneId) {
 		return localDateTime.atZone(originZoneId).withZoneSameInstant(targetZoneId).toLocalDateTime();
+	}
+
+	/**
+	 * 字符串转localDateTime
+	 * @param localDateTimeStr	字符串时间
+	 * @param formatter					需要转换的时间格式
+	 */
+	public static LocalDateTime getLocalDateTime(String localDateTimeStr,DateTimeFormatter formatter){
+		return LocalDateTime.parse(localDateTimeStr,formatter);
+	}
+
+	/**
+	 * 字符串转localDate
+	 * @param localDateTimeStr	字符串时间
+	 * @param formatter					需要转换的时间格式
+	 */
+	public static LocalDate getLocalDate(String localDateTimeStr,DateTimeFormatter formatter){
+		return LocalDate.parse(localDateTimeStr,formatter);
 	}
 }
