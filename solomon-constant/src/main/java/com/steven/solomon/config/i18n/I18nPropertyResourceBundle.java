@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.util.*;
 
+//https://www.jianshu.com/p/ca348edec47e 参考来源
 public class I18nPropertyResourceBundle extends ResourceBundle {
 
   // ==================privates====================
