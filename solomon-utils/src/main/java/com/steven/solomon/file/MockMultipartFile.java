@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.excel;
+package com.steven.solomon.file;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -27,7 +27,7 @@ public class MockMultipartFile implements MultipartFile {
    * @param content the content of the file
    */
   public MockMultipartFile(String name, @Nullable byte[] content) {
-    this(name, name, null, content);
+    this(name, name, name.substring(name.lastIndexOf(".")+1), content);
   }
 
   /**
@@ -37,7 +37,7 @@ public class MockMultipartFile implements MultipartFile {
    * @throws IOException if reading from the stream failed
    */
   public MockMultipartFile(String name, InputStream contentStream) throws IOException {
-    this(name, name, null, FileCopyUtils.copyToByteArray(contentStream));
+    this(name, name, name.substring(name.lastIndexOf(".")+1), FileCopyUtils.copyToByteArray(contentStream));
   }
 
   /**
@@ -113,5 +113,10 @@ public class MockMultipartFile implements MultipartFile {
   @Override
   public void transferTo(File dest) throws IOException, IllegalStateException {
     FileCopyUtils.copy(this.content, dest);
+  }
+
+  public static void main(String[] args) {
+    String a = "abc.jpg";
+    System.out.println(a.substring(a.lastIndexOf(".")+1));
   }
 }
