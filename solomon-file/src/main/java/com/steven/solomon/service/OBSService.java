@@ -35,8 +35,8 @@ public class OBSService extends AbstractFileService {
   }
 
   @Override
-  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception  {
-    client.putObject(bucketName, filePath, inputStream);
+  protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception  {
+    client.putObject(bucketName, filePath, file.getInputStream());
   }
 
   @Override

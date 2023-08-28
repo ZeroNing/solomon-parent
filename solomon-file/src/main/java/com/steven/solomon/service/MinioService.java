@@ -43,11 +43,11 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
-  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception {
+  protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
     client.putObject(
         PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(
-            inputStream, inputStream.available(), -1)
-            .contentType(FileTypeUtils.getFileType(inputStream))
+            file.getInputStream(), file.getSize(), -1)
+            .contentType(FileTypeUtils.getFileType(file.getInputStream(),file.getName()))
             .build());
   }
 

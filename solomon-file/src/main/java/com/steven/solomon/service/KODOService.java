@@ -44,9 +44,9 @@ public class KODOService extends AbstractFileService {
   }
 
   @Override
-  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception {
+  protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
     String uploadToken = auth.uploadToken(bucketName);
-    uploadManager.put(inputStream,inputStream.available(),filePath,uploadToken,null,null,false);
+    uploadManager.put(file.getInputStream(),file.getSize(),filePath,uploadToken,null,null,false);
   }
 
   @Override

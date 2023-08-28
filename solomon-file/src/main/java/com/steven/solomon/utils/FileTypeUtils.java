@@ -17,6 +17,10 @@ public class FileTypeUtils {
     return getFileType(FileTypeUtil.getType(inputStream));
   }
 
+  public static String getFileType(InputStream inputStream,String fileName) {
+    return getFileType(FileTypeUtil.getType(inputStream,fileName));
+  }
+
   public static String getFileType(File file){
     return getFileType(FileTypeUtil.getType(file));
   }
@@ -24,7 +28,7 @@ public class FileTypeUtils {
 
   public static String getFileType(String type){
     if(ValidateUtils.isEmpty(type)){
-      return null;
+      return "application/octet-stream";
     }
     if (type.equalsIgnoreCase("JPG") || type.equalsIgnoreCase("JPEG")
         || type.equalsIgnoreCase("GIF") || type.equalsIgnoreCase("PNG")
@@ -57,9 +61,6 @@ public class FileTypeUtils {
     if (type.equalsIgnoreCase("txt")) {
       return TXT_TYPE+type;
     }
-    if(ValidateUtils.isEmpty(type)){
-      return "application/octet-stream";
-    }
-    return null;
+    return "application/octet-stream";
   }
 }

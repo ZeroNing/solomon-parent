@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -33,7 +34,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
     String name = fileNamingRulesGenerationService.getFileName(file);
 
     String       filePath = getFilePath(name,properties);
-    this.upload(file.getInputStream(),bucketName,filePath);
+    this.upload(file,bucketName,filePath);
     return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 
@@ -48,7 +49,10 @@ public abstract class AbstractFileService implements FileServiceInterface{
     ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
     ImageIO.write(bi, "jpg", imOut);
 
-    this.upload(new ByteArrayInputStream(bs.toByteArray()),bucketName,filePath);
+    InputStream inputStream = new ByteArrayInputStream(bs.toByteArray());
+    MockMultipartFile file =  new MockMultipartFile(fileName,inputStream);
+
+    this.upload(file,bucketName,filePath);
     return new FileUpload(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()));
   }
 
@@ -83,7 +87,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
     this.createBucket(bucketName);
   }
 
-  protected abstract void upload(InputStream inputStream, String bucketName,String filePath) throws Exception;
+  protected abstract void upload(MultipartFile file, String bucketName,String filePath) throws Exception;
 
   protected abstract void delete(String bucketName,String filePath) throws Exception;
 

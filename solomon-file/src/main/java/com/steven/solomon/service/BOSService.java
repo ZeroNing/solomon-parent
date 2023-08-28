@@ -46,8 +46,8 @@ public class BOSService extends AbstractFileService {
   }
 
   @Override
-  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception  {
-    client.putObject(new PutObjectRequest(bucketName,filePath,inputStream));
+  protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception  {
+    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
     client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
   }
 

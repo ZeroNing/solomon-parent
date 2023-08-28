@@ -64,7 +64,7 @@ public class FileConfig {
       case KODO:
         return new KODOService(fileProperties);
       default:
-        return new DefaultService();
+        return new DefaultService(fileProperties);
     }
   }
 }
