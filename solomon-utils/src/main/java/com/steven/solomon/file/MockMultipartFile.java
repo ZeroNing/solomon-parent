@@ -27,7 +27,7 @@ public class MockMultipartFile implements MultipartFile {
    * @param content the content of the file
    */
   public MockMultipartFile(String name, @Nullable byte[] content) {
-    this(name, name, name.substring(name.lastIndexOf(".")+1), content);
+    this(name, name, getFileType(name), content);
   }
 
   /**
@@ -37,7 +37,7 @@ public class MockMultipartFile implements MultipartFile {
    * @throws IOException if reading from the stream failed
    */
   public MockMultipartFile(String name, InputStream contentStream) throws IOException {
-    this(name, name, name.substring(name.lastIndexOf(".")+1), FileCopyUtils.copyToByteArray(contentStream));
+    this(name, name, getFileType(name), FileCopyUtils.copyToByteArray(contentStream));
   }
 
   /**
@@ -115,8 +115,7 @@ public class MockMultipartFile implements MultipartFile {
     FileCopyUtils.copy(this.content, dest);
   }
 
-  public static void main(String[] args) {
-    String a = "abc.jpg";
-    System.out.println(a.substring(a.lastIndexOf(".")+1));
+  private static String getFileType(String name){
+    return name.substring(name.lastIndexOf(".")+1);
   }
 }
