@@ -25,7 +25,7 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class KODOService implements FileServiceInterface {
+public class KODOService extends AbstractFileService {
 
   private UploadManager uploadManager;
 
@@ -35,17 +35,8 @@ public class KODOService implements FileServiceInterface {
 
   private Configuration conf;
 
-  private FileChoiceProperties properties;
-
-  @Autowired
-  private FileNamingRulesGenerationService fileNamingRulesGenerationService;
-
-  public KODOService() {
-
-  }
-
   public KODOService(FileChoiceProperties properties) {
-    this.properties = properties;
+    super(properties);
     this.conf = new Configuration(Region.autoRegion());
     this.auth = Auth.create(properties.getAccessKey(), properties.getSecretKey());
     this.uploadManager = new UploadManager(this.conf);
@@ -53,57 +44,36 @@ public class KODOService implements FileServiceInterface {
   }
 
   @Override
-  public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-
-    String       name     = fileNamingRulesGenerationService.getFileName(file);
-    String       filePath = getFilePath(name,properties);
+  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception {
     String uploadToken = auth.uploadToken(bucketName);
-
-    uploadManager.put(file.getInputStream(),file.getSize(),filePath,uploadToken,null,null,false);
-    return new FileUpload(bucketName, filePath, file.getInputStream());
+    uploadManager.put(inputStream,inputStream.available(),filePath,uploadToken,null,null,false);
   }
 
   @Override
-  public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-    String    filePath  = getFilePath(fileName, properties);
-    String uploadToken = auth.uploadToken(bucketName);
-
-    ByteArrayOutputStream bs    = new ByteArrayOutputStream();
-    ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
-    ImageIO.write(bi, "jpg", imOut);
-    uploadManager.put(new ByteArrayInputStream(bs.toByteArray()),new ByteArrayInputStream(bs.toByteArray()).available(),filePath,uploadToken,null,null,false);
-    return new FileUpload(bucketName, filePath, new ByteArrayInputStream(bs.toByteArray()));
+  protected void delete(String bucketName, String filePath) throws Exception {
+    bucketManager.delete(bucketName, filePath);
   }
 
   @Override
-  public void deleteFile(String fileName, String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if (!flag || ValidateUtils.isEmpty(fileName)) {
-      return;
-    }
-    bucketManager.delete(bucketName, fileName);
-  }
-
-  @Override
-  public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    String encodedFileName = URLEncoder.encode(getFilePath(fileName,properties), "utf-8").replace("+", "%20");
+  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
+    String encodedFileName = URLEncoder.encode(getFilePath(filePath,properties), "utf-8").replace("+", "%20");
     String publicUrl = String.format("%s/%s", properties.getEndpoint(), encodedFileName);
     String accessKey = properties.getAccessKey();
     String secretKey = properties.getSecretKey();
     Auth auth = Auth.create(accessKey, secretKey);
-
     return auth.privateDownloadUrl(publicUrl, unit.toSeconds(expiry));
   }
 
   @Override
-  public InputStream download(String fileName, String bucketName) throws Exception {
-    URL           url  = new URL(share(fileName,bucketName,3600L,TimeUnit.SECONDS));
+  protected InputStream getObject(String bucketName, String filePath) throws Exception {
+    URL           url  = new URL(shareUrl(filePath,bucketName,3600L,TimeUnit.SECONDS));
     URLConnection conn = url.openConnection();
     return conn.getInputStream();
+  }
+
+  @Override
+  protected void createBucket(String bucketName) throws Exception {
+    bucketManager.createBucket(bucketName,properties.getRegionName());
   }
 
   @Override
@@ -111,15 +81,5 @@ public class KODOService implements FileServiceInterface {
     List<String> bucketNames = new ArrayList<>(Arrays.asList(bucketManager.buckets()));
     return bucketNames.contains(bucketName);
   }
-
-  @Override
-  public void makeBucket(String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if(flag){
-      return;
-    }
-    bucketManager.createBucket(bucketName,properties.getRegionName());
-  }
-
 
 }

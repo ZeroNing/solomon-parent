@@ -28,80 +28,45 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class MinioService implements FileServiceInterface {
-
-  public FileChoiceProperties mioProperties;
+public class MinioService extends AbstractFileService {
 
   public MinioClient client;
 
-  @Autowired
-  private FileNamingRulesGenerationService fileNamingRulesGenerationService;
-
-  public MinioService() {
-  }
-
   public MinioService(FileChoiceProperties mioProperties) {
-    this.mioProperties = mioProperties;
+    super(mioProperties);
     client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();
   }
 
   @Override
-  public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-    String name = fileNamingRulesGenerationService.getFileName(file);
-    String       filePath = getFilePath(name,mioProperties);
-    //上传
-    client.putObject(PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(
-        file.getInputStream(), file.getSize(), -1)
-        .contentType(file.getContentType()).build());
-    return new FileUpload(bucketName,name,file.getInputStream());
+  public boolean bucketExists(String bucketName) throws Exception {
+    return client.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
   }
 
   @Override
-  public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-
-    ByteArrayOutputStream bs    = new ByteArrayOutputStream();
-    ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
-    ImageIO.write(bi, "jpg", imOut);
-    String       filePath = getFilePath(fileName,mioProperties);
-
+  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception {
     client.putObject(
         PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(
-            new ByteArrayInputStream(bs.toByteArray()), new ByteArrayInputStream(bs.toByteArray()).available(), -1)
-            .contentType(FileTypeUtils.getFileType(new ByteArrayInputStream(bs.toByteArray())))
+            inputStream, inputStream.available(), -1)
+            .contentType(FileTypeUtils.getFileType(inputStream))
             .build());
-    return new FileUpload(bucketName,fileName,new ByteArrayInputStream(bs.toByteArray()));
   }
 
   @Override
-  public void deleteFile(String fileName, String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if (!flag || ValidateUtils.isEmpty(fileName)) {
-      return;
-    }
-    String filePath = getFilePath(fileName,mioProperties);
+  protected void delete(String bucketName, String filePath) throws Exception {
     client.removeObject(RemoveObjectArgs.builder().bucket(bucketName).object(filePath).build());
   }
 
   @Override
-  public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
+  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
     Builder builder = GetPresignedObjectUrlArgs.builder().bucket(bucketName);
     if(expiry >= Integer.MAX_VALUE){
       throw new BaseException(FileErrorCode.MORE_THAN_THE_SHARING_TIME);
     }
-    return client.getPresignedObjectUrl(builder.expiry((int)expiry,unit).object(fileName).method(Method.GET).build());
+    return client.getPresignedObjectUrl(builder.expiry((int)expiry,unit).object(filePath).method(Method.GET).build());
   }
 
   @Override
-  public InputStream download(String fileName, String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if(!flag){
-      return null;
-    }
-    String filePath = getFilePath(fileName,mioProperties);
+  protected InputStream getObject(String bucketName, String filePath) throws Exception {
     StatObjectResponse statObject =client.statObject(StatObjectArgs.builder().bucket(bucketName).object(filePath).build());
     if (statObject != null && statObject.size() > 0) {
       return client.getObject(GetObjectArgs.builder().bucket(bucketName).object(filePath).build());
@@ -111,16 +76,7 @@ public class MinioService implements FileServiceInterface {
   }
 
   @Override
-  public boolean bucketExists(String bucketName) throws Exception {
-    return client.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
-  }
-
-  @Override
-  public void makeBucket(String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if(flag){
-      return;
-    }
+  protected void createBucket(String bucketName) throws Exception {
     client.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
   }
 

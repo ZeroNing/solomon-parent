@@ -5,6 +5,10 @@ import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.CannedAccessControlList;
 import com.baidubce.services.bos.model.PutObjectRequest;
+import com.obs.services.ObsClient;
+import com.obs.services.model.HttpMethodEnum;
+import com.obs.services.model.TemporarySignatureRequest;
+import com.obs.services.model.TemporarySignatureResponse;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -20,74 +24,20 @@ import javax.imageio.stream.ImageOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
-public class BOSService implements FileServiceInterface {
+public class BOSService extends AbstractFileService {
 
   private BosClient client;
 
-  private FileChoiceProperties properties;
-
-  @Autowired
-  private FileNamingRulesGenerationService fileNamingRulesGenerationService;
-
-  public BOSService() {
-
-  }
-
-  public BOSService(FileChoiceProperties properties) {
+  private BosClient client() {
     BosClientConfiguration config = new BosClientConfiguration();
     config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
     config.setEndpoint(properties.getEndpoint());
-    this.client = new BosClient(config);
-    this.properties = properties;
+    return new BosClient(config);
   }
 
-  @Override
-  public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-
-    String       name     = fileNamingRulesGenerationService.getFileName(file);
-    String       filePath = getFilePath(name,properties);
-    client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
-    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
-    return new FileUpload(bucketName,filePath,file.getInputStream());
-  }
-
-  @Override
-  public FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception {
-    //创建桶
-    makeBucket(bucketName);
-
-    String       filePath = getFilePath(fileName,properties);
-
-    ByteArrayOutputStream bs    = new ByteArrayOutputStream();
-    ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
-    ImageIO.write(bi, "jpg", imOut);
-    client.putObject(new PutObjectRequest(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray())));
-    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
-    return new FileUpload(bucketName,filePath,new ByteArrayInputStream(bs.toByteArray()));
-  }
-
-  @Override
-  public void deleteFile(String fileName, String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if (!flag || ValidateUtils.isEmpty(fileName)) {
-      return;
-    }
-    String filePath = getFilePath(fileName,properties);
-    client.deleteObject(bucketName,filePath);
-  }
-
-  @Override
-  public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    String filePath = getFilePath(fileName,properties);
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry)).getSeconds()).toString();
-  }
-
-  @Override
-  public InputStream download(String fileName, String bucketName) throws Exception {
-    String filePath = getFilePath(fileName,properties);
-    return client.getObject(bucketName,filePath).getObjectContent();
+  public BOSService(FileChoiceProperties properties) {
+    super(properties);
+    this.client = client();
   }
 
   @Override
@@ -96,13 +46,28 @@ public class BOSService implements FileServiceInterface {
   }
 
   @Override
-  public void makeBucket(String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if(flag){
-      return;
-    }
-    client.createBucket(bucketName);
+  protected void upload(InputStream inputStream, String bucketName, String filePath) throws Exception  {
+    client.putObject(new PutObjectRequest(bucketName,filePath,inputStream));
+    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
   }
 
+  @Override
+  protected void delete(String bucketName, String filePath) throws Exception  {
+    client.deleteObject(bucketName, filePath);
+  }
 
+  @Override
+  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception  {
+    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry)).getSeconds()).toString();
+  }
+
+  @Override
+  protected InputStream getObject(String bucketName, String filePath) throws Exception  {
+    return client.getObject(bucketName, filePath).getObjectContent();
+  }
+
+  @Override
+  protected void createBucket(String bucketName) throws Exception  {
+    client.createBucket(bucketName);
+  }
 }
