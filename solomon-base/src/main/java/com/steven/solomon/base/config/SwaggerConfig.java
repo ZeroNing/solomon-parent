@@ -1,7 +1,12 @@
 package com.steven.solomon.base.config;
 
+import java.io.IOException;
+import java.net.URL;
+import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -15,9 +20,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2WebMvc;
 @Configuration(proxyBeanMethods = false)
 @EnableSwagger2WebMvc
 public class SwaggerConfig {
-
-  @Value("${knife4j.package:}")
-  private String packageName;
 
   @Value("${knife4j.title:swagger文档}")
   private String title;
@@ -34,7 +36,7 @@ public class SwaggerConfig {
         .enable(open)
         .select()
         //扫描的路径包,设置basePackage会将包下的所有被@Api标记类的所有方法作为api
-        .apis(RequestHandlerSelectors.basePackage(packageName))
+        .apis(RequestHandlerSelectors.any())
         //指定路径处理PathSelectors.any()代表所有的路径
         .paths(PathSelectors.any())
         .build();
@@ -45,7 +47,27 @@ public class SwaggerConfig {
         //设置文档标题(API名称)
         .title(title)
         //版本号
-        .version("1.0.0")
+        .version(getGitVersion())
         .build();
+  }
+
+  private String getGitVersion() {
+    String version = "1.0.0";
+    try {
+      ClassLoader classLoader = getClass().getClassLoader();
+      URL         resource    = classLoader.getResource("git.properties");
+      if (resource != null) {
+        Properties props = new Properties();
+        props.load(resource.openStream());
+
+        String abbrev= props.getProperty("git.commit.id.abbrev");
+        String time=props.getProperty("git.build.time");
+//        String user = props.getProperty("git.build.user.name");
+        version = time + "-" + abbrev ;
+      }
+    } catch (Exception e) {
+      version = "1.0.0";
+    }
+    return version;
   }
 }

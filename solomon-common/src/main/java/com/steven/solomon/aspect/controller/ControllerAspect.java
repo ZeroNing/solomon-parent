@@ -73,7 +73,7 @@ public class ControllerAspect {
     Double second      = Double.parseDouble(String.valueOf(millisecond)) / 1000;
     StringBuilder sb = new StringBuilder();
     sb.append("==========================================="+System.lineSeparator());
-    sb.append("开始时间:"+startTime+System.lineSeparator());
+    sb.append("请求时间:"+startTime+System.lineSeparator());
     sb.append("请求ID:"+uuid+System.lineSeparator());
     sb.append("请求URL:"+url+System.lineSeparator());
     sb.append("请求参数:"+targetMethodParams+System.lineSeparator());
@@ -85,7 +85,7 @@ public class ControllerAspect {
       String message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
       sb.append("异常为:"+message+System.lineSeparator());
     }
-    sb.append("结束时间:"+DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))+System.lineSeparator());
+    sb.append("请求结束时间:"+DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))+System.lineSeparator());
     sb.append("===========================================");
     logger.info(System.lineSeparator()+sb.toString());
 
