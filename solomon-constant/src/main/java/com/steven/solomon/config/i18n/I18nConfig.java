@@ -61,7 +61,7 @@ public class I18nConfig {
       return resourceBundle;
     }
     String language = locales.get(index);
-    if(language.isEmpty() || "".equals(language)){
+    if(null == language || language.isEmpty()){
       return resourceBundle;
     }
     resourceBundle = ResourceBundle.getBundle(basePath, new Locale(language), new I18nControl());
