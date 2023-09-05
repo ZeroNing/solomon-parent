@@ -72,6 +72,65 @@ public class TestApplication {
 
 ## 自定义配置说明
 
+### swagger版本号支持获取git最后一个提交记录版本号
+
+需要在项目的pom.xml配置以下代码,打包成功后即可读取到项目git最后一条记录版本号
+
+```xml
+<build>
+    <plugins>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>2.1.5</version>
+        <executions>
+          <execution>
+            <id>get-the-git-infos</id>
+            <!-- 默认绑定阶段initialize -->
+            <phase>initialize</phase>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <!--日期格式;默认值:dd.MM.yyyy '@' HH:mm:ss z;-->
+          <dateFormat>yyyy-MM-dd_HH-mm-ss</dateFormat>
+          <!--,构建过程中,是否打印详细信息;默认值:false;-->
+          <verbose>true</verbose>
+          <!-- ".git"文件路径;默认值:${project.basedir}/.git; ${project.basedir}：项目根目录，即包含pom.xml文件的目录-->
+          <dotGitDirectory>${project.basedir}/../../../.git</dotGitDirectory>
+          <!--若项目打包类型为pom,是否取消构建;默认值:true;-->
+          <skipPoms>false</skipPoms>
+          <!--是否生成"git.properties"文件;默认值:false;-->
+          <generateGitPropertiesFile>true</generateGitPropertiesFile>
+          <!--指定"git.properties"文件的存放路径(相对于${project.basedir}的一个路径);-->
+          <generateGitPropertiesFilename>/src/main/resources/git.properties</generateGitPropertiesFilename>
+          <!--".git"文件夹未找到时,构建是否失败;若设置true,则构建失败;若设置false,则跳过执行该目标;默认值:true;-->
+          <failOnNoGitDirectory>true</failOnNoGitDirectory>
+
+          <!--git描述配置,可选;由JGit提供实现;-->
+          <gitDescribe>
+            <!--是否生成描述属性-->
+            <skip>false</skip>
+            <!--提交操作未发现tag时,仅打印提交操作ID,-->
+            <always>false</always>
+            <!--提交操作ID显式字符长度,最大值为:40;默认值:7; 0代表特殊意义;后面有解释;-->
+            <abbrev>7</abbrev>
+            <!--构建触发时,代码有修改时(即"dirty state"),添加指定后缀;默认值:"";-->
+            <dirty>-dirty</dirty>
+            <!--always print using the "tag-commits_from_tag-g_commit_id-maybe_dirty" format, even if "on" a tag.
+                The distance will always be 0 if you're "on" the tag.  -->
+            <forceLongFormat>false</forceLongFormat>
+          </gitDescribe>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+```
+
+
+
 ### Swagger配置说明
 
 ```yaml
