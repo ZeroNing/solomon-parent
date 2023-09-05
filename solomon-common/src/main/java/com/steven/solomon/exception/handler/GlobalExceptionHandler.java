@@ -39,9 +39,9 @@ public class GlobalExceptionHandler {
   /**
    * 捕获全局异常
    */
-  @ExceptionHandler({Exception.class})
+  @ExceptionHandler(value = {Throwable.class})
   @ResponseBody
-  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Exception ex, Locale locale) throws IOException {
+  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex, Locale locale) throws IOException {
     //获取异常名字
     String requestParameter = null;
     if(request instanceof ContentCachingRequestWrapper){

@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 
 public class BaseGlobalExceptionHandler {
 
-    public static BaseExceptionVO handler(Exception ex, Integer httpStatus, String serverId, Locale locale) {
+    public static BaseExceptionVO handler(Throwable ex, Integer httpStatus, String serverId, Locale locale) {
         String exceptionSimpleName = ex.getClass().getSimpleName();
 
         BaseExceptionVO baseExceptionVO = ExceptionUtil.getBaseExceptionVO(exceptionSimpleName,ex);

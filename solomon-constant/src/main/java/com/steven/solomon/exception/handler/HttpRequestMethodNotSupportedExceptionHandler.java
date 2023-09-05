@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class HttpRequestMethodNotSupportedExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     return new BaseExceptionVO(BaseExceptionCode.REQUEST_METHOD_ERROR, 500);
   }
 }

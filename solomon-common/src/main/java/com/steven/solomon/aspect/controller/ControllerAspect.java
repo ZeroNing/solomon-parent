@@ -47,11 +47,11 @@ public class ControllerAspect {
     StopWatch stopWatch = new StopWatch();
     stopWatch.start();
     Object             obj     = null;
-    Exception ex = null;
+    Throwable ex = null;
     String startTime = DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     try {
       obj = pjp.proceed();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       ex = e;
       throw e;
     } finally {
@@ -60,7 +60,7 @@ public class ControllerAspect {
     return obj;
   }
 
-  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Exception ex,String uuid,Object obj,String startTime) {
+  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Throwable ex,String uuid,Object obj,String startTime) {
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     String url = request.getRequestURL().toString();
 //    String proceedingJoinPoint = pjp.getSignature().toString();

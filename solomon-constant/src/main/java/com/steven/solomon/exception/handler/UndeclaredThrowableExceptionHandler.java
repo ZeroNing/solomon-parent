@@ -11,7 +11,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 public class UndeclaredThrowableExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     Throwable t = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
     if(t instanceof BaseException){
       BaseException baseException = (BaseException) t;

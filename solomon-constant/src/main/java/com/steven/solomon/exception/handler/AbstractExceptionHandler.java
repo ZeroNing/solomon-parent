@@ -18,5 +18,5 @@ public abstract class AbstractExceptionHandler {
    * @return 异常对象
    * @throws IOException
    */
-  public abstract BaseExceptionVO handleBaseException(Exception ex);
+  public abstract BaseExceptionVO handleBaseException(Throwable ex);
 }

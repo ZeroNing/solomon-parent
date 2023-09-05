@@ -14,7 +14,7 @@ public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHan
   private Logger logger = LoggerUtils.logger(getClass());
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     MethodArgumentNotValidException e = (MethodArgumentNotValidException) ex;
     String message = e.getBindingResult().getFieldError().getDefaultMessage();
     return new BaseExceptionVO(message, HttpStatus.INTERNAL_SERVER_ERROR.value());

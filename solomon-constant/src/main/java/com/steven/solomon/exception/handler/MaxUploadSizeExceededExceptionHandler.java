@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class MaxUploadSizeExceededExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     return new BaseExceptionVO(BaseExceptionCode.FILE_UPLOAD_MAX_SIZE,500);
   }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     List<ObjectError> errorMessages = ((WebExchangeBindException) ex).getAllErrors();
     String            errorMessage  = null;
     if (ValidateUtils.isNotEmpty(errorMessages)) {

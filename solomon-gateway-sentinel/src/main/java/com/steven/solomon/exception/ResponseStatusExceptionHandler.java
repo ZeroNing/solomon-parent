@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ResponseStatusExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     return new BaseExceptionVO(BaseExceptionCode.BAD_REQUEST,500);
   }
 

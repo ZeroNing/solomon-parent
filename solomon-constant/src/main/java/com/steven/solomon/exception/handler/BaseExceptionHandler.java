@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 public class BaseExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     BaseException e = (BaseException) ex;
     return new BaseExceptionVO(e.getCode(), e.getMessage(), 500);
   }

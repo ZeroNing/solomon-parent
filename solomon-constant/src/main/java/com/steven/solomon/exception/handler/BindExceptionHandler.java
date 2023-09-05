@@ -8,7 +8,7 @@ import org.springframework.validation.BindException;
 public class BindExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     BindException e = (BindException) ex;
     return new BaseExceptionVO(e.getFieldError().getDefaultMessage(), 500);
   }

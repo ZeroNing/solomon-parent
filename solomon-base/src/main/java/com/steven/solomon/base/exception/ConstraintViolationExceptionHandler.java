@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class ConstraintViolationExceptionHandler extends AbstractExceptionHandler {
 
   @Override
-  public BaseExceptionVO handleBaseException(Exception ex) {
+  public BaseExceptionVO handleBaseException(Throwable ex) {
     ConstraintViolationException e = (ConstraintViolationException) ex;
     return new BaseExceptionVO(e.getMessage(), 500);
   }
