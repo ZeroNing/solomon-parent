@@ -27,19 +27,34 @@ public class MqttUtils implements SendService<MqttModel> {
 
   private Logger logger = LoggerUtils.logger(MqttUtils.class);
 
-  @Resource
-  private MqttClient client;
+  private Map<String,MqttClient> clientMap = new HashMap<>();
 
-  private MqttConnectOptions options;
+  private Map<String,MqttConnectOptions> optionsMap = new HashMap<>();
 
-  private Map<AbstractConsumer,Mqtt> consumer = new HashMap<>();
-
-  public void setOptions(MqttConnectOptions options) {
-    this.options = options;
+  public Map<String, MqttConnectOptions> getOptionsMap() {
+    return optionsMap;
   }
 
-  public void setConsumer(Map<AbstractConsumer,Mqtt> consumer){
-    this.consumer.putAll(consumer);
+  public void putOptionsMap(String tenantCode, MqttConnectOptions options) {
+    this.optionsMap.put(tenantCode,options);
+  }
+
+  private Map<String,Map<AbstractConsumer,Mqtt>> tenantAbstractConsumerMap = new HashMap<>();
+
+  public Map<String, MqttClient> getClientMap() {
+    return clientMap;
+  }
+
+  public void putClient(String tenantCode,MqttClient client) {
+    this.clientMap.put(tenantCode, client);
+  }
+
+  public Map<String, Map<AbstractConsumer, Mqtt>> getTenantAbstractConsumerMap() {
+    return tenantAbstractConsumerMap;
+  }
+
+  public void putTenantAbstractConsumerMap(String tenantCode,Map<AbstractConsumer, Mqtt> tenantAbstractConsumerMap) {
+    this.tenantAbstractConsumerMap.put(tenantCode, tenantAbstractConsumerMap);
   }
 
   /**
@@ -53,7 +68,7 @@ public class MqttUtils implements SendService<MqttModel> {
     try {
       // 转换消息为json字符串
       String json = mapper.writeValueAsString(data);
-      client.publish(data.getTopic(), new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
+      getClientMap().get(data.getTenantCode()).publish(data.getTopic(), new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
     } catch (JsonProcessingException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", data.getTopic()));
     } catch (MqttException e) {
@@ -73,42 +88,44 @@ public class MqttUtils implements SendService<MqttModel> {
 
   /**
    * 订阅消息
+   * @param tenantCode 租户编码
    * @param topic 主题
    * @param qos 消息质量
    * @param consumer 消费者
    */
-  public void subscribe(String topic,int qos, AbstractConsumer consumer) throws MqttException {
+  public void subscribe(String tenantCode,String topic,int qos, AbstractConsumer consumer) throws MqttException {
     if(ValidateUtils.isEmpty(topic)){
       return;
     }
-    client.subscribe(topic, qos,consumer);
+    getClientMap().get(tenantCode).subscribe(topic, qos,consumer);
   }
 
   /**
    * 取消订阅
    * @param topic 主题
    */
-  public void unsubscribe(String[] topic) throws MqttException {
+  public void unsubscribe(String tenantCode,String[] topic) throws MqttException {
     if(ValidateUtils.isEmpty(topic)){
       return;
     }
-    client.unsubscribe(topic);
+    getClientMap().get(tenantCode).unsubscribe(topic);
   }
 
   /**
    * 关闭连接
    */
-  public void disconnect() throws MqttException {
-    client.disconnect();
+  public void disconnect(String tenantCode) throws MqttException {
+    getClientMap().get(tenantCode).disconnect();
   }
 
   /**
    * 重新连接
    */
-  public void reconnect() throws MqttException {
+  public void reconnect(String tenantCode) throws MqttException {
+    MqttClient client = getClientMap().get(tenantCode);
     if(!client.isConnected()){
-      client.connect(this.options);
-      Map<AbstractConsumer,Mqtt> consumer = this.consumer;
+      client.connect(getOptionsMap().get(tenantCode));
+      Map<AbstractConsumer,Mqtt> consumer = getTenantAbstractConsumerMap().get(tenantCode);
       for(Entry<AbstractConsumer,Mqtt> map : consumer.entrySet()){
         Mqtt mqtt = map.getValue();
         logger.info("重新连接,重新订阅主题:{}",mqtt.topics());

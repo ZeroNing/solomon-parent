@@ -3,6 +3,8 @@ package com.steven.solomon.consumer;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.header.RequestHeader;
+import com.steven.solomon.header.RequestHeaderHolder;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.nio.charset.StandardCharsets;
@@ -21,12 +23,12 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
       if(checkMessageKey(topic,message)){
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
-      logger.info("线程名:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),topic, json);
-
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
+
+      logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",mqttModel.getTenantCode(),Thread.currentThread().getName(),topic, json);
       // 消费者消费消息
       this.handleMessage((T) mqttModel.getBody());
-    } catch (Exception e){
+    } catch (Throwable e){
       logger.info("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
     }
@@ -44,7 +46,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
    * @param message mq所包含的信息
    * @param e 异常
    */
-  public void saveFailMessage(String topic,MqttMessage message, Exception e){
+  public void saveFailMessage(String topic,MqttMessage message, Throwable e){
 
   }
 

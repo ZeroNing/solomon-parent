@@ -10,6 +10,8 @@ public class MqttModel<T> extends BaseMq<T> {
 
   private String topic;
 
+  private String tenantCode;
+
   public String getTopic() {
     return topic;
   }
@@ -18,13 +20,23 @@ public class MqttModel<T> extends BaseMq<T> {
     this.topic = topic;
   }
 
-  public MqttModel() {
-    super();
+  public String getTenantCode() {
+    return tenantCode;
   }
 
-  public MqttModel(String topic,T body) {
+  public void setTenantCode(String tenantCode) {
+    this.tenantCode = tenantCode;
+  }
+
+  public MqttModel(String tenantCode) {
+    super();
+    this.tenantCode = tenantCode;
+  }
+
+  public MqttModel(String tenantCode,String topic,T body) {
     super(body);
     this.topic = topic;
+    this.tenantCode = tenantCode;
   }
 
 }
