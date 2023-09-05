@@ -44,7 +44,7 @@ public class RSAUtils {
       }
       RSA rsa = new RSA(null, publicKey);
       return StrUtil.str(rsa.decrypt(text, KeyType.PublicKey), CharsetUtil.CHARSET_UTF_8);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       return text;
     }
 

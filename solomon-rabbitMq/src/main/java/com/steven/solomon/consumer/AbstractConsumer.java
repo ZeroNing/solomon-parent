@@ -46,7 +46,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
         // 手动确认消息
         channel.basicAck(deliveryTag, false);
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
       logger.info("AbstractConsumer:消费报错 异常为:", e);
       //将消费失败的记录保存到数据库或者不处理也可以
@@ -112,7 +112,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
    * @param message mq所包含的信息
    * @param e 异常
    */
-  public void saveFailMessage(Message message, Exception e){
+  public void saveFailMessage(Message message, Throwable e){
 
   }
 

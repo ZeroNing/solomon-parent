@@ -15,7 +15,7 @@ public class RequestHeaderHolder {
     serverTimeZone = ValidateUtils.getOrDefault(serverTimeZone,ZoneId.systemDefault().getId());
     try {
       ZoneId.of(serverTimeZone);
-    } catch (Exception e){
+    } catch (Throwable e){
       serverTimeZone = ZoneId.systemDefault().getId();
     }
     return serverTimeZone;

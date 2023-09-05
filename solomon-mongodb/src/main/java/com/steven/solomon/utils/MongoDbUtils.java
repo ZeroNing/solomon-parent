@@ -96,7 +96,7 @@ public class MongoDbUtils {
       MongoClient mongoClients = MongoClients.create(mongoClient);
       Document doc = createUSerDocument(userName, password, roleEnum, dbName);
       mongoClients.getDatabase(dbName).runCommand(doc);
-    }catch (Exception e) {
+    }catch (Throwable e) {
       return false;
     }
     return true;
@@ -117,7 +117,7 @@ public class MongoDbUtils {
     try {
       Document doc = createUSerDocument(userName, password, roleEnum, mongoDatabase.getName());
       mongoDatabase.runCommand(doc);
-    }catch (Exception e) {
+    }catch (Throwable e) {
       return false;
     }
     return true;

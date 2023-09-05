@@ -65,7 +65,7 @@ public class SwaggerConfig {
 //        String user = props.getProperty("git.build.user.name");
         version = time + "-" + abbrev ;
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       version = "1.0.0";
     }
     return version;

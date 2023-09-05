@@ -55,7 +55,7 @@ public class FastJsonAfterFilter extends AfterFilter {
             super.writeKeyValue(fastJsonEnum.fieldName(),value);
           }
         }
-      } catch (Exception e) {
+      } catch (Throwable e) {
         logger.info("fastJson 转义注解失败,失败异常为 e:{}",e);
 //        throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
       }

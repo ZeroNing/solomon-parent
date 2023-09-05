@@ -217,7 +217,7 @@ public class ValidateUtils {
     String bigStr;
     try {
       bigStr = object.toString();
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.info("正则校验报错异常,传入的值为:{},异常为:{}",object,e);
       return false;
     }

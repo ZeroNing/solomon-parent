@@ -104,7 +104,7 @@ public class I18nUtils {
   private static String getMessage(String code,Locale locale, Object... args) {
     try {
       return messageSource.getMessage(code, args, locale);
-    }catch (Exception e) {
+    }catch (Throwable e) {
       return null;
     }
   }

@@ -70,7 +70,7 @@ public class JackJsonUtils {
   public static String formatJsonByFilter(Object result, Class<?> filter) {
     try {
       return ValidateUtils.isEmpty(filter) ? mapper.writeValueAsString(result) : mapper.writerWithView(filter).writeValueAsString(result);
-    } catch (Exception e) {
+    } catch (Throwable e) {
       //TODO
 //      logger.error("转换Json出现异常:{}",e);
       return "";

@@ -31,7 +31,7 @@ public class RedisService extends AbsICacheService {
         redisTemplate.expire(assembleKey(group, key), time, TimeUnit.SECONDS);
       }
       return true;
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return false;
     }
@@ -46,7 +46,7 @@ public class RedisService extends AbsICacheService {
   public boolean hasKey(String group, String key) {
     try {
       return redisTemplate.hasKey(assembleKey(group, key));
-    } catch (Exception e) {
+    } catch (Throwable e) {
       e.printStackTrace();
       return false;
     }

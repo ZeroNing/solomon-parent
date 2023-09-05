@@ -56,7 +56,7 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
           jsonGenerator.writeStringField(fieldName,value);
         }
       }
-    } catch (Exception e) {
+    } catch (Throwable e) {
       logger.info("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodNames.toString(),e);
       return;
     }
