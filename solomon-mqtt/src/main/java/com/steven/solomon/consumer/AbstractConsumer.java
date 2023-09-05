@@ -5,6 +5,7 @@ import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.header.RequestHeader;
 import com.steven.solomon.header.RequestHeaderHolder;
+import com.steven.solomon.holder.HeardHolder;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.nio.charset.StandardCharsets;
@@ -24,7 +25,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
-
+      HeardHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",mqttModel.getTenantCode(),Thread.currentThread().getName(),topic, json);
       // 消费者消费消息
       this.handleMessage((T) mqttModel.getBody());
