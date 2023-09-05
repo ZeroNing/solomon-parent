@@ -42,34 +42,6 @@
 | solomon-mybatis          | 主要是加入了一个通用实体类，未来或许考虑加入动态切换数据源   |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
 
-## 注意事项
-
-1.项目启动时侯需要扫描Jar包路径（"com.steven"）如：
-
-```java
-@SpringBootApplication(scanBasePackages = {"com.test","com.steven"})
-public class TestApplication {
-
-  public static void main(String[] args) {
-    SpringApplication.run(TestApplication.class, args);
-  }
-
-}
-```
-
-```java
-@ComponentScan(value = {"com.steven"})
-public class TestApplication {
-
-  public static void main(String[] args) {
-    SpringApplication.run(TestApplication.class, args);
-  }
-
-}
-```
-
-
-
 ## 自定义配置说明
 
 ### swagger版本号支持获取git最后一个提交记录版本号
