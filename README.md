@@ -95,20 +95,22 @@ i18n:
 ### Mqtt配置说明
 
 ```yaml
-mqtt：
-  user-name:           #用户名
-  password:            #密码
-  url:                 #连接
-  client-id:           #客户端的标识(不可重复,为空时侯用uuid)
-  completion-timeout:  #连接超时
-  automatic-reconnect: #是否自动重连
-  clean-session:       #客户端掉线后,是否自动清除session
-  keep-alive-interval: #心跳时间
-  will:                #遗嘱消息
-    topic:             #遗嘱主题
-    message:           #遗嘱消息
-    qos:               #遗嘱消息质量
-    retained:          #遗嘱是否保留消息
+mqtt:
+  tenant:
+    default:               #租户编码
+      user-name:           #用户名
+      password:            #密码
+      url:                 #连接
+      client-id:           #客户端的标识(不可重复,为空时侯用uuid)
+      completion-timeout:  #连接超时
+      automatic-reconnect: #是否自动重连
+      clean-session:       #客户端掉线后,是否自动清除session
+      keep-alive-interval: #心跳时间
+      will:                #遗嘱消息
+        topic:             #遗嘱主题
+        message:           #遗嘱消息
+        qos:               #遗嘱消息质量
+        retained:          #遗嘱是否保留消息
 ```
 
 
