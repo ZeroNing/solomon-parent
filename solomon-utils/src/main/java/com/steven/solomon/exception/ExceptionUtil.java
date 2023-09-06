@@ -24,7 +24,7 @@ public class ExceptionUtil {
     return AbstractExceptionHandler.exceptionHandlerMap.get(new StringBuilder(exceptionSimpleName).append(AbstractExceptionHandler.HANDLER_NAME).toString());
   }
 
-  public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName,Exception ex){
+  public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName,Throwable ex){
     BaseExceptionVO baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.BASE_EXCEPTION_CODE, HttpStatus.INTERNAL_SERVER_ERROR.value());
 
     AbstractExceptionHandler abstractExceptionHandler = getExceptionHandler(exceptionSimpleName);
@@ -36,7 +36,7 @@ public class ExceptionUtil {
     return baseExceptionVO;
   }
 
-  public static String getMessage(String exceptionSimpleName,Exception ex, Locale locale){
+  public static String getMessage(String exceptionSimpleName,Throwable ex, Locale locale){
     BaseExceptionVO baseExceptionVO = getBaseExceptionVO(exceptionSimpleName, ex);
     return ValidateUtils.isEmpty(baseExceptionVO.getMessage()) ? I18nUtils.getErrorMessage(baseExceptionVO.getCode(),locale,baseExceptionVO.getArg()) : baseExceptionVO.getMessage();
   }
