@@ -28,7 +28,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
       HeardHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",mqttModel.getTenantCode(),Thread.currentThread().getName(),topic, json);
       // 消费者消费消息
-      this.handleMessage((T) mqttModel.getBody());
+      this.handleMessage(topic,(T) mqttModel.getBody());
     } catch (Throwable e){
       logger.info("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
@@ -39,7 +39,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
    * 消费方法
    * @param body 请求数据
    */
-  public abstract void handleMessage(T body) throws Exception;
+  public abstract void handleMessage(String topic, T body) throws Exception;
 
   /**
    * 保存消费失败的消息
