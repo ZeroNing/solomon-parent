@@ -32,19 +32,4 @@ public class TenantMongoProperties {
   public void setTenant(Map<String, MongoProperties> tenant) {
     this.tenant = tenant;
   }
-
-//  public TenantMongoProperties(MongoProperties properties){
-//    setAutoIndexCreation(properties.isAutoIndexCreation());
-//    setUuidRepresentation(properties.getUuidRepresentation());
-//    setFieldNamingStrategy(properties.getFieldNamingStrategy());
-//    setReplicaSetName(properties.getReplicaSetName());
-//    setPassword(properties.getPassword());
-//    setUsername(properties.getUsername());
-//    setGridFsDatabase(properties.getGridFsDatabase());
-//    setAuthenticationDatabase(properties.getAuthenticationDatabase());
-//    setDatabase(properties.getDatabase());
-//    setUri(properties.getUri());
-//    setPort(properties.getPort());
-//    setHost(properties.getHost());
-//  }
 }

@@ -10,6 +10,8 @@ import java.util.List;
 import com.steven.solomon.pojo.param.BasePageParam;
 import com.steven.solomon.pojo.vo.PageVO;
 import com.steven.solomon.verification.ValidateUtils;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -182,12 +184,8 @@ public class MongoRepository<T, I> {
       return page;
     }
 
-    query.skip((basePageParam.getPageNo() - 1) * basePageParam.getPageSize()).limit(basePageParam.getPageSize());
-
-    List<BasePageParam.Sort> sorted = basePageParam.getSorted();
-    if (ValidateUtils.isNotEmpty(sorted)) {
-      query.with(Sort.by(getSort(basePageParam)));
-    }
+    Pageable pageable = PageRequest.of((basePageParam.getPageNo() - 1) * basePageParam.getPageSize(), basePageParam.getPageSize(),sort(basePageParam));
+    query.with(pageable);
     page.setData(this.find(query,clazz));
     return page;
   }
@@ -213,8 +211,7 @@ public class MongoRepository<T, I> {
     if (ValidateUtils.isNotEmpty(sorted)) {
       return Sort.by(getSort(basePageParam));
     } else {
-      List<Sort.Order> orders = null;
-      return Sort.by(orders);
+      return Sort.unsorted();
     }
   }
 
