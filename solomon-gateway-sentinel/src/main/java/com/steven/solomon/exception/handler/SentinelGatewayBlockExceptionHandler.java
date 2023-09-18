@@ -4,10 +4,12 @@ import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManag
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.util.function.Supplier;
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
@@ -39,10 +41,10 @@ public class SentinelGatewayBlockExceptionHandler implements WebExceptionHandler
     Exception exception = (Exception) ex;
 
     ServerHttpResponse resp = exchange.getResponse();
-    resp.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
     resp.getHeaders().add("Content-Type", "application/json;charset=UTF-8");
-    String     json   = JackJsonUtils.formatJsonByFilter(
-        BaseGlobalExceptionHandler.handlerMap(exception,null,serverId,new LocaleUtils().getLocale(exchange)));
+    Map<String,Object> map = BaseGlobalExceptionHandler.handlerMap(exception,serverId,new LocaleUtils().getLocale(exchange));
+    resp.setStatusCode(HttpStatus.valueOf((Integer) map.getOrDefault(BaseCode.HTTP_STATUS,HttpStatus.INTERNAL_SERVER_ERROR)));
+    String     json   = JackJsonUtils.formatJsonByFilter(map);
     DataBuffer buffer = resp.bufferFactory().wrap(json.getBytes(StandardCharsets.UTF_8));
     return resp.writeWith(Mono.just(buffer));
   }

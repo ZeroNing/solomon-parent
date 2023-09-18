@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 
 public class BaseGlobalExceptionHandler {
 
-    private static BaseExceptionVO handler(Throwable ex, Integer httpStatus, String serverId, Locale locale) {
+    private static BaseExceptionVO handler(Throwable ex, String serverId, Locale locale) {
         String exceptionSimpleName = ex.getClass().getSimpleName();
 
         BaseExceptionVO baseExceptionVO = ExceptionUtil.getBaseExceptionVO(exceptionSimpleName,ex);
@@ -28,9 +28,9 @@ public class BaseGlobalExceptionHandler {
         return baseExceptionVO;
     }
 
-    public static Map<String,Object> handlerMap(Throwable ex, Integer httpStatus, String serverId, Locale locale) {
+    public static Map<String,Object> handlerMap(Throwable ex, String serverId, Locale locale) {
         Map<String, Object> result = new HashMap<>(4);
-        BaseExceptionVO baseExceptionVO = handler(ex, httpStatus, serverId, locale);
+        BaseExceptionVO baseExceptionVO = handler(ex, serverId, locale);
         result.put(BaseCode.HTTP_STATUS, ValidateUtils.getOrDefault(baseExceptionVO.getStatusCode(),HttpStatus.INTERNAL_SERVER_ERROR.value()));
         result.put(BaseCode.ERROR_CODE, baseExceptionVO.getCode());
         result.put(BaseCode.MESSAGE, baseExceptionVO.getMessage());
@@ -38,8 +38,8 @@ public class BaseGlobalExceptionHandler {
         result.put(BaseCode.REQUEST_ID, baseExceptionVO.getRequestId());
         return result;
     }
-    public static Map<String,Object> handlerMap(Throwable ex, Integer httpStatus, String serverId, Locale locale, HttpServletResponse response) {
-        Map<String,Object> map = handlerMap(ex,httpStatus,serverId,locale);
+    public static Map<String,Object> handlerMap(Throwable ex, String serverId, Locale locale, HttpServletResponse response) {
+        Map<String,Object> map = handlerMap(ex,serverId,locale);
         response.setStatus((Integer) map.getOrDefault(BaseCode.HTTP_STATUS,HttpStatus.INTERNAL_SERVER_ERROR.value()));
         return map;
     }

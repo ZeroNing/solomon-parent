@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
       requestParameter = StringUtils.toEncodedString(wrapper.getContentAsByteArray(), Charset.forName(wrapper.getCharacterEncoding()));
     }
     logger.info("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), FastJsonUtils.conversionJsonArray(requestParameter), ex);
-    return BaseGlobalExceptionHandler.handlerMap(ex,null,serverId,locale,response);
+    return BaseGlobalExceptionHandler.handlerMap(ex,serverId,locale,response);
   }
 
 }

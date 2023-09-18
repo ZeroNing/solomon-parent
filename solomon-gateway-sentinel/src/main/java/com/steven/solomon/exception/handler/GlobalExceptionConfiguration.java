@@ -1,8 +1,10 @@
 package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
+import java.util.Map;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,16 +54,12 @@ public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandle
 
   @Override
   protected Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-    // 返回码
-    int status;
     // 原始的异常信息可以用getError方法取得
     Throwable throwable = getError(request);
-//    status = getHttpStatus(getErrorAttributes(request, getErrorAttributeOptions(request, MediaType.ALL)));
-    status = HttpStatus.INTERNAL_SERVER_ERROR.value();
-    String json = JackJsonUtils.formatJsonByFilter(
-        BaseGlobalExceptionHandler.handlerMap(getException(throwable),status,serverId,new LocaleUtils().getLocale(request)));
+    Map<String,Object> map = BaseGlobalExceptionHandler.handlerMap(getException(throwable),serverId,new LocaleUtils().getLocale(request));
+    String json = JackJsonUtils.formatJsonByFilter(map);
 
-    return ServerResponse.status(status).contentType(MediaType.APPLICATION_JSON)
+    return ServerResponse.status((Integer) map.getOrDefault(BaseCode.HTTP_STATUS,500)).contentType(MediaType.APPLICATION_JSON)
             .body(BodyInserters.fromValue(json));
   }
 
