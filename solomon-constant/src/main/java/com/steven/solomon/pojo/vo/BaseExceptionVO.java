@@ -81,8 +81,7 @@ public class BaseExceptionVO implements Serializable {
   }
 
   public Integer getStatusCode() {
-//    return ValidateUtils.isEmpty(this.statusCode) ? HttpStatus.INTERNAL_SERVER_ERROR.value() : this.statusCode;
-    return 500;
+    return this.statusCode;
   }
 
   public void setStatusCode(Integer statusCode) {

@@ -41,7 +41,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(value = {Throwable.class})
   @ResponseBody
-  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex, Locale locale) throws IOException {
+  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex, Locale locale) {
     //获取异常名字
     String requestParameter = null;
     if(request instanceof ContentCachingRequestWrapper){
@@ -49,18 +49,7 @@ public class GlobalExceptionHandler {
       requestParameter = StringUtils.toEncodedString(wrapper.getContentAsByteArray(), Charset.forName(wrapper.getCharacterEncoding()));
     }
     logger.info("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), FastJsonUtils.conversionJsonArray(requestParameter), ex);
-    BaseExceptionVO baseExceptionVO = BaseGlobalExceptionHandler.handler(ex, null, serverId, locale);
-    response.setStatus(baseExceptionVO.getStatusCode());
-    return handlerMap(baseExceptionVO);
+    return BaseGlobalExceptionHandler.handlerMap(ex,null,serverId,locale,response);
   }
 
-  public static Map<String, Object> handlerMap(BaseExceptionVO baseExceptionVO) {
-    Map<String, Object> result = new HashMap<>(4);
-    result.put(BaseCode.HTTP_STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value());
-    result.put(BaseCode.ERROR_CODE, baseExceptionVO.getCode());
-    result.put(BaseCode.MESSAGE, baseExceptionVO.getMessage());
-    result.put(BaseCode.SERVER_ID, baseExceptionVO.getServerId());
-    result.put(BaseCode.REQUEST_ID, baseExceptionVO.getRequestId());
-    return result;
-  }
 }
