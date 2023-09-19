@@ -11,8 +11,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 @Configuration(proxyBeanMethods = false,value = "MethodArgumentNotValidExceptionProcessor")
 public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHandler {
 
-  private Logger logger = LoggerUtils.logger(getClass());
-
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     MethodArgumentNotValidException e = (MethodArgumentNotValidException) ex;

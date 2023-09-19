@@ -71,8 +71,7 @@ public class JackJsonUtils {
     try {
       return ValidateUtils.isEmpty(filter) ? mapper.writeValueAsString(result) : mapper.writerWithView(filter).writeValueAsString(result);
     } catch (Throwable e) {
-      //TODO
-//      logger.error("转换Json出现异常:{}",e);
+      logger.error("转换Json出现异常:{}",e);
       return "";
     }
   }

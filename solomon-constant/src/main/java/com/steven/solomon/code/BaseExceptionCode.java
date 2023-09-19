@@ -7,8 +7,6 @@ public interface BaseExceptionCode {
    */
   String FAILED_TO_SWITCH_DATA_SOURCE = "FAILED_TO_SWITCH_DATA_SOURCE";
 
-
-
   /**
    * 请求方式错误
    */
