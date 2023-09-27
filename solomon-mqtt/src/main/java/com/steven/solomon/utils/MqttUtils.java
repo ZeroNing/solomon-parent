@@ -68,7 +68,7 @@ public class MqttUtils implements SendService<MqttModel> {
     try {
       // 转换消息为json字符串
       String json = mapper.writeValueAsString(data);
-      getClientMap().get(data.getTenantCode()).publish(data.getTopic(), new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
+      getClientMap().get(data.getTenantCode()).getTopic(data.getTopic()).publish(new MqttMessage(json.getBytes(StandardCharsets.UTF_8)));
     } catch (JsonProcessingException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", data.getTopic()));
     } catch (MqttException e) {
