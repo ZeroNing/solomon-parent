@@ -62,6 +62,8 @@ public class MqttConfig {
     mqttConnectOptions.setUserName(mqttProfile.getUserName());
     mqttConnectOptions.setPassword(mqttProfile.getPassword().toCharArray());
     mqttConnectOptions.setServerURIs(new String[]{mqttProfile.getUrl()});
+    //设置同一时间可以发送的最大未确认消息数量
+    mqttConnectOptions.setMaxInflight(mqttProfile.getMaxInflight());
     //设置超时时间
     mqttConnectOptions.setConnectionTimeout(mqttProfile.getCompletionTimeout());
     //设置自动重连

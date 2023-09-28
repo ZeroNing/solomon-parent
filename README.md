@@ -137,6 +137,7 @@ mqtt:
       automatic-reconnect: #是否自动重连
       clean-session:       #客户端掉线后,是否自动清除session
       keep-alive-interval: #心跳时间
+      max-inflight:        #最大未确认消息数量(默认:10)
       will:                #遗嘱消息
         topic:             #遗嘱主题
         message:           #遗嘱消息

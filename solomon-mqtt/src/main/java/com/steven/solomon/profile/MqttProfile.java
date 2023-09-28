@@ -51,6 +51,10 @@ public class MqttProfile {
    * 遗嘱消息
    */
   private MqttWill will;
+  /**
+   * 最大未确认消息数量
+   */
+  private int maxInflight = 10;
 
   public static class MqttWill implements Serializable {
 
@@ -177,5 +181,11 @@ public class MqttProfile {
     this.completionTimeout = completionTimeout;
   }
 
+  public int getMaxInflight() {
+    return maxInflight;
+  }
 
+  public void setMaxInflight(int maxInflight) {
+    this.maxInflight = maxInflight;
+  }
 }
