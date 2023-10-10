@@ -62,6 +62,16 @@ public interface FileServiceInterface {
   boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
 
   /**
+   * 生成缩略图
+   * @param bucketName 桶名
+   * @param objectName 文件名
+   * @param filePath   存放路径（允许为空，为空则直接放入桶名下的目录，如果配置有根目录，则存放根目录）
+   * @param isUpload   是否上传
+   * @param width      宽
+   * @param height     高
+   */
+  InputStream generateThumbnail(String bucketName,String objectName,String filePath,boolean isUpload,int width,int height) throws Exception;
+  /**
    * 获取文件MD5
    */
   default String getMd5(MultipartFile file) throws IOException {
