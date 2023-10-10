@@ -27,6 +27,18 @@ public interface FileServiceInterface {
    * 上传
    * @return
    */
+  FileUpload upload(InputStream is,String bucketName,String fileName,boolean isUseOriginalName) throws Exception;
+
+  /**
+   * 上传
+   * @return
+   */
+  FileUpload upload(InputStream is,String bucketName,String fileName) throws Exception;
+
+  /**
+   * 上传
+   * @return
+   */
   FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception;
 
   /**
