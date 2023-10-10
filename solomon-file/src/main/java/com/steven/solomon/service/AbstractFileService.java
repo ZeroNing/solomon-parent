@@ -87,20 +87,17 @@ public abstract class AbstractFileService implements FileServiceInterface{
     if (!flag || ValidateUtils.isEmpty(fileName)) {
       return;
     }
-    String filePath = getFilePath(fileName,properties);
-    delete(bucketName,filePath);
+    delete(bucketName,getFilePath(fileName,properties));
   }
 
   @Override
   public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    String filePath = getFilePath(fileName,properties);
-    return shareUrl(bucketName,filePath,expiry,unit);
+    return shareUrl(bucketName,getFilePath(fileName,properties),expiry,unit);
   }
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    String filePath = getFilePath(fileName,properties);
-    return getObject(bucketName,filePath);
+    return getObject(bucketName,getFilePath(fileName,properties));
   }
 
   @Override
