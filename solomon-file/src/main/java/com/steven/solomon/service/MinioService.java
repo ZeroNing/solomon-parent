@@ -8,7 +8,10 @@ import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import io.minio.BucketExistsArgs;
+import io.minio.CopyObjectArgs;
+import io.minio.CopySource;
 import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.GetPresignedObjectUrlArgs.Builder;
 import io.minio.MakeBucketArgs;
@@ -25,6 +28,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
+import org.apache.hadoop.hbase.client.Get;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,6 +82,23 @@ public class MinioService extends AbstractFileService {
   @Override
   protected void createBucket(String bucketName) throws Exception {
     client.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
+  }
+
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    GetObjectResponse response = client.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.object())){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    client.copyObject(CopyObjectArgs.builder().source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build()).bucket(targetBucket).object(targetObjectName).build());
+    return true;
   }
 
 }

@@ -3,6 +3,7 @@ package com.steven.solomon.service;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
+import com.baidubce.services.bos.model.BosObject;
 import com.baidubce.services.bos.model.CannedAccessControlList;
 import com.baidubce.services.bos.model.PutObjectRequest;
 import com.obs.services.ObsClient;
@@ -13,6 +14,8 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -69,5 +72,22 @@ public class BOSService extends AbstractFileService {
   @Override
   protected void createBucket(String bucketName) throws Exception  {
     client.createBucket(bucketName);
+  }
+
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    BosObject response = client.getObject(bucketName,objectName);
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey())){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
+    return true;
   }
 }

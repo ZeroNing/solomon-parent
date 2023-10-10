@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
@@ -87,6 +89,20 @@ public abstract class AbstractFileService implements FileServiceInterface{
     this.createBucket(bucketName);
   }
 
+  @Override
+  public boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception{
+    if(!checkObject(sourceBucket,sourceObjectName)){
+      throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
+    }
+    copyFile(sourceBucket,getFilePath(sourceObjectName,properties),targetBucket,getFilePath(targetObjectName,properties));
+    return true;
+  }
+
+  @Override
+  public boolean checkObjectExist(String bucketName,String objectName) throws Exception{
+    return checkObject(bucketName,getFilePath(objectName,properties));
+  }
+
   protected abstract void upload(MultipartFile file, String bucketName,String filePath) throws Exception;
 
   protected abstract void delete(String bucketName,String filePath) throws Exception;
@@ -96,4 +112,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
   protected abstract InputStream getObject(String bucketName,String filePath) throws Exception;
 
   protected abstract void createBucket(String bucketName) throws Exception;
+
+  protected abstract boolean checkObject(String bucketName,String objectName) throws Exception;
+
+  protected abstract boolean copyFile(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
 }

@@ -1,9 +1,11 @@
 package com.steven.solomon.service;
 
+import com.baidubce.services.bos.model.BosObject;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
@@ -67,5 +69,22 @@ public class COSService extends AbstractFileService {
   @Override
   protected void createBucket(String bucketName) throws Exception  {
     client.createBucket(bucketName);
+  }
+
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    COSObject response = client.getObject(bucketName,objectName);
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey())){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
+    return true;
   }
 }

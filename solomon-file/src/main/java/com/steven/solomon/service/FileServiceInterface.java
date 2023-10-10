@@ -48,6 +48,19 @@ public interface FileServiceInterface {
    */
   void makeBucket(String bucketName) throws Exception;
 
+  boolean checkObjectExist(String bucketName,String objectName) throws Exception;
+
+  /**
+   * 拷贝文件
+   * @param sourceBucket 原桶名
+   * @param targetBucket 目标桶名
+   * @param sourceObjectName 原文件名
+   * @param targetObjectName 目标文件名
+   * @return
+   * @throws Exception
+   */
+  boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
+
   /**
    * 获取文件MD5
    */

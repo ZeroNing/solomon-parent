@@ -1,9 +1,11 @@
 package com.steven.solomon.service;
 
+import com.qcloud.cos.model.COSObject;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.FileInfo;
 import com.qiniu.util.Auth;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
@@ -82,4 +84,20 @@ public class KODOService extends AbstractFileService {
     return bucketNames.contains(bucketName);
   }
 
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    FileInfo response = bucketManager.stat(bucketName,objectName);
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.key)){
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    bucketManager.copy(sourceBucket,sourceObjectName,targetBucket,targetObjectName,true);
+    return true;
+  }
 }

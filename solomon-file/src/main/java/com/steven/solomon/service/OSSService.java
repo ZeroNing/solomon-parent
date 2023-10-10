@@ -3,7 +3,9 @@ package com.steven.solomon.service;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.CannedAccessControlList;
+import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.obs.services.model.ObsObject;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -61,5 +63,20 @@ public class OSSService extends AbstractFileService {
   protected void createBucket(String bucketName) throws Exception {
     client.createBucket(bucketName);
   }
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    OSSObject response = client.getObject(bucketName,objectName);
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey())){
+      return false;
+    } else {
+      return true;
+    }
+  }
 
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
+    return true;
+  }
 }

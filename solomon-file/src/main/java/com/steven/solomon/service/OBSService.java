@@ -1,7 +1,9 @@
 package com.steven.solomon.service;
 
+import com.baidubce.services.bos.model.BosObject;
 import com.obs.services.ObsClient;
 import com.obs.services.model.HttpMethodEnum;
+import com.obs.services.model.ObsObject;
 import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
 import com.steven.solomon.graphics2D.entity.FileUpload;
@@ -63,5 +65,20 @@ public class OBSService extends AbstractFileService {
     client.createBucket(bucketName);
   }
 
+  @Override
+  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+    ObsObject response = client.getObject(bucketName,objectName);
+    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getObjectKey())){
+      return false;
+    } else {
+      return true;
+    }
+  }
 
+  @Override
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+      throws Exception {
+    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
+    return true;
+  }
 }
