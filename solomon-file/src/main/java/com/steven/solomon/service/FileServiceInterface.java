@@ -15,6 +15,12 @@ public interface FileServiceInterface {
    * 上传
    * @return
    */
+  FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception;
+
+  /**
+   * 上传
+   * @return
+   */
   FileUpload upload(MultipartFile file,String bucketName) throws Exception;
 
   /**

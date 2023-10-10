@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.io.IoUtil;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.file.MockMultipartFile;
@@ -7,7 +9,10 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.ImageUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import java.awt.Color;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,10 +21,14 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import net.coobird.thumbnailator.Thumbnails;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 public abstract class AbstractFileService implements FileServiceInterface{
+
+  private static Logger logger = LoggerUtils.logger(AbstractFileService.class);
 
   @Autowired
   protected FileNamingRulesGenerationService fileNamingRulesGenerationService;
@@ -32,13 +41,15 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public FileUpload upload(MultipartFile file, String bucketName) throws Exception {
+    return upload(file,bucketName,false);
+  }
+
+  @Override
+  public FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception{
     //创建桶
     makeBucket(bucketName);
-
-    String name = fileNamingRulesGenerationService.getFileName(file);
-
-    String       filePath = getFilePath(name,properties);
-    this.upload(file,bucketName,filePath);
+    String       filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+    this.upload(file,bucketName,getFilePath(filePath,properties));
     return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 
@@ -102,26 +113,38 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public boolean checkObjectExist(String bucketName,String objectName) throws Exception{
-    return checkObject(bucketName,getFilePath(objectName,properties));
+    try {
+      return checkObject(bucketName,getFilePath(objectName,properties));
+    } catch (Throwable e){
+      logger.error("检查文件出现异常",e);
+      return false;
+    }
   }
 
   @Override
   public InputStream generateThumbnail(String bucketName,String objectName,String filePath,boolean isUpload,int width,int height)throws Exception{
     makeBucket(bucketName);
-    String thumbnailName = new StringBuilder(width).append("_").append(height).append("_").append(objectName).toString();
-    if(!checkObjectExist(bucketName,getFilePath(thumbnailName,properties))){
-      BufferedImage bufferingImage = Thumbnails.of(getObject(bucketName,getFilePath(objectName,properties))).size(width,height).outputQuality(1).asBufferedImage();
-      if(isUpload){
-        upload(bucketName,bufferingImage,thumbnailName);
+    String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
+    objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
+    String thumbnailName = new StringBuilder(ValidateUtils.isEmpty(filePath) ? "":filePath).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
+    if(!checkObjectExist(bucketName,thumbnailName)){
+      MockMultipartFile file = null;
+      try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+        ImgUtil.scale(getObject(bucketName,objectName+"."+extensionName), baos, width, height, Color.decode("0xFFFFFF"));
+        try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
+          bais.reset();
+          if(isUpload){
+            try(InputStream is = new ByteArrayInputStream(bais.readAllBytes());){
+              file = new MockMultipartFile(thumbnailName,thumbnailName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
+              upload(file,bucketName,true);
+            }
+          }
+        }
       }
-      ByteArrayOutputStream bs    = new ByteArrayOutputStream();
-      ImageOutputStream     imOut = ImageIO.createImageOutputStream(bs);
-      ImageIO.write(bufferingImage, "jpg", imOut);
-      return new ByteArrayInputStream(bs.toByteArray());
+      return file.getInputStream();
     } else {
       return getObject(bucketName,getFilePath(thumbnailName,properties));
     }
-
   }
 
   protected abstract void upload(MultipartFile file, String bucketName,String filePath) throws Exception;
