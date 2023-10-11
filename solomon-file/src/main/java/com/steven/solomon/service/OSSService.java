@@ -64,7 +64,7 @@ public class OSSService extends AbstractFileService {
     client.createBucket(bucketName);
   }
   @Override
-  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+  protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     OSSObject response = client.getObject(bucketName,objectName);
     if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey())){
       return false;

@@ -11,33 +11,54 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface FileServiceInterface {
+
   /**
    * 上传
+   * @param file 文件
+   * @param bucketName 桶名
+   * @param isUseOriginalName 是否使用原名,不使用原名则使用配置的文件名生成器生成
    * @return
+   * @throws Exception
    */
   FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception;
 
   /**
-   * 上传
+   * 上传（默认使用文件名生成器生成）
+   * @param file 文件
+   * @param bucketName 桶名
    * @return
+   * @throws Exception
    */
   FileUpload upload(MultipartFile file,String bucketName) throws Exception;
 
   /**
    * 上传
+   * @param is 文件输入流
+   * @param bucketName 桶名
+   * @param fileName   文件名
+   * @param isUseOriginalName 是否使用原名,不使用原名则使用配置的文件名生成器生成
    * @return
+   * @throws Exception
    */
   FileUpload upload(InputStream is,String bucketName,String fileName,boolean isUseOriginalName) throws Exception;
 
   /**
-   * 上传
+   * 上传（默认使用文件名生成器生成）
+   * @param is 文件输入流
+   * @param bucketName 桶名
+   * @param fileName   文件名
    * @return
+   * @throws Exception
    */
   FileUpload upload(InputStream is,String bucketName,String fileName) throws Exception;
 
   /**
-   * 上传
+   * 上传（默认使用文件名生成器生成）
+   * @param bucketName 桶名
+   * @param bi         缓冲区图像类
+   * @param fileName   文件名
    * @return
+   * @throws Exception
    */
   FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception;
 
@@ -66,7 +87,14 @@ public interface FileServiceInterface {
    */
   void makeBucket(String bucketName) throws Exception;
 
-  boolean checkObjectExist(String bucketName,String objectName) throws Exception;
+  /**
+   * 检查桶内文件是否存在
+   * @param bucketName 桶名
+   * @param objectName 文件名
+   * @return
+   * @throws Exception
+   */
+  boolean objectExist(String bucketName,String objectName) throws Exception;
 
   /**
    * 拷贝文件

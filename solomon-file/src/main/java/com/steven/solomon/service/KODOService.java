@@ -58,7 +58,7 @@ public class KODOService extends AbstractFileService {
 
   @Override
   protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
-    String encodedFileName = URLEncoder.encode(getFilePath(filePath,properties), "utf-8").replace("+", "%20");
+    String encodedFileName = URLEncoder.encode(filePath, "utf-8").replace("+", "%20");
     String publicUrl = String.format("%s/%s", properties.getEndpoint(), encodedFileName);
     String accessKey = properties.getAccessKey();
     String secretKey = properties.getSecretKey();
@@ -85,7 +85,7 @@ public class KODOService extends AbstractFileService {
   }
 
   @Override
-  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+  protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     FileInfo response = bucketManager.stat(bucketName,objectName);
     if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.key)){
       return false;

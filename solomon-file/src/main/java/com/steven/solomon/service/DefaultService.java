@@ -50,7 +50,7 @@ public class DefaultService extends AbstractFileService {
   }
 
   @Override
-  protected boolean checkObject(String bucketName, String objectName) throws Exception {
+  protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
 
   }
