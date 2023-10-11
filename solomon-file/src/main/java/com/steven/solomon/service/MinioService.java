@@ -2,8 +2,6 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.graphics2D.entity.FileUpload;
-import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -21,17 +19,12 @@ import io.minio.RemoveObjectArgs;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.http.Method;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import org.apache.hadoop.hbase.client.Get;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * Minio文件实现类
+ */
 public class MinioService extends AbstractFileService {
 
   public MinioClient client;

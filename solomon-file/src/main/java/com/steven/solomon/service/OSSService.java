@@ -5,20 +5,15 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.OSSObject;
 import com.aliyun.oss.model.PutObjectRequest;
-import com.obs.services.model.ObsObject;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * 阿里云文件实现类
+ */
 public class OSSService extends AbstractFileService {
 
   private OSS client;

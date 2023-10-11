@@ -1,16 +1,14 @@
 package com.steven.solomon.service;
 
-import com.qcloud.cos.model.COSObject;
-import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.code.FileErrorCode;
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
-import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * 默认文件实现类
+ */
 public class DefaultService extends AbstractFileService {
 
 

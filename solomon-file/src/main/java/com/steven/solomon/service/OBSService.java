@@ -1,23 +1,18 @@
 package com.steven.solomon.service;
 
-import com.baidubce.services.bos.model.BosObject;
 import com.obs.services.ObsClient;
 import com.obs.services.model.HttpMethodEnum;
 import com.obs.services.model.ObsObject;
 import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * 华为云文件实现类
+ */
 public class OBSService extends AbstractFileService {
 
   private ObsClient client;

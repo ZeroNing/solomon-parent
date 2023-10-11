@@ -1,6 +1,5 @@
 package com.steven.solomon.service;
 
-import com.baidubce.services.bos.model.BosObject;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -9,21 +8,16 @@ import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
-import com.steven.solomon.graphics2D.entity.FileUpload;
-import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.ImageOutputStream;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
+/**
+ * 腾讯云文件实现类
+ */
 public class COSService extends AbstractFileService {
 
   private COSClient client;
