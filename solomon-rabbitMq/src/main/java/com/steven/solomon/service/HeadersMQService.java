@@ -26,10 +26,7 @@ public class HeadersMQService extends AbstractMQService{
     String[] headers = rabbitMq.headers();
     Map<String,Object> headerMap = new HashMap<>();
     if (rabbitMq.matchValue()) {
-      for (int i = 0; i <= headers.length; i++) {
-        if(i!=0 && i%2==0){
-          continue;
-        }
+      for (int i = 0; i < headers.length; i+=2) {
         String key = headers[i];
         Object value = i+1> headers.length ? null : headers[i + 1];
         headerMap.put(key, value);
