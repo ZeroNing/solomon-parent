@@ -1,7 +1,7 @@
 package com.steven.solomon.aspect;
 
 import com.steven.solomon.config.RedisTenantContext;
-import com.steven.solomon.holder.HeardHolder;
+import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.verification.ValidateUtils;
@@ -14,7 +14,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 /**
  * Redis 租户切换的AOP实现类
@@ -42,8 +41,8 @@ public class RedisAspect {
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     try {
       if(isSwitch){
-        logger.info("redis切换数据源,租户编码为:{}",HeardHolder.getTenantCode());
-        String tenantCode = HeardHolder.getTenantCode();
+        logger.info("redis切换数据源,租户编码为:{}", RequestHeaderHolder.getTenantCode());
+        String tenantCode = RequestHeaderHolder.getTenantCode();
         context.setFactory(tenantCode);
       }
       return point.proceed();
