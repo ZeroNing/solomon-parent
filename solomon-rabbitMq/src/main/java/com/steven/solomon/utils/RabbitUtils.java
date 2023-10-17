@@ -17,6 +17,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Message;
@@ -146,10 +147,15 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
     if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
       return false;
     }
-
+    Map<String,Object> headers = rabbitMQModel.getHeaders();
     rabbitTemplate.convertAndSend(rabbitMQModel.getExchange(), rabbitMQModel.getRoutingKey(), rabbitMQModel,msg->{
       if(ValidateUtils.equals(0,expiration)){
         return msg;
+      }
+      if(ValidateUtils.isNotEmpty(headers)){
+        for(Entry<String,Object> entry : headers.entrySet()){
+          msg.getMessageProperties().setHeader(entry.getKey(),entry.getValue());
+        }
       }
       if(isDelayed){
         msg.getMessageProperties().setHeader("x-delay",expiration);
@@ -157,8 +163,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
         msg.getMessageProperties().setExpiration(String.valueOf(expiration));
       }
       return msg;
-    },new CorrelationData(
-        UUID.randomUUID().toString()));
+    },new CorrelationData(UUID.randomUUID().toString()));
     return true;
   }
 

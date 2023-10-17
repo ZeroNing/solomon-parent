@@ -59,7 +59,7 @@ public @interface RabbitMq {
 	int prefetchCount() default AbstractMessageListenerContainer.DEFAULT_PREFETCH_COUNT;
 
 	/**
-	 * 交换类型（暂时不支持Headers、system，只支持DIRECT、TOPIC、FANOUT）
+	 * 交换类型（暂时不支持system，只支持DIRECT、TOPIC、FANOUT、HEADERS）
 	 */
 	String exchangeTypes() default ExchangeTypes.DIRECT;
 
@@ -77,4 +77,21 @@ public @interface RabbitMq {
 	 * 是否启用插件内的ttl队列
 	 */
 	boolean isDelayExchange() default false;
+
+	/**
+	 * Headers交换器下需要配置 是否匹配全部头部属性 默认非全部
+	 */
+	boolean matchAll() default false;
+
+	/**
+	 * Headers交换器下需要配置 是否匹配值,true就是匹配值,false就是不匹配值，只判断是否存在
+	 */
+	boolean matchValue() default false;
+
+	/**
+	 * 需要匹配的头部消息,如matchAll为True清空则需要匹配全部headers存在,才可通过,false为只要匹配中其中一个即可通过
+	 * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
+	 * @return
+	 */
+	String[] headers() default {};
 }

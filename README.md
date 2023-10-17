@@ -42,6 +42,34 @@
 | solomon-mybatis          | 主要是加入了一个通用实体类，未来或许考虑加入动态切换数据源   |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
 
+## 注意事项
+
+1.项目启动时侯需要扫描Jar包路径（"com.steven"）如：
+
+```java
+@SpringBootApplication(scanBasePackages = {"com.test","com.steven"})
+public class TestApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(TestApplication.class, args);
+  }
+
+}
+```
+
+```java
+@ComponentScan(value = {"com.steven"})
+public class TestApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(TestApplication.class, args);
+  }
+
+}
+```
+
+
+
 ## 自定义配置说明
 
 ### swagger版本号支持获取git最后一个提交记录版本号
@@ -137,7 +165,6 @@ mqtt:
       automatic-reconnect: #是否自动重连
       clean-session:       #客户端掉线后,是否自动清除session
       keep-alive-interval: #心跳时间
-      max-inflight:        #最大未确认消息数量(默认:10)
       will:                #遗嘱消息
         topic:             #遗嘱主题
         message:           #遗嘱消息
@@ -263,6 +290,95 @@ DelFlagEnum.DELETE=删除
 ```
 
 ## Rabbit队列注册以及消费用例
+
+@Rabbit注解描述：
+
+```java
+/**
+ * rabbitmq标注注解
+ * @author huangweihua
+ */
+@Target(value = { ElementType.FIELD, ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface RabbitMq {
+
+	@AliasFor(annotation = Component.class)
+	String value() default "";
+
+	/**
+	 * 队列
+	 */
+	String[] queues();
+
+	/**
+	 * 交换器
+	 */
+	String exchange();
+
+	/**
+	 * 路由规则
+	 */
+	String routingKey() default "";
+
+	/**
+	 * 是否持久化
+	 */
+	boolean isPersistence() default true;
+
+	/**
+	 * 确认模式（只支持手动提交，自动提交代码暂时不支持）
+	 */
+	AcknowledgeMode mode() default AcknowledgeMode.MANUAL;
+
+	/**
+	 * 每个队列消费者数量
+	 */
+	int consumersPerQueue() default 1;
+
+	/**
+	 * 每次的接收的消息数量最大数值(0:公平分发 1:不公平分发)
+	 */
+	int prefetchCount() default AbstractMessageListenerContainer.DEFAULT_PREFETCH_COUNT;
+
+	/**
+	 * 交换类型（暂时不支持system，只支持DIRECT、TOPIC、FANOUT、HEADERS）
+	 */
+	String exchangeTypes() default ExchangeTypes.DIRECT;
+
+	/**
+	 * 消息最大存活时间
+	 */
+	long delay() default 0L;
+
+	/**
+	 * 死信队列Class
+	 */
+	Class dlxClazz() default void.class;
+
+	/**
+	 * 是否启用插件内的ttl队列
+	 */
+	boolean isDelayExchange() default false;
+
+	/**
+	 * Headers交换器下需要配置 是否匹配全部头部属性 默认非全部
+	 */
+	boolean matchAll() default false;
+
+	/**
+	 * Headers交换器下需要配置 是否匹配值,true就是匹配值,false就是不匹配值，只判断是否存在
+	 */
+	boolean matchValue() default false;
+
+	/**
+	 * 需要匹配的头部消息,如matchAll为True清空则需要匹配全部headers存在,才可通过,false为只要匹配中其中一个即可通过
+	 * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
+	 * @return
+	 */
+	String[] headers() default {};
+}
+```
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 

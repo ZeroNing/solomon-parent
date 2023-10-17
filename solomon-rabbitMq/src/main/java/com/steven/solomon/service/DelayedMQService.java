@@ -2,6 +2,7 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.annotation.RabbitMq;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class DelayedMQService extends AbstractMQService {
   }
 
   @Override
-  protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey) {
+  protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey,RabbitMq rabbitMq) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
 
   }

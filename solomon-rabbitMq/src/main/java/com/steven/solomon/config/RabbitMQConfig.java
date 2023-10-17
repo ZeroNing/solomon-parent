@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.service.HeadersMQService;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.service.DelayedMQService;
 import com.steven.solomon.service.DirectMQService;
@@ -10,6 +11,7 @@ import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.amqp.core.HeadersExchange;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.connection.RabbitConnectionFactoryBean;
@@ -31,7 +33,7 @@ import org.springframework.stereotype.Component;
 
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(value={RabbitProperties.class})
-@Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class})
+@Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
 public class RabbitMQConfig {
 
 	private Logger logger = LoggerUtils.logger(RabbitMQConfig.class);

@@ -80,11 +80,11 @@ public class RabbitMQInitConfig implements CommandLineRunner {
 
             for (String queueName : queues) {
                 // 初始化队列绑定
-                Queue queue = initBinding(abstractMQMap,queueName,true, false,admin);
+                Queue queue = initBinding(abstractMQMap,queueName,true, false);
                 // 启动监听器并保存已启动的MQ
-                RabbitMQInitConfig.allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue,admin,connectionFactory));
+                RabbitMQInitConfig.allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue));
                 // 初始化死信队列
-                this.initDlx(queue,admin,connectionFactory,abstractMQMap);
+                this.initDlx(queue,admin,abstractMQMap);
             }
 
         }
@@ -93,7 +93,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
     /**
      * 初始化死信队列MQ
      */
-    private void initDlx(Queue queue,RabbitAdmin admin, CachingConnectionFactory rabbitConnectionFactory,Map<String, AbstractMQService> abstractMQMap) {
+    private void initDlx(Queue queue,RabbitAdmin admin,Map<String, AbstractMQService> abstractMQMap) {
         // 判断消费队列是否需要死信队列 只要死信队列或者延时队列为true即可判断为开启死信队列
         Class<?> clazz = rabbitMq.dlxClazz();
 
@@ -111,9 +111,9 @@ public class RabbitMQInitConfig implements CommandLineRunner {
         // 获取死信队列类
         AbstractConsumer abstractConsumer = (AbstractConsumer) SpringUtil.getBean(clazz);
         // 初始化队列绑定
-        Queue queues = initBinding(abstractMQMap,queueName,false, true,admin);
+        Queue queues = initBinding(abstractMQMap,queueName,false, true);
         // 启动监听器
-        this.startContainer(abstractConsumer, queues,admin,rabbitConnectionFactory);
+        this.startContainer(abstractConsumer, queues);
         logger.info("MessageListenerConfig队列:{}绑定{}死信队列",queue.getName(),queues.getName());
     }
 
@@ -122,9 +122,9 @@ public class RabbitMQInitConfig implements CommandLineRunner {
      *
      * @param abstractConsumer 抽象的消费者
      */
-    private DirectMessageListenerContainer startContainer(AbstractConsumer abstractConsumer, Queue queue,RabbitAdmin admin, CachingConnectionFactory rabbitConnectionFactory) {
+    private DirectMessageListenerContainer startContainer(AbstractConsumer abstractConsumer, Queue queue) {
         // 新建监听器
-        DirectMessageListenerContainer container = new DirectMessageListenerContainer(rabbitConnectionFactory);
+        DirectMessageListenerContainer container = new DirectMessageListenerContainer(connectionFactory);
         // 新建消息侦听器适配器
         MessageListenerAdapter adapter = new MessageListenerAdapter(abstractConsumer);
         // 设置编码格式
@@ -179,8 +179,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
         return retryPolicy;
     }
 
-    private Queue initBinding(Map<String, AbstractMQService> abstractMQMap,String queue,boolean isInitDlxMap, boolean isAddDlxPrefix,
-        RabbitAdmin admin) {
+    private Queue initBinding(Map<String, AbstractMQService> abstractMQMap,String queue,boolean isInitDlxMap, boolean isAddDlxPrefix) {
         AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange()) ? abstractMQMap.get("delayedMQService") : abstractMQMap.get(rabbitMq.exchangeTypes() + AbstractMQService.SERVICE_NAME);
         return abstractMQService.initBinding(rabbitMq,queue, admin, isInitDlxMap, isAddDlxPrefix);
     }

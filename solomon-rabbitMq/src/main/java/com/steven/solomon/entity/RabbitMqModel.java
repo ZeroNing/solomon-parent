@@ -4,6 +4,7 @@ package com.steven.solomon.entity;
 import com.steven.solomon.pojo.entity.BaseMq;
 
 import java.io.Serializable;
+import java.util.Map;
 
 /**
  * 基础发送MQ基类
@@ -19,7 +20,18 @@ public class RabbitMqModel<T> extends BaseMq<T> {
    * 路由规则
    */
   private              String routingKey;
+  /**
+   * 设置头部属性
+   */
+  private Map<String,Object> headers;
 
+  public Map<String, Object> getHeaders() {
+    return headers;
+  }
+
+  public void setHeaders(Map<String, Object> headers) {
+    this.headers = headers;
+  }
 
   public RabbitMqModel() {
     super();
