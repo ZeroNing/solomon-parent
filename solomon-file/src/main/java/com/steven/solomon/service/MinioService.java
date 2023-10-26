@@ -80,11 +80,7 @@ public class MinioService extends AbstractFileService {
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     GetObjectResponse response = client.getObject(GetObjectArgs.builder().bucket(bucketName).object(objectName).build());
-    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.object())){
-      return false;
-    } else {
-      return true;
-    }
+    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.object()));
   }
 
   @Override

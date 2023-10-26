@@ -68,11 +68,7 @@ public class COSService extends AbstractFileService {
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     COSObject response = client.getObject(bucketName,objectName);
-    if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey())){
-      return false;
-    } else {
-      return true;
-    }
+    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey()));
   }
 
   @Override
