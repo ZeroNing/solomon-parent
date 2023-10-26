@@ -1,6 +1,5 @@
 package com.steven.solomon.utils;
 
-import com.steven.solomon.service.FileServiceInterface;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,31 +7,21 @@ import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
 import net.coobird.thumbnailator.geometry.Coordinate;
 import net.coobird.thumbnailator.geometry.Positions;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 /**
  * 图片处理工具类
  */
-@Configuration(proxyBeanMethods = false)
 public class ImageUtils {
-
-  protected final FileServiceInterface fileService;
-
-  public ImageUtils(FileServiceInterface fileService) {this.fileService = fileService;}
 
   /**
    * 对图片进行指定比例的压缩
    * @param originalInputStream 原图字节输入流
    * @param scale 图片大小 1是原图大小 0.5是原图的一半相当于长宽一半
    * @param outputQuality 图片质量 1是最高清 0是最差的
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    */
-  public void compress(InputStream originalInputStream ,float scale,float outputQuality,String bucketName,String newFileName) throws Exception {
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).outputQuality(outputQuality).asBufferedImage();
+  public static BufferedImage compress(InputStream originalInputStream ,float scale,float outputQuality) throws Exception {
+    return Thumbnails.of(originalInputStream).scale(scale).outputQuality(outputQuality).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -41,13 +30,10 @@ public class ImageUtils {
    * @param width 宽度
    * @param height 长度
    * @param outputQuality 图片质量 1是最高清 0是最差的
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    */
-  public void compressSize(InputStream originalInputStream,int width,int height,float outputQuality,String bucketName,String newFileName) throws Exception {
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).size(width,height).outputQuality(outputQuality).asBufferedImage();
+  public static BufferedImage compressSize(InputStream originalInputStream,int width,int height,float outputQuality) throws Exception {
+    return Thumbnails.of(originalInputStream).size(width,height).outputQuality(outputQuality).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -55,14 +41,11 @@ public class ImageUtils {
    * @param originalInputStream 原图字节输入流
    * @param scale 图片大小 1是原图大小 0.5是原图的一半相当于长宽一半
    * @param rotate 旋转度数
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    * @throws IOException
    */
-  public final void rotate(InputStream originalInputStream,float scale,double rotate,String bucketName,String newFileName) throws Exception {
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).rotate(rotate).outputQuality(1).asBufferedImage();
+  public final static BufferedImage rotate(InputStream originalInputStream,float scale,double rotate) throws Exception {
+    return Thumbnails.of(originalInputStream).scale(scale).rotate(rotate).outputQuality(1).asBufferedImage();
 
-    fileService.upload(bucketName,bufferingImage,newFileName);
   }
 
   /**
@@ -70,13 +53,9 @@ public class ImageUtils {
    * @param originalInputStream 原图字节输入流
    * @param scale 图片大小 1是原图大小 0.5是原图的一半相当于长宽一半
    * @param outputFormat 转换格式
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    */
-  public final void conversion(InputStream originalInputStream,float scale,String outputFormat,String bucketName,String newFileName) throws Exception {
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).outputFormat(outputFormat).asBufferedImage();
-
-    fileService.upload(bucketName,bufferingImage,newFileName);
+  public final static BufferedImage conversion(InputStream originalInputStream,float scale,String outputFormat) throws Exception {
+    return Thumbnails.of(originalInputStream).scale(scale).outputFormat(outputFormat).asBufferedImage();
   }
 
   /**
@@ -87,14 +66,10 @@ public class ImageUtils {
    * @param y 裁切图片的Y轴
    * @param width 裁切图片的宽度
    * @param height 裁切图片的高度
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    * @throws IOException
    */
-  public final void tailoring(InputStream originalInputStream,float scale,int x,int y,int width,int height,String bucketName,String newFileName) throws Exception {
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).sourceRegion(x,y,width,height).outputQuality(1).asBufferedImage();
-
-    fileService.upload(bucketName,bufferingImage,newFileName);
+  public final static BufferedImage tailoring(InputStream originalInputStream,float scale,int x,int y,int width,int height) throws Exception {
+    return Thumbnails.of(originalInputStream).scale(scale).sourceRegion(x,y,width,height).outputQuality(1).asBufferedImage();
   }
 
   /**
@@ -105,17 +80,11 @@ public class ImageUtils {
    * @param positions 水印位置
    * @param transparency 透明度
    * @param watermarkSize 水印图片大小占原图的多少
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    */
-  public final void watermark(InputStream originalInputStream, InputStream watermarkIntInputStream,float scale, Positions positions,float transparency,double watermarkSize,String bucketName,String newFileName)
+  public final static BufferedImage watermark(InputStream originalInputStream, InputStream watermarkIntInputStream,float scale, Positions positions,float transparency,double watermarkSize)
       throws Exception {
     BufferedImage bufferedImage = compressWatermark(originalInputStream,watermarkIntInputStream,watermarkSize);
-
-    BufferedImage bufferingImage = Thumbnails.of(originalInputStream).scale(scale).watermark(positions,bufferedImage,transparency).outputQuality(1).asBufferedImage();
-
-    fileService.upload(bucketName,bufferingImage,newFileName);
-
+    return Thumbnails.of(originalInputStream).scale(scale).watermark(positions,bufferedImage,transparency).outputQuality(1).asBufferedImage();
   }
 
   /**
@@ -127,17 +96,12 @@ public class ImageUtils {
    * @param y 水印放在原图的Y轴
    * @param transparency 透明度
    * @param watermarkSize 水印图片大小占原图的多少
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    * @throws IOException
    */
-  public final void watermark(InputStream originalInputStream, InputStream watermarkIntInputStream,float scale,int x,int y,float transparency,double watermarkSize,String bucketName,String newFileName)
+  public final static BufferedImage watermark(InputStream originalInputStream, InputStream watermarkIntInputStream,float scale,int x,int y,float transparency,double watermarkSize)
       throws Exception {
     BufferedImage bufferedImage = compressWatermark(originalInputStream,watermarkIntInputStream,watermarkSize);
-
-    BufferedImage bufferingImage = Thumbnails.of(watermarkIntInputStream).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
-
-    fileService.upload(bucketName,bufferingImage,newFileName);
+    return Thumbnails.of(watermarkIntInputStream).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
   }
 
   /**
@@ -150,18 +114,12 @@ public class ImageUtils {
    * @param width 水印宽
    * @param height 水印高
    * @param transparency 透明度
-   * @param bucketName minio桶名字
-   * @param newFileName 新图片的路径以及名称
    * @throws IOException
    */
-  public final void watermark(String filePath,String watermarkPath,float scale,int x,int y,int width,int height,float transparency,String bucketName,String newFileName)
+  public final static BufferedImage watermark(String filePath,String watermarkPath,float scale,int x,int y,int width,int height,float transparency)
       throws Exception {
-    BufferedImage bufferedImage = Thumbnails.of(watermarkPath).size(width,height)
-        .keepAspectRatio(false).asBufferedImage();
-
-    BufferedImage bufferingImage = Thumbnails.of(filePath).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
-
-    fileService.upload(bucketName,bufferingImage,newFileName);
+    BufferedImage bufferedImage = Thumbnails.of(watermarkPath).size(width,height).keepAspectRatio(false).asBufferedImage();
+    return Thumbnails.of(filePath).scale(scale).watermark(new Coordinate(x,y),bufferedImage,transparency).outputQuality(1).asBufferedImage();
   }
 
   /**
@@ -172,7 +130,8 @@ public class ImageUtils {
    * @return 返回压缩后的水印图
    * @throws IOException
    */
-  private BufferedImage compressWatermark(InputStream originalInputStream, InputStream watermarkIntInputStream, double watermarkSize) throws IOException {
+  private static BufferedImage compressWatermark(InputStream originalInputStream, InputStream watermarkIntInputStream,
+      double watermarkSize) throws IOException {
     // 读取原图，获取宽高
     BufferedImage image = ImageIO.read(originalInputStream);
     // 根据比例计算新的水印图宽高
