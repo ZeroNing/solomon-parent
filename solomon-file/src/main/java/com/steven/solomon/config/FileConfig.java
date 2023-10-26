@@ -32,7 +32,7 @@ public class FileConfig {
   @Bean
   @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
   public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
-    logger.info("选择 {} 命名规则", fileProperties.getFileNamingMethod());
+    logger.info("选择 {} 命名规则", fileProperties.getFileNamingMethod().getDesc());
     switch (fileProperties.getFileNamingMethod()) {
       case DATE:
         return new DateNamingRulesGenerationService();
@@ -49,7 +49,7 @@ public class FileConfig {
   @ConditionalOnMissingBean(FileServiceInterface.class)
   @ConditionalOnClass(OkHttpClient.Builder.class)
   public FileServiceInterface fileService(FileChoiceProperties fileProperties){
-    logger.info("选择 {} 文件服务", fileProperties.getChoice());
+    logger.info("选择 {} 文件服务", fileProperties.getChoice().getDesc());
     switch (fileProperties.getChoice()) {
       case MINIO:
         return new MinioService(fileProperties);
