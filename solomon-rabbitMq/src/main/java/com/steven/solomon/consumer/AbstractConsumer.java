@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * RabbitMq消费器
  */
-public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
+public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
 
   protected final Logger logger = LoggerUtils.logger(getClass());
 
@@ -41,11 +41,13 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
       logger.info("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
       RabbitMqModel rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
       // 消费者消费消息
-      this.handleMessage((T) rabbitMqModel.getBody());
+      R result = this.handleMessage((T) rabbitMqModel.getBody());
       if(!isAutoAck){
         // 手动确认消息
         channel.basicAck(deliveryTag, false);
       }
+      //保存消费成功消息
+      saveLog(result,message,rabbitMqModel);
     } catch (Throwable e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
       logger.info("AbstractConsumer:消费报错 异常为:", e);
@@ -104,7 +106,7 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
    * 消费方法
    * @param body 请求数据
    */
-  public abstract void handleMessage(T body) throws Exception;
+  public abstract R handleMessage(T body) throws Exception;
 
   /**
    * 保存消费失败的消息
@@ -123,4 +125,13 @@ public abstract class AbstractConsumer<T> extends MessageListenerAdapter {
   public boolean checkMessageKey(MessageProperties messageProperties){
     return false;
   }
+
+  /**
+   * 保存消费成功消息
+   * @param result
+   * @param message
+   * @param rabbitMqModel
+   */
+  public abstract void saveLog(R result,Message message,RabbitMqModel rabbitMqModel);
+
 }

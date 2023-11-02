@@ -11,7 +11,7 @@ import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 
-public abstract class AbstractConsumer<T> implements IMqttMessageListener {
+public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
 
   protected final Logger logger = LoggerUtils.logger(getClass());
 
@@ -26,7 +26,9 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",mqttModel.getTenantCode(),Thread.currentThread().getName(),topic, json);
       // 消费者消费消息
-      this.handleMessage(topic,(T) mqttModel.getBody());
+      R result = this.handleMessage(topic,(T) mqttModel.getBody());
+      //保存消费成功消息
+      saveLog(result,message,mqttModel);
     } catch (Throwable e){
       logger.info("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
@@ -37,7 +39,7 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
    * 消费方法
    * @param body 请求数据
    */
-  public abstract void handleMessage(String topic, T body) throws Exception;
+  public abstract R handleMessage(String topic, T body) throws Exception;
 
   /**
    * 保存消费失败的消息
@@ -56,4 +58,12 @@ public abstract class AbstractConsumer<T> implements IMqttMessageListener {
   public boolean checkMessageKey(String topic, MqttMessage message){
     return false;
   }
+
+  /**
+   * 保存消费成功消息
+   * @param result
+   * @param message
+   * @param rabbitMqModel
+   */
+  public abstract void saveLog(R result,MqttMessage message,MqttModel rabbitMqModel);
 }
