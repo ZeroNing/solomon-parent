@@ -6,7 +6,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class RedisTenantContext extends TenantContext<RedisConnectionFactory, TenantRedisProperties> {
 
   private ThreadLocal<RedisConnectionFactory> REDIS_FACTORY_THREAD_LOCAL = new ThreadLocal<>();

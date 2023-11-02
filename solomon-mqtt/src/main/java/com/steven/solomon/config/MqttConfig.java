@@ -37,7 +37,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @IntegrationComponentScan
 @EnableConfigurationProperties(value={TenantMqttProfile.class,})
 @Import(value = {MqttUtils.class})

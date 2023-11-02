@@ -31,7 +31,7 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @EnableConfigurationProperties(value={RabbitProperties.class})
 public class RabbitMQInitConfig implements CommandLineRunner {
 

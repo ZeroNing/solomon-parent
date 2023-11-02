@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class RequestFilter extends OncePerRequestFilter {
 
   @Override

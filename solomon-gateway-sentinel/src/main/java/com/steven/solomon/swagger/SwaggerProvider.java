@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 import springfox.documentation.swagger.web.SwaggerResource;
 import springfox.documentation.swagger.web.SwaggerResourcesProvider;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @Primary
 public class SwaggerProvider implements SwaggerResourcesProvider {
 

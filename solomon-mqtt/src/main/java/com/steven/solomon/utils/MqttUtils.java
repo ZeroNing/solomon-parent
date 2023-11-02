@@ -22,7 +22,7 @@ import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class MqttUtils implements SendService<MqttModel> {
 
   private Logger logger = LoggerUtils.logger(MqttUtils.class);

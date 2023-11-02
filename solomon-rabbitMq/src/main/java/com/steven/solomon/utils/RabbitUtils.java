@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class RabbitUtils implements SendService<RabbitMqModel> {
 
   private Logger logger = LoggerUtils.logger(RabbitUtils.class);

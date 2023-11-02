@@ -24,7 +24,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class ControllerAspect {
 
   private static final Logger logger = LoggerUtils.logger(ControllerAspect.class);

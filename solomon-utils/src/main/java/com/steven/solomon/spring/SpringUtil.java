@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @Author Sans
  * @CreateTime 2019/6/17 13:40
  */
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @Order(1)
 public class SpringUtil implements ApplicationContextAware {
 

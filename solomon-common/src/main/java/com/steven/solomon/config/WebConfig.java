@@ -10,7 +10,7 @@ import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @Import(value = {JacksonObjectMapper.class})
 public class WebConfig implements WebMvcConfigurer {
 

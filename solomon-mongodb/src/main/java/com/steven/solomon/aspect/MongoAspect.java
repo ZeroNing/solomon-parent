@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
  * Redis 租户切换的AOP实现类
  */
 @Aspect
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class MongoAspect {
 
   private final Logger logger = LoggerUtils.logger(getClass());

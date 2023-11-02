@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
  * Redis Lock的AOP实现类
  */
 @Aspect
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class RedisLockAspect {
 
   private final Logger logger = LoggerUtils.logger(getClass());

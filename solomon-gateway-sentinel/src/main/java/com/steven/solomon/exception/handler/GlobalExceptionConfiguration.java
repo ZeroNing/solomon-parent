@@ -31,7 +31,7 @@ import reactor.core.publisher.Mono;
 
 @Order(Integer.MIN_VALUE)
 @AutoConfigureBefore(WebFluxAutoConfiguration.class)
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandler {
 
   private final ObjectProvider<ViewResolver> viewResolvers;

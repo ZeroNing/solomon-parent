@@ -13,7 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.result.view.ViewResolver;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 public class SentinelConfig {
 
   private final List<ViewResolver>    views;

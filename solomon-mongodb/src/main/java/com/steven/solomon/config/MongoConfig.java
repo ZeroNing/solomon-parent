@@ -36,7 +36,7 @@ import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.stereotype.Component;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
 @Import(value = {MongoTenantsContext.class})
 @Order(2)
