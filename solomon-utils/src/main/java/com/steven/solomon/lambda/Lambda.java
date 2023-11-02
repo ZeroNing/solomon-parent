@@ -25,6 +25,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new ArrayList<>();
     }
+    list.removeAll(null);
     Stream<S> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -63,6 +64,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashSet<>();
     }
+    list.removeAll(null);
     Stream<S> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -100,6 +102,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     return stream.collect(Collectors.toMap(keyFunc, Function.identity(), (key1, key2) -> key2));
   }
@@ -136,6 +139,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -156,6 +160,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -187,6 +192,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     return stream.collect(Collectors.toMap(keyFunc, valFunc, (key1, key2) -> key2));
   }
@@ -213,6 +219,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -272,6 +279,10 @@ public class Lambda {
    * @param func      分组汇总相加的字段
    */
   public static <T> Integer sum(Collection<T> list, Predicate<T> predicate, ToIntFunction<T> func,boolean isParallelStream) {
+    if(ValidateUtils.isEmpty(list)){
+      return 0;
+    }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -318,6 +329,10 @@ public class Lambda {
    * @param func      分组汇总相加的字段
    */
   public static <T> Long sum(Collection<T> list, Predicate<T> predicate, ToLongFunction<T> func,boolean isParallelStream) {
+    if(ValidateUtils.isEmpty(list)){
+      return 0L;
+    }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -364,6 +379,10 @@ public class Lambda {
    * @param func      分组汇总相加的字段
    */
   public static <T> Double sum(Collection<T> list, Predicate<T> predicate, ToDoubleFunction<T> func,boolean isParallelStream) {
+    if(ValidateUtils.isEmpty(list)){
+      return 0d;
+    }
+    list.removeAll(null);
     Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
     if(ValidateUtils.isNotEmpty(predicate)){
       stream = stream.filter(predicate);
@@ -392,6 +411,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.counting()));
   }
 
@@ -407,6 +427,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.counting()));
   }
 
@@ -422,6 +443,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingInt(sumFunc)));
   }
 
@@ -438,6 +460,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.summingInt(sumFunc)));
   }
 
@@ -453,6 +476,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingLong(sumFunc)));
   }
 
@@ -469,6 +493,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.summingLong(sumFunc)));
   }
 
@@ -484,6 +509,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingDouble(sumFunc)));
   }
 
@@ -500,6 +526,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(list)) {
       return new HashMap<>();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate)
         .collect(Collectors.groupingBy(groupByFunc, Collectors.summingDouble(sumFunc)));
   }
@@ -514,6 +541,7 @@ public class Lambda {
     if (ValidateUtils.isEmpty(sourceList)) {
       return new ArrayList<>();
     }
+    sourceList.removeAll(null);
     return sourceList.stream().filter(predicate).collect(Collectors.toList());
   }
 
@@ -527,6 +555,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().max(comparator).get();
   }
 
@@ -540,6 +569,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToInt(func).max().getAsInt();
   }
 
@@ -554,6 +584,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToInt(func).max().getAsInt();
   }
 
@@ -567,6 +598,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToLong(func).max().getAsLong();
   }
 
@@ -581,6 +613,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToLong(func).max().getAsLong();
   }
 
@@ -594,6 +627,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToDouble(func).max().getAsDouble();
   }
 
@@ -608,6 +642,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToDouble(func).max().getAsDouble();
   }
 
@@ -621,6 +656,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().min(comparator).get();
   }
 
@@ -634,6 +670,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToInt(func).min().getAsInt();
   }
 
@@ -648,6 +685,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToInt(func).min().getAsInt();
   }
 
@@ -661,6 +699,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToLong(func).min().getAsLong();
   }
 
@@ -675,6 +714,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToLong(func).min().getAsLong();
   }
 
@@ -688,6 +728,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToDouble(func).min().getAsDouble();
   }
 
@@ -702,6 +743,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToDouble(func).min().getAsDouble();
   }
 
@@ -715,6 +757,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToInt(func).average().getAsDouble();
   }
 
@@ -729,6 +772,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToInt(func).average().getAsDouble();
   }
 
@@ -742,6 +786,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToLong(func).average().getAsDouble();
   }
 
@@ -756,6 +801,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToLong(func).average().getAsDouble();
   }
 
@@ -769,6 +815,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().mapToDouble(func).average().getAsDouble();
   }
 
@@ -783,6 +830,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return null;
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToDouble(func).average().getAsDouble();
   }
 
@@ -796,6 +844,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new ArrayList<>();
     }
+    list.removeAll(null);
     return list.stream().sorted(comparator).collect(Collectors.toList());
   }
 
@@ -809,6 +858,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new IntSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().mapToInt(func).summaryStatistics();
   }
 
@@ -824,6 +874,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new IntSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToInt(func).summaryStatistics();
   }
 
@@ -837,6 +888,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new LongSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().mapToLong(func).summaryStatistics();
   }
 
@@ -852,6 +904,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new LongSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToLong(func).summaryStatistics();
   }
 
@@ -865,6 +918,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new DoubleSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().mapToDouble(func).summaryStatistics();
   }
 
@@ -880,6 +934,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new DoubleSummaryStatistics();
     }
+    list.removeAll(null);
     return list.stream().filter(predicate).mapToDouble(func).summaryStatistics();
   }
 
@@ -892,6 +947,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new ArrayList<>();
     }
+    list.removeAll(null);
     return list.stream().map(func).distinct().collect(Collectors.toList());
   }
 
@@ -905,6 +961,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return false;
     }
+    list.removeAll(null);
     return list.stream().anyMatch(predicate);
   }
 
@@ -918,6 +975,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return false;
     }
+    list.removeAll(null);
     return list.stream().allMatch(predicate);
   }
 
@@ -931,6 +989,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return false;
     }
+    list.removeAll(null);
     return list.stream().noneMatch(predicate);
   }
 
@@ -943,6 +1002,7 @@ public class Lambda {
     if(ValidateUtils.isEmpty(list)){
       return new ArrayList<>();
     }
+    list.removeAll(null);
     Map<K, List<T>> groupByMap = groupBy(list,groupByFunc);
     return groupByMap.entrySet().stream().filter(entry -> entry.getValue().size() > 1).map(entry-> entry.getKey()).collect(Collectors.toList());
   }
