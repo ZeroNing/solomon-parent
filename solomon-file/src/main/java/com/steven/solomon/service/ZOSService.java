@@ -27,9 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 天翼云文件实现类
  */
-public class ZOSService extends AbstractFileService {
-
-  private final AmazonS3 client;
+public class ZOSService extends S3Service {
 
   public ZOSService(FileChoiceProperties properties) {
     super(properties);
@@ -42,46 +40,4 @@ public class ZOSService extends AbstractFileService {
     client = builder.build();
   }
 
-  @Override
-  protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
-    client.putObject(bucketName,filePath,file.getInputStream(), null);
-  }
-
-  @Override
-  protected void delete(String bucketName, String filePath) throws Exception {
-    client.deleteObject(bucketName,filePath);
-  }
-
-  @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
-  }
-
-  @Override
-  protected InputStream getObject(String bucketName, String filePath) throws Exception {
-    return client.getObject(bucketName, filePath).getObjectContent();
-  }
-
-  @Override
-  protected void createBucket(String bucketName) throws Exception {
-    client.createBucket(bucketName);
-  }
-
-  @Override
-  protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
-    S3Object response = client.getObject(bucketName,objectName);
-    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey()));
-  }
-
-  @Override
-  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
-      throws Exception {
-    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
-    return true;
-  }
-
-  @Override
-  public boolean bucketExists(String bucketName) throws Exception {
-    return client.doesBucketExistV2(bucketName);
-  }
 }
