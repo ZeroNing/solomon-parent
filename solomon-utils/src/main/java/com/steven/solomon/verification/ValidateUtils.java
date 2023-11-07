@@ -13,6 +13,48 @@ public class ValidateUtils {
 
   private static Logger logger = LoggerUtils.logger(ValidateUtils.class);
 
+  public String valueOf(Number target,String def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return String.valueOf(target);
+  }
+
+  public Long valueOf(String target,Long def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return Long.valueOf(target);
+  }
+
+  public Integer valueOf(String target,Integer def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return Integer.valueOf(target);
+  }
+
+  public Double valueOf(String target,Double def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return Double.valueOf(target);
+  }
+
+  public Short valueOf(String target,Short def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return Short.valueOf(target);
+  }
+
+  public Float valueOf(String target,Float def){
+    if(isEmpty(target)){
+      return def;
+    }
+    return Float.valueOf(target);
+  }
+
   /**
    * 获取默认值
    * @param obj 参数
