@@ -377,7 +377,7 @@ public class ValidateUtils {
    */
   public static boolean checkEnumValueIsEmpty(String value,Class clazz){
     Enum enums = Enum.valueOf(clazz,value);
-    return isEmpty(enums) ? true : false;
+    return isEmpty(enums);
   }
 
   /**
