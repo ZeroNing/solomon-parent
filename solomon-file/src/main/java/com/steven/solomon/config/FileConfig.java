@@ -14,6 +14,7 @@ import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import com.steven.solomon.service.ZOSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import okhttp3.OkHttpClient;
 import org.slf4j.Logger;
@@ -63,6 +64,8 @@ public class FileConfig {
         return new BOSService(fileProperties);
       case KODO:
         return new KODOService(fileProperties);
+      case ZOS:
+        return new ZOSService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }

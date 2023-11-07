@@ -82,6 +82,7 @@
     <qiniuyun.version>7.13.0</qiniuyun.version>
     <elasticsearch.version>5.1.0</elasticsearch.version>
     <elasticsearch-java>8.8.1</elasticsearch-java>
+    <aws.s3.version>1.12.581</aws.s3.version>
   </properties>
 
   <parent>
@@ -93,6 +94,12 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>com.amazonaws</groupId>
+        <artifactId>aws-java-sdk-s3</artifactId>
+        <version>${aws.s3.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.qiniu</groupId>

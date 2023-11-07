@@ -42,7 +42,7 @@ public class COSService extends AbstractFileService {
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception  {
     client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream(),null));
-    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
+    client.setBucketAcl(bucketName, CannedAccessControlList.Default);
   }
 
   @Override

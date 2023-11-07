@@ -10,6 +10,7 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   COS("COS","腾讯云对象存储"),
   BOS("BOS","百度云对象存储"),
   KODO("KODO","七牛云对象存储"),
+  ZOS("ZOS","天翼云对象存储"),
   ;
 
   private String label;
