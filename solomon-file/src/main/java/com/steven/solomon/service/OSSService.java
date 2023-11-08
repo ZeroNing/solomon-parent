@@ -4,11 +4,15 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.CannedAccessControlList;
 import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.ObjectListing;
 import com.aliyun.oss.model.PutObjectRequest;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 /**
@@ -35,7 +39,6 @@ public class OSSService extends AbstractFileService {
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
     client.putObject(new PutObjectRequest(bucketName, filePath, file.getInputStream()));
-    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
   }
 
   @Override
@@ -69,5 +72,14 @@ public class OSSService extends AbstractFileService {
       throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
     return true;
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
   }
 }

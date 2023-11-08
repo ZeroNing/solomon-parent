@@ -1,11 +1,14 @@
 package com.steven.solomon.service;
 
+import com.qcloud.cos.model.ObjectListing;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.FileInfo;
+import com.qiniu.storage.model.FileListing;
 import com.qiniu.util.Auth;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
@@ -14,6 +17,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
@@ -88,5 +92,25 @@ public class KODOService extends AbstractFileService {
       throws Exception {
     bucketManager.copy(sourceBucket,sourceObjectName,targetBucket,targetObjectName,true);
     return true;
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    List<FileInfo> items = new ArrayList<>();
+    String marker = null;
+    boolean flag = true;
+    do{
+      FileListing response= bucketManager.listFilesV2(bucketName,key,marker,1,null);
+      if(ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.marker)){
+        flag = false;
+      }
+      marker = response.marker;
+      Collections.addAll(items, response.items);
+    }while (flag);
+
+    return Lambda.toList(items,data->data.key);
   }
 }

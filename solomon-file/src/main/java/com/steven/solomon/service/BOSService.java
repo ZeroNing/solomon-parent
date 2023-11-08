@@ -4,12 +4,17 @@ import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.BosObject;
+import com.baidubce.services.bos.model.BosObjectSummary;
 import com.baidubce.services.bos.model.CannedAccessControlList;
+import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.baidubce.services.bos.model.PutObjectRequest;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,7 +45,6 @@ public class BOSService extends AbstractFileService {
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception  {
     client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream()));
-    client.setBucketAcl(bucketName, CannedAccessControlList.PublicRead);
   }
 
   @Override
@@ -74,5 +78,14 @@ public class BOSService extends AbstractFileService {
       throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
     return true;
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+     return new ArrayList<>();
+    }
+    ListObjectsResponse response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    return Lambda.toList(response.getContents(),data->data.getKey());
   }
 }

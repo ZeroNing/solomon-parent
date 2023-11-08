@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -37,6 +39,10 @@ public class ZOSService extends S3Service {
     if(ValidateUtils.isNotEmpty(properties.getEndpoint()) && ValidateUtils.isNotEmpty(properties.getRegionName())){
       builder.withEndpointConfiguration(new EndpointConfiguration(properties.getEndpoint(),properties.getRegionName()));
     }
+    ClientConfiguration awsClientConfig = new ClientConfiguration();
+    boolean             isHttps         = properties.getEndpoint().contains("https");
+    awsClientConfig.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
+    builder.setClientConfiguration(awsClientConfig);
     client = builder.build();
   }
 

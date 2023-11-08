@@ -1,17 +1,22 @@
 package com.steven.solomon.service;
 
+import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.COSObject;
 import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +47,6 @@ public class COSService extends AbstractFileService {
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception  {
     client.putObject(new PutObjectRequest(bucketName,filePath,file.getInputStream(),null));
-    client.setBucketAcl(bucketName, CannedAccessControlList.Default);
   }
 
   @Override
@@ -76,5 +80,14 @@ public class COSService extends AbstractFileService {
       throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
     return true;
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
   }
 }

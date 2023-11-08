@@ -1,7 +1,9 @@
 package com.steven.solomon.service;
 
+import com.qcloud.cos.model.ObjectListing;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -12,14 +14,19 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.GetPresignedObjectUrlArgs.Builder;
+import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
+import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.http.Method;
+import io.minio.messages.Item;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 /**
@@ -90,4 +97,20 @@ public class MinioService extends AbstractFileService {
     return true;
   }
 
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    Iterable<Result<Item>> response = ValidateUtils.isEmpty(key) ? client.listObjects(ListObjectsArgs.builder().bucket(bucketName).build()) : client.listObjects(ListObjectsArgs.builder().bucket(bucketName).prefix(key).build());
+    List<String> objectNames = new ArrayList<>();
+    try {
+      for (Result<Item> result : response) {
+        objectNames.add(result.get().objectName());
+      }
+    }catch (Exception e){
+      return objectNames;
+    }
+    return objectNames;
+  }
 }

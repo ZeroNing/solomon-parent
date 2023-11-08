@@ -1,11 +1,15 @@
 package com.steven.solomon.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -49,8 +53,7 @@ public abstract class S3Service extends AbstractFileService {
   }
 
   @Override
-  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
-      throws Exception {
+  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
     return true;
   }
@@ -58,5 +61,14 @@ public abstract class S3Service extends AbstractFileService {
   @Override
   public boolean bucketExists(String bucketName) throws Exception {
     return client.doesBucketExistV2(bucketName);
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
   }
 }

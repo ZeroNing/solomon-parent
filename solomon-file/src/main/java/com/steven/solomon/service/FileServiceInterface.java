@@ -7,6 +7,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -117,6 +118,14 @@ public interface FileServiceInterface {
    * @param height     高
    */
   InputStream generateThumbnail(String bucketName,String objectName,String filePath,boolean isUpload,int width,int height) throws Exception;
+
+  /**
+   * 获取桶内文件名（文件名为空则返回所有文件名）
+   * @param bucketName 桶名
+   * @param key 文件名
+   * @return
+   */
+  List<String> listObjects(String bucketName,String key) throws Exception;
   /**
    * 获取文件MD5
    */

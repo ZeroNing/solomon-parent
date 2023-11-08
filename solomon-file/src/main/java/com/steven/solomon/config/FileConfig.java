@@ -11,6 +11,7 @@ import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.KODOService;
+import com.steven.solomon.service.KS3Service;
 import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
@@ -66,6 +67,8 @@ public class FileConfig {
         return new KODOService(fileProperties);
       case ZOS:
         return new ZOSService(fileProperties);
+      case KS3:
+        return new KS3Service(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }

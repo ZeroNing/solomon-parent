@@ -2,12 +2,17 @@ package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
 import com.obs.services.model.HttpMethodEnum;
+import com.obs.services.model.ListObjectsRequest;
+import com.obs.services.model.ObjectListing;
 import com.obs.services.model.ObsObject;
 import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 /**
@@ -71,5 +76,16 @@ public class OBSService extends AbstractFileService {
       throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
     return true;
+  }
+
+  @Override
+  public List<String> listObjects(String bucketName,String key) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+      return new ArrayList<>();
+    }
+    ListObjectsRequest request = new ListObjectsRequest(bucketName);
+    request.setPrefix(key);
+    ObjectListing      response = client.listObjects(request);
+    return Lambda.toList(response.getObjects(),data->data.getObjectKey());
   }
 }
