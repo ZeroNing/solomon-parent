@@ -69,8 +69,7 @@ public class BOSService extends AbstractFileService {
 
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
-    BosObject response = client.getObject(bucketName,objectName);
-    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getKey()));
+    return client.doesObjectExist(bucketName,objectName);
   }
 
   @Override

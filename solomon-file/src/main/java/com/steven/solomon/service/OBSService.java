@@ -67,8 +67,7 @@ public class OBSService extends AbstractFileService {
 
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
-    ObsObject response = client.getObject(bucketName,objectName);
-    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.getObjectKey()));
+    return client.doesObjectExist(bucketName,objectName);
   }
 
   @Override

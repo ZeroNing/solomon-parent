@@ -33,7 +33,7 @@
 | solomon-cache            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
 | solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获 |
 | solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值，底层数据实体类以及动态切换数据源模板，国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
-| solomon-file             | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云等等 |
+| solomon-file             | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云’、金山云等等 |
 | solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
 | solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方法 |
 | solomon-mq               | 封装一些基础MQ类                                             |
@@ -150,7 +150,7 @@ mqtt:
 
 ```yaml
 file:
-  choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云、KODO:七牛云）
+  choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云、KODO:七牛云、ZOS:天翼云、KS3:金山云）
   file-naming-method: #文件命名选择器(ORIGINAL:原文件名称、DATE:文件名精确到毫秒并且以年月做为文件夹名、UUID:UUID命名、SNOWFLAKE:雪花id命名)
   endpoint:        # 连接地址
   accessKey:       # 访问密钥

@@ -1,19 +1,102 @@
 package com.steven.solomon.utils;
 
+import com.mongodb.MongoClientSettings;
+import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
+import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.CreateCollectionOptions;
+import com.mongodb.connection.ClusterConnectionMode;
+import com.mongodb.connection.ClusterType;
+import com.steven.solomon.annotation.MongoDBCapped;
+import com.steven.solomon.config.MongoTenantsContext;
 import com.steven.solomon.enums.MongoDbRoleEnum;
+import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
 public class MongoDbUtils {
+
+  private static final Logger logger = LoggerUtils.logger(MongoDbUtils.class);
+
+  public static void init(Map<String, MongoProperties> propertiesMap, MongoTenantsContext context){
+    for(Entry<String,MongoProperties> entry : propertiesMap.entrySet()){
+      init(entry.getKey(),entry.getValue(),context);
+    }
+  }
+
+  public static void init(String tenantCode,MongoProperties properties,MongoTenantsContext context){
+    SimpleMongoClientDatabaseFactory factory = initFactory(properties);
+    context.setFactory(tenantCode,factory);
+
+    List<String>  collectionNameList = new ArrayList<>();
+    MongoDatabase mongoDatabase      = factory.getMongoDatabase();
+    mongoDatabase.listCollectionNames().forEach(name->{
+      collectionNameList.add(name);
+    });
+    initDocument(factory);
+  }
+
+  public static SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties){
+    MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
+    MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
+      builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
+          ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
+    }).build();
+    return new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),properties.getDatabase());
+  }
+
+  public static void initDocument(MongoDatabaseFactory factory){
+
+    List<String>  collectionNameList = new ArrayList<>();
+    MongoDatabase mongoDatabase      = factory.getMongoDatabase();
+    mongoDatabase.listCollectionNames().forEach(name->{
+      collectionNameList.add(name);
+    });
+
+    for(Object obj : SpringUtil.getBeansWithAnnotation(MongoDBCapped.class).values()){
+      MongoDBCapped                                          mongoDBCapped = AnnotationUtils
+          .getAnnotation(obj.getClass(), MongoDBCapped.class);
+      org.springframework.data.mongodb.core.mapping.Document document      = AnnotationUtils.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
+
+      String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : "";
+      boolean isCreate = collectionNameList.contains(name);
+      if(!isCreate){
+        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
+          mongoDatabase.createCollection(name,new CreateCollectionOptions().capped(true).maxDocuments(mongoDBCapped.maxDocuments()).sizeInBytes(mongoDBCapped.size()));
+        } else {
+          mongoDatabase.createCollection(name);
+        }
+      } else {
+        logger.info("集合{}已存在,不允许修改为固定集合,防止数据丢失,请先备份数据后,手动创建固定集合",name);
+//        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
+//          org.bson.Document command  = new org.bson.Document("collStats", name);
+//          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");
+//          if(!isCapped){
+//            logger.info("修改集合{}为固定集合,限制字节为:{},记录数:{}",name,mongoDBCapped.size(),mongoDBCapped.maxDocuments());
+//            command = new org.bson.Document("convertToCapped", name).append("capped",true).append("size", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments());
+//            mongoDatabase.runCommand(command);
+//          }
+//        }
+      }
+    }
+  }
+
   /**
    * 检测数据库是否是固定集合
    * @param collectionName 集合名称

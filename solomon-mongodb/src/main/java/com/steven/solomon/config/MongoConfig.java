@@ -3,12 +3,12 @@ package com.steven.solomon.config;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
-import com.steven.solomon.init.MongoInitUtils;
-import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicMongoTemplate;
+import com.steven.solomon.utils.MongoDbUtils;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,14 +16,11 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -35,7 +32,6 @@ import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
@@ -74,10 +70,10 @@ public class MongoConfig {
         tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);
       }
-      MongoInitUtils.init(mongoProperties.getTenant(), context);
+      MongoDbUtils.init(mongoProperties.getTenant(), context);
     } else {
-      SimpleMongoClientDatabaseFactory factory = MongoInitUtils.initFactory(properties);
-      MongoInitUtils.initDocument(factory);
+      SimpleMongoClientDatabaseFactory factory = MongoDbUtils.initFactory(properties);
+      MongoDbUtils.initDocument(factory);
       context.setFactory(BaseCode.DEFAULT,factory);
     }
   }

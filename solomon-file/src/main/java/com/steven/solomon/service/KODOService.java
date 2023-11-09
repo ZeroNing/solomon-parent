@@ -1,6 +1,5 @@
 package com.steven.solomon.service;
 
-import com.qcloud.cos.model.ObjectListing;
 import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
