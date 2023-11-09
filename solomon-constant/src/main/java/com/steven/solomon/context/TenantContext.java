@@ -3,11 +3,11 @@ package com.steven.solomon.context;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class TenantContext<F,P> {
+public abstract class TenantContext<F> {
 
-  private Map<String,F> factoryMap = new ConcurrentHashMap<>();
+  protected ThreadLocal<F> THREAD_LOCAL = new ThreadLocal<>();
 
-  private Map<String,P> propertiesMap = new ConcurrentHashMap<>();
+  protected Map<String, F> FACTORY_MAP = new ConcurrentHashMap<>();
 
   /**
    * 获取工厂
