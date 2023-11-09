@@ -22,6 +22,7 @@ public class DateTimeUtils {
 	public static final DateTimeFormatter DATETIME_FORMATTER  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	public static final DateTimeFormatter YEAR_FORMATTER      = DateTimeFormatter.ofPattern("yyyy");
 	public static final DateTimeFormatter MONTH_FORMATTER     = DateTimeFormatter.ofPattern("MM");
+	public static final DateTimeFormatter DAY_FORMATTER     = DateTimeFormatter.ofPattern("dd");
 
 	/**
 	 * 获取LocalTime所有时区
@@ -193,6 +194,15 @@ public class DateTimeUtils {
 	}
 
 	/**
+	 * 获取当前系统日期时间字符串
+	 *
+	 * @return
+	 */
+	public static String getLocalDateTimeString(String  dateTimeFormatter) {
+		return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormatter));
+	}
+
+	/**
 	 * 获取当前系统年份
 	 * 
 	 * @return
@@ -208,6 +218,15 @@ public class DateTimeUtils {
 	 */
 	public static String getLocalMonthString() {
 		return LocalDateTime.now().format(MONTH_FORMATTER);
+	}
+
+	/**
+	 * 获取当前系统天数
+	 *
+	 * @return
+	 */
+	public static String getLocalDayString() {
+		return LocalDateTime.now().format(DAY_FORMATTER);
 	}
 
 	/**
