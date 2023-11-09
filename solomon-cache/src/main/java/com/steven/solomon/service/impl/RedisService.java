@@ -107,16 +107,7 @@ public class RedisService extends AbsICacheService {
   @Override
   public <T> T set(String group, String key, T value) {
     String assembleKey = assembleKey(group,key);
-
-    if(value instanceof List){
-      redisTemplate.opsForList().rightPushAll(assembleKey,value);
-    } else if(value instanceof Set){
-      redisTemplate.boundSetOps(assembleKey).add(value);
-    } else if (value instanceof Map){
-        redisTemplate.opsForHash().putAll(assembleKey,(Map)value);
-    } else {
-      redisTemplate.opsForValue().set(assembleKey,value);
-    }
+    redisTemplate.opsForValue().set(assembleKey,value);
     return value;
   }
 

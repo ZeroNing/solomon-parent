@@ -3,12 +3,12 @@ package com.steven.solomon.config;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.condition.RedisCondition;
 import com.steven.solomon.init.RedisInitUtils;
+import com.steven.solomon.json.config.JacksonObjectMapper;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.profile.TenantRedisProperties;
-import com.steven.solomon.serializer.BaseRedisSerializer;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
@@ -87,7 +88,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   @Bean(name = "redisTemplate")
   @Conditional(value= RedisCondition.class)
   public RedisTemplate dynamicRedisTemplate() {
-    logger.info("初始化redis start");
+    logger.info("初始化Redis·················");
     RedisTemplate<String, Object> redisTemplate;
     if (isSwitchDb) {
       redisTemplate = new DynamicRedisTemplate<>();
@@ -98,13 +99,12 @@ public class RedisConfig extends CachingConfigurerSupport {
     redisTemplate.setConnectionFactory(context.getFactoryMap().values().iterator().next());
     // 使用Jackson2JsonRedisSerialize 替换默认序列化
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-    BaseRedisSerializer   baseRedisSerializer   = new BaseRedisSerializer();
     // key-value结构序列化数据结构
     redisTemplate.setKeySerializer(stringRedisSerializer);
-    redisTemplate.setValueSerializer(baseRedisSerializer);
+    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(new JacksonObjectMapper()));
     // hash数据结构序列化方式,必须这样否则存hash 就是基于jdk序列化的
     redisTemplate.setHashKeySerializer(stringRedisSerializer);
-    redisTemplate.setHashValueSerializer(baseRedisSerializer);
+    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(new JacksonObjectMapper()));
     // 启用默认序列化方式
     redisTemplate.setEnableDefaultSerializer(true);
     redisTemplate.setEnableTransactionSupport(true);

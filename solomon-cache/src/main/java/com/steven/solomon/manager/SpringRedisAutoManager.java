@@ -43,16 +43,13 @@ public class SpringRedisAutoManager extends RedisCacheManager {
    */
   @Override
   public Cache getCache(String name) {
-    if(ValidateUtils.isNotEmpty(cacheProfile) && SwitchModeEnum.TENANT_PREFIX.toString().equals(cacheProfile.getMode())) {
-      String tenantId = RequestHeaderHolder.getTenantCode();
-      if(ValidateUtils.isEmpty(tenantId)){
-        log.info("在{}模式下,获取到的租户id为空,将redis的Key转为默认模式",cacheProfile.getMode());
-        return super.getCache(name);
-      }
-      return super.getCache(tenantId + StrUtil.COLON + name);
-    } else {
-      return super.getCache(name);
+    String tenantCode = RequestHeaderHolder.getTenantCode();
+    if(SwitchModeEnum.TENANT_PREFIX.toString().equals(cacheProfile.getMode()) && ValidateUtils.isNotEmpty(tenantCode)) {
+      name = tenantCode + StrUtil.COLON + name;
+    } else if(ValidateUtils.isEmpty(tenantCode)){
+      log.info("在{}模式下,获取到的租户id为空,将redis的Key转为默认模式",cacheProfile.getMode());
     }
+    return super.getCache(name);
   }
 
   @Override
