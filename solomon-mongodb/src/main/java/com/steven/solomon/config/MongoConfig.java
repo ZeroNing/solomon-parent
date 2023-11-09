@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
 import com.steven.solomon.init.MongoInitUtils;
@@ -69,15 +70,15 @@ public class MongoConfig {
     SpringUtil.setContext(applicationContext);
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.isEmpty(mongoProperties.getTenant()) ? new HashMap<>() : mongoProperties.getTenant();
-      if(!tenantMap.containsKey("default")){
-        tenantMap.put("default", properties);
+      if(!tenantMap.containsKey(BaseCode.DEFAULT)){
+        tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);
       }
       MongoInitUtils.init(mongoProperties.getTenant(), context);
     } else {
       SimpleMongoClientDatabaseFactory factory = MongoInitUtils.initFactory(properties);
       MongoInitUtils.initDocument(factory);
-      context.setFactory("default",factory);
+      context.setFactory(BaseCode.DEFAULT,factory);
     }
   }
 

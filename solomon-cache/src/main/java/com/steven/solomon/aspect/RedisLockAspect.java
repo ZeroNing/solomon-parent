@@ -46,10 +46,12 @@ public class RedisLockAspect {
     Lock lock = targetMethod.getAnnotation(Lock.class);
 
     if (ValidateUtils.isEmpty(lock)) {
-      Object result = point.proceed();
-      return result;
+      return point.proceed();
     }
-    String key = new StringBuilder(signature.getDeclaringType().getName()).append(":").append(signature.getName()).append("_").append(Md5Utils.digest(JackJsonUtils.formatJsonByFilter(point.getArgs()))).toString();
+    String key = String.format("%s:%s_%s",
+        signature.getDeclaringType().getName(),
+        signature.getName(),
+        Md5Utils.digest(JackJsonUtils.formatJsonByFilter(point.getArgs())));
 
     //通过setnx设置值，如果值不存在，则获得该锁
     boolean flag = iCacheService.lockSet(BaseICacheCode.REDIS_LOCK,key, 0, lock.expire());

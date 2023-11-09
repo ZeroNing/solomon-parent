@@ -27,4 +27,6 @@ public interface BaseCode {
   String REQUEST_ID = "requestId";
 
   String TIMEZONE = "Timezone";
+
+  String DEFAULT = "default";
 }

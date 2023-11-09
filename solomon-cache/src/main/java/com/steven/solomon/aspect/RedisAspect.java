@@ -1,5 +1,6 @@
 package com.steven.solomon.aspect;
 
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -39,17 +40,13 @@ public class RedisAspect {
   @Around("cutPoint()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
+    String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
+    logger.info("Redis切换数据源,租户编码为: {}", tenantCode);
+    context.setFactory(tenantCode);
     try {
-      if(isSwitch){
-        logger.info("redis切换数据源,租户编码为:{}", RequestHeaderHolder.getTenantCode());
-        String tenantCode = RequestHeaderHolder.getTenantCode();
-        context.setFactory(tenantCode);
-      }
       return point.proceed();
     } finally {
-      if(isSwitch){
-        context.removeFactory();
-      }
+      context.removeFactory();
     }
   }
 

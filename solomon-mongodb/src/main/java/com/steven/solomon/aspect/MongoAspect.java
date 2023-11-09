@@ -1,5 +1,6 @@
 package com.steven.solomon.aspect;
 
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.config.MongoTenantsContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -37,17 +38,12 @@ public class MongoAspect {
   public Object around(ProceedingJoinPoint point) throws Throwable {
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     try {
-      if(isSwitch){
-        logger.info("mongo切换数据源,租户编码为:{}", RequestHeaderHolder.getTenantCode());
-        String tenantCode = RequestHeaderHolder.getTenantCode();
-        context.setFactory(tenantCode);
-      }
-      Object result = point.proceed();
-      return result;
+      String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
+      logger.info("mongo切换数据源,租户编码为:{}", tenantCode);
+      context.setFactory(tenantCode);
+      return point.proceed();
     } finally {
-      if(isSwitch){
-        context.removeFactory();
-      }
+      context.removeFactory();
     }
   }
 
