@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.condition.RedisCondition;
 import com.steven.solomon.init.RedisInitUtils;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
@@ -45,7 +46,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private final RedisTenantContext context;
 
-  private boolean isSwitchDb = false;
+  private boolean isSwitchDb;
 
   private final RedisProperties redisProperties;
 
@@ -76,8 +77,8 @@ public class RedisConfig extends CachingConfigurerSupport {
     logger.info("Cache当前类型为:{}", cacheProperties.getType().name());
     logger.info("Redis当前模式为:{}", cacheProfile.getMode().getDesc());
     Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
-    if(!tenantMap.containsKey("default")){
-      tenantMap.put("default", redisProperties);
+    if(!tenantMap.containsKey(BaseCode.DEFAULT)){
+      tenantMap.put(BaseCode.DEFAULT, redisProperties);
       properties.setTenant(tenantMap);
     }
     RedisInitUtils.init(properties.getTenant(), context);
@@ -89,9 +90,9 @@ public class RedisConfig extends CachingConfigurerSupport {
     logger.info("初始化redis start");
     RedisTemplate<String, Object> redisTemplate;
     if (isSwitchDb) {
-      redisTemplate = new DynamicRedisTemplate<String, Object>();
+      redisTemplate = new DynamicRedisTemplate<>();
     } else {
-      redisTemplate = new RedisTemplate<String, Object>();
+      redisTemplate = new RedisTemplate<>();
     }
     // 注入数据源
     redisTemplate.setConnectionFactory(context.getFactoryMap().values().iterator().next());
@@ -119,7 +120,7 @@ public class RedisConfig extends CachingConfigurerSupport {
       factory = context.getFactoryMap().values().iterator().next();
     } else {
       factory = RedisInitUtils.initConnectionFactory(redisProperties);
-      context.setFactory("default", factory);
+      context.setFactory(BaseCode.DEFAULT, factory);
     }
     return factory;
   }
