@@ -86,12 +86,8 @@ public class MinioService extends AbstractFileService {
 
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
-    try {
-      client.statObject(StatObjectArgs.builder().bucket(bucketName).object(objectName).build());
-    } catch (Exception e) {
-      return false;
-    }
-    return true;
+    List<String> objectList = listObjects(bucketName,objectName);
+    return ValidateUtils.isNotEmpty(objectList);
   }
 
   @Override

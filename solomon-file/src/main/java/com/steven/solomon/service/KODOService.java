@@ -83,7 +83,7 @@ public class KODOService extends AbstractFileService {
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     FileInfo response = bucketManager.stat(bucketName,objectName);
-    return (ValidateUtils.isEmpty(response) || ValidateUtils.isEmpty(response.key));
+    return (ValidateUtils.isNotEmpty(response) || ValidateUtils.isNotEmpty(response.key));
   }
 
   @Override
