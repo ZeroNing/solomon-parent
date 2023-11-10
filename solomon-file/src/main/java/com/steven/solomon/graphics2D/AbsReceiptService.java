@@ -24,12 +24,6 @@ public abstract class AbsReceiptService<T extends BaseReceipt>{
   //图片宽度
   protected Integer imageWidth;
 
-
-  protected final FileServiceInterface fileServiceInterface;
-
-  protected AbsReceiptService(
-      FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
-
   public FileUpload drawReceipt(T receipt) throws Exception {
     return drawReceipt(BufferedImage.TYPE_INT_RGB, Color.white,receipt);
   }
