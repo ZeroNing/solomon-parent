@@ -1,9 +1,12 @@
 package com.steven.solomon.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.hash.Hash;
 import com.steven.solomon.service.AbsICacheService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,18 +109,167 @@ public class RedisService extends AbsICacheService {
 
   @Override
   public <T> T set(String group, String key, T value) {
-    String assembleKey = assembleKey(group,key);
-    redisTemplate.opsForValue().set(assembleKey,value);
-    return value;
+    return set(group,key,value,0);
   }
 
   @Override
   public <T> T set(String group, String key, T value, int time) {
-    set(group, key, value);
+    redisTemplate.opsForValue().set(assembleKey(group,key),value);
     if(time > 0){
       expire(group,key,time);
     }
     return value;
+  }
+
+  @Override
+  public <T extends Set> T setGet(String group, String key) {
+    return (T) redisTemplate.opsForSet().members(assembleKey(group,key));
+  }
+
+  @Override
+  public <T extends Set> T set(String group, String key, int time, T... value) {
+    redisTemplate.opsForSet().add(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return (T) CollectionUtil.set(false,value);
+  }
+
+  @Override
+  public <T extends Set> T set(String group, String key, T... value) {
+    return set(group,key,0,value);
+  }
+
+  @Override
+  public Long remove(String group, String key, Object... value) {
+    return redisTemplate.opsForSet().remove(assembleKey(group,key),value);
+  }
+
+  @Override
+  public <T> T ListGet(String group, String key,int start,int end) {
+    return (T) redisTemplate.opsForList().range(assembleKey(group,key),start,end);
+  }
+
+  @Override
+  public <T> T leftPush(String group, String key, T value, int time) {
+    redisTemplate.opsForList().leftPush(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return value;
+  }
+
+  @Override
+  public <T> T leftPush(String group, String key, T value) {
+    return leftPush(group,key,value,0);
+  }
+
+  @Override
+  public <T> T leftPushAll(String group, String key, int time, T... value) {
+    redisTemplate.opsForList().leftPushAll(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return (T) value;
+  }
+
+  @Override
+  public <T> T leftPushAll(String group, String key, int time, List<T> value) {
+    redisTemplate.opsForList().leftPushAll(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return (T) value;
+  }
+
+  @Override
+  public <T> T leftPushAll(String group, String key, T... value) {
+    return leftPushAll(group,key,0,value);
+  }
+
+  @Override
+  public <T> T leftPushAll(String group, String key, List<T> value) {
+    return leftPushAll(group,key,0,value);
+  }
+
+  @Override
+  public <T> T rightPush(String group, String key, T value, int time) {
+    redisTemplate.opsForList().rightPush(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return value;
+  }
+
+  @Override
+  public <T> T rightPushAll(String group, String key, int time, T... value) {
+    redisTemplate.opsForList().rightPushAll(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return (T) value;
+  }
+
+  @Override
+  public <T> T rightPushAll(String group, String key, int time, List<T> value) {
+    redisTemplate.opsForList().rightPushAll(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return (T) value;
+  }
+
+  @Override
+  public <T> T rightPushAll(String group, String key, T... value) {
+    return rightPushAll(group,key,0,value);
+  }
+
+  @Override
+  public <T> T rightPushAll(String group, String key, List<T> value) {
+    return rightPushAll(group,key,0,value);
+  }
+
+  @Override
+  public <T> T rightPush(String group, String key, T value) {
+    return rightPush(group,key,value);
+  }
+
+  @Override
+  public <T> T hashGet(String group, String key, String hashKey) {
+    return (T) redisTemplate.opsForHash().get(assembleKey(group,key),hashKey);
+  }
+
+  @Override
+  public <T> T put(String group, String key, String hashKey, T value) {
+    return put(group,key,hashKey,value,0);
+  }
+
+  @Override
+  public <T> T put(String group, String key, String hashKey, T value, int time) {
+    redisTemplate.opsForHash().put(assembleKey(group,key),hashKey,value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return value;
+  }
+
+  @Override
+  public <T extends Map> T putAll(String group, String key, T value, int time) {
+    redisTemplate.opsForHash().putAll(assembleKey(group,key), value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return value;
+  }
+
+  @Override
+  public <T extends Map> T putAll(String group, String key, T value) {
+    return putAll(group,key,value,0);
+  }
+
+  @Override
+  public Long delete(String group, String key, Object... hashKey) {
+    return redisTemplate.opsForHash().delete(assembleKey(group,key),hashKey);
   }
 
   @Override
