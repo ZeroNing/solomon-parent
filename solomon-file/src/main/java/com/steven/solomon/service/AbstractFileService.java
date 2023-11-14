@@ -97,7 +97,11 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    return getObject(bucketName,getFilePath(fileName,properties));
+    String filePath = getFilePath(fileName,properties);
+    if(!objectExist(bucketName,filePath)){
+      throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
+    }
+    return getObject(bucketName,filePath);
   }
 
   @Override
