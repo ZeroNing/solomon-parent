@@ -33,6 +33,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected FileChoiceProperties properties;
 
+  protected Integer partSize = properties.getPartSize() * 1024*1024;
+
   public AbstractFileService(FileChoiceProperties properties){
     this.properties = properties;
   }
@@ -131,7 +133,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
     makeBucket(bucketName);
     String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
     objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
-    String thumbnailName = new StringBuilder(ValidateUtils.isEmpty(filePath) ? "":filePath).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
+    String thumbnailName = new StringBuilder(ValidateUtils.isEmpty(filePath) ? ValidateUtils.isEmpty(properties.getRootDirectory()) ? "" : properties.getRootDirectory() :filePath).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
     if(!objectExist(bucketName,thumbnailName)){
       MockMultipartFile file = null;
       try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
@@ -148,21 +150,68 @@ public abstract class AbstractFileService implements FileServiceInterface{
       }
       return file.getInputStream();
     } else {
-      return getObject(bucketName,getFilePath(thumbnailName,properties));
+      return getObject(bucketName,thumbnailName);
     }
   }
 
+  /**
+   * 上传
+   * @param file 文件
+   * @param bucketName 桶名
+   * @param filePath 文件名
+   */
   protected abstract void upload(MultipartFile file, String bucketName,String filePath) throws Exception;
 
+  /**
+   * 删除
+   * @param bucketName 桶名
+   * @param filePath 文件名
+   */
   protected abstract void delete(String bucketName,String filePath) throws Exception;
 
+  /**
+   * 分享url
+   * @param bucketName 桶名
+   * @param filePath 文件名
+   * @param expiry 时间
+   * @param unit 时间单位
+   */
   protected abstract String shareUrl(String bucketName,String filePath,long expiry, TimeUnit unit) throws Exception;
 
+  /**
+   * 获取文件流
+   * @param bucketName 桶名
+   * @param filePath 文件名
+   */
   protected abstract InputStream getObject(String bucketName,String filePath) throws Exception;
 
+  /**
+   * 创建桶
+   * @param bucketName 桶名
+   */
   protected abstract void createBucket(String bucketName) throws Exception;
 
+  /**
+   * 判断文件是否存在
+   * @param bucketName 桶名
+   * @param objectName 文件名
+   */
   protected abstract boolean checkObjectExist(String bucketName,String objectName) throws Exception;
 
+  /**
+   * 复制文件
+   * @param sourceBucket 来源桶
+   * @param targetBucket 目标桶
+   * @param sourceObjectName 来源文件名
+   * @param targetObjectName 目标文件名
+   */
   protected abstract boolean copyFile(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
+
+  /**
+   * 取消分片上传
+   * @param uploadId 上传id
+   * @param bucketName 桶名
+   * @param filePath 文件名
+   */
+  protected abstract void abortMultipartUpload(String uploadId,String bucketName,String filePath) throws Exception;
 }

@@ -1,11 +1,15 @@
 package com.steven.solomon.service;
 
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
+import com.baidubce.services.bos.model.AbortMultipartUploadRequest;
 import com.baidubce.services.bos.model.BosObject;
 import com.baidubce.services.bos.model.BosObjectSummary;
 import com.baidubce.services.bos.model.CannedAccessControlList;
+import com.baidubce.services.bos.model.InitiateMultipartUploadRequest;
+import com.baidubce.services.bos.model.InitiateMultipartUploadResponse;
 import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.baidubce.services.bos.model.PutObjectRequest;
 import com.steven.solomon.lambda.Lambda;
@@ -86,5 +90,17 @@ public class BOSService extends AbstractFileService {
     }
     ListObjectsResponse response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getContents(),data->data.getKey());
+  }
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    InitiateMultipartUploadRequest  initRequest  = new InitiateMultipartUploadRequest(bucketName,objectName);
+    InitiateMultipartUploadResponse initResponse = client.initiateMultipartUpload(initRequest);
+    return initResponse.getUploadId();
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
+    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
   }
 }

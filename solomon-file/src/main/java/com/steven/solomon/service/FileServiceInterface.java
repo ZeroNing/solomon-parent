@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.rsa.Md5Utils;
@@ -126,6 +127,15 @@ public interface FileServiceInterface {
    * @return
    */
   List<String> listObjects(String bucketName,String key) throws Exception;
+
+  /**
+   * 初始化分片任务
+   * @param bucketName
+   * @param objectName
+   * @return
+   */
+  String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
+
   /**
    * 获取文件MD5
    */

@@ -48,6 +48,19 @@ public class FileChoiceProperties {
    */
   private String regionName = Region.Guangzhou.getValue();
 
+  /**
+   * 分片大小(默认单位为:MB,默认为5MB)
+   */
+  private Integer partSize = 5;
+
+  public Integer getPartSize() {
+    return partSize;
+  }
+
+  public void setPartSize(Integer partSize) {
+    this.partSize = partSize;
+  }
+
   public String getRegionName() {
     return regionName;
   }

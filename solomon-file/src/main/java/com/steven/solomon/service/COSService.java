@@ -1,12 +1,12 @@
 package com.steven.solomon.service;
 
-import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.COSObject;
-import com.qcloud.cos.model.CannedAccessControlList;
+import com.qcloud.cos.model.AbortMultipartUploadRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadRequest;
+import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ObjectListing;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
@@ -88,5 +88,17 @@ public class COSService extends AbstractFileService {
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
+  }
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucketName,objectName);
+    InitiateMultipartUploadResult  initResponse                   = client.initiateMultipartUpload(initiateMultipartUploadRequest);
+    return initResponse.getUploadId();
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
+    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
   }
 }

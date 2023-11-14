@@ -9,10 +9,12 @@ import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
+import com.steven.solomon.service.EOSService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.KS3Service;
 import com.steven.solomon.service.MinioService;
+import com.steven.solomon.service.NOSService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
 import com.steven.solomon.service.ZOSService;
@@ -69,6 +71,10 @@ public class FileConfig {
         return new ZOSService(fileProperties);
       case KS3:
         return new KS3Service(fileProperties);
+      case EOS:
+        return new EOSService(fileProperties);
+      case NOS:
+        return new NOSService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }

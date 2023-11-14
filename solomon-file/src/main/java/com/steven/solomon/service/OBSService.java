@@ -1,7 +1,10 @@
 package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
+import com.obs.services.model.AbortMultipartUploadRequest;
 import com.obs.services.model.HttpMethodEnum;
+import com.obs.services.model.InitiateMultipartUploadRequest;
+import com.obs.services.model.InitiateMultipartUploadResult;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObjectListing;
 import com.obs.services.model.ObsObject;
@@ -86,5 +89,17 @@ public class OBSService extends AbstractFileService {
     request.setPrefix(key);
     ObjectListing      response = client.listObjects(request);
     return Lambda.toList(response.getObjects(),data->data.getObjectKey());
+  }
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucketName,objectName);
+    InitiateMultipartUploadResult  initiateMultipartUploadResult  = client.initiateMultipartUpload(initiateMultipartUploadRequest);
+    return initiateMultipartUploadResult.getUploadId();
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
+    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
   }
 }

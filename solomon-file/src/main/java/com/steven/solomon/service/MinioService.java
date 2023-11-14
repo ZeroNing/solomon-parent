@@ -1,9 +1,8 @@
 package com.steven.solomon.service;
 
-import com.qcloud.cos.model.ObjectListing;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -11,7 +10,6 @@ import io.minio.BucketExistsArgs;
 import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
 import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
 import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.GetPresignedObjectUrlArgs.Builder;
 import io.minio.ListObjectsArgs;
@@ -50,7 +48,7 @@ public class MinioService extends AbstractFileService {
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
     client.putObject(
         PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(
-            file.getInputStream(), file.getSize(), -1)
+            file.getInputStream(), file.getSize(), partSize)
             .contentType(FileTypeUtils.getFileType(file.getInputStream(),file.getName()))
             .build());
   }
@@ -98,6 +96,11 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
+
+  }
+
+  @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
     if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
       return new ArrayList<>();
@@ -113,4 +116,10 @@ public class MinioService extends AbstractFileService {
     }
     return objectNames;
   }
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    return null;
+  }
+
 }

@@ -2,8 +2,9 @@ package com.steven.solomon.service;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.model.CannedAccessControlList;
-import com.aliyun.oss.model.OSSObject;
+import com.aliyun.oss.model.AbortMultipartUploadRequest;
+import com.aliyun.oss.model.InitiateMultipartUploadRequest;
+import com.aliyun.oss.model.InitiateMultipartUploadResult;
 import com.aliyun.oss.model.ObjectListing;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.steven.solomon.lambda.Lambda;
@@ -81,5 +82,17 @@ public class OSSService extends AbstractFileService {
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
+  }
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    InitiateMultipartUploadRequest initiateMultipartUploadRequest = new InitiateMultipartUploadRequest(bucketName,objectName);
+    InitiateMultipartUploadResult                       initiateMultipartUploadResult  = client.initiateMultipartUpload(initiateMultipartUploadRequest);
+    return initiateMultipartUploadResult.getUploadId();
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
+    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
   }
 }

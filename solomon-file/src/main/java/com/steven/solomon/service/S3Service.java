@@ -1,6 +1,9 @@
 package com.steven.solomon.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AbortMultipartUploadRequest;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
+import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
 import com.steven.solomon.lambda.Lambda;
@@ -69,5 +72,18 @@ public abstract class S3Service extends AbstractFileService {
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
+  }
+
+
+  @Override
+  public String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception {
+    InitiateMultipartUploadRequest initRequest  = new InitiateMultipartUploadRequest(bucketName, objectName);
+    InitiateMultipartUploadResult  initResponse = client.initiateMultipartUpload(initRequest);
+    return initResponse.getUploadId();
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
+    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
   }
 }

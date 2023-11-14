@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.obs.services.model.AbortMultipartUploadRequest;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -54,6 +55,11 @@ public class DefaultService extends AbstractFileService {
   }
 
   @Override
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
+    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+  }
+
+  @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
 
@@ -62,6 +68,11 @@ public class DefaultService extends AbstractFileService {
   @Override
   protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
       throws Exception {
+    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+  }
+
+  @Override
+  protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
 }
