@@ -15,6 +15,6 @@ public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHan
   public BaseExceptionVO handleBaseException(Throwable ex) {
     MethodArgumentNotValidException e = (MethodArgumentNotValidException) ex;
     String message = e.getBindingResult().getFieldError().getDefaultMessage();
-    return new BaseExceptionVO(message, HttpStatus.INTERNAL_SERVER_ERROR.value());
+    return new BaseExceptionVO(message, HttpStatus.BAD_REQUEST.value());
   }
 }

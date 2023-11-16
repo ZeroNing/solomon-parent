@@ -33,10 +33,11 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected FileChoiceProperties properties;
 
-  protected Integer partSize = properties.getPartSize() * 1024*1024;
+  protected Integer partSize;
 
   public AbstractFileService(FileChoiceProperties properties){
     this.properties = properties;
+    this.partSize = this.properties.getPartSize() * 1024*1024;
   }
 
   @Override

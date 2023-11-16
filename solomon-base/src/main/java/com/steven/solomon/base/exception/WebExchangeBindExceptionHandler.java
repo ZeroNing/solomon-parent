@@ -5,6 +5,7 @@ import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.support.WebExchangeBindException;
 
@@ -19,6 +20,6 @@ public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
       ObjectError objectError = errorMessages.get(0);
       errorMessage = objectError.getDefaultMessage();
     }
-    return new BaseExceptionVO(errorMessage, 500);
+    return new BaseExceptionVO(errorMessage, HttpStatus.BAD_REQUEST.value());
   }
 }

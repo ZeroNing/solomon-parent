@@ -10,6 +10,6 @@ public class BindExceptionHandler extends AbstractExceptionHandler {
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     BindException e = (BindException) ex;
-    return new BaseExceptionVO(e.getFieldError().getDefaultMessage(), 500);
+    return new BaseExceptionVO(e.getFieldError().getDefaultMessage(), 400);
   }
 }
