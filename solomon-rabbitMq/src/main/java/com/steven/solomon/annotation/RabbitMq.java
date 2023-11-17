@@ -31,7 +31,7 @@ public @interface RabbitMq {
 	/**
 	 * 交换器
 	 */
-	String exchange();
+	String exchange() default "";
 
 	/**
 	 * 路由规则
