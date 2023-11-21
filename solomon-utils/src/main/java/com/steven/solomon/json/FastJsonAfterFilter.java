@@ -44,16 +44,14 @@ public class FastJsonAfterFilter extends AfterFilter {
           logger.info("fastJson 转换枚举为空,值:{},类名:{}",enumValue,enumClass.getName());
           continue;
         }
-        String[] methodNames = fastJsonEnum.methodNames();
+        String methodName = fastJsonEnum.methodName();
         String prefix = field.getName();
 
-        for(String  methodName: methodNames){
-          String value    = (String) enumClass.getMethod(methodName).invoke(enums);
-          if(ValidateUtils.isEmpty(fastJsonEnum.fieldName())){
-            super.writeKeyValue(new StringBuilder(prefix).append(methodName).toString(), value);
-          } else {
-            super.writeKeyValue(fastJsonEnum.fieldName(),value);
-          }
+        String value    = (String) enumClass.getMethod(methodName).invoke(enums);
+        if(ValidateUtils.isEmpty(fastJsonEnum.fieldName())){
+          super.writeKeyValue(new StringBuilder(prefix).append(methodName).toString(), value);
+        } else {
+          super.writeKeyValue(fastJsonEnum.fieldName(),value);
         }
       } catch (Throwable e) {
         logger.info("fastJson 转义注解失败,失败异常为 e:{}",e);

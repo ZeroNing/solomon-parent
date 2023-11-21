@@ -22,7 +22,7 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
 
   private String prefix;
 
-  private String[] methodNames;
+  private String methodName;
 
   private String fieldName;
 
@@ -30,10 +30,10 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
     super();
   }
 
-  public EnumSerializer(Class<? extends Enum> enumClass,String prefix,String[] methodNames,String fieldName) {
+  public EnumSerializer(Class<? extends Enum> enumClass,String prefix,String methodName,String fieldName) {
     this.enumClass = enumClass;
     this.prefix = prefix;
-    this.methodNames = methodNames;
+    this.methodName = methodName;
     this.fieldName = fieldName;
   }
 
@@ -48,16 +48,14 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
         logger.info("EnumSerializer 转换枚举为空,值:{},类名:{}",o,enumClass.getName());
         return;
       }
-      for (String methodName : methodNames) {
-        String value    = (String) enumClass.getMethod(methodName).invoke(enums);
-        if(ValidateUtils.isEmpty(fieldName)){
-          jsonGenerator.writeStringField(new StringBuilder(prefix).append(methodName).toString(), value);
-        } else {
-          jsonGenerator.writeStringField(fieldName,value);
-        }
+      String value    = (String) enumClass.getMethod(methodName).invoke(enums);
+      if(ValidateUtils.isEmpty(fieldName)){
+        jsonGenerator.writeStringField(new StringBuilder(prefix).append(methodName).toString(), value);
+      } else {
+        jsonGenerator.writeStringField(fieldName,value);
       }
     } catch (Throwable e) {
-      logger.info("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodNames.toString(),e);
+      logger.info("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodName,e);
       return;
     }
   }
@@ -77,6 +75,6 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
     if (ValidateUtils.isEmpty(enumLabel) || !enumLabel.ignore()) {
       return serializerProvider.findValueSerializer(beanProperty.getType(), beanProperty);
     }
-    return new EnumSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodNames(),enumLabel.fieldName());
+    return new EnumSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodName(),enumLabel.fieldName());
   }
 }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -79,6 +80,7 @@ public class MongoConfig {
   }
 
   @Bean(name = "mongoTemplate")
+  @ConditionalOnMissingBean(MongoTemplate.class)
   public MongoTemplate dynamicMongoTemplate() {
     SimpleMongoClientDatabaseFactory factory          = context.getFactoryMap().values().iterator().next();
     DbRefResolver                    dbRefResolver    = new DefaultDbRefResolver(factory);
@@ -93,6 +95,7 @@ public class MongoConfig {
   }
 
   @Bean(name = "mongoDbFactory")
+  @ConditionalOnMissingBean(MongoDatabaseFactory.class)
   public MongoDatabaseFactory tenantMongoDbFactory() {
     return context.getFactoryMap().values().iterator().next();
   }
