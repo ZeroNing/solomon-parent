@@ -19,7 +19,10 @@ public class ClassUtils {
    * @throws Exception
    */
   public static <T extends Annotation> void updateClassField(Class clazz,String fieldName,Class<T> annotationClazz, Map<String,Object> annotationNameAndValueMap) throws Exception {
-    Field field = clazz.getDeclaredField(fieldName);
+    updateClassField(clazz,clazz.getDeclaredField(fieldName),annotationClazz,annotationNameAndValueMap);
+  }
+
+  public static <T extends Annotation> void updateClassField(Class clazz,Field field,Class<T> annotationClazz, Map<String,Object> annotationNameAndValueMap) throws Exception {
     field.setAccessible(true);
     T excelProperty =  field.getAnnotation(annotationClazz);
     if(ObjectUtil.isEmpty(excelProperty)){

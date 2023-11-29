@@ -3,8 +3,8 @@ package com.steven.solomon.enums;
 import com.steven.solomon.pojo.enums.BaseEnum;
 
 public enum FileChoiceEnum implements BaseEnum<String> {
-  MINIO("MINIO","minio对象存储"),
   DEFAULT("DEFAULT","无文件存储实现"),
+  MINIO("MINIO","minio对象存储"),
   OSS("OSS","阿里云对象存储"),
   OBS("OBS","华为与对象存储"),
   COS("COS","腾讯云对象存储"),

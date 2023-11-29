@@ -16,12 +16,15 @@ import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import com.steven.solomon.clazz.ClassUtils;
 import com.steven.solomon.file.MockMultipartFile;
+import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
@@ -45,48 +48,40 @@ public class ExcelUtils {
 	private static final Logger logger = LoggerUtils.logger(ExcelUtils.class);
 
 	/**
-	 * 导出Excel(07版.xlsx)到web
-	 *
-	 * @param response  响应
-	 * @param excelName Excel名称
-	 * @param sheetName sheet页名称
-	 * @param clazz     Excel要转换的类型
-	 * @param data      要导出的数据
+	 * 导出
+	 * @param response
+	 * @param excelName 文件名需要带上后缀名
+	 * @param sheetName 表名 不填默认为sheet
+	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
+	 * @param data      数据
 	 * @throws Exception
 	 */
-	public static MultipartFile exportUpload(HttpServletResponse response, String excelName, String sheetName,List<String> includeColumnFieldNames,Map<String,String> excelPropertyValueMap, Class<?> clazz,List<?> data) throws Exception {
-		return exportUpload(response, excelName, sheetName, includeColumnFieldNames,excelPropertyValueMap, clazz, data,null);
+	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data) throws Exception {
+		setHead(response, excelName);
+		//更新Class注解值
+		updateClassExcelPropertyValue(clazz);
+		//开始导出
+		EasyExcel.write(response.getOutputStream(), clazz)
+				.registerWriteHandler(formatExcel())
+				.registerWriteHandler(new ExcelWidthStyleStrategy())
+				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet")).doWrite(data);
 	}
 
 	/**
-	 * 导出Excel(07版.xlsx)到web
-	 *
-	 * @param response  响应
-	 * @param excelName Excel名称
-	 * @param sheetName sheet页名称
-	 * @param clazz     Excel要转换的类型
-	 * @param data      要导出的数据
+	 * 导出
+	 * @param excelName 文件名需要带上后缀名
+	 * @param sheetName 表名 不填默认为sheet
+	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
+	 * @param data      数据
+	 * @return          文件
 	 * @throws Exception
 	 */
-	public static MultipartFile exportUpload(HttpServletResponse response, String excelName, String sheetName,List<String> includeColumnFieldNames,Map<String,String> excelPropertyValueMap, Class<?> clazz,List<?> data,
-			WriteHandler writeHandler) throws Exception {
+	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data) throws Exception {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
-			setHead(response, excelName);
-			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(writeHandler,formatExcel())).registerWriteHandler(new ExcelWidthStyleStrategy());
-
-			if(ValidateUtils.isNotEmpty(includeColumnFieldNames)){
-				excelWriterBuilder.includeColumnFieldNames(includeColumnFieldNames);
-				for(String filedName : includeColumnFieldNames){
-					String i18nName = excelPropertyValueMap.get(filedName);
-					if(ValidateUtils.isEmpty(i18nName)){
-						continue;
-					}
-					Map<String,Object> annotationNameAndValueMap = new HashMap<>();
-					annotationNameAndValueMap.put("value",i18nName);
-					ClassUtils.updateClassField(clazz,filedName,ExcelProperty.class,annotationNameAndValueMap);
-				}
-			}
-
+			//更新Class注解值
+			updateClassExcelPropertyValue(clazz);
+			//开始导出
+			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(formatExcel()).registerWriteHandler(new ExcelWidthStyleStrategy());
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
 			WriteSheet              writeSheet;
@@ -97,9 +92,19 @@ public class ExcelUtils {
 			// 必须要finish才会写入，不finish只会创建empty的文件
 			excelWriter.finish();
 			byte[] content = os.toByteArray();
+			//生成文件
 			try(InputStream is = new ByteArrayInputStream(content);){
 				return new MockMultipartFile(excelName,excelName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
 			}
+		}
+	}
+
+	private static void updateClassExcelPropertyValue(Class<?> clazz) throws Exception {
+		for(Field field : clazz.getDeclaredFields()){
+			String i18nKey = clazz.getSimpleName()+"."+field.getName();
+			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
+			annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,null));
+			ClassUtils.updateClassField(clazz,field.getName(),ExcelProperty.class,annotationNameAndValueMap);
 		}
 	}
 

@@ -51,7 +51,6 @@ public class I18nConfig {
 
     bundleMessageSource.setBasenames(beanNames.toArray(new String[]{}));
     bundleMessageSource.setDefaultLocale(DEFAULT_LOCALE == null ? Locale.CHINESE : DEFAULT_LOCALE);
-    bundleMessageSource.setDefaultEncoding("UTF-8");
     logger.info("BaseI18nConfig初始化I18N国际化文件成功,国际化默认语言为:{},国际化文件路径为:{}",DEFAULT_LOCALE.toString(), beanNames.toString());
     return bundleMessageSource;
   }

@@ -11,6 +11,6 @@ public class UUIDNamingRulesGenerationService implements FileNamingRulesGenerati
   @Override
   public String getFileName(MultipartFile file) {
     String contentType = getExtensionName(file.getOriginalFilename());
-    return new StringBuilder().append(UUID.randomUUID().toString().replace("-","")).append(".").append(contentType).toString();
+    return UUID.randomUUID().toString().replace("-","") + "."+contentType;
   }
 }

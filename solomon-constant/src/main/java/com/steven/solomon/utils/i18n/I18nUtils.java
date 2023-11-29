@@ -96,7 +96,7 @@ public class I18nUtils {
    * @param args 参数
    * @return
    */
-  private static String getMessage(String code, Object... args) {
+  public static String getMessage(String code, Object... args) {
     Locale locale = LocaleContextHolder.getLocale();
     return getMessage(code,locale,args);
   }
