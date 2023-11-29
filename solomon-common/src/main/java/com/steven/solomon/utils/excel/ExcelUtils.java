@@ -124,7 +124,7 @@ public class ExcelUtils {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		response.setHeader("Content-disposition", "attachment;filename=" + fileName + ".xlsx");
+		response.setHeader("Content-disposition", "attachment;filename=" + fileName);
 	}
 
 	public static HorizontalCellStyleStrategy formatExcel() {
