@@ -41,7 +41,7 @@ public class FastJsonAfterFilter extends AfterFilter {
         String enumValue = (String) method.invoke(o);
         Enum enums = EnumUtils.codeOf(enumClass, enumValue);
         if(ValidateUtils.isEmpty(enums)){
-          logger.info("fastJson 转换枚举为空,值:{},类名:{}",enumValue,enumClass.getName());
+          logger.debug("fastJson 转换枚举为空,值:{},类名:{}",enumValue,enumClass.getName());
           continue;
         }
         String methodName = fastJsonEnum.methodName();
@@ -54,7 +54,7 @@ public class FastJsonAfterFilter extends AfterFilter {
           super.writeKeyValue(fastJsonEnum.fieldName(),value);
         }
       } catch (Throwable e) {
-        logger.info("fastJson 转义注解失败,失败异常为 e:{}",e);
+        logger.error("fastJson 转义注解失败,失败异常为 e:{}",e);
 //        throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
       }
     }

@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
       ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
       requestParameter = StringUtils.toEncodedString(wrapper.getContentAsByteArray(), Charset.forName(wrapper.getCharacterEncoding()));
     }
-    logger.info("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), FastJsonUtils.conversionJsonArray(requestParameter), ex);
+    logger.error("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), FastJsonUtils.conversionJsonArray(requestParameter), ex);
     return BaseGlobalExceptionHandler.handlerMap(ex,serverId,locale,response);
   }
 

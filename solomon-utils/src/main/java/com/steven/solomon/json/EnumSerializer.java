@@ -45,7 +45,7 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
     try {
       Enum   enums  = EnumUtils.codeOf(enumClass,o);
       if(ValidateUtils.isEmpty(enums)){
-        logger.info("EnumSerializer 转换枚举为空,值:{},类名:{}",o,enumClass.getName());
+        logger.debug("EnumSerializer 转换枚举为空,值:{},类名:{}",o,enumClass.getName());
         return;
       }
       String value    = (String) enumClass.getMethod(methodName).invoke(enums);
@@ -55,7 +55,7 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
         jsonGenerator.writeStringField(fieldName,value);
       }
     } catch (Throwable e) {
-      logger.info("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodName,e);
+      logger.error("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}",o,enumClass.getName(),methodName,e);
       return;
     }
   }

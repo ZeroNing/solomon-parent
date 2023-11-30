@@ -29,7 +29,7 @@ public class ExceptionUtil {
 
     AbstractExceptionHandler abstractExceptionHandler = getExceptionHandler(exceptionSimpleName);
     if (ValidateUtils.isEmpty(abstractExceptionHandler)) {
-      logger.info("BaseGlobalExceptionHandler 处理异常遇到未知异常抛出默认的系统异常 S9999,未知异常为:{}", exceptionSimpleName);
+      logger.error("BaseGlobalExceptionHandler 处理异常遇到未知异常抛出默认的系统异常 S9999,未知异常为:{}", exceptionSimpleName);
     } else {
       baseExceptionVO = abstractExceptionHandler.handleBaseException(ex);
     }

@@ -23,7 +23,7 @@ public class RabbitCallBack implements ReturnsCallback, ConfirmCallback {
   @Override
   public void confirm(CorrelationData correlationData, boolean ack, String cause) {
     if (!ack) {
-      logger.info("RabbitMQConfig:消息发送失败:correlationData({}),ack(false),cause({})", correlationData,cause);
+      logger.error("RabbitMQConfig:消息发送失败:correlationData({}),ack(false),cause({})", correlationData,cause);
     }
     if(ValidateUtils.isNotEmpty(RabbitCallBack.rabbitCallBackList)){
       for(AbstractRabbitCallBack abstractRabbitCallBack : RabbitCallBack.rabbitCallBackList){
@@ -34,7 +34,7 @@ public class RabbitCallBack implements ReturnsCallback, ConfirmCallback {
 
   @Override
   public void returnedMessage(ReturnedMessage returned) {
-    logger.info("RabbitMQConfig:消息丢失:exchange({}),route({}),replyCode({}),replyText({}),message:{}",
+    logger.error("RabbitMQConfig:消息丢失:exchange({}),route({}),replyCode({}),replyText({}),message:{}",
         returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(), returned.getReplyText(), returned.getMessage());
     if(ValidateUtils.isNotEmpty(RabbitCallBack.rabbitCallBackList)){
       for(AbstractRabbitCallBack abstractRabbitCallBack : RabbitCallBack.rabbitCallBackList){

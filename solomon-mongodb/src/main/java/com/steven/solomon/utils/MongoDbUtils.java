@@ -83,7 +83,7 @@ public class MongoDbUtils {
           mongoDatabase.createCollection(name);
         }
       } else {
-        logger.info("集合{}已存在,不允许修改为固定集合,防止数据丢失,请先备份数据后,手动创建固定集合",name);
+        logger.error("集合{}已存在,不允许修改为固定集合,防止数据丢失,请先备份数据后,手动创建固定集合",name);
 //        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
 //          org.bson.Document command  = new org.bson.Document("collStats", name);
 //          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");

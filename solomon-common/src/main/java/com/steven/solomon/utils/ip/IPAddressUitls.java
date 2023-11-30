@@ -100,7 +100,7 @@ public class IPAddressUitls {
 		while (headerNames.hasMoreElements()) {
 			String key = (String) headerNames.nextElement();
 			String value = request.getHeader(key);
-			logger.info("------nextElement ={} ,\n ------------request.getHeader(nextElement) ={}", key, value);
+			logger.debug("------nextElement ={} ,\n ------------request.getHeader(nextElement) ={}", key, value);
 		}
 		String ip = request.getHeader("x-forwarded-for");
 		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
@@ -123,18 +123,18 @@ public class IPAddressUitls {
 		}
 		// 返回多个ip 处理
 		if (StringUtils.contains(ip, ",")) {
-			logger.info("返回IP多条 ip ={}", ip);
+			logger.debug("返回IP多条 ip ={}", ip);
 			String[] addres = ip.split(",");
 			for (int i = 0; i < addres.length; i++) {
 				if (!addres[i].trim().startsWith("10.") && !addres[i].trim().startsWith("100.")
 						&& !addres[i].trim().startsWith("192.") && !("127.0.0.1").equals(addres[i].trim())) {
-					logger.info("过滤后只返回公网IP：{}", addres[i].trim());
+					logger.debug("过滤后只返回公网IP：{}", addres[i].trim());
 					ip = addres[i].trim();
 					break;
 				}
 			}
 		}
-		logger.info("-------getIpAddress----返回 ip ={}", ip);
+		logger.debug("-------getIpAddress----返回 ip ={}", ip);
 		return ip;
 	}
 

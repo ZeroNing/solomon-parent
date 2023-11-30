@@ -38,7 +38,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
       }
       // 消费者内容
       String json= new String(message.getBody(), StandardCharsets.UTF_8);
-      logger.info("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
+      logger.debug("线程名:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(), json);
       RabbitMqModel rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
       // 消费者消费消息
       R result = this.handleMessage((T) rabbitMqModel.getBody());
@@ -50,7 +50,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
       saveLog(result,message,rabbitMqModel);
     } catch (Throwable e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
-      logger.info("AbstractConsumer:消费报错 异常为:", e);
+      logger.error("AbstractConsumer:消费报错 异常为:", e);
       //将消费失败的记录保存到数据库或者不处理也可以
       this.saveFailMessage(message, e);
       //保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
@@ -67,17 +67,17 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
   public void saveFailNumber(MessageProperties messageProperties, Channel channel, long deliveryTag,String correlationId) throws Exception {
     Integer lock = messageProperties.getHeader("retryNumber");
     Integer actualLock = ValidateUtils.isEmpty(lock) ? 1 : lock + 1;
-    logger.info("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, deliveryTag,actualLock);
+    logger.error("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, deliveryTag,actualLock);
     int retryNumber = getRetryNumber();
     if(retryNumber <= this.retryNumber || actualLock >= retryNumber){
       if(retryNumber <= this.retryNumber){
-        logger.info("rabbitMQ 失败记录:因记录不需要重试因此直接拒绝此消息,消费者correlationId为:{},消费者设置重试次数为:{}", correlationId, retryNumber);
+        logger.error("rabbitMQ 失败记录:因记录不需要重试因此直接拒绝此消息,消费者correlationId为:{},消费者设置重试次数为:{}", correlationId, retryNumber);
       } else {
-        logger.info("rabbitMQ 失败记录:已满足重试次数,删除redis消息并且拒绝此消息,消费者correlationId为:{},重试次数为:{}", correlationId, actualLock);
+        logger.error("rabbitMQ 失败记录:已满足重试次数,删除redis消息并且拒绝此消息,消费者correlationId为:{},重试次数为:{}", correlationId, actualLock);
       }
       channel.basicNack(messageProperties.getDeliveryTag(), false, false);
     } else {
-      logger.info("rabbitMQ 失败记录:因记录重试次数还未达到重试上限，还将继续进行重试,消费者correlationId为:{},消费者设置重试次数为:{},现重试次数为:{}", correlationId, retryNumber,actualLock);
+      logger.error("rabbitMQ 失败记录:因记录重试次数还未达到重试上限，还将继续进行重试,消费者correlationId为:{},消费者设置重试次数为:{},现重试次数为:{}", correlationId, retryNumber,actualLock);
       messageProperties.setHeader("retryNumber",actualLock);
     }
   }

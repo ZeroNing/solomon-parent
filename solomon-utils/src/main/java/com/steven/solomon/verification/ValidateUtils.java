@@ -260,7 +260,7 @@ public class ValidateUtils {
     try {
       bigStr = object.toString();
     } catch (Throwable e) {
-      logger.info("正则校验报错异常,传入的值为:{},异常为:{}",object,e);
+      logger.error("正则校验报错异常,传入的值为:{},异常为:{}",object,e);
       return false;
     }
     Matcher matcher = pattern.matcher(bigStr);

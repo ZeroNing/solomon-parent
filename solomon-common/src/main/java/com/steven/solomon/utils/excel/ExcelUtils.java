@@ -1,5 +1,6 @@
 package com.steven.solomon.utils.excel;
 
+import cn.hutool.core.date.StopWatch;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -59,12 +60,22 @@ public class ExcelUtils {
 	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data) throws Exception {
 		setHead(response, excelName);
 		//更新Class注解值
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		logger.debug("开始更新Class注解值国际化");
 		updateClassExcelPropertyValue(clazz);
+		stopWatch.stop();
+		logger.debug("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 		//开始导出
+		stopWatch = new StopWatch();
+		stopWatch.start();
+		logger.debug("开始导出Excel");
 		EasyExcel.write(response.getOutputStream(), clazz)
 				.registerWriteHandler(formatExcel())
 				.registerWriteHandler(new ExcelWidthStyleStrategy())
 				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet")).doWrite(data);
+		stopWatch.stop();
+		logger.debug("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 	}
 
 	/**
@@ -79,8 +90,16 @@ public class ExcelUtils {
 	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data) throws Exception {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
 			//更新Class注解值
+			StopWatch stopWatch = new StopWatch();
+			stopWatch.start();
+			logger.debug("开始更新Class注解值国际化");
 			updateClassExcelPropertyValue(clazz);
+			stopWatch.stop();
+			logger.debug("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 			//开始导出
+			stopWatch = new StopWatch();
+			stopWatch.start();
+			logger.debug("开始导出Excel");
 			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(formatExcel()).registerWriteHandler(new ExcelWidthStyleStrategy());
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
@@ -91,6 +110,8 @@ public class ExcelUtils {
 			excelWriter.write(data, writeSheet);
 			// 必须要finish才会写入，不finish只会创建empty的文件
 			excelWriter.finish();
+			stopWatch.stop();
+			logger.debug("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 			byte[] content = os.toByteArray();
 			//生成文件
 			try(InputStream is = new ByteArrayInputStream(content);){

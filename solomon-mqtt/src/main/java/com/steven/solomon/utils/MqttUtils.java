@@ -128,7 +128,7 @@ public class MqttUtils implements SendService<MqttModel> {
       Map<AbstractConsumer,Mqtt> consumer = getTenantAbstractConsumerMap().get(tenantCode);
       for(Entry<AbstractConsumer,Mqtt> map : consumer.entrySet()){
         Mqtt mqtt = map.getValue();
-        logger.info("重新连接,重新订阅主题:{}",mqtt.topics());
+        logger.debug("重新连接,重新订阅主题:{}",mqtt.topics());
         for(String topic : mqtt.topics()){
           client.subscribe(topic,mqtt.qos(),map.getKey());
         }

@@ -30,7 +30,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
       //保存消费成功消息
       saveLog(result,message,mqttModel);
     } catch (Throwable e){
-      logger.info("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
+      logger.error("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
     }
   }
