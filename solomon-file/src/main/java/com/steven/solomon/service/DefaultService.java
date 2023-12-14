@@ -1,6 +1,5 @@
 package com.steven.solomon.service;
 
-import com.obs.services.model.AbortMultipartUploadRequest;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
@@ -47,6 +46,12 @@ public class DefaultService extends AbstractFileService {
 
   @Override
   public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
+    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+  }
+
+  @Override
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+      throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
 

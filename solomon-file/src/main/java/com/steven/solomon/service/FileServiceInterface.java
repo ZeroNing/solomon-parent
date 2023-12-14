@@ -1,6 +1,5 @@
 package com.steven.solomon.service;
 
-import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.rsa.Md5Utils;

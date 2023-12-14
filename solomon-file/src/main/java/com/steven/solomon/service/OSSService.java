@@ -38,42 +38,29 @@ public class OSSService extends AbstractFileService {
   }
 
   @Override
-  public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
-    String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
-
-    // 初始化分片上传
-    InitiateMultipartUploadRequest initRequest  = new InitiateMultipartUploadRequest(bucketName, filePath);
-    InitiateMultipartUploadResult  initResponse = client.initiateMultipartUpload(initRequest);
-    String uploadId = initResponse.getUploadId();
-    long contentLength = file.getSize();
-    try{
-      // 分割文件并上传分片
-      List<PartETag> partETags    = new ArrayList<>();
-      for (int i = 0; contentLength > partSize * i; i++) {
-        // 计算每个分片的大小
-        long size = Math.min(partSize, contentLength - partSize * i);
-        // 创建上传分片请求
-        UploadPartRequest uploadPartRequest = new UploadPartRequest();
-        uploadPartRequest.setBucketName(bucketName);
-        uploadPartRequest.setKey(filePath);
-        uploadPartRequest.setUploadId(uploadId);
-        uploadPartRequest.setInputStream(file.getInputStream());
-        uploadPartRequest.setPartSize(size);
-        uploadPartRequest.setPartNumber(i + 1);
-        // 上传分片
-        UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
-        partETags.add(uploadPartResult.getPartETag());
-      }
-      // 完成分片上传
-      CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
-          bucketName, filePath, initResponse.getUploadId(), partETags);
-
-      client.completeMultipartUpload(compRequest);
-    } catch (Exception e) {
-      abortMultipartUpload(initResponse.getUploadId(),bucketName,filePath);
-      throw e;
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+      throws Exception {
+    List<PartETag> partETags    = new ArrayList<>();
+    for (int i = 0; fileSize > partSize * i; i++) {
+      // 计算每个分片的大小
+      long size = Math.min(partSize, fileSize - partSize * i);
+      // 创建上传分片请求
+      UploadPartRequest uploadPartRequest = new UploadPartRequest();
+      uploadPartRequest.setBucketName(bucketName);
+      uploadPartRequest.setKey(filePath);
+      uploadPartRequest.setUploadId(uploadId);
+      uploadPartRequest.setInputStream(file.getInputStream());
+      uploadPartRequest.setPartSize(size);
+      uploadPartRequest.setPartNumber(i + 1);
+      // 上传分片
+      UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
+      partETags.add(uploadPartResult.getPartETag());
     }
-    return new FileUpload(bucketName,filePath,file.getInputStream());
+    // 完成分片上传
+    CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
+        bucketName, filePath, uploadId, partETags);
+
+    client.completeMultipartUpload(compRequest);
   }
 
   @Override

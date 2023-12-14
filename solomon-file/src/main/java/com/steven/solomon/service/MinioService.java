@@ -45,6 +45,12 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+      throws Exception {
+
+  }
+
+  @Override
   public boolean bucketExists(String bucketName) throws Exception {
     return client.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
   }

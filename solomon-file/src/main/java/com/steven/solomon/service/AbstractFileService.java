@@ -14,8 +14,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
@@ -163,6 +161,23 @@ public abstract class AbstractFileService implements FileServiceInterface{
       return getObject(bucketName,thumbnailName);
     }
   }
+
+  @Override
+  public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
+    String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+    String uploadId = initiateMultipartUploadTask(bucketName, filePath);
+
+    long contentLength = file.getSize();
+    try{
+      multipartUpload(file,bucketName,contentLength,uploadId,filePath);
+    }catch (Exception e){
+      abortMultipartUpload(uploadId,bucketName,filePath);
+      throw e;
+    }
+    return new FileUpload(bucketName,filePath,file.getInputStream());
+  }
+
+  protected abstract void multipartUpload(MultipartFile file, String bucketName,long fileSize,String uploadId,String filePath) throws Exception;
 
   /**
    * 上传
