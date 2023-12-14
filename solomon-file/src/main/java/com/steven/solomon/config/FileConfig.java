@@ -6,6 +6,7 @@ import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
 import com.steven.solomon.namingRules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.namingRules.UUIDNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.service.B2Service;
 import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
@@ -75,6 +76,8 @@ public class FileConfig {
         return new EOSService(fileProperties);
       case NOS:
         return new NOSService(fileProperties);
+      case B2:
+        return new B2Service(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }
