@@ -100,8 +100,6 @@ public abstract class S3Service extends AbstractFileService {
     InitiateMultipartUploadResult initResponse = client.initiateMultipartUpload(initRequest);
 
     long contentLength = file.getSize();
-    // 分片大小设置为5MB
-    long partSize = 5 * 1024 * 1024;
     try{
       // 分割文件并上传分片
       long           filePosition = 0;
