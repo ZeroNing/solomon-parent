@@ -63,6 +63,24 @@ public interface FileServiceInterface {
    * @throws Exception
    */
   FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception;
+  /**
+   * 分片上传
+   * @param file 文件
+   * @param bucketName 桶名
+   * @param isUseOriginalName 是否使用原名,不使用原名则使用配置的文件名生成器生成
+   * @return
+   * @throws Exception
+   */
+  FileUpload multipartUpload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception;
+
+  /**
+   * 分片上传
+   * @param file 文件
+   * @param bucketName 桶名
+   * @return
+   * @throws Exception
+   */
+  FileUpload multipartUpload(MultipartFile file,String bucketName) throws Exception;
 
   /**
    * 删除文件

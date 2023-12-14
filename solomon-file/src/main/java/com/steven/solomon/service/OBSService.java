@@ -2,17 +2,23 @@ package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
 import com.obs.services.model.AbortMultipartUploadRequest;
+import com.obs.services.model.CompleteMultipartUploadRequest;
 import com.obs.services.model.HttpMethodEnum;
 import com.obs.services.model.InitiateMultipartUploadRequest;
 import com.obs.services.model.InitiateMultipartUploadResult;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObjectListing;
 import com.obs.services.model.ObsObject;
+import com.obs.services.model.PartEtag;
 import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
+import com.obs.services.model.UploadPartRequest;
+import com.obs.services.model.UploadPartResult;
+import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +38,51 @@ public class OBSService extends AbstractFileService {
 
   private ObsClient client() {
     return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), properties.getEndpoint());
+  }
+
+  @Override
+  public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
+    String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+
+    // 初始化分片上传
+    InitiateMultipartUploadRequest initRequest  = new InitiateMultipartUploadRequest(bucketName, filePath);
+    InitiateMultipartUploadResult  initResponse = client.initiateMultipartUpload(initRequest);
+    String                                              uploadId     = initResponse.getUploadId();
+    long contentLength = file.getSize();
+    try{
+      // 分割文件并上传分片
+      long           filePosition = 0;
+      List<PartEtag> partETags    = new ArrayList<>();
+      int            partNumber   = 1;
+      while (contentLength > filePosition) {
+        // 计算每个分片的大小
+        long currentPartSize = Math.min(partSize, contentLength - filePosition);
+        byte[] partBuffer = new byte[(int) currentPartSize];
+        file.getInputStream().read(partBuffer, 0, (int) currentPartSize);
+
+        UploadPartRequest uploadPartRequest = new UploadPartRequest();
+        uploadPartRequest.setBucketName(bucketName);
+        uploadPartRequest.setObjectKey(filePath);
+        uploadPartRequest.setUploadId(uploadId);
+        uploadPartRequest.setPartSize(currentPartSize);
+        uploadPartRequest.setPartNumber(partNumber++);
+        uploadPartRequest.setInput(new ByteArrayInputStream(partBuffer));
+
+        UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
+        filePosition += currentPartSize;
+        partETags.add(new PartEtag(uploadPartResult.getEtag(),uploadPartResult.getPartNumber()));
+
+      }
+      // 完成分片上传
+      CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
+          bucketName, filePath, initResponse.getUploadId(), partETags);
+
+      client.completeMultipartUpload(compRequest);
+    } catch (Exception e) {
+      abortMultipartUpload(initResponse.getUploadId(),bucketName,filePath);
+      throw e;
+    }
+    return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 
   @Override

@@ -2,10 +2,14 @@ package com.steven.solomon.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AbortMultipartUploadRequest;
+import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.PartETag;
 import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.UploadPartRequest;
+import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -85,5 +89,49 @@ public abstract class S3Service extends AbstractFileService {
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
     client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+  }
+
+  @Override
+  public FileUpload multipartUpload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception {
+    String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+
+    // 初始化分片上传
+    InitiateMultipartUploadRequest initRequest = new InitiateMultipartUploadRequest(bucketName, filePath);
+    InitiateMultipartUploadResult initResponse = client.initiateMultipartUpload(initRequest);
+
+    long contentLength = file.getSize();
+    // 分片大小设置为5MB
+    long partSize = 5 * 1024 * 1024;
+    try{
+      // 分割文件并上传分片
+      long           filePosition = 0;
+      List<PartETag> partETags    = new ArrayList<>();
+      for (int i = 1; filePosition < contentLength; i++) {
+        // 计算当前分片大小
+        partSize = Math.min(partSize, (contentLength - filePosition));
+
+        // 创建上传请求
+        UploadPartRequest uploadRequest = new UploadPartRequest()
+            .withBucketName(bucketName).withKey(filePath)
+            .withUploadId(initResponse.getUploadId()).withPartNumber(i)
+            .withInputStream(file.getInputStream())
+            .withPartSize(partSize)
+            .withFileOffset(filePosition);
+
+        // 上传分片并添加到列表
+        partETags.add(client.uploadPart(uploadRequest).getPartETag());
+
+        filePosition += partSize;
+      }
+      // 完成分片上传
+      CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
+          bucketName, filePath, initResponse.getUploadId(), partETags);
+
+      client.completeMultipartUpload(compRequest);
+    } catch (Exception e) {
+      abortMultipartUpload(initResponse.getUploadId(),bucketName,filePath);
+      throw e;
+    }
+    return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 }

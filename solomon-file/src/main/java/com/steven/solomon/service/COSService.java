@@ -5,11 +5,16 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
+import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
 import com.qcloud.cos.model.ObjectListing;
+import com.qcloud.cos.model.PartETag;
 import com.qcloud.cos.model.PutObjectRequest;
+import com.qcloud.cos.model.UploadPartRequest;
+import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.region.Region;
+import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -37,6 +42,45 @@ public class COSService extends AbstractFileService {
     Region         region       = new Region(properties.getRegionName());
     ClientConfig   clientConfig = new ClientConfig(region);
     return new COSClient(credentials, clientConfig);
+  }
+
+  @Override
+  public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
+    String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+
+    InitiateMultipartUploadRequest  initiateMultipartUploadRequest  = new InitiateMultipartUploadRequest(bucketName, filePath);
+    InitiateMultipartUploadResult initiateMultipartUploadResponse = client.initiateMultipartUpload(initiateMultipartUploadRequest);
+    String                          uploadId                        = initiateMultipartUploadResponse.getUploadId();
+    long contentLength = file.getSize();
+    
+    try{
+      // 分割文件并上传分片
+      List<PartETag> partETags    = new ArrayList<>();
+      for (int i = 0; contentLength > partSize * i; i++) {
+        // 计算每个分片的大小
+        long size = Math.min(partSize, contentLength - partSize * i);
+        // 创建上传分片请求
+        UploadPartRequest uploadPartRequest = new UploadPartRequest();
+        uploadPartRequest.setBucketName(bucketName);
+        uploadPartRequest.setKey(filePath);
+        uploadPartRequest.setUploadId(uploadId);
+        uploadPartRequest.setInputStream(file.getInputStream());
+        uploadPartRequest.setPartSize(size);
+        uploadPartRequest.setPartNumber(i + 1);
+        // 上传分片
+        UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
+        partETags.add(uploadPartResult.getPartETag());
+      }
+      // 完成分片上传
+      CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
+          bucketName, filePath, uploadId, partETags);
+
+      client.completeMultipartUpload(compRequest);
+    } catch (Exception e) {
+      abortMultipartUpload(uploadId,bucketName,filePath);
+      throw e;
+    }
+    return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 
   @Override

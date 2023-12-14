@@ -33,11 +33,16 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected FileChoiceProperties properties;
 
-  protected Integer partSize;
+  protected Long partSize;
 
   public AbstractFileService(FileChoiceProperties properties){
     this.properties = properties;
-    this.partSize = this.properties.getPartSize() * 1024*1024;
+    this.partSize = Long.valueOf(this.properties.getPartSize() * 1024*1024);
+  }
+
+  @Override
+  public FileUpload multipartUpload(MultipartFile file,String bucketName) throws Exception{
+    return multipartUpload(file,bucketName,false);
   }
 
   @Override
@@ -47,7 +52,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public FileUpload upload(InputStream is, String bucketName,String fileName,boolean isUseOriginalName) throws Exception {
-    return upload(new MockMultipartFile(fileName,fileName, MediaType.MULTIPART_FORM_DATA_VALUE, is),bucketName,false);
+    return upload(new MockMultipartFile(fileName,fileName, MediaType.MULTIPART_FORM_DATA_VALUE, is),bucketName,isUseOriginalName);
   }
 
   @Override
