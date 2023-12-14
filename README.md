@@ -524,3 +524,66 @@ HeardHolder.setTenantCode("租户编码");
 
 需要在请求头中添加"Timezone"然后value值就是时区例：UTC+8或者GMT+8，如果不填则默认是系统时区，然后切换时区逻辑为：将传入的参数转换为"Timezone"时区时间后转换为系统默认时区，返回的时候就将返回参数中的时间转换为"Timezone"的时区时间
 
+## 文件上传下载分享使用用例
+
+1.引文件jar包
+
+```java
+<dependencies>
+	<dependency>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-file</artifactId>
+      <version>1.0</version>
+    </dependency>
+</dependencies>
+```
+
+2.注入FileServiceInterface
+
+```java
+@RestController
+@RequestMapping("/api/file")
+@Api(tags = "文件接口")
+public class FileController {
+
+  private final FileServiceInterface fileServiceInterface;
+
+  public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+}
+```
+
+3.方法使用
+
+```java
+@RestController
+@RequestMapping("/api/file")
+@Api(tags = "文件接口")
+public class FileController {
+
+  private final FileServiceInterface fileServiceInterface;
+
+  public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+
+  @PostMapping("/{bucket}/upload")
+  @ApiOperation(value = "文件上传")
+  public ResultVO<FileUpload> upload(@RequestPart("file") MultipartFile file,
+      @ApiParam("minio桶") @PathVariable("bucket") String bucket) throws Exception {
+    //上传文件
+    FileUpload fileUpload = fileServiceInterface.upload(file,"桶名");
+    //分享文件
+    String shareUrl = fileServiceInterface.share("文件名","桶名",分享文件超时时间,TimeUnit.SECONDS);
+    //分片上传
+    FileUpload fileUpload = fileServiceInterface.multipartUpload(file,"桶名");
+    //删除文件
+    fileServiceInterface.deleteFile("文件名","桶名");
+    //拷贝文件
+    boolean     flag        = fileServiceInterface.copyObject("原桶名","目标桶名","原文件名","目标文件名");
+    //下载文件流
+    InputStream inputStream = fileServiceInterface.download("文件名","桶名");
+
+    return ResultVO.success(fileServiceInterface.upload(file,bucket));
+  }
+
+}
+```
+
