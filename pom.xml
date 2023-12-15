@@ -82,6 +82,7 @@
     <elasticsearch.version>5.1.0</elasticsearch.version>
     <elasticsearch-java>8.8.1</elasticsearch-java>
     <aws.s3.version>1.12.581</aws.s3.version>
+    <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
   </properties>
 
   <parent>
@@ -93,6 +94,12 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${bcprov.jdk15on.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.amazonaws</groupId>
