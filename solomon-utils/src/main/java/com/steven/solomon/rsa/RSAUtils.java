@@ -28,8 +28,7 @@ public class RSAUtils {
     } else {
       rsa = new RSA(null,key);
     }
-    byte[] data = encrypt ? rsa.encrypt(text, keyType) : rsa.decrypt(Base64.decode(text), keyType);
-    return encrypt ? Base64.encode(data) : StrUtil.str(data, CharsetUtil.CHARSET_UTF_8);
+    return handleRSA(rsa,text,keyType,encrypt);
   }
 
   /**
