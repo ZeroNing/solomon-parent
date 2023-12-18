@@ -39,11 +39,6 @@ public abstract class AbstractFileService implements FileServiceInterface{
   }
 
   @Override
-  public FileUpload multipartUpload(MultipartFile file,String bucketName) throws Exception{
-    return multipartUpload(file,bucketName,false);
-  }
-
-  @Override
   public FileUpload upload(InputStream is, String bucketName,String fileName) throws Exception {
     return upload(is,bucketName,fileName,false);
   }
@@ -63,8 +58,13 @@ public abstract class AbstractFileService implements FileServiceInterface{
     //创建桶
     makeBucket(bucketName);
     String       filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
-    this.upload(file,bucketName,filePath);
-    return new FileUpload(bucketName,filePath,file.getInputStream());
+    long fileSize = file.getSize();
+    if(fileSize >= partSize){
+      return multipartUpload(file,bucketName,isUseOriginalName);
+    } else {
+      this.upload(file,bucketName,filePath);
+      return new FileUpload(bucketName,filePath,file.getInputStream());
+    }
   }
 
   @Override
@@ -162,7 +162,6 @@ public abstract class AbstractFileService implements FileServiceInterface{
     }
   }
 
-  @Override
   public FileUpload multipartUpload(MultipartFile file, String bucketName, boolean isUseOriginalName) throws Exception {
     String filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
     String uploadId = initiateMultipartUploadTask(bucketName, filePath);
