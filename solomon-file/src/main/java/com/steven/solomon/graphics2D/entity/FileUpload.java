@@ -1,7 +1,7 @@
 package com.steven.solomon.graphics2D.entity;
 
 import cn.hutool.core.io.IoUtil;
-import com.steven.solomon.rsa.Md5Utils;
+import cn.hutool.crypto.digest.DigestUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -33,7 +33,7 @@ public class FileUpload implements Serializable {
     this.bucket = bucket;
     this.fileName = fileName;
     this.size = Long.valueOf(is.available());
-    this.md5 = Md5Utils.getFileMd5(IoUtil.readBytes(is));
+    this.md5 = DigestUtil.md5Hex(IoUtil.readBytes(is));
   }
 
   public String getBucket() {

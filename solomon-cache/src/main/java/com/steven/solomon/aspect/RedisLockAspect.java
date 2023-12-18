@@ -1,11 +1,11 @@
 package com.steven.solomon.aspect;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.steven.solomon.annotation.Lock;
 import com.steven.solomon.code.BaseICacheCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.rsa.Md5Utils;
 import com.steven.solomon.service.ICacheService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.lang.reflect.Method;
@@ -51,7 +51,7 @@ public class RedisLockAspect {
     String key = String.format("%s:%s_%s",
         signature.getDeclaringType().getName(),
         signature.getName(),
-        Md5Utils.digest(JackJsonUtils.formatJsonByFilter(point.getArgs())));
+        DigestUtil.md5Hex(JackJsonUtils.formatJsonByFilter(point.getArgs())));
 
     //通过setnx设置值，如果值不存在，则获得该锁
     boolean flag = iCacheService.lockSet(BaseICacheCode.REDIS_LOCK,key, 0, lock.expire());

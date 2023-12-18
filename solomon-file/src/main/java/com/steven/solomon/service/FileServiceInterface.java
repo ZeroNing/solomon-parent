@@ -1,8 +1,8 @@
 package com.steven.solomon.service;
 
+import cn.hutool.crypto.digest.DigestUtil;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.rsa.Md5Utils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -157,7 +157,7 @@ public interface FileServiceInterface {
    * 获取文件MD5
    */
   default String getMd5(MultipartFile file) throws IOException {
-    return Md5Utils.getFileMd5Code(file);
+    return DigestUtil.md5Hex(file.getInputStream());
   }
 
   default String getFilePath(String fileName, FileChoiceProperties properties){

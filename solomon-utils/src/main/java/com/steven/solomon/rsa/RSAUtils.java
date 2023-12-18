@@ -5,6 +5,8 @@ import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
+import com.steven.solomon.json.FastJsonUtils;
+import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.FileReader;
 import java.security.KeyFactory;
@@ -12,6 +14,8 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.HashMap;
+import java.util.Map;
 import org.bouncycastle.util.io.pem.PemReader;
 
 public class RSAUtils {
@@ -97,16 +101,23 @@ public class RSAUtils {
   }
 
   public static void main(String[] args) throws Exception {
-    String publicKeyPath = "C:\\\\Users\\\\lead-dev-222\\\\Desktop\\\\fsdownload\\\\test public key.pem";
-    String privateKeyPath = "C:\\\\Users\\\\lead-dev-222\\\\Desktop\\\\fsdownload\\\\test private key.pem";
-    String bbb = "11111111";
+    String publicKeyPath = "C:\\Users\\lead-dev-222\\Desktop\\fsdownload\\test public key.pem";
+    String privateKeyPath = "C:\\Users\\lead-dev-222\\Desktop\\fsdownload\\test private key.pem";
+    Map<String,Object> map = new HashMap<>();
+    map.put("test123","11231aad21");
+    map.put("tes23t","1123");
+    map.put("tes21t","1123");
+    map.put("tes1t","1213");
+    map.put("tes1t1","1123");
+    map.put("test1","1123");
+    String body = FastJsonUtils.formatJsonByFilter(map);
     //公钥加密 私钥解密
-    String token = encryptPemFile(bbb,publicKeyPath,KeyType.PublicKey);
+    String token = encryptPemFile(body,publicKeyPath,KeyType.PublicKey);
     System.out.println("加密后:"+token);
     System.out.println("解密后:"+decryptPemFile(token,privateKeyPath,KeyType.PrivateKey));
 
     //私钥加密 公钥解密
-    token = encryptPemFile(bbb,privateKeyPath,KeyType.PrivateKey);
+    token = encryptPemFile(body,privateKeyPath,KeyType.PrivateKey);
     System.out.println("加密后:"+token);
     System.out.println("解密后:"+decryptPemFile(token,publicKeyPath,KeyType.PublicKey));
   }
