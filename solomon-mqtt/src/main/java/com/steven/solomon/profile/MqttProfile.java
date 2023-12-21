@@ -36,12 +36,12 @@ public class MqttProfile {
   /**
    * 是否自动重连
    */
-  private boolean automaticReconnect = false;
+  private boolean automaticReconnect = true;
 
   /**
    * 客户端掉线后,是否自动清除session
    */
-  private boolean cleanSession = true;
+  private boolean cleanSession = false;
 
   /**
    * 心跳时间
