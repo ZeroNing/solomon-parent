@@ -1,5 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.spring.SpringUtil,\
-com.steven.solomon.json.config.JacksonObjectMapper,\
-com.steven.solomon.rsa.RSAConfig
+com.steven.solomon.json.config.JacksonObjectMapper

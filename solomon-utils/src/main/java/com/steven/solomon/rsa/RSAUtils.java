@@ -6,8 +6,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.asymmetric.KeyType;
 import cn.hutool.crypto.asymmetric.RSA;
 import com.steven.solomon.json.FastJsonUtils;
-import com.steven.solomon.json.JackJsonUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.FileReader;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
@@ -113,12 +111,12 @@ public class RSAUtils {
     String body = FastJsonUtils.formatJsonByFilter(map);
     //公钥加密 私钥解密
     String token = encryptPemFile(body,publicKeyPath,KeyType.PublicKey);
-    System.out.println("加密后:"+token);
-    System.out.println("解密后:"+decryptPemFile(token,privateKeyPath,KeyType.PrivateKey));
+    System.out.println("公钥加密后:"+token);
+    System.out.println("私钥解密后:"+decryptPemFile(token,privateKeyPath,KeyType.PrivateKey));
 
     //私钥加密 公钥解密
     token = encryptPemFile(body,privateKeyPath,KeyType.PrivateKey);
-    System.out.println("加密后:"+token);
-    System.out.println("解密后:"+decryptPemFile(token,publicKeyPath,KeyType.PublicKey));
+    System.out.println("私钥加密后:"+token);
+    System.out.println("公钥解密后:"+decryptPemFile(token,publicKeyPath,KeyType.PublicKey));
   }
 }
