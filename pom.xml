@@ -67,7 +67,7 @@
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
     <druid.version>1.2.18</druid.version>
     <xmpcore.version>6.1.11</xmpcore.version>
-    <metadata.version>2.18.0</metadata.version>
+    <metadata.version>2.19.0</metadata.version>
     <knife4j.version>3.0.3</knife4j.version>
     <jwt.version>0.9.1</jwt.version>
     <oss.version>3.15.1</oss.version>

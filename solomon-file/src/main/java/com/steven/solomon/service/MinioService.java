@@ -34,9 +34,13 @@ public class MinioService extends AbstractFileService {
 
   public MinioClient client;
 
-  public MinioService(FileChoiceProperties mioProperties) {
-    super(mioProperties);
-    client = MinioClient.builder().credentials(mioProperties.getAccessKey(), mioProperties.getSecretKey()).endpoint(mioProperties.getEndpoint()).build();
+  public MinioService(FileChoiceProperties properties) {
+    super(properties);
+    MinioClient.Builder builder = MinioClient.builder().credentials(properties.getAccessKey(), properties.getSecretKey()).endpoint(properties.getEndpoint());
+    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+      builder.region(properties.getRegionName());
+    }
+    client = builder.build();
   }
 
   @Override
