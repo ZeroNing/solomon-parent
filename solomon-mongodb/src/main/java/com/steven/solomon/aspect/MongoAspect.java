@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Redis 租户切换的AOP实现类
+ * mongodb 租户切换的AOP实现类
  */
 @Aspect
 @Configuration
