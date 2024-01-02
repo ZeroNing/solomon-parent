@@ -91,8 +91,7 @@ public class MqttConfig {
       String tenantCode = entry.getKey();
       MqttProfile mqttProfile = entry.getValue();
 
-      MqttClient   mqttClient = new MqttClient(mqttProfile.getUrl(),
-          ValidateUtils.isEmpty(mqttProfile.getClientId()) ? UUID.randomUUID().toString() : mqttProfile.getClientId());
+      MqttClient   mqttClient = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(),UUID.randomUUID().toString()));
       List<Object> clazzList  = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
       MqttConnectOptions options = getMqttConnectOptions(mqttProfile);
       mqttClient.connect(options);

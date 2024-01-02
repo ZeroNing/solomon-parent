@@ -18,7 +18,7 @@ public class BaseGlobalExceptionHandler {
 
         BaseExceptionVO baseExceptionVO = ExceptionUtil.getBaseExceptionVO(exceptionSimpleName,ex);
         String requestId = ExceptionUtil.requestId.get();
-        requestId = ValidateUtils.isEmpty(requestId) ? "0" : requestId;
+        requestId = ValidateUtils.getOrDefault(requestId,"0");
         baseExceptionVO.setServerId(serverId);
         baseExceptionVO.setLocale(locale);
         baseExceptionVO.setRequestId(requestId);

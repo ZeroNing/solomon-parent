@@ -15,6 +15,6 @@ public class DynamicRedisTemplate<K,V> extends RedisTemplate<K,V> {
   @Override
   public RedisConnectionFactory getConnectionFactory() {
     RedisConnectionFactory factory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
-    return ValidateUtils.isEmpty(factory) ? super.getConnectionFactory() : factory;
+    return ValidateUtils.getOrDefault(factory,super.getConnectionFactory());
   }
 }

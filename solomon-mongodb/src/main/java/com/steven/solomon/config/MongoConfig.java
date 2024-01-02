@@ -66,7 +66,7 @@ public class MongoConfig {
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
     SpringUtil.setContext(applicationContext);
     if (isSwitchDb) {
-      Map<String, MongoProperties> tenantMap = ValidateUtils.isEmpty(mongoProperties.getTenant()) ? new HashMap<>() : mongoProperties.getTenant();
+      Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
       if(!tenantMap.containsKey(BaseCode.DEFAULT)){
         tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);

@@ -276,7 +276,7 @@ public class RedisService extends AbsICacheService {
   public boolean lockSet(String group, String key, Object value, int time) {
     Boolean success = redisTemplate.opsForValue().setIfAbsent(assembleKey(group, key), value);
     expire(group,key,time);
-    return !ValidateUtils.isEmpty(success) ? success : false;
+    return !ValidateUtils.getOrDefault(success,false);
   }
 
   @Override
