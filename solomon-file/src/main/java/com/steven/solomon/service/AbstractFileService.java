@@ -38,6 +38,10 @@ public abstract class AbstractFileService implements FileServiceInterface{
     this.partSize = Long.valueOf(this.properties.getPartSize() * 1024*1024);
   }
 
+  public AbstractFileService(){
+    this.partSize = Long.valueOf(5 * 1024*1024);
+  }
+
   @Override
   public FileUpload upload(InputStream is, String bucketName,String fileName) throws Exception {
     return upload(is,bucketName,fileName,false);

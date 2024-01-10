@@ -1,6 +1,13 @@
 package com.steven.solomon.service;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.Protocol;
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AbortMultipartUploadRequest;
 import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
@@ -8,8 +15,6 @@ import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
 import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.PartETag;
 import com.amazonaws.services.s3.model.UploadPartRequest;
-import com.amazonaws.services.s3.model.UploadPartResult;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -24,8 +29,23 @@ public abstract class S3Service extends AbstractFileService {
 
   protected AmazonS3 client;
 
+  public S3Service(){
+    super();
+  }
+
   public S3Service(FileChoiceProperties properties) {
     super(properties);
+    AWSCredentials        credentials = new BasicAWSCredentials(properties.getAccessKey(), properties.getSecretKey());
+    AmazonS3ClientBuilder builder     = AmazonS3ClientBuilder.standard();
+    builder.withCredentials(new AWSStaticCredentialsProvider(credentials));
+    if(ValidateUtils.isNotEmpty(properties.getEndpoint()) && ValidateUtils.isNotEmpty(properties.getRegionName())){
+      builder.withEndpointConfiguration(new EndpointConfiguration(properties.getEndpoint(),properties.getRegionName()));
+    }
+    ClientConfiguration awsClientConfig = new ClientConfiguration();
+    boolean             isHttps         = properties.getEndpoint().contains("https");
+    awsClientConfig.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
+    builder.setClientConfiguration(awsClientConfig);
+    client = builder.build();
   }
 
   @Override
