@@ -956,7 +956,7 @@ public class Lambda {
    * @param list      数据集合
    * @param predicate 条件筛选数据
    */
-  public <T> boolean anyMatch(List<T> list,Predicate<T> predicate){
+  public static <T> boolean anyMatch(List<T> list,Predicate<T> predicate){
     if(ValidateUtils.isEmpty(list)){
       return false;
     }
@@ -1004,5 +1004,12 @@ public class Lambda {
     
     Map<K, List<T>> groupByMap = groupBy(list,groupByFunc);
     return groupByMap.entrySet().stream().filter(entry -> entry.getValue().size() > 1).map(entry-> entry.getKey()).collect(Collectors.toList());
+  }
+
+  public static void main(String[] args) {
+    List<String> a = new ArrayList<>();
+    a.add("aa");
+    a.add("a");
+    System.out.println(Lambda.anyMatch(a,key->key.equals("a")));
   }
 }
