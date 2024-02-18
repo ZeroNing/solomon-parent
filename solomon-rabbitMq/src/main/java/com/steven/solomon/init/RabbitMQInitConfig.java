@@ -82,8 +82,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
           // 初始化队列绑定
           Queue queue = initBinding(abstractMQMap, queueName, true, false);
           // 启动监听器并保存已启动的MQ
-          RabbitMQInitConfig.allQueueContainerMap
-              .put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue));
+          allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue));
           // 初始化死信队列
           this.initDlx(queue,abstractMQMap);
         }
@@ -114,7 +113,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
     // 初始化队列绑定
     Queue queues = initBinding(abstractMQMap, queueName, false, true);
     // 启动监听器
-    this.startContainer(abstractConsumer, queues);
+    allQueueContainerMap.put(queues.getName(), this.startContainer(abstractConsumer, queues));
     logger.debug("MessageListenerConfig队列:{}绑定{}死信队列", queue.getName(), queues.getName());
   }
 
@@ -146,14 +145,14 @@ public class RabbitMQInitConfig implements CommandLineRunner {
     if (ValidateUtils.isNotEmpty(rabbitMqRetry) && AbstractConsumer.class
         .isAssignableFrom(abstractConsumer.getClass())) {
       //设置重试机制
-      container.setAdviceChain(setRabbitRetry(rabbitMqRetry, admin));
+      container.setAdviceChain(setRabbitRetry(rabbitMqRetry));
     }
     // 启动对应的适配器
     container.start();
     return container;
   }
 
-  public RetryOperationsInterceptor setRabbitRetry(RabbitMqRetry rabbitMqRetry, RabbitAdmin admin) {
+  public RetryOperationsInterceptor setRabbitRetry(RabbitMqRetry rabbitMqRetry) {
     RetryTemplate retryTemplate = new RetryTemplate();
     retryTemplate.setBackOffPolicy(backOffPolicyByProperties(rabbitMqRetry));
     retryTemplate.setRetryPolicy(retryPolicyByProperties(rabbitMqRetry));
