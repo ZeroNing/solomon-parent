@@ -91,8 +91,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if (!flag || ValidateUtils.isEmpty(fileName)) {
+    if (!bucketExists(bucketName) || ValidateUtils.isEmpty(fileName)) {
       return;
     }
     delete(bucketName,getFilePath(fileName,properties));
@@ -114,8 +113,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void makeBucket(String bucketName) throws Exception {
-    boolean flag = bucketExists(bucketName);
-    if(flag){
+    if(bucketExists(bucketName)){
       return;
     }
     this.createBucket(bucketName);
