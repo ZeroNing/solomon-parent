@@ -1,10 +1,13 @@
 package com.steven.solomon.service;
 
+import com.baidubce.services.bos.model.BucketSummary;
+import com.baidubce.services.bos.model.ListBucketsResponse;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.AbortMultipartUploadRequest;
+import com.qcloud.cos.model.Bucket;
 import com.qcloud.cos.model.CompleteMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadRequest;
 import com.qcloud.cos.model.InitiateMultipartUploadResult;
@@ -132,5 +135,25 @@ public class COSService extends AbstractFileService {
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
     client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+  }
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.deleteBucket(bucketName);
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    List<Bucket> listBucketsResponse = client.listBuckets();
+    List<String> bucketNameList      = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
+      for(Bucket bucket : listBucketsResponse){
+        bucketNameList.add(bucket.getName());
+      }
+    }
+    return bucketNameList;
   }
 }

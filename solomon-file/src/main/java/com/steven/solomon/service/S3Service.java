@@ -9,6 +9,7 @@ import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AbortMultipartUploadRequest;
+import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.CompleteMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadRequest;
 import com.amazonaws.services.s3.model.InitiateMultipartUploadResult;
@@ -141,4 +142,24 @@ public abstract class S3Service extends AbstractFileService {
     client.completeMultipartUpload(compRequest);
   }
 
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.deleteBucket(bucketName);
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    List<Bucket> bucketList = client.listBuckets();
+    List<String> bucketNameList = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(bucketList)){
+      for(Bucket bucket : bucketList){
+        bucketNameList.add(bucket.getName());
+      }
+    }
+    return bucketNameList;
+  }
 }

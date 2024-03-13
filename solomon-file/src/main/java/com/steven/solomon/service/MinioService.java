@@ -16,11 +16,13 @@ import io.minio.ListObjectsArgs;
 import io.minio.MakeBucketArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveBucketArgs;
 import io.minio.RemoveObjectArgs;
 import io.minio.Result;
 import io.minio.StatObjectArgs;
 import io.minio.StatObjectResponse;
 import io.minio.http.Method;
+import io.minio.messages.Bucket;
 import io.minio.messages.Item;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -137,4 +139,23 @@ public class MinioService extends AbstractFileService {
     return null;
   }
 
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    List<Bucket> listBucketsResponse = client.listBuckets();
+    List<String> bucketNameList      = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
+      for(Bucket bucket : listBucketsResponse){
+        bucketNameList.add(bucket.name());
+      }
+    }
+    return bucketNameList;
+  }
 }

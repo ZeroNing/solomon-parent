@@ -3,6 +3,7 @@ package com.steven.solomon.service;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.AbortMultipartUploadRequest;
+import com.aliyun.oss.model.Bucket;
 import com.aliyun.oss.model.CompleteMultipartUploadRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadRequest;
 import com.aliyun.oss.model.InitiateMultipartUploadResult;
@@ -11,6 +12,7 @@ import com.aliyun.oss.model.PartETag;
 import com.aliyun.oss.model.PutObjectRequest;
 import com.aliyun.oss.model.UploadPartRequest;
 import com.aliyun.oss.model.UploadPartResult;
+import com.obs.services.model.S3Bucket;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -125,5 +127,25 @@ public class OSSService extends AbstractFileService {
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
     client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+  }
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.deleteBucket(bucketName);
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    List<Bucket> listBucketsResponse = client.listBuckets();
+    List<String> bucketNameList      = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
+      for(Bucket bucket : listBucketsResponse){
+        bucketNameList.add(bucket.getName());
+      }
+    }
+    return bucketNameList;
   }
 }

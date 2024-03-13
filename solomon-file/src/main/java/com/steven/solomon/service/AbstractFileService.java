@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public abstract class AbstractFileService implements FileServiceInterface{
 
-  private static Logger logger = LoggerUtils.logger(AbstractFileService.class);
+  protected static Logger logger = LoggerUtils.logger(AbstractFileService.class);
 
   @Autowired
   protected FileNamingRulesGenerationService fileNamingRulesGenerationService;

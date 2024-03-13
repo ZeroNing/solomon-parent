@@ -9,6 +9,7 @@ import com.obs.services.model.InitiateMultipartUploadResult;
 import com.obs.services.model.ListObjectsRequest;
 import com.obs.services.model.ObjectListing;
 import com.obs.services.model.PartEtag;
+import com.obs.services.model.S3Bucket;
 import com.obs.services.model.TemporarySignatureRequest;
 import com.obs.services.model.TemporarySignatureResponse;
 import com.obs.services.model.UploadPartRequest;
@@ -17,6 +18,7 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
+import io.minio.messages.Bucket;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -139,5 +141,25 @@ public class OBSService extends AbstractFileService {
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
     client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+  }
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.deleteBucket(bucketName);
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    List<S3Bucket> listBucketsResponse = client.listBuckets();
+    List<String>   bucketNameList      = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
+      for(S3Bucket bucket : listBucketsResponse){
+        bucketNameList.add(bucket.getBucketName());
+      }
+    }
+    return bucketNameList;
   }
 }

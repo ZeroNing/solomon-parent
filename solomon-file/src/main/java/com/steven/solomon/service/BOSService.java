@@ -1,12 +1,15 @@
 package com.steven.solomon.service;
 
+import com.amazonaws.services.s3.model.Bucket;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.AbortMultipartUploadRequest;
+import com.baidubce.services.bos.model.BucketSummary;
 import com.baidubce.services.bos.model.CompleteMultipartUploadRequest;
 import com.baidubce.services.bos.model.InitiateMultipartUploadRequest;
 import com.baidubce.services.bos.model.InitiateMultipartUploadResponse;
+import com.baidubce.services.bos.model.ListBucketsResponse;
 import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.baidubce.services.bos.model.PartETag;
 import com.baidubce.services.bos.model.PutObjectRequest;
@@ -130,5 +133,25 @@ public class BOSService extends AbstractFileService {
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
     client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+  }
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
+    if(ValidateUtils.isEmpty(bucketName)){
+      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+    }
+    client.deleteBucket(bucketName);
+  }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    ListBucketsResponse listBucketsResponse     = client.listBuckets();
+    List<String>        bucketNameList = new ArrayList<>();
+    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
+      for(BucketSummary bucket : listBucketsResponse.getBuckets()){
+        bucketNameList.add(bucket.getName());
+      }
+    }
+    return bucketNameList;
   }
 }

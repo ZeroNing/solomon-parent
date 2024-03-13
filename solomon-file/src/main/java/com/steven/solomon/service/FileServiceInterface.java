@@ -136,6 +136,18 @@ public interface FileServiceInterface {
   String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
 
   /**
+   * 删除桶名
+   * @param bucketName 桶名
+   * @throws Exception
+   */
+  void deleteBucket(String bucketName) throws Exception;
+
+  /**
+   * 获取所有桶名
+   */
+  List<String> getBucketList() throws Exception;
+
+  /**
    * 获取文件MD5
    */
   default String getMd5(MultipartFile file) throws IOException {

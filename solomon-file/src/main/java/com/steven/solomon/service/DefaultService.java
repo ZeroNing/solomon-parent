@@ -4,6 +4,7 @@ import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -84,6 +85,11 @@ public class DefaultService extends AbstractFileService {
 
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) throws Exception {
+    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+  }
+
+  @Override
+  public void deleteBucket(String bucketName) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
 }
