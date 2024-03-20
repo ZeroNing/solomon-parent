@@ -24,7 +24,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
       }
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
-      logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",mqttModel.getTenantCode(),Thread.currentThread().getName(),topic, json);
+      logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),topic, json);
       // 消费者消费消息
       R result = this.handleMessage(topic,(T) mqttModel.getBody());
       //保存消费成功消息

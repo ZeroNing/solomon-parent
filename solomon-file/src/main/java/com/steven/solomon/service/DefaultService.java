@@ -92,4 +92,9 @@ public class DefaultService extends AbstractFileService {
   public void deleteBucket(String bucketName) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
+
+  @Override
+  public List<String> getBucketList() throws Exception {
+    throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
+  }
 }

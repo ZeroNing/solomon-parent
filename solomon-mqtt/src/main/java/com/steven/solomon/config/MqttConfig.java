@@ -1,5 +1,7 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import com.steven.solomon.annotation.Mqtt;
 import com.steven.solomon.consumer.AbstractConsumer;
@@ -105,10 +107,11 @@ public class MqttConfig {
           if (ValidateUtils.isEmpty(mqtt)) {
             continue;
           }
+          AbstractConsumer consumer = (AbstractConsumer) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
           for(String topic : mqtt.topics()){
-            mqttClient.subscribe(topic, mqtt.qos(), (AbstractConsumer) abstractConsumer);
+            mqttClient.subscribe(topic, mqtt.qos(), consumer);
           }
-          map.put((AbstractConsumer) abstractConsumer, mqtt);
+          map.put(consumer, mqtt);
           utils.putTenantAbstractConsumerMap(tenantCode,map);
         }
       }

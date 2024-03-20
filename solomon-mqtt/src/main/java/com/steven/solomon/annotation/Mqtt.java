@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Target(value = { ElementType.FIELD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-@Scope("prototype")
+//@Scope("prototype")
 public @interface Mqtt {
 
   /**
