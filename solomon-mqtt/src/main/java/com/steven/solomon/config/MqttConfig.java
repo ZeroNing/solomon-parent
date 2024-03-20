@@ -49,13 +49,10 @@ public class MqttConfig {
 
   private final MqttUtils utils;
 
-  private final ApplicationContext applicationContext;
-
   public MqttConfig(TenantMqttProfile profile, MqttUtils utils,
       ApplicationContext applicationContext) {
     this.profile = profile;
     this.utils   = utils;
-    this.applicationContext = applicationContext;
     SpringUtil.setContext(applicationContext);
   }
 

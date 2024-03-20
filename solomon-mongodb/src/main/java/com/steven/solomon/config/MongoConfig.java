@@ -50,7 +50,6 @@ public class MongoConfig {
 
   private boolean isSwitchDb = false;
 
-  private final ApplicationContext applicationContext;
 
   public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantsContext context,
       MongoProperties properties, ApplicationContext applicationContext) {
@@ -58,13 +57,12 @@ public class MongoConfig {
     this.context         = context;
     this.properties      = properties;
     this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
-    this.applicationContext = applicationContext;
+    SpringUtil.setContext(applicationContext);
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
-    SpringUtil.setContext(applicationContext);
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
       if(!tenantMap.containsKey(BaseCode.DEFAULT)){

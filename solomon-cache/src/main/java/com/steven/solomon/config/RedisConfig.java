@@ -51,8 +51,6 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private final RedisProperties redisProperties;
 
-  private final ApplicationContext applicationContext;
-
   private final CacheProfile cacheProfile;
 
   private final CacheProperties cacheProperties;
@@ -64,14 +62,13 @@ public class RedisConfig extends CachingConfigurerSupport {
     this.context            = context;
     this.isSwitchDb         = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), cacheProfile.getMode().toString());
     this.redisProperties    = redisProperties;
-    this.applicationContext = applicationContext;
     this.cacheProfile       = cacheProfile;
     this.cacheProperties    = cacheProperties;
+    SpringUtil.setContext(applicationContext);
   }
 
   @PostConstruct
   public void afterPropertiesSet() {
-    SpringUtil.setContext(applicationContext);
     if (!ValidateUtils.equalsIgnoreCase(CacheType.REDIS.toString(), cacheProperties.getType().name())) {
       return;
     }
