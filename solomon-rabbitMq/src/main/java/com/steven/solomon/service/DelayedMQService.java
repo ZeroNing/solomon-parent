@@ -25,6 +25,5 @@ public class DelayedMQService extends AbstractMQService {
   @Override
   protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey,RabbitMq rabbitMq) {
     return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
-
   }
 }
