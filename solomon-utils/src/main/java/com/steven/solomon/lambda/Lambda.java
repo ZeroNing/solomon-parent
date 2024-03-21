@@ -1,9 +1,11 @@
 package com.steven.solomon.lambda;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
@@ -1006,10 +1008,25 @@ public class Lambda {
     return groupByMap.entrySet().stream().filter(entry -> entry.getValue().size() > 1).map(entry-> entry.getKey()).collect(Collectors.toList());
   }
 
+  public static <T> void foreach(List<T> list, Consumer<T> consumer){
+    if(ValidateUtils.isEmpty(list)){
+      return;
+    }
+    for(T t : list){
+      consumer.accept(t);
+    }
+  }
+
   public static void main(String[] args) {
     List<String> a = new ArrayList<>();
     a.add("aa");
     a.add("a");
-    System.out.println(Lambda.anyMatch(a,key->key.equals("a")));
+    Set<String> b = new HashSet<>();
+    Lambda.foreach(a,(String c)->{
+      if(StrUtil.equalsIgnoreCase("a",c)){
+        b.add(c);
+      }
+    });
+    System.out.println(b.toString());
   }
 }
