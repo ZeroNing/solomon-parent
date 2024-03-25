@@ -52,7 +52,7 @@ public class ActiveMQInitConfig implements CommandLineRunner {
   public void init(List<Object> clazzList) throws JMSException {
     // 判断消费者队列是否存在
     if (ValidateUtils.isEmpty(clazzList)) {
-      logger.info("MessageListenerConfig:没有ActiveMQ消费者");
+      logger.error("MessageListenerConfig:没有ActiveMQ消费者");
       return;
     }
     Connection connection = connectionFactory.createConnection();

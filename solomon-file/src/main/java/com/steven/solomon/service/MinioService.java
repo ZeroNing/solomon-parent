@@ -142,7 +142,7 @@ public class MinioService extends AbstractFileService {
   @Override
   public void deleteBucket(String bucketName) throws Exception {
     if(ValidateUtils.isEmpty(bucketName)){
-      logger.info("deleteBucket方法中,请求参数为空,删除桶失败");
+      logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
   }
