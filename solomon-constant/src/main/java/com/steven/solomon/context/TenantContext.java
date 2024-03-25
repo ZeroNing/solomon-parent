@@ -13,35 +13,47 @@ public abstract class TenantContext<F> {
    * 获取工厂
    * @return
    */
-  public abstract F getFactory();
+  public F getFactory() {
+    return THREAD_LOCAL.get();
+  }
 
   /**
    * 设置工厂
    * @param key
    */
-  public abstract void setFactory(String key);
+  public void setFactory(String key) {
+    THREAD_LOCAL.set(FACTORY_MAP.get(key));
+  }
 
   /**
    * 删除工厂
    */
-  public abstract void removeFactory();
+  public void removeFactory() {
+    THREAD_LOCAL.remove();
+  }
 
   /**
    * 获取所有工厂
    * @return
    */
-  public abstract Map<String,F> getFactoryMap();
+  public Map<String, F> getFactoryMap() {
+    return FACTORY_MAP;
+  }
 
   /**
    * set工厂
    * @param factoryMap
    */
-  public abstract void setFactory(Map<String, F> factoryMap);
+  public void setFactory(Map<String, F> factoryMap) {
+    FACTORY_MAP.putAll(factoryMap);
+  }
 
   /**
    * set工厂
    * @param key
    * @param factory
    */
-  public abstract void setFactory(String key,F factory);
+  public void setFactory(String key, F factory) {
+    FACTORY_MAP.put(key,factory);
+  }
 }
