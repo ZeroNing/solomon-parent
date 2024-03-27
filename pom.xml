@@ -31,7 +31,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
     <yauaa.version>7.26.0</yauaa.version>
-    <easy.excel.version>3.3.2</easy.excel.version>
+    <easy.excel.version>3.3.4</easy.excel.version>
     <spring.boot.version>2.4.13</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
     <javax.validation>2.0.1.Final</javax.validation>
@@ -52,7 +52,7 @@
     <spring.context.support.version>1.0.11</spring.context.support.version>
     <nacos.client.version>2.2.2</nacos.client.version>
     <jedis.version>4.0.0</jedis.version>
-    <seata.version>1.7.0-native-rc2</seata.version>
+    <seata.version>2.0.0</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
     <redisson.version>3.15.1</redisson.version>
     <hutool.version>5.8.18</hutool.version>
