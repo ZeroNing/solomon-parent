@@ -81,7 +81,7 @@
 <!--    <okio.version>2.10.0</okio.version>-->
     <elasticsearch.version>5.1.0</elasticsearch.version>
     <elasticsearch-java>8.8.1</elasticsearch-java>
-    <aws.s3.version>1.12.581</aws.s3.version>
+    <aws.s3.version>1.12.687</aws.s3.version>
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
   </properties>
 
