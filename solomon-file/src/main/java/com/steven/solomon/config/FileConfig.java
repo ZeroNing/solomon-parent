@@ -12,12 +12,14 @@ import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.EOSService;
 import com.steven.solomon.service.FileServiceInterface;
+import com.steven.solomon.service.JDService;
 import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.KS3Service;
 import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.NOSService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import com.steven.solomon.service.YandexService;
 import com.steven.solomon.service.ZOSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import okhttp3.OkHttpClient;
@@ -78,6 +80,10 @@ public class FileConfig {
         return new NOSService(fileProperties);
       case B2:
         return new B2Service(fileProperties);
+      case JD:
+        return new JDService(fileProperties);
+      case YANDEX:
+        return new YandexService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }

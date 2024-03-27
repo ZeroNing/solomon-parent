@@ -15,6 +15,8 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   EOS("EOS","移动云对象存储"),
   NOS("NOS","网易数帆对象存储"),
   B2("B2","B2云存储"),
+  JD("JD","京东云存储"),
+  YANDEX("YANDEX","Yandex对象存储"),
   ;
 
   private String label;
