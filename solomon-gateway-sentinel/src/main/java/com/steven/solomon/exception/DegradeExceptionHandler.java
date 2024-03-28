@@ -10,6 +10,6 @@ public class DegradeExceptionHandler extends AbstractExceptionHandler {
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    return new BaseExceptionVO(BaseExceptionCode.SYSTEM_FUSING,500);
+    return new BaseExceptionVO(BaseExceptionCode.SYSTEM_FUSING,503);
   }
 }

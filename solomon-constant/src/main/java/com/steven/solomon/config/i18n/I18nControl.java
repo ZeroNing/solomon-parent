@@ -1,5 +1,6 @@
 package com.steven.solomon.config.i18n;
 
+import com.steven.solomon.code.BaseCode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +13,6 @@ import java.util.*;
 
 public class I18nControl extends ResourceBundle.Control{
   private static final String ALL_CLASSPATH_URL_PERFIX = "classpath*:";
-  private static final String PROPERTY_ENCODING = "UTF-8";
 
   @Override
   public ResourceBundle newBundle(String baseName, Locale locale, String format,
@@ -92,7 +92,7 @@ public class I18nControl extends ResourceBundle.Control{
     }
     if (stream != null) {
       try {
-        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, PROPERTY_ENCODING));
+        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, BaseCode.UTF8));
       } finally {
         stream.close();
       }
@@ -128,7 +128,7 @@ public class I18nControl extends ResourceBundle.Control{
     }
     if (stream != null) {
       try {
-        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, PROPERTY_ENCODING));
+        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, BaseCode.UTF8));
       } finally {
         stream.close();
       }

@@ -12,6 +12,6 @@ public class ConstraintViolationExceptionHandler extends AbstractExceptionHandle
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     ConstraintViolationException e = (ConstraintViolationException) ex;
-    return new BaseExceptionVO(e.getMessage(), HttpStatus.BAD_REQUEST.value());
+    return new BaseExceptionVO(e.getMessage(), 400);
   }
 }

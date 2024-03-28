@@ -10,6 +10,6 @@ public class FlowExceptionHandler extends AbstractExceptionHandler {
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    return new BaseExceptionVO(BaseExceptionCode.SYSTEM_LIMITING,500);
+    return new BaseExceptionVO(BaseExceptionCode.SYSTEM_LIMITING,429);
   }
 }

@@ -10,7 +10,7 @@ public class ResponseStatusExceptionHandler extends AbstractExceptionHandler {
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    return new BaseExceptionVO(BaseExceptionCode.BAD_REQUEST,500);
+    return new BaseExceptionVO(BaseExceptionCode.BAD_REQUEST,404);
   }
 
 }

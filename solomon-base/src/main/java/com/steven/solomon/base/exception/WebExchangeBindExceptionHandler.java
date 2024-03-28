@@ -20,6 +20,6 @@ public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
       ObjectError objectError = errorMessages.get(0);
       errorMessage = objectError.getDefaultMessage();
     }
-    return new BaseExceptionVO(errorMessage, HttpStatus.BAD_REQUEST.value());
+    return new BaseExceptionVO(errorMessage, 400);
   }
 }

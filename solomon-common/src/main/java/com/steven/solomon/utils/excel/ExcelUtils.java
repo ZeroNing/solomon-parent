@@ -16,6 +16,7 @@ import com.alibaba.excel.write.metadata.style.WriteFont;
 import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
 import com.alibaba.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import com.steven.solomon.clazz.ClassUtils;
+import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -138,10 +139,10 @@ public class ExcelUtils {
 	private static void setHead(HttpServletResponse response, String fileName) {
 
 		response.setContentType("application/vnd.ms-excel");
-		response.setCharacterEncoding("utf-8");
+		response.setCharacterEncoding(BaseCode.UTF8);
 		// 这里URLEncoder.encode可以防止中文乱码
 		try {
-			fileName = URLEncoder.encode(fileName, "UTF-8");
+			fileName = URLEncoder.encode(fileName, BaseCode.UTF8);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}

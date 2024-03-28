@@ -11,7 +11,7 @@ public class NotFoundExceptionHandler extends AbstractExceptionHandler {
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    BaseExceptionVO baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.BASE_EXCEPTION_CODE, 500);
+    BaseExceptionVO baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.BASE_EXCEPTION_CODE, 404);
     if(ex instanceof NotFoundException){
       String reason = ((NotFoundException) ex).getReason();
       reason = reason.substring(reason.lastIndexOf("for ")+4);

@@ -60,7 +60,7 @@ public class ControllerAspect {
     return obj;
   }
 
-  private void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Throwable ex,String uuid,Object obj,String startTime) {
+  protected void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch,Throwable ex,String uuid,Object obj,String startTime) {
     HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
     String url = request.getRequestURL().toString();
 //    String proceedingJoinPoint = pjp.getSignature().toString();
