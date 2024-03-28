@@ -1,19 +1,24 @@
 package com.steven.solomon.utils.userAgent;
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class UserAgentUtils {
 
   private static final String USER_AGENT = "User-Agent";
   private UserAgentAnalyzer userAgentAnalyzer = null;
 
-  public UserAgentUtils() {
-    userAgentAnalyzer = UserAgentAnalyzer.newBuilder()
-        .withFields(UserAgent.AGENT_NAME_VERSION, UserAgent.OPERATING_SYSTEM_NAME_VERSION, UserAgent.DEVICE_BRAND, UserAgent.DEVICE_CLASS, UserAgent.DEVICE_NAME)
-        .hideMatcherLoadStats().withCache(10000).build();
+  public UserAgentUtils(){
+    if(ValidateUtils.isEmpty(this.userAgentAnalyzer)){
+      this.userAgentAnalyzer = UserAgentAnalyzer.newBuilder()
+          .withFields(UserAgent.AGENT_NAME_VERSION, UserAgent.OPERATING_SYSTEM_NAME_VERSION, UserAgent.DEVICE_BRAND, UserAgent.DEVICE_CLASS, UserAgent.DEVICE_NAME)
+          .hideMatcherLoadStats().withCache(10000).build();
+    }
   }
 
   /**
