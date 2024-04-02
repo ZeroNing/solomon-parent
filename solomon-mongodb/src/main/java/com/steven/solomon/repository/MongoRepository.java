@@ -35,7 +35,7 @@ public class MongoRepository<T, I> {
    * 获取一条记录
    */
   public T get(Query query) {
-    return mongoTemplate.findOne(query, modelClass);
+    return get(query, modelClass);
   }
 
   /**
@@ -49,9 +49,7 @@ public class MongoRepository<T, I> {
    * 根据id获取记录
    */
   public T getById(I id) {
-    Query query = new Query();
-    query.addCriteria(Criteria.where(ID).is(id));
-    return mongoTemplate.findOne(query, modelClass);
+    return getById(id, modelClass);
   }
 
   /**
@@ -67,7 +65,16 @@ public class MongoRepository<T, I> {
    * 查询列表
    */
   public List<T> find(Query query) {
-    return mongoTemplate.find(query, modelClass);
+    return find(query, modelClass);
+  }
+
+  /**
+   * 根据id查询列表
+   */
+  public List<T> findByIds(Collection<I> ids) {
+    Query query = new Query();
+    query.addCriteria(Criteria.where(ID).in(ids));
+    return find(query, modelClass);
   }
 
   /**
