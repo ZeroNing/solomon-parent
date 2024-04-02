@@ -58,7 +58,7 @@ public class MongoRepository<T, I> {
   public <V> V getById(I id, Class<V> clazz) {
     Query query = new Query();
     query.addCriteria(Criteria.where(ID).is(id));
-    return mongoTemplate.findOne(query, clazz);
+    return get(query, clazz);
   }
 
   /**
@@ -129,8 +129,14 @@ public class MongoRepository<T, I> {
    * 根据id删除记录
    */
   public void deleteById(I id) {
-    Query query = new Query(Criteria.where("_id").is(id));
-    mongoTemplate.remove(query, modelClass);
+    delete(new Query(Criteria.where("_id").is(id)));
+  }
+
+  /**
+   * 根据id删除记录
+   */
+  public void deleteByIds(Collection<I> ids) {
+    delete(new Query(Criteria.where("_id").in(ids)));
   }
 
   /**
