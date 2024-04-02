@@ -20,8 +20,7 @@ import org.springframework.data.redis.connection.lettuce.LettucePoolingClientCon
 public class RedisInitUtils {
 
   public static void init(String tenantCode,RedisProperties properties,RedisTenantContext context) {
-    RedisConnectionFactory factory = initConnectionFactory(properties);
-    context.setFactory(tenantCode, factory);
+    context.setFactory(tenantCode, initConnectionFactory(properties));
   }
 
   public static void init(Map<String,RedisProperties> propertiesMap,RedisTenantContext context) {
