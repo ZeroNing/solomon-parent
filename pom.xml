@@ -35,7 +35,7 @@
     <spring.boot.version>2.4.13</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
     <javax.validation>2.0.1.Final</javax.validation>
-    <thumbnailator.version>0.4.3</thumbnailator.version>
+    <thumbnailator.version>0.4.20</thumbnailator.version>
     <commons.collections4.version>4.4</commons.collections4.version>
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
@@ -51,11 +51,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.context.support.version>1.0.11</spring.context.support.version>
     <nacos.client.version>2.2.2</nacos.client.version>
-    <jedis.version>4.0.0</jedis.version>
     <seata.version>2.0.0</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
-    <redisson.version>3.15.1</redisson.version>
-    <hutool.version>5.8.18</hutool.version>
+    <hutool.version>5.8.27</hutool.version>
     <spring.loadbalancer.version>3.0.4</spring.loadbalancer.version>
     <spring.bootstrap.version>3.0.4</spring.bootstrap.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
