@@ -23,6 +23,7 @@ import com.steven.solomon.service.NOSService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
 import com.steven.solomon.service.SharktechService;
+import com.steven.solomon.service.TosService;
 import com.steven.solomon.service.YandexService;
 import com.steven.solomon.service.ZOSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -96,6 +97,8 @@ public class FileConfig {
         return new DiDiService(fileProperties);
       case BOTO3:
         return new Boto3Service(fileProperties);
+      case TOS:
+        return new TosService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }
