@@ -6,10 +6,13 @@ import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
 import com.steven.solomon.namingRules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.namingRules.UUIDNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.service.AmazonService;
 import com.steven.solomon.service.B2Service;
 import com.steven.solomon.service.BOSService;
+import com.steven.solomon.service.Boto3Service;
 import com.steven.solomon.service.COSService;
 import com.steven.solomon.service.DefaultService;
+import com.steven.solomon.service.DiDiService;
 import com.steven.solomon.service.EOSService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.JDService;
@@ -19,6 +22,7 @@ import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.NOSService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import com.steven.solomon.service.SharktechService;
 import com.steven.solomon.service.YandexService;
 import com.steven.solomon.service.ZOSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -84,6 +88,14 @@ public class FileConfig {
         return new JDService(fileProperties);
       case YANDEX:
         return new YandexService(fileProperties);
+      case AMAZON:
+        return new AmazonService(fileProperties);
+      case SHARKTECH:
+        return new SharktechService(fileProperties);
+      case DIDI:
+        return new DiDiService(fileProperties);
+      case BOTO3:
+        return new Boto3Service(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }

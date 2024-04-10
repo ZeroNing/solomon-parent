@@ -17,6 +17,10 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   B2("B2","B2云存储"),
   JD("JD","京东云存储"),
   YANDEX("YANDEX","Yandex对象存储"),
+  AMAZON("AMAZON","亚马逊对象存储"),
+  SHARKTECH("SHARKTECH","鲨鱼对象存储"),
+  DIDI("DIDI","滴滴云对象存储"),
+  BOTO3("BOTO3","交大云对象存储"),
   ;
 
   private String label;
