@@ -42,30 +42,31 @@ public class OBSService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
-    long           filePosition = 0;
-    List<PartEtag> partETags    = new ArrayList<>();
-    int            partNumber   = 1;
-    while (fileSize > filePosition) {
-      // 计算每个分片的大小
-      long currentPartSize = Math.min(partSize, fileSize - filePosition);
-      byte[] partBuffer = new byte[(int) currentPartSize];
-      file.getInputStream().read(partBuffer, 0, (int) currentPartSize);
+    List<PartEtag> partETags = new ArrayList<>();
+
+    for (int i = 0; i < partCount; i++) {
+      InputStream inputStream = file.getInputStream();
+      // 跳到每个分块的开头
+      long skipBytes = partSize * i;
+      inputStream.skip(skipBytes);
+
+      // 计算每个分块的大小
+      long size = partSize < fileSize - skipBytes ?
+                  partSize : fileSize - skipBytes;
 
       UploadPartRequest uploadPartRequest = new UploadPartRequest();
       uploadPartRequest.setBucketName(bucketName);
       uploadPartRequest.setObjectKey(filePath);
       uploadPartRequest.setUploadId(uploadId);
-      uploadPartRequest.setPartSize(currentPartSize);
-      uploadPartRequest.setPartNumber(partNumber++);
-      uploadPartRequest.setInput(new ByteArrayInputStream(partBuffer));
+      uploadPartRequest.setPartSize(size);
+      uploadPartRequest.setPartNumber(i + 1);
+      uploadPartRequest.setInput(inputStream);
 
       UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
-      filePosition += currentPartSize;
       partETags.add(new PartEtag(uploadPartResult.getEtag(),uploadPartResult.getPartNumber()));
-
     }
     // 完成分片上传
     CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(

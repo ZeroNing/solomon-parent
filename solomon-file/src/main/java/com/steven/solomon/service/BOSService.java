@@ -14,6 +14,7 @@ import com.baidubce.services.bos.model.ListObjectsResponse;
 import com.baidubce.services.bos.model.PartETag;
 import com.baidubce.services.bos.model.PutObjectRequest;
 import com.baidubce.services.bos.model.UploadPartRequest;
+import com.baidubce.services.bos.model.UploadPartResponse;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -45,25 +46,28 @@ public class BOSService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
-    long           filePosition = 0;
-    List<PartETag> partETags    = new ArrayList<>();
-    for (int i = 1; filePosition < fileSize; i++) {
-      // 计算当前分片大小
-      partSize = Math.min(partSize, (fileSize - filePosition));
+    List<PartETag> partETags = new ArrayList<>();
+    for(int i = 0; i < partCount; i++){
+      InputStream inputStream = file.getInputStream();
+      // 跳到每个分块的开头
+      long skipBytes = partSize * i;
+      inputStream.skip(skipBytes);
 
-      // 创建上传请求
-      UploadPartRequest uploadRequest = new UploadPartRequest()
-          .withBucketName(bucketName).withKey(filePath)
-          .withUploadId(uploadId).withPartNumber(i)
-          .withInputStream(file.getInputStream())
-          .withPartSize(partSize);
-
-      // 上传分片并添加到列表
-      partETags.add(client.uploadPart(uploadRequest).getPartETag());
-
-      filePosition += partSize;
+      // 计算每个分块的大小
+      long size = partSize < fileSize - skipBytes ?
+                  partSize : fileSize - skipBytes;
+      UploadPartRequest uploadPartRequest = new UploadPartRequest();
+      uploadPartRequest.setBucketName(bucketName);
+      uploadPartRequest.setKey(filePath);
+      uploadPartRequest.setUploadId(uploadId);
+      uploadPartRequest.setInputStream(inputStream);
+      uploadPartRequest.setPartSize(size);
+      uploadPartRequest.setPartNumber(i + 1);
+      UploadPartResponse uploadPartResponse = client.uploadPart(uploadPartRequest);
+      // 将返回的PartETag保存到List中。
+      partETags.add(uploadPartResponse.getPartETag());
     }
     // 完成分片上传
     CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(

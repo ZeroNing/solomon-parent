@@ -48,19 +48,26 @@ public class COSService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
-    List<PartETag> partETags    = new ArrayList<>();
-    for (int i = 0; fileSize > partSize * i; i++) {
-      // 计算每个分片的大小
-      long size = Math.min(partSize, fileSize - partSize * i);
+    List<PartETag> partETags = new ArrayList<>();
+    for (int i = 0; i < partCount; i++) {
+      InputStream inputStream = file.getInputStream();
+      // 跳到每个分块的开头
+      long skipBytes = partSize * i;
+      inputStream.skip(skipBytes);
+
+      // 计算每个分块的大小
+      long size = partSize < fileSize - skipBytes ?
+                  partSize : fileSize - skipBytes;
+
       // 创建上传分片请求
       UploadPartRequest uploadPartRequest = new UploadPartRequest();
       uploadPartRequest.setBucketName(bucketName);
       uploadPartRequest.setKey(filePath);
       uploadPartRequest.setUploadId(uploadId);
-      uploadPartRequest.setInputStream(file.getInputStream());
+      uploadPartRequest.setInputStream(inputStream);
       uploadPartRequest.setPartSize(size);
       uploadPartRequest.setPartNumber(i + 1);
       // 上传分片

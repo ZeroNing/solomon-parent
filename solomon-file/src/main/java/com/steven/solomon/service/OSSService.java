@@ -17,6 +17,7 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,22 +41,28 @@ public class OSSService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
-    List<PartETag> partETags    = new ArrayList<>();
-    for (int i = 0; fileSize > partSize * i; i++) {
-      // 计算每个分片的大小
-      long size = Math.min(partSize, fileSize - partSize * i);
-      // 创建上传分片请求
+    List<PartETag> partETags = new ArrayList<>();
+    for (int i = 0; i < partCount; i++) {
+      long startPos = i * partSize;
+      long curPartSize = (i + 1 == partCount) ? (fileSize - startPos) : partSize;
       UploadPartRequest uploadPartRequest = new UploadPartRequest();
       uploadPartRequest.setBucketName(bucketName);
       uploadPartRequest.setKey(filePath);
       uploadPartRequest.setUploadId(uploadId);
-      uploadPartRequest.setInputStream(file.getInputStream());
-      uploadPartRequest.setPartSize(size);
+      // 设置上传的分片流。
+      // 以本地文件为例说明如何创建FIleInputstream，并通过InputStream.skip()方法跳过指定数据。
+      InputStream instream = file.getInputStream();
+      instream.skip(startPos);
+      uploadPartRequest.setInputStream(instream);
+      // 设置分片大小。除了最后一个分片没有大小限制，其他的分片最小为100 KB。
+      uploadPartRequest.setPartSize(curPartSize);
+      // 设置分片号。每一个上传的分片都有一个分片号，取值范围是1~10000，如果超出此范围，OSS将返回InvalidArgument错误码。
       uploadPartRequest.setPartNumber(i + 1);
-      // 上传分片
+      // 每个分片不需要按顺序上传，甚至可以在不同客户端上传，OSS会按照分片号排序组成完整的文件。
       UploadPartResult uploadPartResult = client.uploadPart(uploadPartRequest);
+      // 每次上传分片之后，OSS的返回结果包含PartETag。PartETag将被保存在partETags中。
       partETags.add(uploadPartResult.getPartETag());
     }
     // 完成分片上传

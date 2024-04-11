@@ -113,28 +113,31 @@ public abstract class S3Service extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
-    long           filePosition = 0;
-    List<PartETag> partETags    = new ArrayList<>();
-    for (int i = 1; filePosition < fileSize; i++) {
-      // 计算当前分片大小
-      partSize = Math.min(partSize, (fileSize - filePosition));
+    List<PartETag> partETags = new ArrayList<>();
+    for (int i = 0; i < partCount; i++) {
+      InputStream inputStream = file.getInputStream();
+      // 跳到每个分块的开头
+      long skipBytes = partSize * i;
+      inputStream.skip(skipBytes);
 
-      // 创建上传请求
-      UploadPartRequest uploadRequest = new UploadPartRequest()
-          .withBucketName(bucketName).withKey(filePath)
-          .withUploadId(uploadId).withPartNumber(i)
-          .withInputStream(file.getInputStream())
-          .withPartSize(partSize)
-          .withFileOffset(filePosition);
+      // 计算每个分块的大小
+      long size = partSize < fileSize - skipBytes ?
+                  partSize : fileSize - skipBytes;
 
+      UploadPartRequest uploadRequest = new UploadPartRequest();
+      uploadRequest.setBucketName(bucketName);
+      uploadRequest.setKey(filePath);
+      uploadRequest.setUploadId(uploadId);
+      uploadRequest.setPartSize(size);
+      uploadRequest.setInputStream(inputStream);
+      uploadRequest.setPartSize(i+1);
       // 上传分片并添加到列表
       partETags.add(client.uploadPart(uploadRequest).getPartETag());
-
-      filePosition += partSize;
     }
+
     // 完成分片上传
     CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
         bucketName, filePath, uploadId, partETags);

@@ -171,8 +171,12 @@ public abstract class AbstractFileService implements FileServiceInterface{
     String uploadId = initiateMultipartUploadTask(bucketName, filePath);
 
     long contentLength = file.getSize();
+    int partCount = (int) (contentLength / partSize);
+    if (contentLength % partSize != 0){
+      partCount++;
+    }
     try{
-      multipartUpload(file,bucketName,contentLength,uploadId,filePath);
+      multipartUpload(file,bucketName,contentLength,uploadId,filePath,partCount);
     }catch (Exception e){
       abortMultipartUpload(uploadId,bucketName,filePath);
       throw e;
@@ -180,7 +184,16 @@ public abstract class AbstractFileService implements FileServiceInterface{
     return new FileUpload(bucketName,filePath,file.getInputStream());
   }
 
-  protected abstract void multipartUpload(MultipartFile file, String bucketName,long fileSize,String uploadId,String filePath) throws Exception;
+  /**
+   * 分片上传
+   * @param file 文件
+   * @param bucketName 桶名
+   * @param fileSize 文件大小
+   * @param uploadId 上传id
+   * @param filePath 文件名
+   * @throws Exception
+   */
+  protected abstract void multipartUpload(MultipartFile file, String bucketName,long fileSize,String uploadId,String filePath,int partCount) throws Exception;
 
   /**
    * 上传
