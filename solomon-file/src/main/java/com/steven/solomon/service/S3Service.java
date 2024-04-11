@@ -127,15 +127,15 @@ public abstract class S3Service extends AbstractFileService {
       long size = partSize < fileSize - skipBytes ?
                   partSize : fileSize - skipBytes;
 
-      UploadPartRequest uploadRequest = new UploadPartRequest();
-      uploadRequest.setBucketName(bucketName);
-      uploadRequest.setKey(filePath);
-      uploadRequest.setUploadId(uploadId);
-      uploadRequest.setPartSize(size);
-      uploadRequest.setInputStream(inputStream);
-      uploadRequest.setPartSize(i+1);
+      UploadPartRequest uploadPartRequest = new UploadPartRequest();
+      uploadPartRequest.setBucketName(bucketName);
+      uploadPartRequest.setKey(filePath);
+      uploadPartRequest.setUploadId(uploadId);
+      uploadPartRequest.setPartSize(size);
+      uploadPartRequest.setInputStream(inputStream);
+      uploadPartRequest.setPartNumber(i + 1);
       // 上传分片并添加到列表
-      partETags.add(client.uploadPart(uploadRequest).getPartETag());
+      partETags.add(client.uploadPart(uploadPartRequest).getPartETag());
     }
 
     // 完成分片上传
