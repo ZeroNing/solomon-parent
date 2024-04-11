@@ -45,19 +45,23 @@ public class OSSService extends AbstractFileService {
       throws Exception {
     List<PartETag> partETags = new ArrayList<>();
     for (int i = 0; i < partCount; i++) {
-      long startPos = i * partSize;
-      long curPartSize = (i + 1 == partCount) ? (fileSize - startPos) : partSize;
+      InputStream inputStream = file.getInputStream();
+      // 跳到每个分块的开头
+      long skipBytes = partSize * i;
+      inputStream.skip(skipBytes);
+
+      // 计算每个分块的大小
+      long size = partSize < fileSize - skipBytes ?
+                  partSize : fileSize - skipBytes;
+
       UploadPartRequest uploadPartRequest = new UploadPartRequest();
       uploadPartRequest.setBucketName(bucketName);
       uploadPartRequest.setKey(filePath);
       uploadPartRequest.setUploadId(uploadId);
       // 设置上传的分片流。
-      // 以本地文件为例说明如何创建FIleInputstream，并通过InputStream.skip()方法跳过指定数据。
-      InputStream instream = file.getInputStream();
-      instream.skip(startPos);
-      uploadPartRequest.setInputStream(instream);
+      uploadPartRequest.setInputStream(inputStream);
       // 设置分片大小。除了最后一个分片没有大小限制，其他的分片最小为100 KB。
-      uploadPartRequest.setPartSize(curPartSize);
+      uploadPartRequest.setPartSize(size);
       // 设置分片号。每一个上传的分片都有一个分片号，取值范围是1~10000，如果超出此范围，OSS将返回InvalidArgument错误码。
       uploadPartRequest.setPartNumber(i + 1);
       // 每个分片不需要按顺序上传，甚至可以在不同客户端上传，OSS会按照分片号排序组成完整的文件。
