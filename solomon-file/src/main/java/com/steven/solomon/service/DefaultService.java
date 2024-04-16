@@ -51,8 +51,8 @@ public class DefaultService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
-      throws Exception {
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,
+      int partCount) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
 
