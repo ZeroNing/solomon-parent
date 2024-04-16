@@ -21,7 +21,11 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   SHARKTECH("SHARKTECH","鲨鱼对象存储"),
   DIDI("DIDI","滴滴云对象存储"),
   BOTO3("BOTO3","交大云对象存储"),
-  TOS("TOS","火山云对象存储")
+  TOS("TOS","火山云对象存储"),
+  R2("R2","R2对象存储"),
+  GOOGLE_CLOUD_STORAGE("GOOGLE_CLOUD_STORAGE","谷歌云对象存储"),
+  UOS("UOS","紫光云对象存储"),
+  AZURE("AZURE","微软对象存储"),
   ;
 
   private String label;

@@ -7,6 +7,7 @@ import com.steven.solomon.namingRules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.namingRules.UUIDNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.service.AmazonService;
+import com.steven.solomon.service.AzureService;
 import com.steven.solomon.service.B2Service;
 import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.Boto3Service;
@@ -15,6 +16,7 @@ import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.DiDiService;
 import com.steven.solomon.service.EOSService;
 import com.steven.solomon.service.FileServiceInterface;
+import com.steven.solomon.service.GoogleCloudStorageService;
 import com.steven.solomon.service.JDService;
 import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.KS3Service;
@@ -22,8 +24,10 @@ import com.steven.solomon.service.MinioService;
 import com.steven.solomon.service.NOSService;
 import com.steven.solomon.service.OBSService;
 import com.steven.solomon.service.OSSService;
+import com.steven.solomon.service.R2Service;
 import com.steven.solomon.service.SharktechService;
 import com.steven.solomon.service.TosService;
+import com.steven.solomon.service.UosService;
 import com.steven.solomon.service.YandexService;
 import com.steven.solomon.service.ZOSService;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -99,6 +103,14 @@ public class FileConfig {
         return new Boto3Service(fileProperties);
       case TOS:
         return new TosService(fileProperties);
+      case R2:
+        return new R2Service(fileProperties);
+      case GOOGLE_CLOUD_STORAGE:
+        return new GoogleCloudStorageService(fileProperties);
+      case UOS:
+        return new UosService(fileProperties);
+      case AZURE:
+        return new AzureService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }
