@@ -51,7 +51,7 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
-  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath)
+  protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     this.upload(file,bucketName,filePath);
   }
