@@ -17,6 +17,7 @@ import com.steven.solomon.service.DiDiService;
 import com.steven.solomon.service.EOSService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.GoogleCloudStorageService;
+import com.steven.solomon.service.InspurService;
 import com.steven.solomon.service.JDService;
 import com.steven.solomon.service.KODOService;
 import com.steven.solomon.service.KS3Service;
@@ -111,6 +112,8 @@ public class FileConfig {
         return new UosService(fileProperties);
       case AZURE:
         return new AzureService(fileProperties);
+      case INSPUR:
+        return new InspurService(fileProperties);
       default:
         return new DefaultService(fileProperties);
     }
