@@ -2,6 +2,7 @@ package com.steven.solomon.profile;
 
 import com.steven.solomon.config.MqttConfig;
 import java.io.Serializable;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.stereotype.Component;
@@ -55,6 +56,21 @@ public class MqttProfile {
    * 最大未确认消息数量
    */
   private int maxInflight = 10;
+
+  /**
+   * 重新连接之间等待的最长时间
+   */
+  private int maxReconnectDelay = 12800;
+
+  /**
+   * 设置连接超时值,该值以秒为单位 0 禁用超时处理,这意味着客户端将等待，直到网络连接成功或失败.
+   */
+  private int connectionTimeout = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
+
+  /**
+   * 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止。不建议更改除非您绝对确定需要，否则该值。
+   */
+  private int executorServiceTimeout = 1;
 
   public static class MqttWill implements Serializable {
 
@@ -187,5 +203,29 @@ public class MqttProfile {
 
   public void setMaxInflight(int maxInflight) {
     this.maxInflight = maxInflight;
+  }
+
+  public int getMaxReconnectDelay() {
+    return maxReconnectDelay;
+  }
+
+  public void setMaxReconnectDelay(int maxReconnectDelay) {
+    this.maxReconnectDelay = maxReconnectDelay;
+  }
+
+  public int getConnectionTimeout() {
+    return connectionTimeout;
+  }
+
+  public void setConnectionTimeout(int connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+  public int getExecutorServiceTimeout() {
+    return executorServiceTimeout;
+  }
+
+  public void setExecutorServiceTimeout(int executorServiceTimeout) {
+    this.executorServiceTimeout = executorServiceTimeout;
   }
 }

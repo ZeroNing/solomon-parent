@@ -193,6 +193,12 @@ public class MqttUtils implements SendService<MqttModel> {
     mqttConnectOptions.setCleanSession(mqttProfile.getCleanSession());
     // 设置会话心跳时间 单位为秒   设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
     mqttConnectOptions.setKeepAliveInterval(mqttProfile.getKeepAliveInterval());
+    // 设置重新连接之间等待的最长时间
+    mqttConnectOptions.setMaxReconnectDelay(mqttProfile.getMaxReconnectDelay());
+    // 设置连接超时值,该值以秒为单位 0 禁用超时处理,这意味着客户端将等待，直到网络连接成功或失败.
+    mqttConnectOptions.setConnectionTimeout(mqttProfile.getConnectionTimeout());
+    // 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止.不建议更改除非您绝对确定需要，否则该值.
+    mqttConnectOptions.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
     //设置遗嘱消息
     if (ValidateUtils.isNotEmpty(mqttProfile.getWill())) {
       MqttWill will = mqttProfile.getWill();
