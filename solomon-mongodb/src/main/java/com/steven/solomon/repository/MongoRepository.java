@@ -25,11 +25,13 @@ public class MongoRepository<T, I> {
 
   protected Class<T> modelClass = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
-  protected static String ID = "_id";
-
   private final MongoTemplate mongoTemplate;
 
   public MongoRepository(MongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
+
+  public String getIdField(){
+    return "_id";
+  }
 
   /**
    * 获取一条记录
@@ -57,7 +59,7 @@ public class MongoRepository<T, I> {
    */
   public <V> V getById(I id, Class<V> clazz) {
     Query query = new Query();
-    query.addCriteria(Criteria.where(ID).is(id));
+    query.addCriteria(Criteria.where(getIdField()).is(id));
     return get(query, clazz);
   }
 
@@ -73,7 +75,7 @@ public class MongoRepository<T, I> {
    */
   public List<T> findByIds(Collection<I> ids) {
     Query query = new Query();
-    query.addCriteria(Criteria.where(ID).in(ids));
+    query.addCriteria(Criteria.where(getIdField()).in(ids));
     return find(query, modelClass);
   }
 
@@ -129,14 +131,14 @@ public class MongoRepository<T, I> {
    * 根据id删除记录
    */
   public void deleteById(I id) {
-    delete(new Query(Criteria.where("_id").is(id)));
+    delete(new Query(Criteria.where(getIdField()).is(id)));
   }
 
   /**
    * 根据id删除记录
    */
   public void deleteByIds(Collection<I> ids) {
-    delete(new Query(Criteria.where("_id").in(ids)));
+    delete(new Query(Criteria.where(getIdField()).in(ids)));
   }
 
   /**
