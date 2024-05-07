@@ -13,6 +13,6 @@ public class DateNamingRulesGenerationService implements FileNamingRulesGenerati
   @Override
   public String getFileName(MultipartFile file) {
     String contentType = getExtensionName(file.getOriginalFilename());
-    return DateTimeUtils.getLocalDateTimeString("yyyy/MM/dd/yyyyMMddHHmmssSSS") + "."+contentType;
+    return DateTimeUtils.getLocalDateTimeString("yyyy/MM/dd/HHmmssSSS") + "."+contentType;
   }
 }
