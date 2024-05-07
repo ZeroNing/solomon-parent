@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Objects;
 import org.slf4j.Logger;
 
-public class EnumSerializer extends JsonSerializer<String> implements ContextualSerializer {
+public class JacksonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
   private Logger logger = LoggerUtils.logger(getClass());
 
@@ -26,11 +26,11 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
 
   private String fieldName;
 
-  public EnumSerializer() {
+  public JacksonSerializer() {
     super();
   }
 
-  public EnumSerializer(Class<? extends Enum> enumClass,String prefix,String methodName,String fieldName) {
+  public JacksonSerializer(Class<? extends Enum> enumClass, String prefix, String methodName, String fieldName) {
     this.enumClass = enumClass;
     this.prefix = prefix;
     this.methodName = methodName;
@@ -75,6 +75,6 @@ public class EnumSerializer extends JsonSerializer<String> implements Contextual
     if (ValidateUtils.isEmpty(enumLabel) || !enumLabel.ignore()) {
       return serializerProvider.findValueSerializer(beanProperty.getType(), beanProperty);
     }
-    return new EnumSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodName(),enumLabel.fieldName());
+    return new JacksonSerializer(enumLabel.enumClass(),beanProperty.getName(),enumLabel.methodName(),enumLabel.fieldName());
   }
 }
