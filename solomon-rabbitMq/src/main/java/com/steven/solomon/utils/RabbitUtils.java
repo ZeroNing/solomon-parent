@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -149,6 +150,8 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
     }
     Map<String,Object> headers = rabbitMQModel.getHeaders();
     rabbitTemplate.convertAndSend(rabbitMQModel.getExchange(), rabbitMQModel.getRoutingKey(), rabbitMQModel,msg->{
+      //设置消息持久化
+      msg.getMessageProperties().setDeliveryMode(rabbitMQModel.getMessagePersistent() ? MessageDeliveryMode.PERSISTENT : MessageDeliveryMode.NON_PERSISTENT);
       if(ValidateUtils.equals(0L,expiration)){
         return msg;
       }

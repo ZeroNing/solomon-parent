@@ -25,6 +25,19 @@ public class RabbitMqModel<T> extends BaseMq<T> {
    */
   private Map<String,Object> headers;
 
+  /**
+   * 消息是否持久
+   */
+  private boolean messagePersistent = true;
+
+  public boolean getMessagePersistent() {
+    return messagePersistent;
+  }
+
+  public void setMessagePersistent(boolean messagePersistent) {
+    this.messagePersistent = messagePersistent;
+  }
+
   public Map<String, Object> getHeaders() {
     return headers;
   }
@@ -44,12 +57,21 @@ public class RabbitMqModel<T> extends BaseMq<T> {
   public RabbitMqModel(String exchange, T body) {
     super(body);
     this.exchange = exchange;
+    this.messagePersistent = true;
   }
 
   public RabbitMqModel(String exchange, String routingKey, T body) {
     super(body);
     this.exchange   = exchange;
     this.routingKey = routingKey;
+    this.messagePersistent = true;
+  }
+
+  public RabbitMqModel(String exchange, String routingKey, T body,boolean messagePersistent) {
+    super(body);
+    this.exchange   = exchange;
+    this.routingKey = routingKey;
+    this.messagePersistent = messagePersistent;
   }
 
   public String getExchange() {
