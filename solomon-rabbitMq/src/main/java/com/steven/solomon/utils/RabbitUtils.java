@@ -149,7 +149,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
     }
     Map<String,Object> headers = rabbitMQModel.getHeaders();
     rabbitTemplate.convertAndSend(rabbitMQModel.getExchange(), rabbitMQModel.getRoutingKey(), rabbitMQModel,msg->{
-      if(ValidateUtils.equals(0,expiration)){
+      if(ValidateUtils.equals(0L,expiration)){
         return msg;
       }
       if(ValidateUtils.isNotEmpty(headers)){
