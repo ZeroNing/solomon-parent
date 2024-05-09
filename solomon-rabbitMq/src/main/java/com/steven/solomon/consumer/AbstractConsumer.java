@@ -46,17 +46,18 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
         // 手动确认消息
         channel.basicAck(deliveryTag, false);
       }
-      //保存消费成功消息
+      // 保存消费成功消息
       saveLog(result,message,rabbitMqModel);
     } catch (Throwable e) {
       // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
       logger.error("AbstractConsumer:消费报错 异常为:", e);
-      //将消费失败的记录保存到数据库或者不处理也可以
+      // 将消费失败的记录保存到数据库或者不处理也可以
       this.saveFailMessage(message, e);
-      //保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
+      // 保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
       saveFailNumber(messageProperties, channel, deliveryTag,correlationId);
       throw e;
     } finally {
+      // 删除判断重复消费Key
       deleteCheckMessageKey(messageProperties);
     }
   }
