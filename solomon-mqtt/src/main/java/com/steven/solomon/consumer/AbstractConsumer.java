@@ -32,6 +32,8 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
     } catch (Throwable e){
       logger.error("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       saveFailMessage(topic,message,e);
+    } finally {
+      deleteCheckMessageKey(topic,message);
     }
   }
 
@@ -66,4 +68,11 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    * @param rabbitMqModel
    */
   public abstract void saveLog(R result,MqttMessage message,MqttModel rabbitMqModel);
+
+  /**
+   * 删除判断重复消费Key
+   */
+  public void deleteCheckMessageKey(String topic, MqttMessage message){
+
+  }
 }
