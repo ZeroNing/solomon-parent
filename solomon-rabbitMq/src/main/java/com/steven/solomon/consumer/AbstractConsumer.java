@@ -57,7 +57,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
       saveFailNumber(messageProperties, channel, deliveryTag,correlationId);
       throw e;
     } finally {
-      //iCacheService.del(BaseICacheCode.RABBIT_LOCK,correlationId);
+      deleteCheckMessageKey(messageProperties);
     }
   }
 
@@ -124,6 +124,14 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
    */
   public boolean checkMessageKey(MessageProperties messageProperties){
     return false;
+  }
+
+  /**
+   * 删除判断重复消费Key
+   * @param messageProperties
+   */
+  public void deleteCheckMessageKey(MessageProperties messageProperties){
+
   }
 
   /**
