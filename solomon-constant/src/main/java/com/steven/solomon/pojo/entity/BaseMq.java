@@ -9,6 +9,11 @@ public class BaseMq<T> implements Serializable {
      */
     private              T body;
 
+    /**
+     * 租户
+     */
+    private String tenantCode;
+
     public BaseMq(){
 
     }
@@ -23,5 +28,13 @@ public class BaseMq<T> implements Serializable {
 
     public void setBody(T body) {
         this.body = body;
+    }
+
+    public String getTenantCode() {
+        return tenantCode;
+    }
+
+    public void setTenantCode(String tenantCode) {
+        this.tenantCode = tenantCode;
     }
 }
