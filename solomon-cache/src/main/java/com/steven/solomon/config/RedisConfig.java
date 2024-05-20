@@ -1,9 +1,10 @@
 package com.steven.solomon.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.condition.RedisCondition;
 import com.steven.solomon.init.RedisInitUtils;
-import com.steven.solomon.json.config.JacksonObjectMapper;
+import com.steven.solomon.json.config.JacksonConfig;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
@@ -38,7 +39,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class,TenantRedisProperties.class, CacheProfile.class,CacheProperties.class})
-@Import(value = {RedisTenantContext.class})
+@Import(value = {RedisTenantContext.class,JacksonConfig.class})
 public class RedisConfig extends CachingConfigurerSupport {
 
   private Logger logger = LoggerUtils.logger(getClass());
@@ -55,15 +56,19 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   private final CacheProperties cacheProperties;
 
+  private final ObjectMapper objectMapper;
+
+
   public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties,
-      ApplicationContext applicationContext, CacheProfile cacheProfile,
-      CacheProperties cacheProperties) {
+                     ApplicationContext applicationContext, CacheProfile cacheProfile,
+                     CacheProperties cacheProperties, ObjectMapper objectMapper) {
     this.properties         = properties;
     this.context            = context;
     this.isSwitchDb         = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), cacheProfile.getMode().toString());
     this.redisProperties    = redisProperties;
     this.cacheProfile       = cacheProfile;
     this.cacheProperties    = cacheProperties;
+    this.objectMapper = objectMapper;
     SpringUtil.setContext(applicationContext);
   }
 
@@ -98,10 +103,10 @@ public class RedisConfig extends CachingConfigurerSupport {
     StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
     // key-value结构序列化数据结构
     redisTemplate.setKeySerializer(stringRedisSerializer);
-    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(new JacksonObjectMapper()));
+    redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
     // hash数据结构序列化方式,必须这样否则存hash 就是基于jdk序列化的
     redisTemplate.setHashKeySerializer(stringRedisSerializer);
-    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(new JacksonObjectMapper()));
+    redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
     // 启用默认序列化方式
     redisTemplate.setEnableDefaultSerializer(true);
     redisTemplate.setEnableTransactionSupport(true);

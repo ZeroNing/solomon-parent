@@ -29,10 +29,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class JacksonObjectMapper extends ObjectMapper {
+public class JacksonConfig {
 
-  public JacksonObjectMapper(){
-    super();
+  @Bean
+  public ObjectMapper objectMapper(){
+    ObjectMapper mapper = new ObjectMapper();
     JavaTimeModule javaTimeModule = new JavaTimeModule();
     /** 序列化配置,针对java8 时间 **/
     javaTimeModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -50,14 +51,15 @@ public class JacksonObjectMapper extends ObjectMapper {
     simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
     simpleModule.addSerializer(Long.TYPE, ToStringSerializer.instance);
     simpleModule.addSerializer(BigInteger.class, ToStringSerializer.instance);
-    this.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
-    this.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    this.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-    this.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
+    mapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
+    mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+    mapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
     //序列化的时候序列对象的所有属性
-    this.setSerializationInclusion(Include.ALWAYS);
+    mapper.setSerializationInclusion(Include.ALWAYS);
     //反序列化的时候如果多了其他属性,不抛出异常
-    this.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper;
   }
 
 }

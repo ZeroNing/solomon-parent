@@ -1,6 +1,8 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.json.config.JacksonObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.steven.solomon.json.config.JacksonConfig;
+
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.context.annotation.Configuration;
@@ -11,12 +13,12 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@Import(value = {JacksonObjectMapper.class})
+@Import(value = {JacksonConfig.class})
 public class WebConfig implements WebMvcConfigurer {
 
-  private final JacksonObjectMapper jacksonObjectMapper;
+  private final ObjectMapper mapper;
 
-  public WebConfig(JacksonObjectMapper jacksonObjectMapper) {this.jacksonObjectMapper = jacksonObjectMapper;}
+  public WebConfig(ObjectMapper mapper) {this.mapper = mapper;}
 
   @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -29,7 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
     //创建消息转换器对象
     MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
     //设置对象转换器，底层使用Jackson将Java对象转为json
-    messageConverter.setObjectMapper(jacksonObjectMapper);
+    messageConverter.setObjectMapper(mapper);
     //将上面的消息转换器对象追加到mvc框架的转换器集合中
     converters.add(0, messageConverter);
   }
