@@ -1,8 +1,10 @@
 package com.steven.solomon.config;
 
 import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.converter.DateToLocalDateConverter;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
+import com.steven.solomon.converter.LocalDateToDateConverter;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.spring.SpringUtil;
@@ -87,6 +89,8 @@ public class MongoConfig {
     List<Object> list = new ArrayList<>();
     list.add(new LocalDateTimeToDateConverter());
     list.add(new DateToLocalDateTimeConverter());
+    list.add(new LocalDateToDateConverter());
+    list.add(new DateToLocalDateConverter());
     mappingConverter.setCustomConversions(new MongoCustomConversions(list));
     mappingConverter.setTypeMapper(new DefaultMongoTypeMapper(null));
     return isSwitchDb ? new DynamicMongoTemplate(factory, mappingConverter) : new MongoTemplate(factory, mappingConverter);
