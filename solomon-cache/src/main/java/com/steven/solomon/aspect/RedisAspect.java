@@ -41,7 +41,8 @@ public class RedisAspect {
   public Object around(ProceedingJoinPoint point) throws Throwable {
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
-    logger.info("Redis切换数据源,租户编码为: {}", tenantCode);
+    String msg = isSwitch ? "Redis切换数据源,租户编码为: " + tenantCode : "Redis不需要切换数据源,使用默认数据源";
+    logger.info(msg);
     context.setFactory(tenantCode);
     try {
       return point.proceed();

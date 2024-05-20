@@ -39,7 +39,8 @@ public class MongoAspect {
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     try {
       String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
-      logger.info("mongo切换数据源,租户编码为:{}", tenantCode);
+      String msg = isSwitch ? "Mongodb切换数据源,租户编码为: " + tenantCode : "Mongodb不需要切换数据源,使用默认数据源";
+      logger.info(msg);
       context.setFactory(tenantCode);
       return point.proceed();
     } finally {
