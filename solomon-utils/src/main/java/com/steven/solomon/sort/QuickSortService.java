@@ -11,19 +11,6 @@ import java.util.List;
 public class QuickSortService implements SortService{
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
-
-    // 根据 ascending 参数决定是否反转比较器
-    if (!ascending) {
-      comparator = comparator.reversed(); // 如果是降序排序，反转比较器
-    }
-
-    quickSortHelper(sortedList, 0, sortedList.size() - 1, comparator);
-    return sortedList; // 返回排序后的列表
-  }
-
-  @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
 

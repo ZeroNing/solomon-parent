@@ -11,34 +11,6 @@ import java.util.List;
 public class HeapSortService implements SortService{
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    int n = list.size();
-    List<T> data = new ArrayList<>(list);
-    // 构建最大堆
-    for (int i = n / 2 - 1; i >= 0; i--) {
-      heapify(data, i, n, comparator);
-    }
-
-    // 一个一个地从堆中取出元素
-    for (int i = n - 1; i >= 0; i--) {
-      swap(data, 0, i);
-
-      // 重新对堆进行调整
-      heapify(data, 0, i, comparator);
-    }
-
-    // 如果需要升序排序，我们需要反转列表
-    if (!ascending) {
-      List<T> reversed = new ArrayList<>(data);
-      for (int i = 0; i < data.size(); i++) {
-        data.set(i, reversed.get(data.size() - 1 - i));
-      }
-    }
-
-    return data;
-  }
-
-  @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
     int n = list.size();
     List<T> data = new ArrayList<>(list);
