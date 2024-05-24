@@ -38,6 +38,37 @@ public class HeapSortService implements SortService{
     return data;
   }
 
+  @Override
+  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+    int n = list.size();
+    List<T> data = new ArrayList<>(list);
+
+    // 创建一个复合的Comparator
+    Comparator<T> compositeComparator = null;
+    for (Comparator<T> comparator : comparators) {
+      if (compositeComparator == null) {
+        compositeComparator = comparator;
+      } else {
+        compositeComparator = compositeComparator.thenComparing(comparator);
+      }
+    }
+
+    // 构建最大堆
+    for (int i = n / 2 - 1; i >= 0; i--) {
+      heapify(data, i, n, compositeComparator);
+    }
+
+    // 一个一个地从堆中取出元素
+    for (int i = n - 1; i >= 0; i--) {
+      swap(data, 0, i);
+
+      // 重新对堆进行调整
+      heapify(data, 0, i, compositeComparator);
+    }
+
+    return data;
+  }
+
   private static <T> void heapify(List<T> list, int i, int n, Comparator<? super T> comparator) {
     int largest = i; // 初始化最大值为根节点
     int left = 2 * i + 1; // 左子节点

@@ -23,6 +23,24 @@ public class QuickSortService implements SortService{
     return sortedList; // 返回排序后的列表
   }
 
+  @Override
+  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+    List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
+
+    // 创建一个复合的Comparator
+    Comparator<T> compositeComparator = null;
+    for (Comparator<T> comparator : comparators) {
+      if (compositeComparator == null) {
+        compositeComparator = comparator;
+      } else {
+        compositeComparator = compositeComparator.thenComparing(comparator);
+      }
+    }
+
+    quickSortHelper(sortedList, 0, sortedList.size() - 1, compositeComparator);
+    return sortedList; // 返回排序后的列表
+  }
+
   private static <T> void quickSortHelper(List<T> list, int low, int high, Comparator<? super T> comparator) {
     if (low < high) {
       int pivotIndex = partition(list, low, high, comparator);

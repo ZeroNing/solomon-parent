@@ -16,4 +16,14 @@ public interface SortService {
     * @return 排序后的列表
     */
    <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending);
+
+   /**
+    * 对给定的列表进行排序
+    *
+    * @param <T>          列表元素的类型
+    * @param list         要排序的列表
+    * @param comparators   用于比较列表元素的比较器
+    * @return 排序后的列表
+    */
+   <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators);
 }
