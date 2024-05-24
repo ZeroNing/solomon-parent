@@ -1,6 +1,7 @@
 package com.steven.solomon.lambda;
 
 import cn.hutool.core.util.StrUtil;
+import com.steven.solomon.sort.SortUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.*;
@@ -1055,15 +1056,13 @@ public class Lambda {
 
 
   public static void main(String[] args) {
-    List<String> a = new ArrayList<>();
-    a.add("aa");
-    a.add("a");
-    Set<String> b = new HashSet<>();
-    Lambda.foreach(a,(String c)->{
-      if(StrUtil.equalsIgnoreCase("a",c)){
-        b.add(c);
-      }
-    });
-    System.out.println(b.toString());
+    List<Integer> a = new ArrayList<>();
+    a.add(9);
+    a.add(3);
+    a.add(1);
+    a.add(10);
+    a.add(0);
+    a.add(7);
+    System.out.println("冒泡算法："+ SortUtil.countingSort(a,Comparator.comparing(Function.identity()),false));
   }
 }
