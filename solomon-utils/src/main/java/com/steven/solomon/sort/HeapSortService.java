@@ -27,7 +27,7 @@ public class HeapSortService implements SortService{
     }
 
     // 如果需要升序排序，我们需要反转列表
-    if (ascending) {
+    if (!ascending) {
       List<T> reversed = new ArrayList<>(list);
       for (int i = 0; i < list.size(); i++) {
         list.set(i, reversed.get(list.size() - 1 - i));
