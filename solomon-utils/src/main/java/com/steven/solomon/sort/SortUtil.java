@@ -1,5 +1,6 @@
 package com.steven.solomon.sort;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -43,8 +44,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> bubbleSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return bubbleSortService.sort(list,comparatorList);
+  public static <T> Collection<T> bubbleSort(Collection<T> list, Comparator<T>... comparatorList){
+    return bubbleSortService.sort(list, Arrays.asList(comparatorList));
   }
 
   /**
@@ -68,8 +69,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> bucketSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return bucketSortService.sort(list,comparatorList);
+  public static <T> Collection<T> bucketSort(Collection<T> list, Comparator<T>... comparatorList){
+    return bucketSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -93,8 +94,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> heapSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return heapSortService.sort(list,comparatorList);
+  public static <T> Collection<T> heapSort(Collection<T> list, Comparator<T>... comparatorList){
+    return heapSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -118,8 +119,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> insertionSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return insertionSortService.sort(list,comparatorList);
+  public static <T> Collection<T> insertionSort(Collection<T> list, Comparator<T>... comparatorList){
+    return insertionSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -143,8 +144,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> mergeSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return mergeSortService.sort(list,comparatorList);
+  public static <T> Collection<T> mergeSort(Collection<T> list, Comparator<T>... comparatorList){
+    return mergeSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -168,8 +169,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> quickSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return quickSortService.sort(list,comparatorList);
+  public static <T> Collection<T> quickSort(Collection<T> list, Comparator<T>... comparatorList){
+    return quickSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -193,8 +194,8 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> selectionSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return selectionSortService.sort(list,comparatorList);
+  public static <T> Collection<T> selectionSort(Collection<T> list, Comparator<T>... comparatorList){
+    return selectionSortService.sort(list,Arrays.asList(comparatorList));
   }
 
   /**
@@ -218,7 +219,7 @@ public class SortUtil {
    * @param comparatorList   用于比较列表元素的比较器
    * @return 排序后的列表
    */
-  public static <T> Collection<T> shellSort(Collection<T> list, List<Comparator<T>> comparatorList){
-    return shellSortService.sort(list,comparatorList);
+  public static <T> Collection<T> shellSort(Collection<T> list, Comparator<T>... comparatorList){
+    return shellSortService.sort(list,Arrays.asList(comparatorList));
   }
 }
