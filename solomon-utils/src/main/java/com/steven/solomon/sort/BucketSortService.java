@@ -1,6 +1,7 @@
 package com.steven.solomon.sort;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class BucketSortService implements SortService{
 
   @Override
-  public <T> List<T> sort(List<T> list, Comparator<? super T> comparator, boolean ascending) {
+  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyList(); // 如果列表为空，直接返回空列表
     }
@@ -40,7 +41,7 @@ public class BucketSortService implements SortService{
 
     // 合并所有桶中的元素
     List<T> sortedList = new ArrayList<>();
-    for (List<T> bucket : buckets) {
+    for (Collection<T> bucket : buckets) {
       sortedList.addAll(bucket);
     }
 

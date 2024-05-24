@@ -1,5 +1,6 @@
 package com.steven.solomon.sort;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> bubbleSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> bubbleSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return bubbleSortService.sort(list,comparator,ascending);
   }
 
@@ -43,7 +44,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> bucketSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> bucketSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return bucketSortService.sort(list,comparator,ascending);
   }
 
@@ -56,7 +57,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> heapSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> heapSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return heapSortService.sort(list,comparator,ascending);
   }
 
@@ -69,7 +70,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> insertionSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> insertionSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return insertionSortService.sort(list,comparator,ascending);
   }
 
@@ -82,7 +83,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> mergeSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> mergeSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return mergeSortService.sort(list,comparator,ascending);
   }
 
@@ -95,7 +96,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> quickSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> quickSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return quickSortService.sort(list,comparator,ascending);
   }
 
@@ -108,7 +109,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> selectionSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> selectionSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return selectionSortService.sort(list,comparator,ascending);
   }
 
@@ -121,7 +122,7 @@ public class SortUtil {
    * @param ascending    如果为 true，则进行升序排序；如果为 false，则进行降序排序
    * @return 排序后的列表
    */
-  public static <T> List<T> shellSort(List<T> list, Comparator<? super T> comparator, boolean ascending){
+  public static <T> Collection<T> shellSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
     return shellSortService.sort(list,comparator,ascending);
   }
 }

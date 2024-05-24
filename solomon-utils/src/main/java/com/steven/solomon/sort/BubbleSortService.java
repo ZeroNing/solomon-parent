@@ -1,6 +1,7 @@
 package com.steven.solomon.sort;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class BubbleSortService implements SortService{
 
   @Override
-  public <T> List<T> sort(List<T> list, Comparator<? super T> comparator, boolean ascending) {
+  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
     boolean swapped;
     int n = sortedList.size();

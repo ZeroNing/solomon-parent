@@ -1056,13 +1056,28 @@ public class Lambda {
 
 
   public static void main(String[] args) {
-    List<Integer> a = new ArrayList<>();
-    a.add(9);
-    a.add(3);
-    a.add(1);
-    a.add(10);
-    a.add(0);
-    a.add(7);
-    System.out.println("冒泡算法："+ SortUtil.countingSort(a,Comparator.comparing(Function.identity()),false));
+    Set<Integer> a = new HashSet<>();
+    for(Integer i = 0;i<=20;i++){
+      a.add(Integer.valueOf((int) (Math.random()*100)));
+    }
+    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),false));
+    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),false));
+
+    System.out.println("===================================");
+
+    System.out.println("冒泡排序算法：升序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("桶排序算法:  升序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("堆排序算法:  升序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("插入排序算法：升序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("归并排序算法：升序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("快速排序算法：升序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("选择排序算法：升序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),true));
+    System.out.println("希尔排序算法：升序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),true));
   }
 }

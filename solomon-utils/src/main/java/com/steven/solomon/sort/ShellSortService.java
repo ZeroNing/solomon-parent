@@ -1,6 +1,7 @@
 package com.steven.solomon.sort;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public class ShellSortService implements SortService{
 
   @Override
-  public <T> List<T> sort(List<T> list, Comparator<? super T> comparator, boolean ascending) {
+  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
     // 创建列表的副本，以避免修改原始列表
     List<T> sortedList = new ArrayList<>(list);
 

@@ -1,6 +1,7 @@
 package com.steven.solomon.sort;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -11,25 +12,25 @@ import java.util.List;
 public class MergeSortService implements SortService{
 
   @Override
-  public <T> List<T> sort(List<T> list, Comparator<? super T> comparator, boolean ascending) {
+  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
     if (list.size() <= 1) {
       return list;
     }
-
+    List<T> data = new ArrayList<>(list);
     // 分割列表
     int middle = list.size() / 2;
-    List<T> left = new ArrayList<>(list.subList(0, middle));
-    List<T> right = new ArrayList<>(list.subList(middle, list.size()));
+    Collection<T> left = new ArrayList<>(data.subList(0, middle));
+    Collection<T> right = new ArrayList<>(data.subList(middle, list.size()));
 
     // 递归排序左右两部分
     left = sort(left, comparator, ascending);
     right = sort(right, comparator, ascending);
 
     // 合并排序后的左右两部分
-    return merge(left, right, comparator, ascending);
+    return merge((List)left, (List)right, comparator, ascending);
   }
 
-  private static <T> List<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator, boolean ascending) {
+  private static <T> Collection<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator, boolean ascending) {
     List<T> result = new ArrayList<>();
     int leftIndex = 0;
     int rightIndex = 0;
