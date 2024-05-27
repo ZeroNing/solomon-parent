@@ -1,5 +1,6 @@
 package com.steven.solomon.lambda;
 
+import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -1059,58 +1060,95 @@ public class Lambda {
 
 
   public static void main(String[] args) {
-    Set<Integer> a = new HashSet<>();
-    for(Integer i = 0;i<=20;i++){
-      a.add(Integer.valueOf((int) (Math.random()*100)));
+    List<Person> b = new ArrayList<>();
+    for(Integer i = 0;i< 1000000;i++){
+      b.add(new Person(String.valueOf(i),i));
     }
 
-    List<Person> b = new ArrayList<>();
-    b.add(new Person("1",1));
-    b.add(new Person("2",2));
-
     System.out.println("============多字段排序算法降序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("============多字段排序算法降序结束=======================");
-    System.out.println("\n");
-    System.out.println("============多字段排序算法升序开始=======================");
-    System.out.println("冒泡排序算法：升序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("桶排序算法:  升序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("堆排序算法:  升序:"+ SortUtil.heapSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("插入排序算法：升序:"+ SortUtil.insertionSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("归并排序算法：升序:"+ SortUtil.mergeSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("快速排序算法：升序:"+ SortUtil.quickSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("选择排序算法：升序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("希尔排序算法：升序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("============多字段排序算法升序结束=======================");
-    System.out.println("\n");
-    System.out.println("============单字段排序算法降序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("============单字段排序算法降序结束=======================");
-    System.out.println("\n");
-    System.out.println("============单字段排序算法升序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("============单字段排序算法升序结束=======================");
+    System.out.println("总记录数:"+b.size()+"排序测试");
+    StopWatch stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.bubbleSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("冒泡排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.bucketSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("桶排序算法:  降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.heapSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("堆排序算法:  降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.insertionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("插入排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.mergeSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("归并排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.quickSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("快速排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.selectionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+    System.out.println("选择排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+
+    stopWatch = new StopWatch();
+    stopWatch.start();
+    SortUtil.shellSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed());
+    stopWatch.stop();
+
+    System.out.println("希尔排序算法：降序耗时:"+  stopWatch.getTotalTimeMillis() / 1000 + "秒");
+//    System.out.println("============多字段排序算法降序结束=======================");
+//    System.out.println("\n");
+//    System.out.println("============多字段排序算法升序开始=======================");
+//    System.out.println("冒泡排序算法：升序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("桶排序算法:  升序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("堆排序算法:  升序:"+ SortUtil.heapSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("插入排序算法：升序:"+ SortUtil.insertionSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("归并排序算法：升序:"+ SortUtil.mergeSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("快速排序算法：升序:"+ SortUtil.quickSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("选择排序算法：升序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("希尔排序算法：升序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName)));
+//    System.out.println("============多字段排序算法升序结束=======================");
+//    System.out.println("\n");
+//    System.out.println("============单字段排序算法降序开始=======================");
+//    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),false));
+//    System.out.println("============单字段排序算法降序结束=======================");
+//    System.out.println("\n");
+//    System.out.println("============单字段排序算法升序开始=======================");
+//    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),true));
+//    System.out.println("============单字段排序算法升序结束=======================");
   }
 
   static class Person {
