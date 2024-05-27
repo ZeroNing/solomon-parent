@@ -1,5 +1,7 @@
 package com.steven.solomon.sort;
 
+import com.steven.solomon.verification.ValidateUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,8 +15,8 @@ public class BucketSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if (list == null || list.isEmpty()) {
-      return Collections.emptyList(); // 如果列表为空，直接返回空列表
+    if(ValidateUtils.isEmpty(list)){
+      return list;
     }
 
     // 找到列表中的最大值和最小值
@@ -55,8 +57,8 @@ public class BucketSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if (list == null || list.isEmpty()) {
-      return Collections.emptyList(); // 如果列表为空，直接返回空列表
+    if(ValidateUtils.isEmpty(list)){
+      return list;
     }
 
     // 创建一个复合的Comparator

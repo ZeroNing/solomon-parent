@@ -1,5 +1,7 @@
 package com.steven.solomon.sort;
 
+import com.steven.solomon.verification.ValidateUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -13,7 +15,7 @@ public class MergeSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if (list.size() <= 1) {
+    if(ValidateUtils.isEmpty(list)){
       return list;
     }
     List<T> data = new ArrayList<>(list);
@@ -32,7 +34,7 @@ public class MergeSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if (list.size() <= 1) {
+    if(ValidateUtils.isEmpty(list)){
       return list;
     }
     List<T> data = new ArrayList<>(list);

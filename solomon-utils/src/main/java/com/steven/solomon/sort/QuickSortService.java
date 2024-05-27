@@ -1,5 +1,7 @@
 package com.steven.solomon.sort;
 
+import com.steven.solomon.verification.ValidateUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -12,6 +14,9 @@ public class QuickSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
 
     // 根据 ascending 参数决定是否反转比较器
@@ -25,6 +30,9 @@ public class QuickSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list,  List<Comparator<? super T>> comparators) {
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
 
     // 创建一个复合的Comparator
