@@ -25,5 +25,5 @@ public interface SortService {
     * @param comparators   用于比较列表元素的比较器
     * @return 排序后的列表
     */
-   <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators);
+   <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators);
 }

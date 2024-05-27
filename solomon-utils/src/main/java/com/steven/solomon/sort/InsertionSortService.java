@@ -38,13 +38,13 @@ public class InsertionSortService implements SortService{
   }
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+  public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
     int n = sortedList.size();
 
     // 创建一个复合的Comparator
-    Comparator<T> compositeComparator = null;
-    for (Comparator<T> comparator : comparators) {
+    Comparator<? super T> compositeComparator = null;
+    for (Comparator comparator : comparators) {
       if (compositeComparator == null) {
         compositeComparator = comparator;
       } else {

@@ -54,14 +54,14 @@ public class BucketSortService implements SortService{
   }
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+  public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
     if (list == null || list.isEmpty()) {
       return Collections.emptyList(); // 如果列表为空，直接返回空列表
     }
 
     // 创建一个复合的Comparator
-    Comparator<T> compositeComparator = null;
-    for (Comparator<T> comparator : comparators) {
+    Comparator<? super T> compositeComparator = null;
+    for (Comparator comparator : comparators) {
       if (compositeComparator == null) {
         compositeComparator = comparator;
       } else {

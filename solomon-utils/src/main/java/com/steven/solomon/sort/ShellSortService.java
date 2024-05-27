@@ -51,7 +51,7 @@ public class ShellSortService implements SortService{
   }
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+  public <T> Collection<T> sort(Collection<T> list,  List<Comparator<? super T>> comparators) {
     // 创建列表的副本，以避免修改原始列表
     List<T> sortedList = new ArrayList<>(list);
 
@@ -59,8 +59,8 @@ public class ShellSortService implements SortService{
     int gap = sortedList.size() / 2;
 
     // 创建一个复合的Comparator
-    Comparator<T> compositeComparator = null;
-    for (Comparator<T> comparator : comparators) {
+    Comparator<? super T> compositeComparator = null;
+    for (Comparator comparator : comparators) {
       if (compositeComparator == null) {
         compositeComparator = comparator;
       } else {

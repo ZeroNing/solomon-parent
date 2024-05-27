@@ -31,7 +31,7 @@ public class MergeSortService implements SortService{
   }
 
   @Override
-  public <T> Collection<T> sort(Collection<T> list, List<Comparator<T>> comparators) {
+  public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
     if (list.size() <= 1) {
       return list;
     }
@@ -49,14 +49,14 @@ public class MergeSortService implements SortService{
     return merge((List<T>) left, (List<T>) right, comparators);
   }
 
-  private static <T> Collection<T> merge(List<T> left, List<T> right, List<Comparator<T>> comparators) {
+  private static <T> Collection<T> merge(List<T> left, List<T> right, List<Comparator<? super T>> comparators) {
     List<T> result = new ArrayList<>();
     int leftIndex = 0;
     int rightIndex = 0;
 
     // 创建一个复合的Comparator
-    Comparator<T> compositeComparator = null;
-    for (Comparator<T> comparator : comparators) {
+    Comparator<? super T> compositeComparator = null;
+    for (Comparator comparator : comparators) {
       if (compositeComparator == null) {
         compositeComparator = comparator;
       } else {
