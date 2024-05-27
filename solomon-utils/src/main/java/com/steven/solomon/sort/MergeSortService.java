@@ -15,7 +15,7 @@ public class MergeSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if(ValidateUtils.isEmpty(list)){
+    if (list.size() <= 1) {
       return list;
     }
     List<T> data = new ArrayList<>(list);
@@ -34,7 +34,7 @@ public class MergeSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if(ValidateUtils.isEmpty(list)){
+    if (list.size() <= 1) {
       return list;
     }
     List<T> data = new ArrayList<>(list);

@@ -14,9 +14,7 @@ public class InsertionSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
     int n = sortedList.size();
 
@@ -44,9 +42,7 @@ public class InsertionSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
     int n = sortedList.size();
 

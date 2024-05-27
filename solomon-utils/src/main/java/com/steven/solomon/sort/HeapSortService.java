@@ -14,9 +14,7 @@ public class HeapSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     int n = list.size();
     List<T> data = new ArrayList<>(list);
     // 构建最大堆
@@ -45,9 +43,7 @@ public class HeapSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     int n = list.size();
     List<T> data = new ArrayList<>(list);
 

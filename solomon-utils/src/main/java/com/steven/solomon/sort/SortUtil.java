@@ -1,5 +1,6 @@
 package com.steven.solomon.sort;
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
@@ -32,6 +33,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> bubbleSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return bubbleSortService.sort(list, Arrays.asList(comparatorList));
   }
 
@@ -44,6 +48,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> bucketSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return bucketSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -56,6 +63,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> heapSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return heapSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -68,6 +78,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> insertionSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return insertionSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -80,6 +93,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> mergeSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return mergeSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -92,6 +108,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> quickSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return quickSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -104,6 +123,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> selectionSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return selectionSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -116,6 +138,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> shellSort(Collection<T> list, Comparator<? super T>... comparatorList){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return shellSortService.sort(list,Arrays.asList(comparatorList));
   }
 
@@ -129,6 +154,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> bubbleSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return bubbleSortService.sort(list,comparator,ascending);
   }
 
@@ -142,6 +170,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> bucketSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return bucketSortService.sort(list,comparator,ascending);
   }
 
@@ -155,6 +186,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> heapSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return heapSortService.sort(list,comparator,ascending);
   }
 
@@ -168,6 +202,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> insertionSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return insertionSortService.sort(list,comparator,ascending);
   }
 
@@ -181,6 +218,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> mergeSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return mergeSortService.sort(list,comparator,ascending);
   }
 
@@ -194,6 +234,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> quickSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return quickSortService.sort(list,comparator,ascending);
   }
 
@@ -207,6 +250,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> selectionSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return selectionSortService.sort(list,comparator,ascending);
   }
 
@@ -220,6 +266,9 @@ public class SortUtil {
    * @return 排序后的列表
    */
   public static <T> Collection<T> shellSort(Collection<T> list, Comparator<? super T> comparator, boolean ascending){
+    if(ValidateUtils.isEmpty(list)){
+      return list;
+    }
     return shellSortService.sort(list,comparator,ascending);
   }
 }

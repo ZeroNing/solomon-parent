@@ -1078,7 +1078,7 @@ public class Lambda {
     System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
     System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
     System.out.println("============多字段排序算法降序结束=======================");
-
+    System.out.println("\n");
     System.out.println("============多字段排序算法升序开始=======================");
     System.out.println("冒泡排序算法：升序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
     System.out.println("桶排序算法:  升序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
@@ -1089,7 +1089,7 @@ public class Lambda {
     System.out.println("选择排序算法：升序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
     System.out.println("希尔排序算法：升序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
     System.out.println("============多字段排序算法升序结束=======================");
-
+    System.out.println("\n");
     System.out.println("============单字段排序算法降序开始=======================");
     System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),false));
     System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),false));
@@ -1100,7 +1100,7 @@ public class Lambda {
     System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),false));
     System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),false));
     System.out.println("============单字段排序算法降序结束=======================");
-
+    System.out.println("\n");
     System.out.println("============单字段排序算法升序开始=======================");
     System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),true));
     System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),true));

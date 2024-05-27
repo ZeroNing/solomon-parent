@@ -15,9 +15,7 @@ public class ShellSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     // 创建列表的副本，以避免修改原始列表
     List<T> sortedList = new ArrayList<>(list);
 
@@ -57,9 +55,7 @@ public class ShellSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list,  List<Comparator<? super T>> comparators) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
     // 创建列表的副本，以避免修改原始列表
     List<T> sortedList = new ArrayList<>(list);
 

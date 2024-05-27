@@ -15,9 +15,7 @@ public class BucketSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
 
     // 找到列表中的最大值和最小值
     T min = Collections.min(list, comparator);
@@ -57,9 +55,7 @@ public class BucketSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-    if(ValidateUtils.isEmpty(list)){
-      return list;
-    }
+
 
     // 创建一个复合的Comparator
     Comparator<? super T> compositeComparator = null;
