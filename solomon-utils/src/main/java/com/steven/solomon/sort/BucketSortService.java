@@ -55,8 +55,6 @@ public class BucketSortService implements SortService{
 
   @Override
   public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
-
-
     // 创建一个复合的Comparator
     Comparator<? super T> compositeComparator = null;
     for (Comparator comparator : comparators) {
@@ -72,7 +70,7 @@ public class BucketSortService implements SortService{
     T max = Collections.max(list, compositeComparator);
 
     // 计算桶的数量
-    int bucketCount = Math.max(1, (compositeComparator.compare(max, min) / list.size()) + 1);
+    int bucketCount = list.size(); // 使用列表大小作为桶的数量
     List<List<T>> buckets = new ArrayList<>(bucketCount);
     for (int i = 0; i < bucketCount; i++) {
       buckets.add(new ArrayList<>());
@@ -80,7 +78,8 @@ public class BucketSortService implements SortService{
 
     // 将元素分配到各个桶中
     for (T element : list) {
-      int bucketIndex = (compositeComparator.compare(element, min) * bucketCount) / (compositeComparator.compare(max, min) + 1);
+      // 计算桶索引，确保索引在0到(bucketCount-1)之间
+      int bucketIndex = (int) ((long) compositeComparator.compare(element, min) * (bucketCount - 1) / (compositeComparator.compare(max, min) + 1));
       buckets.get(bucketIndex).add(element);
     }
 
