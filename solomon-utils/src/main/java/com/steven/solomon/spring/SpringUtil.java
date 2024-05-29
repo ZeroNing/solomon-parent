@@ -3,6 +3,7 @@ package com.steven.solomon.spring;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.annotation.PostConstruct;
+
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -20,53 +21,55 @@ import org.springframework.stereotype.Component;
 @Order(1)
 public class SpringUtil implements ApplicationContextAware {
 
-	private static ApplicationContext context;
+    private static ApplicationContext context;
 
-	public SpringUtil(ApplicationContext applicationContext){
-		SpringUtil.context = applicationContext;
-	}
+    public SpringUtil(ApplicationContext applicationContext) {
+        SpringUtil.context = applicationContext;
+    }
 
-	/**
-	 * Spring在bean初始化后会判断是不是ApplicationContextAware的子类
-	 * 如果该类是,setApplicationContext()方法,会将容器中ApplicationContext作为参数传入进去
-	 */
-	@Override
-	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-		if (SpringUtil.context == null) {
-			SpringUtil.context = applicationContext;
-		}
-	}
-	public static void setContext(ApplicationContext applicationContext) {
-		if (SpringUtil.context == null) {
-			SpringUtil.context = applicationContext;
-		}
-	}
+    /**
+     * Spring在bean初始化后会判断是不是ApplicationContextAware的子类
+     * 如果该类是,setApplicationContext()方法,会将容器中ApplicationContext作为参数传入进去
+     */
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        if (SpringUtil.context == null) {
+            SpringUtil.context = applicationContext;
+        }
+    }
 
-	public static ApplicationContext getApplicationContext() {
-		return context;
-	}
+    public static void setContext(ApplicationContext applicationContext) {
+        if (SpringUtil.context == null) {
+            SpringUtil.context = applicationContext;
+        }
+    }
 
-	/**
-	 * 通过Name返回指定的Bean
-	 */
-	public static <T> T getBean(Class<T> beanClass) {
-		return context.getBean(beanClass);
-	}
+    public static ApplicationContext getApplicationContext() {
+        return context;
+    }
 
-	public static <T>T getBean(String name,Class<T> beanClass) {
-		return context.getBean(name,beanClass);
-	}
+    /**
+     * 通过Name返回指定的Bean
+     */
+    public static <T> T getBean(Class<T> beanClass) {
+        return context.getBean(beanClass);
+    }
 
-	/**
-	 * 根据注解找到使用注解的类
-	 * @param annotationType 注解class
-	 * @return
-	 */
-	public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
-		return context.getBeansWithAnnotation(annotationType);
-	}
+    public static <T> T getBean(String name, Class<T> beanClass) {
+        return context.getBean(name, beanClass);
+    }
 
-	public static <T> Map<String, T> getBeansOfType(Class<T> type) {
-		return context.getBeansOfType(type);
-	}
+    /**
+     * 根据注解找到使用注解的类
+     *
+     * @param annotationType 注解class
+     * @return
+     */
+    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
+        return context.getBeansWithAnnotation(annotationType);
+    }
+
+    public static <T> Map<String, T> getBeansOfType(Class<T> type) {
+        return context.getBeansOfType(type);
+    }
 }
