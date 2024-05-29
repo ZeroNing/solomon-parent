@@ -14,16 +14,16 @@ import java.util.Map;
 @Service("delayedMQService")
 public class DelayedMQService extends AbstractMQService {
 
-  @Override
-  protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
-    Map<String, Object> props = new HashMap<>(1);
-    //延迟交换器类型
-    props.put("x-delayed-type", rabbitMq.exchangeTypes());
-    return new CustomExchange(exchangeName, "x-delayed-message", true, false, props);
-  }
+    @Override
+    protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
+        Map<String, Object> props = new HashMap<>(1);
+        //延迟交换器类型
+        props.put("x-delayed-type", rabbitMq.exchangeTypes());
+        return new CustomExchange(exchangeName, "x-delayed-message", true, false, props);
+    }
 
-  @Override
-  protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey,RabbitMq rabbitMq) {
-    return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
-  }
+    @Override
+    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, RabbitMq rabbitMq) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
+    }
 }

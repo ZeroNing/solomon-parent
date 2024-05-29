@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 @Service("directMQService")
 public class DirectMQService extends AbstractMQService {
 
-  @Override
-	protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
-		return new DirectExchange(exchangeName);
-	}
+    @Override
+    protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
+        return new DirectExchange(exchangeName);
+    }
 
-	@Override
-	protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey,RabbitMq rabbitMq) {
-		return BindingBuilder.bind(queue).to((DirectExchange) exchange).with(routingKey);
-	}
+    @Override
+    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, RabbitMq rabbitMq) {
+        return BindingBuilder.bind(queue).to((DirectExchange) exchange).with(routingKey);
+    }
 
 }

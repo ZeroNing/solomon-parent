@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 @Service("topicMQService")
 public class TopicMQService extends AbstractMQService {
 
-  @Override
-	protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
-		return new TopicExchange(exchangeName);
-	}
+    @Override
+    protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
+        return new TopicExchange(exchangeName);
+    }
 
-	@Override
-	protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey,RabbitMq rabbitMq) {
-		return BindingBuilder.bind(queue).to((TopicExchange) exchange).with(routingKey);
-	}
+    @Override
+    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, RabbitMq rabbitMq) {
+        return BindingBuilder.bind(queue).to((TopicExchange) exchange).with(routingKey);
+    }
 }
