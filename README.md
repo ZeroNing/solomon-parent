@@ -50,54 +50,54 @@
 ```xml
 <build>
     <plugins>
-      <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <version>2.1.5</version>
-        <executions>
-          <execution>
-            <id>get-the-git-infos</id>
-            <!-- 默认绑定阶段initialize -->
-            <phase>initialize</phase>
-            <goals>
-              <goal>revision</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!--日期格式;默认值:dd.MM.yyyy '@' HH:mm:ss z;-->
-          <dateFormat>yyyy-MM-dd_HH-mm-ss</dateFormat>
-          <!--,构建过程中,是否打印详细信息;默认值:false;-->
-          <verbose>true</verbose>
-          <!-- ".git"文件路径;默认值:${project.basedir}/.git; ${project.basedir}：项目根目录，即包含pom.xml文件的目录-->
-          <dotGitDirectory>${project.basedir}/../../../.git</dotGitDirectory>
-          <!--若项目打包类型为pom,是否取消构建;默认值:true;-->
-          <skipPoms>false</skipPoms>
-          <!--是否生成"git.properties"文件;默认值:false;-->
-          <generateGitPropertiesFile>true</generateGitPropertiesFile>
-          <!--指定"git.properties"文件的存放路径(相对于${project.basedir}的一个路径);-->
-          <generateGitPropertiesFilename>/src/main/resources/git.properties</generateGitPropertiesFilename>
-          <!--".git"文件夹未找到时,构建是否失败;若设置true,则构建失败;若设置false,则跳过执行该目标;默认值:true;-->
-          <failOnNoGitDirectory>true</failOnNoGitDirectory>
+        <plugin>
+            <groupId>pl.project13.maven</groupId>
+            <artifactId>git-commit-id-plugin</artifactId>
+            <version>2.1.5</version>
+            <executions>
+                <execution>
+                    <id>get-the-git-infos</id>
+                    <!-- 默认绑定阶段initialize -->
+                    <phase>initialize</phase>
+                    <goals>
+                        <goal>revision</goal>
+                    </goals>
+                </execution>
+            </executions>
+            <configuration>
+                <!--日期格式;默认值:dd.MM.yyyy '@' HH:mm:ss z;-->
+                <dateFormat>yyyy-MM-dd_HH-mm-ss</dateFormat>
+                <!--,构建过程中,是否打印详细信息;默认值:false;-->
+                <verbose>true</verbose>
+                <!-- ".git"文件路径;默认值:${project.basedir}/.git; ${project.basedir}：项目根目录，即包含pom.xml文件的目录-->
+                <dotGitDirectory>${project.basedir}/../../../.git</dotGitDirectory>
+                <!--若项目打包类型为pom,是否取消构建;默认值:true;-->
+                <skipPoms>false</skipPoms>
+                <!--是否生成"git.properties"文件;默认值:false;-->
+                <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                <!--指定"git.properties"文件的存放路径(相对于${project.basedir}的一个路径);-->
+                <generateGitPropertiesFilename>/src/main/resources/git.properties</generateGitPropertiesFilename>
+                <!--".git"文件夹未找到时,构建是否失败;若设置true,则构建失败;若设置false,则跳过执行该目标;默认值:true;-->
+                <failOnNoGitDirectory>true</failOnNoGitDirectory>
 
-          <!--git描述配置,可选;由JGit提供实现;-->
-          <gitDescribe>
-            <!--是否生成描述属性-->
-            <skip>false</skip>
-            <!--提交操作未发现tag时,仅打印提交操作ID,-->
-            <always>false</always>
-            <!--提交操作ID显式字符长度,最大值为:40;默认值:7; 0代表特殊意义;后面有解释;-->
-            <abbrev>7</abbrev>
-            <!--构建触发时,代码有修改时(即"dirty state"),添加指定后缀;默认值:"";-->
-            <dirty>-dirty</dirty>
-            <!--always print using the "tag-commits_from_tag-g_commit_id-maybe_dirty" format, even if "on" a tag.
-                The distance will always be 0 if you're "on" the tag.  -->
-            <forceLongFormat>false</forceLongFormat>
-          </gitDescribe>
-        </configuration>
-      </plugin>
+                <!--git描述配置,可选;由JGit提供实现;-->
+                <gitDescribe>
+                    <!--是否生成描述属性-->
+                    <skip>false</skip>
+                    <!--提交操作未发现tag时,仅打印提交操作ID,-->
+                    <always>false</always>
+                    <!--提交操作ID显式字符长度,最大值为:40;默认值:7; 0代表特殊意义;后面有解释;-->
+                    <abbrev>7</abbrev>
+                    <!--构建触发时,代码有修改时(即"dirty state"),添加指定后缀;默认值:"";-->
+                    <dirty>-dirty</dirty>
+                    <!--always print using the "tag-commits_from_tag-g_commit_id-maybe_dirty" format, even if "on" a tag.
+                        The distance will always be 0 if you're "on" the tag.  -->
+                    <forceLongFormat>false</forceLongFormat>
+                </gitDescribe>
+            </configuration>
+        </plugin>
     </plugins>
-  </build>
+</build>
 ```
 
 
@@ -177,37 +177,37 @@ spring:
 ```java
 public interface BaseEnum<T> {
 
-  /**
-   * 获取I8N国际化key
-   *
-   * @return code
-   */
-  String key();
+    /**
+     * 获取I8N国际化key
+     *
+     * @return code
+     */
+    String key();
 
-  /**
-   * 获取存入数据库的值
-   *
-   * @return label
-   */
-  T label();
+    /**
+     * 获取存入数据库的值
+     *
+     * @return label
+     */
+    T label();
 
-  /**
-   * 获取I18N国际化信息
-   *
-   * @return 国际化信息
-   */
-  default String Desc() {
-    return I18nUtils.getEnumMessage(getClass().getSimpleName()+"."+key());
-  }
+    /**
+     * 获取I18N国际化信息
+     *
+     * @return 国际化信息
+     */
+    default String Desc() {
+        return I18nUtils.getEnumMessage(getClass().getSimpleName()+"."+key());
+    }
 
-  /**
-   * 获取存入数据库的值
-   *
-   * @return label
-   */
-  default T Value() {
-    return label();
-  }
+    /**
+     * 获取存入数据库的值
+     *
+     * @return label
+     */
+    default T Value() {
+        return label();
+    }
 }
 ```
 
@@ -215,30 +215,30 @@ public interface BaseEnum<T> {
 
 ```java
 public enum DelFlagEnum implements BaseEnum<String> {
-  /**
-   * 未删除
-   */
-  NOT_DELETE("0"),
-  /**
-   * 已删除
-   */
-  DELETE("1");
+    /**
+     * 未删除
+     */
+    NOT_DELETE("0"),
+    /**
+     * 已删除
+     */
+    DELETE("1");
 
-  private final String label;
+    private final String label;
 
-  DelFlagEnum(String label) {
-    this.label = label;
-  }
+    DelFlagEnum(String label) {
+        this.label = label;
+    }
 
-  @Override
-  public String label() {
-    return this.label;
-  }
+    @Override
+    public String label() {
+        return this.label;
+    }
 
-  @Override
-  public String key() {
-    return this.name();
-  }
+    @Override
+    public String key() {
+        return this.name();
+    }
 }
 ```
 
@@ -248,7 +248,7 @@ public enum DelFlagEnum implements BaseEnum<String> {
 
 ```java
   @JsonEnum(enumClass = DelFlagEnum.class)
-  private              String        delFlag;
+private              String        delFlag;
 ```
 
 3.添加国际化 枚举类名是枚举国际化的前缀必须有，然后拼接的是枚举类中的label名称
@@ -274,80 +274,80 @@ DelFlagEnum.DELETE=删除
 @Component
 public @interface RabbitMq {
 
-	@AliasFor(annotation = Component.class)
-	String value() default "";
+    @AliasFor(annotation = Component.class)
+    String value() default "";
 
-	/**
-	 * 队列
-	 */
-	String[] queues();
+    /**
+     * 队列
+     */
+    String[] queues();
 
-	/**
-	 * 交换器
-	 */
-	String exchange();
+    /**
+     * 交换器
+     */
+    String exchange();
 
-	/**
-	 * 路由规则
-	 */
-	String routingKey() default "";
+    /**
+     * 路由规则
+     */
+    String routingKey() default "";
 
-	/**
-	 * 是否持久化
-	 */
-	boolean isPersistence() default true;
+    /**
+     * 是否持久化
+     */
+    boolean isPersistence() default true;
 
-	/**
-	 * 确认模式（只支持手动提交，自动提交代码暂时不支持）
-	 */
-	AcknowledgeMode mode() default AcknowledgeMode.MANUAL;
+    /**
+     * 确认模式（只支持手动提交，自动提交代码暂时不支持）
+     */
+    AcknowledgeMode mode() default AcknowledgeMode.MANUAL;
 
-	/**
-	 * 每个队列消费者数量
-	 */
-	int consumersPerQueue() default 1;
+    /**
+     * 每个队列消费者数量
+     */
+    int consumersPerQueue() default 1;
 
-	/**
-	 * 每次的接收的消息数量最大数值(0:公平分发 1:不公平分发)
-	 */
-	int prefetchCount() default AbstractMessageListenerContainer.DEFAULT_PREFETCH_COUNT;
+    /**
+     * 每次的接收的消息数量最大数值(0:公平分发 1:不公平分发)
+     */
+    int prefetchCount() default AbstractMessageListenerContainer.DEFAULT_PREFETCH_COUNT;
 
-	/**
-	 * 交换类型（暂时不支持system，只支持DIRECT、TOPIC、FANOUT、HEADERS）
-	 */
-	String exchangeTypes() default ExchangeTypes.DIRECT;
+    /**
+     * 交换类型（暂时不支持system，只支持DIRECT、TOPIC、FANOUT、HEADERS）
+     */
+    String exchangeTypes() default ExchangeTypes.DIRECT;
 
-	/**
-	 * 消息最大存活时间
-	 */
-	long delay() default 0L;
+    /**
+     * 消息最大存活时间
+     */
+    long delay() default 0L;
 
-	/**
-	 * 死信队列Class
-	 */
-	Class dlxClazz() default void.class;
+    /**
+     * 死信队列Class
+     */
+    Class dlxClazz() default void.class;
 
-	/**
-	 * 是否启用插件内的ttl队列
-	 */
-	boolean isDelayExchange() default false;
+    /**
+     * 是否启用插件内的ttl队列
+     */
+    boolean isDelayExchange() default false;
 
-	/**
-	 * Headers交换器下需要配置 是否匹配全部头部属性 默认非全部
-	 */
-	boolean matchAll() default false;
+    /**
+     * Headers交换器下需要配置 是否匹配全部头部属性 默认非全部
+     */
+    boolean matchAll() default false;
 
-	/**
-	 * Headers交换器下需要配置 是否匹配值,true就是匹配值,false就是不匹配值，只判断是否存在
-	 */
-	boolean matchValue() default false;
+    /**
+     * Headers交换器下需要配置 是否匹配值,true就是匹配值,false就是不匹配值，只判断是否存在
+     */
+    boolean matchValue() default false;
 
-	/**
-	 * 需要匹配的头部消息,如matchAll为True清空则需要匹配全部headers存在,才可通过,false为只要匹配中其中一个即可通过
-	 * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
-	 * @return
-	 */
-	String[] headers() default {};
+    /**
+     * 需要匹配的头部消息,如matchAll为True清空则需要匹配全部headers存在,才可通过,false为只要匹配中其中一个即可通过
+     * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
+     * @return
+     */
+    String[] headers() default {};
 }
 ```
 
@@ -359,14 +359,14 @@ public @interface RabbitMq {
 @RabbitMq(queues = "test1",exchange = "test1")
 public class TestMq extends AbstractConsumer<String> {
 
-  @Override
-  public void handleMessage(String body) throws Exception {
-  }
+    @Override
+    public void handleMessage(String body) throws Exception {
+    }
 
-  @Override
-  public void saveFailMessage(Message message, Exception e) {
+    @Override
+    public void saveFailMessage(Message message, Exception e) {
 
-  }
+    }
 }
 ```
 
@@ -377,14 +377,14 @@ public class TestMq extends AbstractConsumer<String> {
 @RabbitMqRetry(retryNumber = 5)
 public class TestMq extends AbstractConsumer<String> {
 
-  @Override
-  public void handleMessage(String body) throws Exception {
-  }
+    @Override
+    public void handleMessage(String body) throws Exception {
+    }
 
-  @Override
-  public void saveFailMessage(Message message, Exception e) {
+    @Override
+    public void saveFailMessage(Message message, Exception e) {
 
-  }
+    }
 }
 ```
 
@@ -395,14 +395,14 @@ public class TestMq extends AbstractConsumer<String> {
 @RabbitMqRetry(retryNumber = 5)
 public class TestMq extends AbstractConsumer<String> {
 
-  @Override
-  public void handleMessage(String body) throws Exception {
-  }
+    @Override
+    public void handleMessage(String body) throws Exception {
+    }
 
-  @Override
-  public void saveFailMessage(Message message, Exception e) {
+    @Override
+    public void saveFailMessage(Message message, Exception e) {
 
-  }
+    }
 }
 ```
 
@@ -410,15 +410,15 @@ public class TestMq extends AbstractConsumer<String> {
 @Component
 public class TestDlxMq extends AbstractConsumer<String> {
 
-  @Override
-  public void handleMessage(String body) throws Exception {
+    @Override
+    public void handleMessage(String body) throws Exception {
 
-  }
+    }
 
-  @Override
-  public void saveFailMessage(Message message, Exception e) {
+    @Override
+    public void saveFailMessage(Message message, Exception e) {
 
-  }
+    }
 }
 ```
 
@@ -432,18 +432,18 @@ public class TestDlxMq extends AbstractConsumer<String> {
 @Mqtt(topics = "topic",qos = 2)
 public class Test extends AbstractConsumer<String> {
 
-  private Logger logger = LoggerUtils.logger(Test.class);
+    private Logger logger = LoggerUtils.logger(Test.class);
 
 
-  @Override
-  public void handleMessage(String body) throws Exception {
-    logger.info("消息为:{}",body);
-  }
+    @Override
+    public void handleMessage(String body) throws Exception {
+        logger.info("消息为:{}",body);
+    }
 
-  @Override
-  public void saveFailMessage(String topic, MqttMessage message, Exception e) {
+    @Override
+    public void saveFailMessage(String topic, MqttMessage message, Exception e) {
 
-  }
+    }
 }
 ```
 
@@ -453,32 +453,32 @@ public class Test extends AbstractConsumer<String> {
 
 ```properties
 spring:
-  redis:
-    mode: SWITCH_DB
-    type: REDIS
-    host: 
-    port: 6379
-    password: 
-    database:
+redis:
+mode: SWITCH_DB
+type: REDIS
+host:
+port: 6379
+password:
+database:
 ```
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
 
 ```properties
 spring:
-  redis:
-    mode: SWITCH_DB
-    type: REDIS
-    host: 
-    port: 6379
-    password: 
-    database: 
-    tenant:
-    	租户编码:
-    		host: 
-            port: 6379
-            password: 
-            database: 
+redis:
+mode: SWITCH_DB
+type: REDIS
+host:
+port: 6379
+password:
+database: 
+tenant:
+租户编码:
+host:
+port: 6379
+password:
+database: 
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 RedisInitUtils.init的方法，传入租户编码和redis配置以及注入一个RedisTenantContext对象
@@ -493,23 +493,23 @@ spring:
 
 ```properties
 spring:
-  data:
-    mongodb:
-      mode: SWITCH_DB
-      host:
-      port:
-      username:
-      password:
-      database:
-      uri:
-      tenant:
-        租户编码:
-          host: 
-          port: 
-          username: 
-          password: 
-          database: 
-          uri: 
+data:
+mongodb:
+mode: SWITCH_DB
+host:
+port:
+username:
+password:
+database:
+uri:
+tenant:
+租户编码:
+host:
+port: 
+username:
+password: 
+database:
+uri: 
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
@@ -546,9 +546,9 @@ HeardHolder.setTenantCode("租户编码");
 @Api(tags = "文件接口")
 public class FileController {
 
-  private final FileServiceInterface fileServiceInterface;
+    private final FileServiceInterface fileServiceInterface;
 
-  public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
 }
 ```
 
@@ -560,29 +560,29 @@ public class FileController {
 @Api(tags = "文件接口")
 public class FileController {
 
-  private final FileServiceInterface fileServiceInterface;
+    private final FileServiceInterface fileServiceInterface;
 
-  public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
 
-  @PostMapping("/{bucket}/upload")
-  @ApiOperation(value = "文件上传")
-  public ResultVO<FileUpload> upload(@RequestPart("file") MultipartFile file,
-      @ApiParam("minio桶") @PathVariable("bucket") String bucket) throws Exception {
-    //上传文件
-    FileUpload fileUpload = fileServiceInterface.upload(file,"桶名");
-    //分享文件
-    String shareUrl = fileServiceInterface.share("文件名","桶名",分享文件超时时间,TimeUnit.SECONDS);
-    //分片上传
-    FileUpload fileUpload = fileServiceInterface.multipartUpload(file,"桶名");
-    //删除文件
-    fileServiceInterface.deleteFile("文件名","桶名");
-    //拷贝文件
-    boolean     flag        = fileServiceInterface.copyObject("原桶名","目标桶名","原文件名","目标文件名");
-    //下载文件流
-    InputStream inputStream = fileServiceInterface.download("文件名","桶名");
+    @PostMapping("/{bucket}/upload")
+    @ApiOperation(value = "文件上传")
+    public ResultVO<FileUpload> upload(@RequestPart("file") MultipartFile file,
+                                       @ApiParam("minio桶") @PathVariable("bucket") String bucket) throws Exception {
+        //上传文件
+        FileUpload fileUpload = fileServiceInterface.upload(file,"桶名");
+        //分享文件
+        String shareUrl = fileServiceInterface.share("文件名","桶名",分享文件超时时间,TimeUnit.SECONDS);
+        //分片上传
+        FileUpload fileUpload = fileServiceInterface.multipartUpload(file,"桶名");
+        //删除文件
+        fileServiceInterface.deleteFile("文件名","桶名");
+        //拷贝文件
+        boolean     flag        = fileServiceInterface.copyObject("原桶名","目标桶名","原文件名","目标文件名");
+        //下载文件流
+        InputStream inputStream = fileServiceInterface.download("文件名","桶名");
 
-    return ResultVO.success(fileServiceInterface.upload(file,bucket));
-  }
+        return ResultVO.success(fileServiceInterface.upload(file,bucket));
+    }
 
 }
 ```
@@ -592,7 +592,7 @@ public class FileController {
   public static void main(String[] args) {
     Set<Integer> a = new HashSet<>();
     for(Integer i = 0;i<=20;i++){
-      a.add(Integer.valueOf((int) (Math.random()*100)));
+        a.add(Integer.valueOf((int) (Math.random()*100)));
     }
 
     List<Person> b = new ArrayList<>();
@@ -642,31 +642,45 @@ public class FileController {
     System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),true));
     System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),true));
     System.out.println("============单字段排序算法升序结束=======================");
-  }
+}
 
-  static class Person {
+static class Person {
     private String name;
     private int age;
 
     public Person(String name, int age) {
-      this.name = name;
-      this.age = age;
+        this.name = name;
+        this.age = age;
     }
 
     public String getName() {
-      return name;
+        return name;
     }
 
     public int getAge() {
-      return age;
+        return age;
     }
 
     @Override
     public String toString() {
-      return "Person{" +
-          "name='" + name + '\'' +
-          ", age=" + age +
-          '}';
+        return "Person{" +
+                "name='" + name + '\'' +
+                ", age=" + age +
+                '}';
     }
-  }
+}
+```
+## MongoDB配置固定集合
+以下代码配置的是集合固定大小为2048字节,限制行数为五十万
+```java
+@MongoDBCapped(size = 2048,maxDocuments = 500000)
+@Document
+public class Entity implements Serializable {
+    
+    private String id;
+    
+    private Date created;
+    
+    private Date updated;
+}
 ```
