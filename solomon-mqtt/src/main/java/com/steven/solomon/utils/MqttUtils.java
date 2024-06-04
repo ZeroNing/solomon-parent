@@ -21,12 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import javax.annotation.Resource;
-import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
+
+import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -91,7 +87,7 @@ public class MqttUtils implements SendService<MqttModel> {
         putTenantAbstractConsumerMap(tenantCode,map);
       }
     }
-    Collection<MqttCallback> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallback.class).values();
+    Collection<MqttCallbackExtended> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallbackExtended.class).values();
     if (ValidateUtils.isNotEmpty(mqttCallbacks)) {
       mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
     }
