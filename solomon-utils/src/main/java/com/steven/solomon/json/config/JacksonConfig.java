@@ -57,6 +57,7 @@ public class JacksonConfig {
         mapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.registerModule(javaTimeModule).registerModule(new ParameterNamesModule()).registerModule(simpleModule);
         //序列化的时候序列对象的所有属性
         mapper.setSerializationInclusion(Include.ALWAYS);
