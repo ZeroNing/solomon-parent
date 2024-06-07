@@ -1024,6 +1024,55 @@ public class Lambda {
         }
     }
 
+    /**
+     *
+     * @param input 字符串 如:skuCustomFieldValue03
+     * @param regex 替换标记 如:_
+     * @return sku_custom_field_value_03
+     */
+    public static String toSnakeCase(String input,String regex) {
+        if (input == null) {
+            return null;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(Character.toLowerCase(input.charAt(0)));  // 初始化StringBuilder并添加第一个字符，转为小写
+
+        for (int i = 1; i < input.length(); i++) {
+            char currentChar = input.charAt(i);
+            char previousChar = input.charAt(i - 1);
+            // 添加下划线条件: 当前字符是大写字母，或者当前字符是数字且前一个字符不是数字
+            if (Character.isUpperCase(currentChar) || (Character.isDigit(currentChar) && !Character.isDigit(previousChar))) {
+                sb.append(regex);
+            }
+            sb.append(Character.toLowerCase(currentChar));
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 驼峰转换
+     * @param input 字符串 如:sku_custom_field_value_03
+     * @param regex 替换标记 如:_
+     * @return skuCustomFieldValue03
+     */
+    public static String toCamelCase(String input,String regex) {
+        if (input == null) {
+            return null;
+        }
+
+        String[] parts = input.split(regex);
+        StringBuilder camelCaseString = new StringBuilder(parts[0].toLowerCase());
+
+        for (int i = 1; i < parts.length; i++) {
+            camelCaseString.append(parts[i].substring(0, 1).toUpperCase());
+            camelCaseString.append(parts[i].substring(1).toLowerCase());
+        }
+
+        return camelCaseString.toString();
+    }
+
     public static void main(String[] args) {
         List<Person> b = new ArrayList<>();
         for (Integer i = 1; i <= 5; i++) {
