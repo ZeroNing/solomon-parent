@@ -33,8 +33,6 @@ public abstract class AbstractMQService {
 
     /**
      * 初始化绑定
-     *
-     * @return
      */
     protected abstract Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, RabbitMq rabbitMq);
 }

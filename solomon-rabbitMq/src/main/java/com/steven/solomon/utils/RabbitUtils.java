@@ -71,10 +71,6 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
 
     /**
      * 发送消息,并设置消息过期时间
-     *
-     * @param mq
-     * @param expiration
-     * @throws Exception
      */
     @Override
     public void sendExpiration(RabbitMqModel mq, long expiration) throws Exception {
@@ -194,8 +190,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
 
     public AbstractMessageListenerContainer findContainerByQueueName(String queueName) {
         String key = StringUtils.trim(queueName);
-        AbstractMessageListenerContainer container = RabbitMQInitConfig.allQueueContainerMap.get(key);
-        return container;
+        return RabbitMQInitConfig.allQueueContainerMap.get(key);
     }
 
     /**
@@ -203,7 +198,6 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      *
      * @param transactional 是否开启事务
      * @param queueName     队列名
-     * @throws Exception
      */
     public void handleQueueMessageManually(boolean transactional, String queueName) throws Exception {
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);

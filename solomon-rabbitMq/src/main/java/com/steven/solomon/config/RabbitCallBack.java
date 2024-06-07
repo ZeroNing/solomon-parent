@@ -12,7 +12,7 @@ import java.util.Collection;
 
 public class RabbitCallBack implements ReturnsCallback, ConfirmCallback {
 
-    private Logger logger = LoggerUtils.logger(RabbitCallBack.class);
+    public final Logger logger = LoggerUtils.logger(RabbitCallBack.class);
 
     private static Collection<AbstractRabbitCallBack> rabbitCallBackList;
 

@@ -7,7 +7,7 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 
 public abstract class AbstractRabbitCallBack {
 
-    private Logger logger = LoggerUtils.logger(AbstractRabbitCallBack.class);
+    public final Logger logger = LoggerUtils.logger(AbstractRabbitCallBack.class);
 
     /**
      * 保存mq消费成功或失败后方法

@@ -85,8 +85,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     /**
      * 获取重试次数，默认为2
-     *
-     * @return
      */
     public int getRetryNumber() {
         RabbitMqRetry rabbitMqRetry = getClass().getAnnotation(RabbitMqRetry.class);
@@ -95,17 +93,14 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     /**
      * 获取是否是自动确认
-     *
-     * @return
      */
     public boolean getIsAutoAck() {
         RabbitMq rabbitMq = getClass().getAnnotation(RabbitMq.class);
-        return ValidateUtils.isEmpty(rabbitMq) ? false : ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), rabbitMq.mode().toString()) ? true : false;
+        return ValidateUtils.isNotEmpty(rabbitMq) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), rabbitMq.mode().toString());
     }
 
     /**
      * 消费方法
-     *
      * @param body 请求数据
      */
     public abstract R handleMessage(T body) throws Exception;
@@ -122,8 +117,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     /**
      * 判断是否重复消费
-     *
-     * @return true 重复消费 false 不重复消费
      */
     public boolean checkMessageKey(MessageProperties messageProperties) {
         return false;
@@ -131,8 +124,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     /**
      * 删除判断重复消费Key
-     *
-     * @param messageProperties
      */
     public void deleteCheckMessageKey(MessageProperties messageProperties) {
 
@@ -140,10 +131,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     /**
      * 保存消费成功消息
-     *
-     * @param result
-     * @param message
-     * @param rabbitMqModel
      */
     public abstract void saveLog(R result, Message message, RabbitMqModel rabbitMqModel);
 

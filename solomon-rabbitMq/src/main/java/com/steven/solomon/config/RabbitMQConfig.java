@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
 public class RabbitMQConfig {
 
-    private Logger logger = LoggerUtils.logger(RabbitMQConfig.class);
+    private final Logger logger = LoggerUtils.logger(RabbitMQConfig.class);
 
     /**
      * 接受数据自动的转换为Json

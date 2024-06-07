@@ -57,14 +57,12 @@ public class RabbitMqModel<T> extends BaseMq<T> {
     public RabbitMqModel(String exchange, T body) {
         super(body);
         this.exchange = exchange;
-        this.messagePersistent = true;
     }
 
     public RabbitMqModel(String exchange, String routingKey, T body) {
         super(body);
         this.exchange = exchange;
         this.routingKey = routingKey;
-        this.messagePersistent = true;
     }
 
     public RabbitMqModel(String exchange, String routingKey, T body, boolean messagePersistent) {
