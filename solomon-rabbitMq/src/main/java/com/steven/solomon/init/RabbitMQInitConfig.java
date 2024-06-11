@@ -84,7 +84,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
                     // 初始化队列绑定
                     Queue queue = initBinding(abstractMQMap, queueName, true, false);
                     // 启动监听器并保存已启动的MQ
-                    allQueueContainerMap.put(queue.getName(), this.startContainer((AbstractConsumer) abstractConsumer, queue));
+                    allQueueContainerMap.put(queue.getName(), this.startContainer(abstractConsumer, queue));
                     // 初始化死信队列
                     this.initDlx(queue, abstractMQMap);
                 }
@@ -111,7 +111,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
             return;
         }
         // 获取死信队列类
-        AbstractConsumer abstractConsumer = (AbstractConsumer) SpringUtil.getBean(clazz);
+        Object abstractConsumer = SpringUtil.getBean(clazz);
         // 初始化队列绑定
         Queue queues = initBinding(abstractMQMap, queueName, false, true);
         // 启动监听器
@@ -124,7 +124,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
      *
      * @param abstractConsumer 抽象的消费者
      */
-    private DirectMessageListenerContainer startContainer(AbstractConsumer abstractConsumer, Queue queue) {
+    private DirectMessageListenerContainer startContainer(Object abstractConsumer, Queue queue) {
         // 新建监听器
         DirectMessageListenerContainer container = new DirectMessageListenerContainer(connectionFactory);
         // 新建消息侦听器适配器
@@ -144,8 +144,7 @@ public class RabbitMQInitConfig implements CommandLineRunner {
         container.setPrefetchCount(rabbitMq.prefetchCount());
         container.setAmqpAdmin(admin);
         RabbitMqRetry rabbitMqRetry = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RabbitMqRetry.class);
-        if (ValidateUtils.isNotEmpty(rabbitMqRetry) && AbstractConsumer.class
-                .isAssignableFrom(abstractConsumer.getClass())) {
+        if (ValidateUtils.isNotEmpty(rabbitMqRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
             container.setAdviceChain(setRabbitRetry(rabbitMqRetry));
         }
