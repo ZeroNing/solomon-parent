@@ -43,12 +43,7 @@ public class MqttConfig {
       return ;
     }
     Map<String, MqttInitService> abstractMQMap = SpringUtil.getBeansOfType(MqttInitService.class);
-    MqttInitService mqttInitService = null;
-    if(ValidateUtils.isNotEmpty(abstractMQMap)){
-      mqttInitService = abstractMQMap.values().stream().findFirst().get();
-    } else {
-      mqttInitService = new DefaultMqttInitService(mqttUtils);
-    }
+    MqttInitService mqttInitService = ValidateUtils.isNotEmpty(abstractMQMap) ? abstractMQMap.values().stream().findFirst().get() : new DefaultMqttInitService(mqttUtils);
     for(Entry<String,MqttProfile> entry: tenantProfileMap.entrySet()){
       mqttInitService.initMqttClient(entry.getKey(),entry.getValue());
     }
