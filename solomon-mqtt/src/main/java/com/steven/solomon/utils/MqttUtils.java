@@ -45,8 +45,6 @@ public class MqttUtils implements SendService<MqttModel> {
     this.optionsMap.put(tenantCode,options);
   }
 
-  private Map<String,Map<AbstractConsumer,Mqtt>> tenantAbstractConsumerMap = new HashMap<>();
-
   public Map<String, MqttClient> getClientMap() {
     return clientMap;
   }
@@ -55,23 +53,14 @@ public class MqttUtils implements SendService<MqttModel> {
     this.clientMap.put(tenantCode, client);
   }
 
-  public Map<String, Map<AbstractConsumer, Mqtt>> getTenantAbstractConsumerMap() {
-    return tenantAbstractConsumerMap;
-  }
-
-  public void putTenantAbstractConsumerMap(String tenantCode,Map<AbstractConsumer, Mqtt> tenantAbstractConsumerMap) {
-    this.tenantAbstractConsumerMap.put(tenantCode, tenantAbstractConsumerMap);
-  }
-
   public void init(String tenantCode, MqttProfile mqttProfile) throws MqttException {
     MqttClient mqttClient = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
-    List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
     MqttConnectOptions options   = getMqttConnectOptions(mqttProfile);
     mqttClient.connect(options);
     putOptionsMap(tenantCode,options);
 
+    List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
     if (ValidateUtils.isNotEmpty(clazzList)) {
-      Map<AbstractConsumer, Mqtt> map = new HashMap<>(clazzList.size());
       for (Object abstractConsumer : clazzList) {
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
 
@@ -83,10 +72,9 @@ public class MqttUtils implements SendService<MqttModel> {
         for(String topic : mqtt.topics()){
           mqttClient.subscribe(topic, mqtt.qos(), consumer);
         }
-        map.put(consumer, mqtt);
-        putTenantAbstractConsumerMap(tenantCode,map);
       }
     }
+
     mqttClient.setCallback(new MqttCallbackExtended() {
       @Override
       public void connectComplete(boolean reconnect, String serverURI) {
@@ -179,18 +167,19 @@ public class MqttUtils implements SendService<MqttModel> {
    */
   public void subscribe(String tenantCode) throws MqttException {
     MqttClient client = getClientMap().get(tenantCode);
-    Map<AbstractConsumer,Mqtt> abstractConsumerMqttMap = tenantAbstractConsumerMap.get(tenantCode);
-    if(ValidateUtils.isNotEmpty(abstractConsumerMqttMap)){
-      for(Entry<AbstractConsumer,Mqtt> entry : abstractConsumerMqttMap.entrySet()){
-        Mqtt mqtt = entry.getValue();
-        if(ValidateUtils.isNotEmpty(mqtt)){
+    List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+    if (ValidateUtils.isNotEmpty(clazzList)) {
+      for (Object abstractConsumer : clazzList) {
+        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
+
+        if (ValidateUtils.isEmpty(mqtt)) {
           continue;
         }
-
+        AbstractConsumer consumer = (AbstractConsumer) BeanUtil
+                .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
         for(String topic : mqtt.topics()){
-          client.subscribe(topic,mqtt.qos(),entry.getKey());
+          client.subscribe(topic, mqtt.qos(), consumer);
         }
-
       }
     }
   }
@@ -220,12 +209,19 @@ public class MqttUtils implements SendService<MqttModel> {
     MqttClient client = getClientMap().get(tenantCode);
     if(!client.isConnected()){
       client.connect(getOptionsMap().get(tenantCode));
-      Map<AbstractConsumer,Mqtt> consumer = getTenantAbstractConsumerMap().get(tenantCode);
-      for(Entry<AbstractConsumer,Mqtt> map : consumer.entrySet()){
-        Mqtt mqtt = map.getValue();
-        logger.debug("重新连接,重新订阅主题:{}",mqtt.topics());
-        for(String topic : mqtt.topics()){
-          client.subscribe(topic,mqtt.qos(),map.getKey());
+      List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+      if (ValidateUtils.isNotEmpty(clazzList)) {
+        for (Object abstractConsumer : clazzList) {
+          Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
+
+          if (ValidateUtils.isEmpty(mqtt)) {
+            continue;
+          }
+          AbstractConsumer consumer = (AbstractConsumer) BeanUtil
+                  .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+          for(String topic : mqtt.topics()){
+            client.subscribe(topic, mqtt.qos(), consumer);
+          }
         }
       }
     }
