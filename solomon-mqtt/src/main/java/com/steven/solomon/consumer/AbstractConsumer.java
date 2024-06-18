@@ -63,11 +63,11 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
 
   /**
    * 保存消费成功消息
-   * @param result
-   * @param message
-   * @param rabbitMqModel
+   * @param result 消费成功后返回的结果
+   * @param message mqtt消息题
+   * @param model 收到的消息体
    */
-  public abstract void saveLog(R result,MqttMessage message,MqttModel rabbitMqModel);
+  public abstract void saveLog(R result,MqttMessage message,MqttModel model);
 
   /**
    * 删除判断重复消费Key
