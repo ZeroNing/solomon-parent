@@ -3,6 +3,7 @@ package com.steven.solomon.config;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.TenantMqttProfile;
 import com.steven.solomon.service.MqttInitService;
+import com.steven.solomon.service.impl.DefaultMqttInitService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -27,8 +28,11 @@ public class MqttConfig {
 
   private final TenantMqttProfile profile;
 
-  public MqttConfig(TenantMqttProfile profile,ApplicationContext applicationContext) {
+  private final MqttUtils mqttUtils;
+
+  public MqttConfig(TenantMqttProfile profile, ApplicationContext applicationContext, MqttUtils mqttUtils) {
     this.profile = profile;
+    this.mqttUtils = mqttUtils;
     SpringUtil.setContext(applicationContext);
   }
 
@@ -39,10 +43,11 @@ public class MqttConfig {
       return ;
     }
     Map<String, MqttInitService> abstractMQMap = SpringUtil.getBeansOfType(MqttInitService.class);
-    MqttInitService mqttInitService = abstractMQMap.get("mqttInitServiceImpl");
-    abstractMQMap.remove("mqttInitServiceImpl");
+    MqttInitService mqttInitService = null;
     if(ValidateUtils.isNotEmpty(abstractMQMap)){
       mqttInitService = abstractMQMap.values().stream().findFirst().get();
+    } else {
+      mqttInitService = new DefaultMqttInitService(mqttUtils);
     }
     for(Entry<String,MqttProfile> entry: tenantProfileMap.entrySet()){
       mqttInitService.initMqttClient(entry.getKey(),entry.getValue());

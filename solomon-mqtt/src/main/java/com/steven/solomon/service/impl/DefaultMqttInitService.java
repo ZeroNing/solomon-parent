@@ -12,19 +12,16 @@ import com.steven.solomon.verification.ValidateUtils;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
-@Service
-public class MqttInitServiceImpl implements MqttInitService {
+public class DefaultMqttInitService implements MqttInitService {
 
-    private Logger logger = LoggerUtils.logger(MqttInitServiceImpl.class);
+    private final Logger logger = LoggerUtils.logger(DefaultMqttInitService.class);
 
     private final MqttUtils utils;
 
-    public MqttInitServiceImpl(MqttUtils utils) {
+    public DefaultMqttInitService(MqttUtils utils) {
         this.utils = utils;
     }
 
