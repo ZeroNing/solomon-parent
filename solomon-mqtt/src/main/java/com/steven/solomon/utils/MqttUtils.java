@@ -90,7 +90,7 @@ public class MqttUtils implements SendService<MqttModel> {
     mqttClient.setCallback(new MqttCallbackExtended() {
       @Override
       public void connectComplete(boolean reconnect, String serverURI) {
-        logger.info("租户:{0} 重连{1}",tenantCode,reconnect ? "成功" : "失败");
+        logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
         if(reconnect){
           List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
           for (Object abstractConsumer : clazzList) {
@@ -99,10 +99,10 @@ public class MqttUtils implements SendService<MqttModel> {
             if (ValidateUtils.isEmpty(mqtt)) {
               continue;
             }
-            AbstractConsumer consumer = (AbstractConsumer) BeanUtil
-                    .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+            AbstractConsumer consumer = (AbstractConsumer) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
             try {
               for(String topic : mqtt.topics()){
+                logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
                 mqttClient.subscribe(topic, mqtt.qos(), consumer);
               }
             } catch (MqttException e) {
@@ -114,7 +114,7 @@ public class MqttUtils implements SendService<MqttModel> {
 
       @Override
       public void connectionLost(Throwable cause) {
-        logger.info("租户:{0} 断开连接,异常为:",tenantCode,cause);
+        logger.info("租户:{} 断开连接,异常为:",tenantCode,cause);
       }
 
       @Override
