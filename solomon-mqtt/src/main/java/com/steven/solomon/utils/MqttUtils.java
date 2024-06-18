@@ -87,10 +87,46 @@ public class MqttUtils implements SendService<MqttModel> {
         putTenantAbstractConsumerMap(tenantCode,map);
       }
     }
-    Collection<MqttCallbackExtended> mqttCallbacks = SpringUtil.getBeansOfType(MqttCallbackExtended.class).values();
-    if (ValidateUtils.isNotEmpty(mqttCallbacks)) {
-      mqttClient.setCallback(mqttCallbacks.stream().findFirst().get());
-    }
+    mqttClient.setCallback(new MqttCallbackExtended() {
+      @Override
+      public void connectComplete(boolean reconnect, String serverURI) {
+        logger.info("租户:{0} 重连{1}",tenantCode,reconnect ? "成功" : "失败");
+        if(reconnect){
+          List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+          for (Object abstractConsumer : clazzList) {
+            Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
+
+            if (ValidateUtils.isEmpty(mqtt)) {
+              continue;
+            }
+            AbstractConsumer consumer = (AbstractConsumer) BeanUtil
+                    .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+            try {
+              for(String topic : mqtt.topics()){
+                mqttClient.subscribe(topic, mqtt.qos(), consumer);
+              }
+            } catch (MqttException e) {
+              logger.error("重连重新订阅主题失败,异常为:",e);
+            }
+          }
+        }
+      }
+
+      @Override
+      public void connectionLost(Throwable cause) {
+        logger.info("租户:{0} 断开连接,异常为:",tenantCode,cause);
+      }
+
+      @Override
+      public void messageArrived(String topic, MqttMessage message) throws Exception {
+
+      }
+
+      @Override
+      public void deliveryComplete(IMqttDeliveryToken token) {
+
+      }
+    });
     putClient(tenantCode,mqttClient);
   }
 
@@ -135,6 +171,28 @@ public class MqttUtils implements SendService<MqttModel> {
       return;
     }
     getClientMap().get(tenantCode).subscribe(topic, qos,consumer);
+  }
+
+  /**
+   * 订阅消息
+   * @param tenantCode 租户编码
+   */
+  public void subscribe(String tenantCode) throws MqttException {
+    MqttClient client = getClientMap().get(tenantCode);
+    Map<AbstractConsumer,Mqtt> abstractConsumerMqttMap = tenantAbstractConsumerMap.get(tenantCode);
+    if(ValidateUtils.isNotEmpty(abstractConsumerMqttMap)){
+      for(Entry<AbstractConsumer,Mqtt> entry : abstractConsumerMqttMap.entrySet()){
+        Mqtt mqtt = entry.getValue();
+        if(ValidateUtils.isNotEmpty(mqtt)){
+          continue;
+        }
+
+        for(String topic : mqtt.topics()){
+          client.subscribe(topic,mqtt.qos(),entry.getKey());
+        }
+
+      }
+    }
   }
 
   /**
