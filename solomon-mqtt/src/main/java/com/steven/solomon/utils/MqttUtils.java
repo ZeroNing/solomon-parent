@@ -53,57 +53,6 @@ public class MqttUtils implements SendService<MqttModel> {
     this.clientMap.put(tenantCode, client);
   }
 
-  public void init(String tenantCode, MqttProfile mqttProfile) throws MqttException {
-    MqttClient mqttClient = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
-    MqttConnectOptions options = initMqttConnectOptions(mqttProfile);
-    mqttClient.connect(options);
-    putOptionsMap(tenantCode,options);
-    // 订阅主题
-    subscribe(mqttClient);
-
-    //配置callback
-    mqttClient.setCallback(new MqttCallbackExtended() {
-      @Override
-      public void connectComplete(boolean reconnect, String serverURI) {
-        logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
-        if(reconnect){
-          List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
-          for (Object abstractConsumer : clazzList) {
-            Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-            if (ValidateUtils.isNotEmpty(mqtt)) {
-              try {
-                for(String topic : mqtt.topics()){
-                  logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                  mqttClient.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
-                }
-              } catch (MqttException e) {
-                logger.error("重连重新订阅主题失败,异常为:",e);
-              }
-            }
-          }
-        }
-      }
-
-      @Override
-      public void connectionLost(Throwable cause) {
-        logger.info("租户:{} 断开连接,异常为:",tenantCode,cause);
-      }
-
-      @Override
-      public void messageArrived(String topic, MqttMessage message) throws Exception {
-
-      }
-
-      @Override
-      public void deliveryComplete(IMqttDeliveryToken token) {
-
-      }
-    });
-
-    //保存client
-    putClient(tenantCode,mqttClient);
-  }
-
   /**
    *   发送消息
    *   @param data 消息内容
@@ -195,7 +144,7 @@ public class MqttUtils implements SendService<MqttModel> {
     }
   }
 
-  private MqttConnectOptions initMqttConnectOptions(MqttProfile mqttProfile) {
+  public MqttConnectOptions initMqttConnectOptions(MqttProfile mqttProfile) {
     MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
     mqttConnectOptions.setUserName(mqttProfile.getUserName());
     mqttConnectOptions.setPassword(mqttProfile.getPassword().toCharArray());
