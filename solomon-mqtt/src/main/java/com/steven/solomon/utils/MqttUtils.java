@@ -55,26 +55,13 @@ public class MqttUtils implements SendService<MqttModel> {
 
   public void init(String tenantCode, MqttProfile mqttProfile) throws MqttException {
     MqttClient mqttClient = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
-    MqttConnectOptions options   = getMqttConnectOptions(mqttProfile);
+    MqttConnectOptions options = initMqttConnectOptions(mqttProfile);
     mqttClient.connect(options);
     putOptionsMap(tenantCode,options);
+    // 订阅主题
+    subscribe(mqttClient);
 
-    List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
-    if (ValidateUtils.isNotEmpty(clazzList)) {
-      for (Object abstractConsumer : clazzList) {
-        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-
-        if (ValidateUtils.isEmpty(mqtt)) {
-          continue;
-        }
-        AbstractConsumer consumer = (AbstractConsumer) BeanUtil
-            .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-        for(String topic : mqtt.topics()){
-          mqttClient.subscribe(topic, mqtt.qos(), consumer);
-        }
-      }
-    }
-
+    //配置callback
     mqttClient.setCallback(new MqttCallbackExtended() {
       @Override
       public void connectComplete(boolean reconnect, String serverURI) {
@@ -83,18 +70,15 @@ public class MqttUtils implements SendService<MqttModel> {
           List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
           for (Object abstractConsumer : clazzList) {
             Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-
-            if (ValidateUtils.isEmpty(mqtt)) {
-              continue;
-            }
-            AbstractConsumer consumer = (AbstractConsumer) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-            try {
-              for(String topic : mqtt.topics()){
-                logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                mqttClient.subscribe(topic, mqtt.qos(), consumer);
+            if (ValidateUtils.isNotEmpty(mqtt)) {
+              try {
+                for(String topic : mqtt.topics()){
+                  logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
+                  mqttClient.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+                }
+              } catch (MqttException e) {
+                logger.error("重连重新订阅主题失败,异常为:",e);
               }
-            } catch (MqttException e) {
-              logger.error("重连重新订阅主题失败,异常为:",e);
             }
           }
         }
@@ -115,6 +99,8 @@ public class MqttUtils implements SendService<MqttModel> {
 
       }
     });
+
+    //保存client
     putClient(tenantCode,mqttClient);
   }
 
@@ -123,7 +109,7 @@ public class MqttUtils implements SendService<MqttModel> {
    *   @param data 消息内容
    */
   @Override
-  public void send(MqttModel data) {
+  public void send(MqttModel data) throws Exception {
     // 获取客户端实例
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -154,7 +140,7 @@ public class MqttUtils implements SendService<MqttModel> {
    * @param qos 消息质量
    * @param consumer 消费者
    */
-  public void subscribe(String tenantCode,String topic,int qos, AbstractConsumer consumer) throws MqttException {
+  public void subscribe(String tenantCode,String topic,int qos, IMqttMessageListener consumer) throws MqttException {
     if(ValidateUtils.isEmpty(topic)){
       return;
     }
@@ -163,22 +149,18 @@ public class MqttUtils implements SendService<MqttModel> {
 
   /**
    * 订阅消息
-   * @param tenantCode 租户编码
+   * @param client mqtt连接
    */
-  public void subscribe(String tenantCode) throws MqttException {
-    MqttClient client = getClientMap().get(tenantCode);
-    List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+  public void subscribe(MqttClient client) throws MqttException {
+    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-
         if (ValidateUtils.isEmpty(mqtt)) {
           continue;
         }
-        AbstractConsumer consumer = (AbstractConsumer) BeanUtil
-                .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-        for(String topic : mqtt.topics()){
-          client.subscribe(topic, mqtt.qos(), consumer);
+        for (String topic : mqtt.topics()) {
+          client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
         }
       }
     }
@@ -209,25 +191,11 @@ public class MqttUtils implements SendService<MqttModel> {
     MqttClient client = getClientMap().get(tenantCode);
     if(!client.isConnected()){
       client.connect(getOptionsMap().get(tenantCode));
-      List<Object>       clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
-      if (ValidateUtils.isNotEmpty(clazzList)) {
-        for (Object abstractConsumer : clazzList) {
-          Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-
-          if (ValidateUtils.isEmpty(mqtt)) {
-            continue;
-          }
-          AbstractConsumer consumer = (AbstractConsumer) BeanUtil
-                  .copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-          for(String topic : mqtt.topics()){
-            client.subscribe(topic, mqtt.qos(), consumer);
-          }
-        }
-      }
+      subscribe(client);
     }
   }
 
-  private MqttConnectOptions getMqttConnectOptions(MqttProfile mqttProfile) {
+  private MqttConnectOptions initMqttConnectOptions(MqttProfile mqttProfile) {
     MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
     mqttConnectOptions.setUserName(mqttProfile.getUserName());
     mqttConnectOptions.setPassword(mqttProfile.getPassword().toCharArray());

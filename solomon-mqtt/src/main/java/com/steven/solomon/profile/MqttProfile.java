@@ -1,12 +1,7 @@
 package com.steven.solomon.profile;
 
-import com.steven.solomon.config.MqttConfig;
 import java.io.Serializable;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.integration.annotation.IntegrationComponentScan;
-import org.springframework.stereotype.Component;
-
 public class MqttProfile {
 
   /**

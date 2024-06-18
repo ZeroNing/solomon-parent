@@ -1,6 +1,4 @@
 package com.steven.solomon.entity;
-
-
 import com.steven.solomon.pojo.entity.BaseMq;
 
 /**
