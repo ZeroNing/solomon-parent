@@ -12,6 +12,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import org.eclipse.paho.mqttv5.client.*;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.mqttv5.common.MqttSubscription;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -67,7 +68,9 @@ public class DefaultMqttInitService implements MqttInitService {
                             try {
                                 for(String topic : mqtt.topics()){
                                     logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                                    client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+                                    MqttSubscription[]     mqttSubscriptionList = new MqttSubscription[]{new MqttSubscription(topic,mqtt.qos())};
+                                    IMqttMessageListener[] listenerList         = new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())};
+                                    client.subscribe(mqttSubscriptionList, listenerList);
                                 }
                             } catch (MqttException e) {
                                 logger.error("重连重新订阅主题失败,异常为:",e);

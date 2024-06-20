@@ -16,6 +16,7 @@ import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
+import org.eclipse.paho.mqttv5.common.MqttSubscription;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.eclipse.paho.mqttv5.common.packet.UserProperty;
 import org.slf4j.Logger;
@@ -108,7 +109,9 @@ public class MqttUtils implements SendService<MqttModel> {
           continue;
         }
         for (String topic : mqtt.topics()) {
-          client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+          MqttSubscription[] mqttSubscriptionList = new MqttSubscription[]{new MqttSubscription(topic,mqtt.qos())};
+          IMqttMessageListener[] listenerList = new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())};
+          client.subscribe(mqttSubscriptionList, listenerList);
         }
       }
     }
@@ -165,9 +168,9 @@ public class MqttUtils implements SendService<MqttModel> {
     // 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止.不建议更改除非您绝对确定需要，否则该值.
     mqttConnectOptions.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
     // 指示客户端是否请求服务器在发生错误时发送问题信息
-    mqttConnectOptions.setRequestProblemInfo(mqttProfile.getRequestProblemInformation());
+//    mqttConnectOptions.setRequestProblemInfo(mqttProfile.getRequestProblemInformation());
     // 指示客户端是否请求服务器发送响应信息
-    mqttConnectOptions.setRequestResponseInfo(mqttProfile.getRequestResponseInformation());
+//    mqttConnectOptions.setRequestResponseInfo(mqttProfile.getRequestResponseInformation());
     // 客户端愿意接收的最大 MQTT 数据包大小。
     mqttConnectOptions.setMaximumPacketSize(mqttProfile.getMaximumPacketSize());
     // 自动重新连接尝试之间的最小和最大延迟时间(以秒为单位）
