@@ -72,12 +72,12 @@ public class MqttProfile {
   /**
    * 指示客户端是否请求服务器在发生错误时发送问题信息
    */
-  private Boolean requestProblemInformation;
+  private Boolean requestProblemInformation = false;
 
   /**
    * 指示客户端是否请求服务器发送响应信息
    */
-  private Boolean requestResponseInformation;
+  private Boolean requestResponseInformation = false;
 
   /**
    * 客户端愿意接收的最大 MQTT 数据包大小

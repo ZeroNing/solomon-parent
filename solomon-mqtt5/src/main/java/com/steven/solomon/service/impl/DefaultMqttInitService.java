@@ -68,9 +68,7 @@ public class DefaultMqttInitService implements MqttInitService {
                             try {
                                 for(String topic : mqtt.topics()){
                                     logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                                    MqttSubscription[]     mqttSubscriptionList = new MqttSubscription[]{new MqttSubscription(topic,mqtt.qos())};
-                                    IMqttMessageListener[] listenerList         = new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())};
-                                    client.subscribe(mqttSubscriptionList, listenerList);
+                                    client.subscribe(new MqttSubscription[]{new MqttSubscription(topic,mqtt.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});
                                 }
                             } catch (MqttException e) {
                                 logger.error("重连重新订阅主题失败,异常为:",e);
