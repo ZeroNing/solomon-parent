@@ -107,11 +107,11 @@ public class MongoDbUtils {
   }
 
   public static void checkCapped(MongoDatabase database, String collectionName, int size, int maxDocuments) {
-    List<String> a= new ArrayList<>();
+    List<String> collectionNameList= new ArrayList<>();
     database.listCollectionNames().forEach(s -> {
-      a.add(s);
+      collectionNameList.add(s);
     });
-    if (a.contains(collectionName)) {
+    if (collectionNameList.contains(collectionName)) {
       Document command = new Document("collStats", collectionName);
       Boolean isCapped = database.runCommand(command, ReadPreference.primary()).getBoolean("capped");
 
