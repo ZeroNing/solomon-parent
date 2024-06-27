@@ -66,7 +66,7 @@ public class MinioService extends AbstractFileService {
     client.putObject(
         PutObjectArgs.builder().bucket(bucketName).object(filePath).stream(
             file.getInputStream(), file.getSize(), partSize)
-            .contentType(FileTypeUtils.getFileType(file.getInputStream(),file.getOriginalFilename()))
+            .contentType(FileTypeUtils.getFileType(file.getInputStream()))
             .build());
   }
 
