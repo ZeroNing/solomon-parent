@@ -61,7 +61,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
   public FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception{
     //创建桶
     makeBucket(bucketName);
-    String       filePath = getFilePath(!isUseOriginalName? fileNamingRulesGenerationService.getFileName(file): file.getName(),properties);
+    String       filePath = getFilePath(!isUseOriginalName ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);
     long fileSize = file.getSize();
     if(fileSize >= partSize){
       return multipartUpload(file,bucketName,isUseOriginalName);
