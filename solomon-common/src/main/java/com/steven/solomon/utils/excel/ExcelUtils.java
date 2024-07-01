@@ -58,7 +58,7 @@ public class ExcelUtils {
 	 * @param data      数据
 	 * @throws Exception
 	 */
-	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data) throws Exception {
+	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		setHead(response, excelName);
 		//更新Class注解值
 		StopWatch stopWatch = new StopWatch();
@@ -72,11 +72,25 @@ public class ExcelUtils {
 		stopWatch.start();
 		logger.debug("开始导出Excel");
 		EasyExcel.write(response.getOutputStream(), clazz)
-				.registerWriteHandler(formatExcel())
-				.registerWriteHandler(new ExcelWidthStyleStrategy())
-				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet")).doWrite(data);
+				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
+				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
+				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
+				.doWrite(data);
 		stopWatch.stop();
 		logger.debug("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+	}
+
+	/**
+	 * 导出
+	 * @param response
+	 * @param excelName 文件名需要带上后缀名
+	 * @param sheetName 表名 不填默认为sheet
+	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
+	 * @param data      数据
+	 * @throws Exception
+	 */
+	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data) throws Exception {
+		export(response, excelName, sheetName, clazz, data, null, null);
 	}
 
 	/**
@@ -88,7 +102,7 @@ public class ExcelUtils {
 	 * @return          文件
 	 * @throws Exception
 	 */
-	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data) throws Exception {
+	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
 			//更新Class注解值
 			StopWatch stopWatch = new StopWatch();
@@ -101,7 +115,7 @@ public class ExcelUtils {
 			stopWatch = new StopWatch();
 			stopWatch.start();
 			logger.debug("开始导出Excel");
-			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(formatExcel()).registerWriteHandler(new ExcelWidthStyleStrategy());
+			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
 			WriteSheet              writeSheet;
@@ -119,6 +133,19 @@ public class ExcelUtils {
 				return new MockMultipartFile(excelName,excelName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
 			}
 		}
+	}
+
+	/**
+	 * 导出
+	 * @param excelName 文件名需要带上后缀名
+	 * @param sheetName 表名 不填默认为sheet
+	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
+	 * @param data      数据
+	 * @return          文件
+	 * @throws Exception
+	 */
+	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data) throws Exception {
+		return export(excelName, sheetName, clazz, data, null, null);
 	}
 
 	private static void updateClassExcelPropertyValue(Class<?> clazz) throws Exception {
@@ -149,7 +176,7 @@ public class ExcelUtils {
 		response.setHeader("Content-disposition", "attachment;filename=" + fileName);
 	}
 
-	public static HorizontalCellStyleStrategy formatExcel() {
+	private static HorizontalCellStyleStrategy formatExcel() {
 		WriteCellStyle headWriteCellStyle = new WriteCellStyle();
 		headWriteCellStyle.setFillBackgroundColor(IndexedColors.WHITE.getIndex());
 		WriteFont headWriteFont = new WriteFont();
@@ -171,19 +198,4 @@ public class ExcelUtils {
 		return new HorizontalCellStyleStrategy(headWriteCellStyle, contentWriteCellStyle);
 
 	}
-
-	/**
-	 * 设置头部单元格宽度
-	 */
-	public static class ExcelWidthStyleStrategy extends AbstractColumnWidthStyleStrategy {
-
-		@Override
-		protected void setColumnWidth(WriteSheetHolder writeSheetHolder, List<WriteCellData<?>> list, Cell cell, Head head,
-				Integer integer, Boolean aBoolean) {
-			// 设置宽度
-			Sheet sheet = writeSheetHolder.getSheet();
-			sheet.setColumnWidth(cell.getColumnIndex(), 5000);
-		}
-	}
-
 }
