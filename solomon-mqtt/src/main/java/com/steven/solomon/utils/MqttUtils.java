@@ -167,8 +167,8 @@ public class MqttUtils implements SendService<MqttModel> {
     // 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止.不建议更改除非您绝对确定需要，否则该值.
     mqttConnectOptions.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
     //设置遗嘱消息
-    if (ValidateUtils.isNotEmpty(mqttProfile.getWill())) {
-      MqttWill will = mqttProfile.getWill();
+    MqttWill will = mqttProfile.getWill();
+    if (ValidateUtils.isNotEmpty(will)) {
       mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
     }
     return mqttConnectOptions;

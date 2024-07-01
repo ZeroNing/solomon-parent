@@ -173,8 +173,8 @@ public class MqttUtils implements SendService<MqttModel> {
     // 会话过期间隔时间（以秒为单位），如果设置为 null，则使用默认值（通常是无限期）
     mqttConnectOptions.setSessionExpiryInterval(mqttProfile.getSessionExpiryInterval());
     //设置遗嘱消息
-    if (ValidateUtils.isNotEmpty(mqttProfile.getWill())) {
-      MqttWill will = mqttProfile.getWill();
+    MqttWill will = mqttProfile.getWill();
+    if (ValidateUtils.isNotEmpty(will)) {
       MqttMessage message = new MqttMessage(will.getMessage().getBytes(StandardCharsets.UTF_8));
       message.setQos(will.getQos());
       message.setRetained(will.getRetained());
