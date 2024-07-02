@@ -1,9 +1,6 @@
 package com.steven.solomon.sort;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * 归并排序
@@ -12,21 +9,10 @@ public class MergeSortService implements SortService {
 
     @Override
     public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if (list.size() <= 1) {
-            return list;
+        if(!ascending){
+            comparator = comparator.reversed();
         }
-        List<T> data = new ArrayList<>(list);
-        // 分割列表
-        int middle = list.size() / 2;
-        Collection<T> left = new ArrayList<>(data.subList(0, middle));
-        Collection<T> right = new ArrayList<>(data.subList(middle, list.size()));
-
-        // 递归排序左右两部分
-        left = sort(left, comparator, ascending);
-        right = sort(right, comparator, ascending);
-
-        // 合并排序后的左右两部分
-        return merge((List) left, (List) right, comparator, ascending);
+        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
     }
 
     @Override
