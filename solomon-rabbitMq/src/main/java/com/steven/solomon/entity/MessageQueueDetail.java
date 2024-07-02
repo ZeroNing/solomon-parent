@@ -5,7 +5,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 
-public class MessageQueueDatail implements Serializable {
+public class MessageQueueDetail implements Serializable {
 
     private static final long serialVersionUID = 7292656135434186436L;
     /**
@@ -32,7 +32,7 @@ public class MessageQueueDatail implements Serializable {
      * 活动消费者数量
      */
 //	private int activeConsumerCount;
-    public MessageQueueDatail(String queueName, AbstractMessageListenerContainer container) {
+    public MessageQueueDetail(String queueName, AbstractMessageListenerContainer container) {
         this.queueName = queueName;
         this.running = container.isRunning();
         this.activeContainer = container.isActive();

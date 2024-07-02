@@ -5,7 +5,7 @@ import com.rabbitmq.client.GetResponse;
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.consumer.AbstractConsumer;
-import com.steven.solomon.entity.MessageQueueDatail;
+import com.steven.solomon.entity.MessageQueueDetail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
@@ -15,7 +15,6 @@ import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -176,12 +175,12 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
         return RabbitMQInitConfig.allQueueContainerMap.values();
     }
 
-    public List<MessageQueueDatail> statAllMessageQueueDetail() {
-        List<MessageQueueDatail> queueDetailList = new ArrayList<>();
+    public List<MessageQueueDetail> statAllMessageQueueDetail() {
+        List<MessageQueueDetail> queueDetailList = new ArrayList<>();
         RabbitMQInitConfig.allQueueContainerMap.entrySet().forEach(entry -> {
             String queueName = entry.getKey();
             AbstractMessageListenerContainer container = entry.getValue();
-            MessageQueueDatail deatil = new MessageQueueDatail(queueName, container);
+            MessageQueueDetail deatil = new MessageQueueDetail(queueName, container);
             queueDetailList.add(deatil);
         });
 
