@@ -1,8 +1,6 @@
 package com.steven.solomon.rmb;
 
-
 import com.steven.solomon.verification.ValidateUtils;
-
 /**
  * @Title: ConvertUpMoney
  * @Description: 将数字金额转为大写汉字金额

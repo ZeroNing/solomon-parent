@@ -1,10 +1,8 @@
 package com.steven.solomon.sort;
 
-import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
