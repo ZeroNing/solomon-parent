@@ -1,7 +1,5 @@
 package com.steven.solomon.service;
 
-import com.baidubce.services.bos.model.BucketSummary;
-import com.baidubce.services.bos.model.ListBucketsResponse;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -17,7 +15,6 @@ import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.model.UploadPartRequest;
 import com.qcloud.cos.model.UploadPartResult;
 import com.qcloud.cos.region.Region;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;

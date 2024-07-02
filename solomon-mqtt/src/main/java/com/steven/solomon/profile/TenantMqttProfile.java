@@ -1,6 +1,5 @@
 package com.steven.solomon.profile;
 
-import java.io.Serializable;
 import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

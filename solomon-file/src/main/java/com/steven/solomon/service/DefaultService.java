@@ -4,7 +4,6 @@ import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

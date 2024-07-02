@@ -1,6 +1,5 @@
 package com.steven.solomon.service;
 
-import com.amazonaws.services.s3.model.Bucket;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
@@ -15,7 +14,6 @@ import com.baidubce.services.bos.model.PartETag;
 import com.baidubce.services.bos.model.PutObjectRequest;
 import com.baidubce.services.bos.model.UploadPartRequest;
 import com.baidubce.services.bos.model.UploadPartResponse;
-import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;

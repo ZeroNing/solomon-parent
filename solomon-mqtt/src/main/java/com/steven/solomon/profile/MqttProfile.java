@@ -2,6 +2,7 @@ package com.steven.solomon.profile;
 
 import java.io.Serializable;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+
 public class MqttProfile {
 
   /**

@@ -1,9 +1,7 @@
 package com.steven.solomon.profile;
 
-
-import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
-
 import java.io.Serializable;
+
 public class MqttProfile {
 
   /**
