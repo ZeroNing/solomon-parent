@@ -1,5 +1,8 @@
 package com.steven.solomon.lambda;
 
+import cn.hutool.core.date.StopWatch;
+import com.steven.solomon.sort.SortUtil;
+import com.steven.solomon.sort.enums.SortTypeEnum;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.*;
@@ -1064,5 +1067,50 @@ public class Lambda {
         }
 
         return camelCaseString.toString();
+    }
+
+
+    public static void main(String[] args) {
+        List<Long> b = new ArrayList<>();
+        for (Integer i = 0; i < 10000000; i++) {
+            b.add(new Long(i * 13));
+        }
+
+        System.out.println("============多字段排序算法降序开始=======================\n");
+        System.out.println("总记录数:" + b.size() + "排序测试\n");
+        for(SortTypeEnum typeEnum : SortTypeEnum.values()){
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+            SortUtil.sort(typeEnum,b, Comparator.comparing(Function.identity()),false);
+            stopWatch.stop();
+            System.out.println(typeEnum.getDesc() + "算法：降序耗时:" + stopWatch.getTotalTimeSeconds() + "秒");
+            System.out.print("\n");
+        }
+    }
+
+    static class Person {
+        private String name;
+        private int age;
+
+        public Person(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getAge() {
+            return age;
+        }
+
+        @Override
+        public String toString() {
+            return "Person{" +
+                    "name='" + name + '\'' +
+                    ", age=" + age +
+                    '}';
+        }
     }
 }
