@@ -30,7 +30,7 @@ public class DingTalkBotNoteSendService implements BotNoteSendService {
     }
 
     @Override
-    public String initProfile() throws Exception {
+    public String getUrl() throws Exception {
         String secret = profile.getSecret();
         long timestamp = Instant.now().toEpochMilli();
         String stringToSign = timestamp + "\n" + secret;
@@ -43,7 +43,7 @@ public class DingTalkBotNoteSendService implements BotNoteSendService {
 
     @Override
     public NoteRequestVO sendNote(SendBaseNoteMessage message) throws Exception {
-        DingTalkClient client = new DefaultDingTalkClient(initProfile());
+        DingTalkClient client = new DefaultDingTalkClient(getUrl());
         OapiRobotSendRequest request = new OapiRobotSendRequest();
 
         SendBaseNoteMessage.SendLinkMessage linkMessage = message.getLink();

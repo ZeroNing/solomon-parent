@@ -5,9 +5,9 @@ import com.steven.solomon.note.entity.SendBaseNoteMessage;
 
 public interface BotNoteSendService {
     /**
-     * 初始化机器人通知配置
+     * 初始化机器人通知配置url
      */
-    String initProfile() throws Exception;
+    String getUrl() throws Exception;
 
     /**
      * 发送机器人通知

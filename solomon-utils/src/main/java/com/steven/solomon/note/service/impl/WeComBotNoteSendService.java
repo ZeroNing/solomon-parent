@@ -24,7 +24,7 @@ public class WeComBotNoteSendService implements BotNoteSendService {
     }
 
     @Override
-    public String initProfile() throws Exception {
+    public String getUrl() throws Exception {
         return profile.getUrl();
     }
 
@@ -78,7 +78,7 @@ public class WeComBotNoteSendService implements BotNoteSendService {
             map.put("markdown", detailMap);
         }
 
-        HttpResponse response = HttpRequest.post(initProfile()).body(JSONUtil.toJsonStr(map)).execute();
+        HttpResponse response = HttpRequest.post(getUrl()).body(JSONUtil.toJsonStr(map)).execute();
         return new NoteRequestVO(response.isOk(),response.body());
     }
 
