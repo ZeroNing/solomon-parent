@@ -23,10 +23,10 @@ import java.time.Instant;
 @EnableConfigurationProperties(value={NoteProfile.class})
 public class DingTalkBotNoteSendService implements BotNoteSendService {
 
-    private final NoteProfile profile;
+    private final NoteProfile.DingTalkNotProfile profile;
 
     public DingTalkBotNoteSendService(NoteProfile profile) {
-        this.profile = profile;
+        this.profile = profile.getDingTalkNot();
     }
 
     @Override

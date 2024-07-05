@@ -18,10 +18,10 @@ import java.util.*;
 @EnableConfigurationProperties(value={NoteProfile.class})
 public class WeComBotNoteSendService implements BotNoteSendService {
 
-    private final NoteProfile profile;
+    private final NoteProfile.WeComNotProfile profile;
 
     public WeComBotNoteSendService(NoteProfile profile) {
-        this.profile = profile;
+        this.profile = profile.getWeCom();
     }
 
     @Override
