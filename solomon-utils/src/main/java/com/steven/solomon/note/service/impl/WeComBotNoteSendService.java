@@ -82,13 +82,4 @@ public class WeComBotNoteSendService implements BotNoteSendService {
         return new NoteRequestVO(response.isOk(),response.body());
     }
 
-    public static void main(String[] args) throws Exception {
-        String url = "https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=7612021e-1e83-496c-a2f3-beaf99622e24";
-        DingTalkProfile dingTalkProfile = new DingTalkProfile();
-        dingTalkProfile.setUrl(url);
-        WeComBotNoteSendService a = new WeComBotNoteSendService(dingTalkProfile);
-
-        SendBaseNoteMessage message = new SendBaseNoteMessage(new SendBaseNoteMessage.SendTextMessage("a"),new SendBaseNoteMessage.SendAtMessage(null,null,null,true));
-        a.sendNote(message);
-    }
 }
