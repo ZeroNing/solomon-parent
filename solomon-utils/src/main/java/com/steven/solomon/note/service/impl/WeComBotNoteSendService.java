@@ -3,6 +3,7 @@ package com.steven.solomon.note.service.impl;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
 import cn.hutool.json.JSONUtil;
+import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.note.entity.NoteRequestVO;
 import com.steven.solomon.note.entity.SendBaseNoteMessage;
 import com.steven.solomon.note.profile.NoteProfile;
@@ -78,7 +79,7 @@ public class WeComBotNoteSendService implements BotNoteSendService {
             map.put("markdown", detailMap);
         }
 
-        HttpResponse response = HttpRequest.post(getUrl()).body(JSONUtil.toJsonStr(map)).execute();
+        HttpResponse response = HttpRequest.post(getUrl()).body(JackJsonUtils.formatJsonByFilter(map)).execute();
         return new NoteRequestVO(response.isOk(),response.body());
     }
 
