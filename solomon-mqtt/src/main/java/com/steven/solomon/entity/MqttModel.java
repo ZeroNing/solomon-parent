@@ -8,6 +8,26 @@ public class MqttModel<T> extends BaseMq<T> {
 
   private String topic;
 
+  private boolean retained;
+
+  private int qos;
+
+  public int getQos() {
+    return qos;
+  }
+
+  public void setQos(int qos) {
+    this.qos = qos;
+  }
+
+  public boolean getRetained() {
+    return retained;
+  }
+
+  public void setRetained(boolean retained) {
+    this.retained = retained;
+  }
+
   public String getTopic() {
     return topic;
   }
