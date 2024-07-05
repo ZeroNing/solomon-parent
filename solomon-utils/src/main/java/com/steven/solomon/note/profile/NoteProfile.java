@@ -9,7 +9,7 @@ public class NoteProfile {
 
     private WeComNotProfile weCom;
 
-    private DingTalkNotProfile dingTalkNot;
+    private DingTalkNotProfile dingTalk;
 
     public static class WeComNotProfile implements Serializable {
         /**
@@ -62,11 +62,11 @@ public class NoteProfile {
         this.weCom = weCom;
     }
 
-    public DingTalkNotProfile getDingTalkNot() {
-        return dingTalkNot;
+    public DingTalkNotProfile getDingTalk() {
+        return dingTalk;
     }
 
-    public void setDingTalkNot(DingTalkNotProfile dingTalkNot) {
-        this.dingTalkNot = dingTalkNot;
+    public void setDingTalk(DingTalkNotProfile dingTalk) {
+        this.dingTalk = dingTalk;
     }
 }

@@ -26,7 +26,7 @@ public class DingTalkBotNoteSendService implements BotNoteSendService {
     private final NoteProfile.DingTalkNotProfile profile;
 
     public DingTalkBotNoteSendService(NoteProfile profile) {
-        this.profile = profile.getDingTalkNot();
+        this.profile = profile.getDingTalk();
     }
 
     @Override
