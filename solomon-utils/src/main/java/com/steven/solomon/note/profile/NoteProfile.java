@@ -2,8 +2,8 @@ package com.steven.solomon.note.profile;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties("ding-talk")
-public class DingTalkProfile {
+@ConfigurationProperties("note")
+public class NoteProfile {
 
     /**
      * 发送消息websocket地址
