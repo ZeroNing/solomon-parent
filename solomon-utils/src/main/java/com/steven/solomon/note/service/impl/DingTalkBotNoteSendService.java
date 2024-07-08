@@ -5,7 +5,7 @@ import com.dingtalk.api.DingTalkClient;
 import com.dingtalk.api.request.OapiRobotSendRequest;
 import com.steven.solomon.note.entity.NoteRequestVO;
 import com.steven.solomon.note.entity.SendBaseNoteMessage;
-import com.steven.solomon.note.profile.NoteProfile;
+import com.steven.solomon.note.profile.BotNoteProfile;
 import com.steven.solomon.note.service.BotNoteSendService;
 import com.steven.solomon.verification.ValidateUtils;
 import com.taobao.api.TaobaoResponse;
@@ -20,12 +20,12 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 
 @Service
-@EnableConfigurationProperties(value={NoteProfile.class})
+@EnableConfigurationProperties(value={BotNoteProfile.class})
 public class DingTalkBotNoteSendService implements BotNoteSendService {
 
-    private final NoteProfile.DingTalkNotProfile profile;
+    private final BotNoteProfile.DingTalkNotProfile profile;
 
-    public DingTalkBotNoteSendService(NoteProfile profile) {
+    public DingTalkBotNoteSendService(BotNoteProfile profile) {
         this.profile = profile.getDingTalk();
     }
 

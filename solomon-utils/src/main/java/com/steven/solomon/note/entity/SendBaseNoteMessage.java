@@ -39,6 +39,12 @@ public class SendBaseNoteMessage implements Serializable {
         this.link = link;
     }
 
+    public SendBaseNoteMessage(SendLinkMessage link,SendAtMessage at) {
+        super();
+        this.link = link;
+        this.at = at;
+    }
+
     public SendBaseNoteMessage(SendTextMessage text) {
         super();
         this.text = text;
@@ -53,6 +59,12 @@ public class SendBaseNoteMessage implements Serializable {
     public SendBaseNoteMessage(SendMarkdownMessage markdown) {
         super();
         this.markdown = markdown;
+    }
+
+    public SendBaseNoteMessage(SendMarkdownMessage markdown,SendAtMessage at) {
+        super();
+        this.markdown = markdown;
+        this.at = at;
     }
 
     public static class SendAtMessage implements Serializable {

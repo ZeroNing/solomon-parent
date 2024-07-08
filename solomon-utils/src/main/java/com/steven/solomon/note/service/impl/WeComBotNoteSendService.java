@@ -2,11 +2,10 @@ package com.steven.solomon.note.service.impl;
 
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
-import cn.hutool.json.JSONUtil;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.note.entity.NoteRequestVO;
 import com.steven.solomon.note.entity.SendBaseNoteMessage;
-import com.steven.solomon.note.profile.NoteProfile;
+import com.steven.solomon.note.profile.BotNoteProfile;
 import com.steven.solomon.note.service.BotNoteSendService;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -15,12 +14,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-@EnableConfigurationProperties(value={NoteProfile.class})
+@EnableConfigurationProperties(value={BotNoteProfile.class})
 public class WeComBotNoteSendService implements BotNoteSendService {
 
-    private final NoteProfile.WeComNotProfile profile;
+    private final BotNoteProfile.WeComNotProfile profile;
 
-    public WeComBotNoteSendService(NoteProfile profile) {
+    public WeComBotNoteSendService(BotNoteProfile profile) {
         this.profile = profile.getWeCom();
     }
 

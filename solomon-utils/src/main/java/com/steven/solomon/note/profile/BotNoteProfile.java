@@ -4,8 +4,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
 
-@ConfigurationProperties("note")
-public class NoteProfile {
+@ConfigurationProperties("bot.note")
+public class BotNoteProfile {
 
     private WeComNotProfile weCom;
 
