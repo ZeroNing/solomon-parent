@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
-public abstract class S3Service extends AbstractFileService {
+public class S3Service extends AbstractFileService {
 
   protected AmazonS3 client;
 

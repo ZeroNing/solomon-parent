@@ -27,6 +27,7 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   UOS("UOS","紫光云对象存储"),
   AZURE("AZURE","微软对象存储"),
   INSPUR("INSPUR","浪潮云对象存储"),
+  S3("S3","S3协议对象存储")
   ;
 
   private String label;
