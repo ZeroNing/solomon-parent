@@ -25,7 +25,7 @@ public class MongoRepository<T, I> {
 
   protected Class<T> modelClass = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
 
-  private final MongoTemplate mongoTemplate;
+  protected final MongoTemplate mongoTemplate;
 
   public MongoRepository(MongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
 
