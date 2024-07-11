@@ -9,31 +9,13 @@ import java.util.*;
 public class ShellSortService implements SortService {
 
     @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if(!ascending){
-            comparator = comparator.reversed();
-        }
-        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
-    }
-
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
+    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
 
         // 创建列表的副本，以避免修改原始列表
         List<T> sortedList = new ArrayList<>(list);
 
         // 初始化间隔gap为列表大小的一半
         int gap = sortedList.size() / 2;
-
-        // 创建一个复合的Comparator
-        Comparator<? super T> compositeComparator = null;
-        for (Comparator comparator : comparators) {
-            if (compositeComparator == null) {
-                compositeComparator = comparator;
-            } else {
-                compositeComparator = compositeComparator.thenComparing(comparator);
-            }
-        }
 
         // 逐步减小间隔，直到gap为0
         while (gap > 0) {
@@ -43,7 +25,7 @@ public class ShellSortService implements SortService {
                 int j = i;
 
                 // 使用复合比较器进行比较
-                while (j >= gap && compositeComparator.compare(sortedList.get(j - gap), temp) > 0) {
+                while (j >= gap && comparator.compare(sortedList.get(j - gap), temp) > 0) {
                     sortedList.set(j, sortedList.get(j - gap));
                     j -= gap;
                 }

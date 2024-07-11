@@ -1081,7 +1081,7 @@ public class Lambda {
         for(SortTypeEnum typeEnum : SortTypeEnum.values()){
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            SortUtil.sort(typeEnum,b, Comparator.comparing(Function.identity()),false);
+            SortUtil.sort(typeEnum,b, Comparator.comparing(Function.identity()));
             stopWatch.stop();
             System.out.println(typeEnum.getDesc() + "算法：降序耗时:" + stopWatch.getTotalTimeSeconds() + "秒");
             System.out.print("\n");

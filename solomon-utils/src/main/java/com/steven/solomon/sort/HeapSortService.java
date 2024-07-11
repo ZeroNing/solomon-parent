@@ -8,32 +8,14 @@ import java.util.*;
 public class HeapSortService implements SortService {
 
     @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if(!ascending){
-            comparator = comparator.reversed();
-        }
-        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
-    }
-
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
+    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
 
         int n = list.size();
         List<T> data = new ArrayList<>(list);
 
-        // 创建一个复合的Comparator
-        Comparator<? super T> compositeComparator = null;
-        for (Comparator comparator : comparators) {
-            if (compositeComparator == null) {
-                compositeComparator = comparator;
-            } else {
-                compositeComparator = compositeComparator.thenComparing(comparator);
-            }
-        }
-
         // 构建最大堆
         for (int i = n / 2 - 1; i >= 0; i--) {
-            heapify(data, i, n, compositeComparator);
+            heapify(data, i, n, comparator);
         }
 
         // 一个一个地从堆中取出元素
@@ -41,7 +23,7 @@ public class HeapSortService implements SortService {
             swap(data, 0, i);
 
             // 重新对堆进行调整
-            heapify(data, 0, i, compositeComparator);
+            heapify(data, 0, i, comparator);
         }
 
         return data;

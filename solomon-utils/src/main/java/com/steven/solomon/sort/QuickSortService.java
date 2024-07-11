@@ -8,28 +8,10 @@ import java.util.*;
 public class QuickSortService implements SortService {
 
     @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if(!ascending){
-            comparator = comparator.reversed();
-        }
-        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
-    }
-
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
+    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
         List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
 
-        // 创建一个复合的Comparator
-        Comparator<? super T> compositeComparator = null;
-        for (Comparator comparator : comparators) {
-            if (compositeComparator == null) {
-                compositeComparator = comparator;
-            } else {
-                compositeComparator = compositeComparator.thenComparing(comparator);
-            }
-        }
-
-        quickSort(sortedList, compositeComparator);
+        quickSort(sortedList, comparator);
         return sortedList; // 返回排序后的列表
     }
 

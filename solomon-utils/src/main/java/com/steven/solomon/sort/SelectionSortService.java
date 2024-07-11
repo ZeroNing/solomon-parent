@@ -9,34 +9,16 @@ import java.util.*;
 public class SelectionSortService implements SortService {
 
     @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if(!ascending){
-            comparator = comparator.reversed();
-        }
-        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
-    }
-
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
+    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
 
         List<T> sortedList = new ArrayList<>(list); // 创建一个副本以避免修改原始列表
         int n = sortedList.size();
-
-        // 创建一个复合的Comparator
-        Comparator<? super T> compositeComparator = null;
-        for (Comparator comparator : comparators) {
-            if (compositeComparator == null) {
-                compositeComparator = comparator;
-            } else {
-                compositeComparator = compositeComparator.thenComparing(comparator);
-            }
-        }
 
         for (int i = 0; i < n - 1; i++) {
             int selectedIndex = i;
             for (int j = i + 1; j < n; j++) {
                 // 使用复合比较器比较元素
-                if (compositeComparator.compare(sortedList.get(j), sortedList.get(selectedIndex)) < 0) {
+                if (comparator.compare(sortedList.get(j), sortedList.get(selectedIndex)) < 0) {
                     selectedIndex = j; // 找到更小（或更大）的元素索引
                 }
             }

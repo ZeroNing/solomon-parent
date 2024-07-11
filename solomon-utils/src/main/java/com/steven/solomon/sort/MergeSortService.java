@@ -8,15 +8,7 @@ import java.util.*;
 public class MergeSortService implements SortService {
 
     @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator, boolean ascending) {
-        if(!ascending){
-            comparator = comparator.reversed();
-        }
-        return sort(list, Arrays.asList(comparator)); // 返回排序后的列表
-    }
-
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, List<Comparator<? super T>> comparators) {
+    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
         if (list.size() <= 1) {
             return list;
         }
@@ -27,31 +19,21 @@ public class MergeSortService implements SortService {
         Collection<T> right = new ArrayList<>(data.subList(middle, list.size()));
 
         // 递归排序左右两部分
-        left = sort(left, comparators);
-        right = sort(right, comparators);
+        left = sort(left, comparator);
+        right = sort(right, comparator);
 
         // 合并排序后的左右两部分
-        return merge((List<T>) left, (List<T>) right, comparators);
+        return merge((List<T>) left, (List<T>) right, comparator);
     }
 
-    private static <T> Collection<T> merge(List<T> left, List<T> right, List<Comparator<? super T>> comparators) {
+    private static <T> Collection<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator) {
         List<T> result = new ArrayList<>();
         int leftIndex = 0;
         int rightIndex = 0;
 
-        // 创建一个复合的Comparator
-        Comparator<? super T> compositeComparator = null;
-        for (Comparator comparator : comparators) {
-            if (compositeComparator == null) {
-                compositeComparator = comparator;
-            } else {
-                compositeComparator = compositeComparator.thenComparing(comparator);
-            }
-        }
-
         // 合并两个有序列表
         while (leftIndex < left.size() && rightIndex < right.size()) {
-            if (compositeComparator.compare(left.get(leftIndex), right.get(rightIndex)) <= 0) {
+            if (comparator.compare(left.get(leftIndex), right.get(rightIndex)) <= 0) {
                 result.add(left.get(leftIndex));
                 leftIndex++;
             } else {
