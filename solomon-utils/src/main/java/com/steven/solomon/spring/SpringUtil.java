@@ -72,4 +72,12 @@ public class SpringUtil implements ApplicationContextAware {
     public static <T> Map<String, T> getBeansOfType(Class<T> type) {
         return context.getBeansOfType(type);
     }
+
+    public static String getElValue(String elKey,String defaultValue){
+        return context.getEnvironment().getProperty(elKey,defaultValue);
+    }
+
+    public static String getElValue(String elKey){
+        return context.getEnvironment().getProperty(elKey);
+    }
 }

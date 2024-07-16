@@ -426,5 +426,9 @@ public class ValidateUtils {
             throw new BaseException(errorCode, (String) null);
         }
     }
-
+    public static boolean isELExpression(String expression) {
+        // 正则表达式来检查是否符合 `${...}` 或 `#{...}` 的模式
+        String elRegex = "\\$\\{[^}]+\\}|#\\{[^}]+\\}";
+        return expression.matches(elRegex);
+    }
 }
