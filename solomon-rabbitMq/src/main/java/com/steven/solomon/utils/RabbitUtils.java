@@ -8,7 +8,7 @@ import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MessageQueueDetail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.config.RabbitMQInitConfig;
+import com.steven.solomon.init.RabbitMQInitConfig;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;

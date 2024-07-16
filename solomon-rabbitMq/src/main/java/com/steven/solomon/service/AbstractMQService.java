@@ -2,6 +2,8 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.entity.InitRabbitBinding;
+import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;

@@ -431,4 +431,32 @@ public class ValidateUtils {
         String elRegex = "\\$\\{[^}]+\\}|#\\{[^}]+\\}";
         return expression.matches(elRegex);
     }
+
+    public static String extractPropertyName(String expression) {
+        // 定义正则表达式，匹配 ${...} 格式的字符串中的属性名，忽略冒号及其后的默认值
+        Pattern pattern = Pattern.compile("\\$\\{([^:}]+)(?::[^}]+)?\\}");
+        Matcher matcher = pattern.matcher(expression);
+
+        // 提取匹配到的内容
+        if (matcher.find()) {
+            return matcher.group(1); // group(1) 返回第一个捕获组，即属性名
+        }
+
+        return null; // 如果没有匹配到，返回null
+    }
+
+    public static String getElDefaultValue(String expression){
+        String defaultValue = null;
+
+        if (expression.contains(":")) {
+            defaultValue = expression.substring(expression.indexOf(":") + 1, expression.indexOf("}"));
+        }
+        return defaultValue;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(extractPropertyName("${server.port:2000}"));
+        System.out.println(getElDefaultValue("${server.port:2000}"));
+
+    }
 }

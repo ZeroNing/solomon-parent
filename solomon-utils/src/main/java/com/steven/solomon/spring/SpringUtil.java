@@ -4,12 +4,16 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
+import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -74,7 +78,7 @@ public class SpringUtil implements ApplicationContextAware {
     }
 
     public static String getElValue(String elKey,String defaultValue){
-        return context.getEnvironment().getProperty(elKey,defaultValue);
+        return ValidateUtils.getOrDefault(getElValue(elKey),defaultValue);
     }
 
     public static String getElValue(String elKey){

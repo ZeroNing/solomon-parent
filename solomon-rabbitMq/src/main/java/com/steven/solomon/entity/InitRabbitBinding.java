@@ -3,6 +3,7 @@ package com.steven.solomon.entity;
 
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.code.BaseRabbitMqCode;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.io.Serializable;
@@ -64,6 +65,9 @@ public class InitRabbitBinding implements Serializable {
     private String getName(String name, boolean isAddDlxPrefix) {
         if (ValidateUtils.isEmpty(name)) {
             return name;
+        }
+        if(ValidateUtils.isELExpression(name)){
+            name = SpringUtil.getElValue(ValidateUtils.extractPropertyName(name),ValidateUtils.getElDefaultValue(name));
         }
         return isAddDlxPrefix ? BaseRabbitMqCode.DLX_PREFIX + name : name;
     }
