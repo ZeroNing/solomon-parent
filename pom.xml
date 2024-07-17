@@ -23,6 +23,7 @@
     <module>solomon-rabbitMq</module>
     <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
+      <module>solomon-rocketMq</module>
   </modules>
 
   <properties>
@@ -95,6 +96,12 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.apache.rocketmq</groupId>
+        <artifactId>rocketmq-spring-boot-starter</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.aliyun</groupId>

@@ -77,11 +77,23 @@ public class SpringUtil implements ApplicationContextAware {
         return context.getBeansOfType(type);
     }
 
+    /**
+     * 读取#{}和${}值
+     */
     public static String getElValue(String elKey,String defaultValue){
         return ValidateUtils.getOrDefault(getElValue(elKey),defaultValue);
     }
 
+    /**
+     * 读取#{}和${}值
+     */
     public static String getElValue(String elKey){
-        return context.getEnvironment().getProperty(elKey);
+        if(ValidateUtils.isNotEmpty(elKey)){
+            if(ValidateUtils.isELExpression(elKey)){
+                elKey = ValidateUtils.extractPropertyName(elKey);
+                return context.getEnvironment().getProperty(elKey);
+            }
+        }
+        return elKey;
     }
 }

@@ -11,11 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class InitRabbitBinding implements Serializable {
-
+    /**
+     * 队列名
+     */
     String queue;
-
+    /**
+     * 交换器名
+     */
     String exchange;
-
+    /**
+     * 路由键名
+     */
     String routingKey;
 
     Map<String, Object> args;
@@ -66,9 +72,7 @@ public class InitRabbitBinding implements Serializable {
         if (ValidateUtils.isEmpty(name)) {
             return name;
         }
-        if(ValidateUtils.isELExpression(name)){
-            name = SpringUtil.getElValue(ValidateUtils.extractPropertyName(name),ValidateUtils.getElDefaultValue(name));
-        }
+        name = SpringUtil.getElValue(name,ValidateUtils.getElDefaultValue(name));
         return isAddDlxPrefix ? BaseRabbitMqCode.DLX_PREFIX + name : name;
     }
 
