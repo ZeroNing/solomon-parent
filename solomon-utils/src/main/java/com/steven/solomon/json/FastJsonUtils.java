@@ -9,6 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FastJsonUtils {
 
@@ -20,7 +23,12 @@ public class FastJsonUtils {
      * @throws JsonProcessingException
      */
     public static String formatJsonByFilter(Object result, SerializeFilter... filter) {
-        return JSONObject.toJSONString(result, filter);
+        List<SerializeFilter> serializeFilters = new ArrayList<>();
+        if(ValidateUtils.isNotEmpty(filter)){
+            serializeFilters.addAll(Arrays.asList(filter));
+        }
+        serializeFilters.add(new FastJsonAfterFilter());
+        return JSONObject.toJSONString(result, serializeFilters.toArray(new SerializeFilter[0]));
     }
 
     /**
@@ -31,7 +39,12 @@ public class FastJsonUtils {
      * @throws JsonProcessingException
      */
     public static byte[] formatBytesByFilter(Object result, SerializeFilter... filter) {
-        return JSONObject.toJSONBytes(result, filter);
+        List<SerializeFilter> serializeFilters = new ArrayList<>();
+        if(ValidateUtils.isNotEmpty(filter)){
+            serializeFilters.addAll(Arrays.asList(filter));
+        }
+        serializeFilters.add(new FastJsonAfterFilter());
+        return JSONObject.toJSONBytes(result, serializeFilters.toArray(new SerializeFilter[0]));
     }
 
     /**
