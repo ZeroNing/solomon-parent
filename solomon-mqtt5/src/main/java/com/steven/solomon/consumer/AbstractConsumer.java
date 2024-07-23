@@ -20,15 +20,16 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
   public void messageArrived(String topic, MqttMessage message) throws Exception {
     String json          = new String(message.getPayload(), StandardCharsets.UTF_8);
     try {
-      if(checkMessageKey(topic,message)){
-        throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
-      }
       MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),topic, json);
-      // 消费者消费消息
+      // 判断是否重复消费
+      if(checkMessageKey(topic,message,mqttModel)){
+        throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+      }
+      // 消费消息
       R result = this.handleMessage(topic,mqttModel.getTenantCode(),(T) mqttModel.getBody());
-      //保存消费成功消息
+      // 保存消费成功消息
       saveLog(result,message,mqttModel);
     } catch (Throwable e){
       logger.error("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
@@ -58,7 +59,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    * 判断是否重复消费
    * @return true 重复消费 false 不重复消费
    */
-  public boolean checkMessageKey(String topic, MqttMessage message){
+  public boolean checkMessageKey(String topic, MqttMessage message,MqttModel mqttModel){
     return false;
   }
 

@@ -33,14 +33,15 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         String correlationId = messageProperties.getHeader("spring_returned_message_correlation");
         boolean isAutoAck = getIsAutoAck();
         try {
-            if (checkMessageKey(messageProperties)) {
-                throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
-            }
             // 消费者内容
             String json = new String(message.getBody(), StandardCharsets.UTF_8);
             logger.debug("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
             RabbitMqModel rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
-            // 消费者消费消息
+            // 判断是否重复消费
+            if (checkMessageKey(messageProperties,rabbitMqModel)) {
+                throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+            }
+            // 消费消息
             R result = this.handleMessage((T) rabbitMqModel.getBody());
             if (!isAutoAck) {
                 // 手动确认消息
@@ -118,7 +119,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     /**
      * 判断是否重复消费
      */
-    public boolean checkMessageKey(MessageProperties messageProperties) {
+    public boolean checkMessageKey(MessageProperties messageProperties,RabbitMqModel rabbitMqModel) {
         return false;
     }
 
