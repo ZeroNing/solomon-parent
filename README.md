@@ -451,7 +451,7 @@ public class Test extends AbstractConsumer<String> {
 
 1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");type是选择缓存类型目前只支持REDIS
 
-```properties
+```yaml
 spring:
     redis:
       mode: SWITCH_DB
@@ -464,7 +464,7 @@ spring:
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
 
-```properties
+```yaml
 spring:
   redis:
     mode: SWITCH_DB
@@ -510,7 +510,7 @@ public class Test extends AbstractConsumer<String,String> {
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
 
-```properties
+```yaml
 spring:
     data:
       mongodb:
@@ -547,7 +547,7 @@ HeardHolder.setTenantCode("租户编码");
 
 1.引文件jar包
 
-```java
+```xml
 <dependencies>
 	<dependency>
       <groupId>com.steven</groupId>
