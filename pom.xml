@@ -14,7 +14,6 @@
     <module>solomon-common</module>
     <module>solomon-constant</module>
     <module>solomon-file</module>
-    <module>solomon-cache</module>
     <module>solomon-utils</module>
     <module>solomon-mongodb</module>
     <module>solomon-mybatis</module>
@@ -23,6 +22,7 @@
     <module>solomon-rabbitMq</module>
     <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
+      <module>solomon-redis</module>
   </modules>
 
   <properties>
