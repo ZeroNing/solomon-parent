@@ -23,6 +23,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.Topic;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,9 +69,11 @@ public class RedisQueueConfig implements CommandLineRunner {
                 if(ValidateUtils.isEmpty(redisQueue)){
                     continue;
                 }
+                String topicName = SpringUtil.getElValue(redisQueue.topic(),ValidateUtils.getElDefaultValue(redisQueue.topic()));
+                Topic topic = ValidateUtils.equalsIgnoreCase(redisQueue.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
                 RedisMessageListenerContainer container = new RedisMessageListenerContainer();
                 container.setConnectionFactory(factory);
-                container.addMessageListener((MessageListener) abstractConsumer, ValidateUtils.equalsIgnoreCase(redisQueue.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(redisQueue.topic()) : new PatternTopic(redisQueue.topic()));
+                container.addMessageListener((MessageListener) abstractConsumer, topic);
                 container.afterPropertiesSet();
                 container.start();
             }
