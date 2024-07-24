@@ -34,17 +34,12 @@ import java.util.Map;
 public class RedisQueueConfig implements CommandLineRunner {
 
     private final Logger logger = LoggerUtils.logger(getClass());
+
     private final RedisTenantContext redisTenantContext;
-
-    private boolean isSwitchDb;
-
-    private final CacheProfile cacheProfile;
 
     private RedisQueue redisQueue;
 
-    public RedisQueueConfig(ApplicationContext applicationContext, CacheProfile cacheProfile, RedisTenantContext redisTenantContext){
-        this.cacheProfile = cacheProfile;
-        this.isSwitchDb         = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), cacheProfile.getMode().toString());
+    public RedisQueueConfig(ApplicationContext applicationContext, RedisTenantContext redisTenantContext){
         SpringUtil.setContext(applicationContext);
         this.redisTenantContext = redisTenantContext;
     }
