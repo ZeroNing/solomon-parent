@@ -17,6 +17,7 @@ public enum SortTypeEnum {
     GNOME("地精排序",new GnomeSortService()),
     BITON("双调排序",new BitonicSortService()),
     CYCLE("圈排序",new CycleSortService()),
+    COCKTAIL("鸡尾酒排序",new CocktailSortService()),
     ;
 
     private String desc;
