@@ -1071,9 +1071,9 @@ public class Lambda {
 
 
     public static void main(String[] args) {
-        List<Long> b = new ArrayList<>();
+        List<Person> b = new ArrayList<>();
         for (Integer i = 0; i < 10000000; i++) {
-            b.add(new Long(i * 13));
+            b.add(new Person(String.valueOf(i*21), i*13));
         }
 
         System.out.println("============多字段排序算法降序开始=======================\n");
@@ -1081,7 +1081,7 @@ public class Lambda {
         for(SortTypeEnum typeEnum : SortTypeEnum.values()){
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
-            SortUtil.sort(typeEnum,b, Comparator.comparing(Function.identity()));
+            SortUtil.sort(typeEnum,b, Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed());
             stopWatch.stop();
             System.out.println(typeEnum.getDesc() + "算法：降序耗时:" + stopWatch.getTotalTimeSeconds() + "秒");
             System.out.print("\n");

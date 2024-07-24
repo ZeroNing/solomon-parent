@@ -27,10 +27,10 @@
 
 ## 项目描述
 
-| 项目名                   | 说明                                                         |
-| :----------------------- | ------------------------------------------------------------ |
+| 项目名                      | 说明                                                         |
+|:-------------------------| ------------------------------------------------------------ |
 | solomon-base             | 主要是封装了底层的异常捕获以及通用返回实体类                 |
-| solomon-cache            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
+| solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
 | solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获 |
 | solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值，底层数据实体类以及动态切换数据源模板，国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
 | solomon-file             | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等 |
@@ -453,37 +453,56 @@ public class Test extends AbstractConsumer<String> {
 
 ```properties
 spring:
-redis:
-mode: SWITCH_DB
-type: REDIS
-host:
-port: 6379
-password:
-database:
+    redis:
+      mode: SWITCH_DB
+      type: REDIS
+      host:
+      port: 6379
+      password:
+      database:
 ```
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
 
 ```properties
 spring:
-redis:
-mode: SWITCH_DB
-type: REDIS
-host:
-port: 6379
-password:
-database: 
-tenant:
-租户编码:
-host:
-port: 6379
-password:
-database: 
+  redis:
+    mode: SWITCH_DB
+    type: REDIS
+    host:
+    port: 6379
+    password:
+    database: 
+        tenant:
+           租户编码:
+               host:
+               port: 6379
+               password:
+               database: 
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 RedisInitUtils.init的方法，传入租户编码和redis配置以及注入一个RedisTenantContext对象
 
+## Redis消息队列用例
+1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
+2.加上@RedisQueue注解，并填写主题名,并设置主题模式
+```java
+@RedisQueue(topic = "test",mode = TopicMode.CHANNEL)
+public class Test extends AbstractConsumer<String,String> {
+
+    @Override
+    public String handleMessage(String body) throws Exception {
+        System.out.println(body);
+        return null;
+    }
+
+    @Override
+    public void saveLog(String result, Message message, RedisQueueModel model) {
+
+    }
+}
+```
 
 ## MongoDB多租户配置方式
 
@@ -493,23 +512,23 @@ database:
 
 ```properties
 spring:
-data:
-mongodb:
-mode: SWITCH_DB
-host:
-port:
-username:
-password:
-database:
-uri:
-tenant:
-租户编码:
-host:
-port: 
-username:
-password: 
-database:
-uri: 
+    data:
+      mongodb:
+        mode: SWITCH_DB
+        host:
+        port:
+        username:
+        password:
+        database:
+        uri:
+        tenant:
+          租户编码:
+            host:
+            port: 
+            username:
+            password: 
+            database:
+            uri: 
 ```
 
 3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
@@ -590,58 +609,21 @@ public class FileController {
 
 ```java
   public static void main(String[] args) {
-    Set<Integer> a = new HashSet<>();
-    for(Integer i = 0;i<=20;i++){
-        a.add(Integer.valueOf((int) (Math.random()*100)));
+    List<Person> b = new ArrayList<>();
+    for (Integer i = 0; i < 10000000; i++) {
+        b.add(new Person(String.valueOf(i*21), i*13));
     }
 
-    List<Person> b = new ArrayList<>();
-    b.add(new Person("1",1));
-    b.add(new Person("2",2));
-
-    System.out.println("============多字段排序算法降序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName).reversed(),Comparator.comparing(Person::getAge).reversed()));
-    System.out.println("============多字段排序算法降序结束=======================");
-
-    System.out.println("============多字段排序算法升序开始=======================");
-    System.out.println("冒泡排序算法：升序:"+ SortUtil.bubbleSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("桶排序算法:  升序:"+ SortUtil.bucketSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("堆排序算法:  升序:"+ SortUtil.heapSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("插入排序算法：升序:"+ SortUtil.insertionSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("归并排序算法：升序:"+ SortUtil.mergeSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("快速排序算法：升序:"+ SortUtil.quickSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("选择排序算法：升序:"+ SortUtil.selectionSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("希尔排序算法：升序:"+ SortUtil.shellSort(b,Comparator.comparing(Person::getName),Comparator.comparing(Person::getAge)));
-    System.out.println("============多字段排序算法升序结束=======================");
-
-    System.out.println("============单字段排序算法降序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),false));
-    System.out.println("============单字段排序算法降序结束=======================");
-
-    System.out.println("============单字段排序算法升序开始=======================");
-    System.out.println("冒泡排序算法：降序:"+ SortUtil.bubbleSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("桶排序算法:  降序:"+ SortUtil.bucketSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("堆排序算法:  降序:"+ SortUtil.heapSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("插入排序算法：降序:"+ SortUtil.insertionSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("归并排序算法：降序:"+ SortUtil.mergeSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("快速排序算法：降序:"+ SortUtil.quickSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("选择排序算法：降序:"+ SortUtil.selectionSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("希尔排序算法：降序:"+ SortUtil.shellSort(a,Comparator.comparing(Function.identity()),true));
-    System.out.println("============单字段排序算法升序结束=======================");
+    System.out.println("============多字段排序算法降序开始=======================\n");
+    System.out.println("总记录数:" + b.size() + "排序测试\n");
+    for(SortTypeEnum typeEnum : SortTypeEnum.values()){
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        SortUtil.sort(typeEnum,b, Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed());
+        stopWatch.stop();
+        System.out.println(typeEnum.getDesc() + "算法：降序耗时:" + stopWatch.getTotalTimeSeconds() + "秒");
+        System.out.print("\n");
+    }
 }
 
 static class Person {
