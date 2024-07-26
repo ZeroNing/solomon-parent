@@ -103,6 +103,9 @@ public class InitRabbitBinding implements Serializable {
         if (rabbitMq.delay() != 0L && !rabbitMq.isDelayExchange()) {
             args.put(BaseRabbitMqCode.DLX_TTL, rabbitMq.delay());
         }
+        if(rabbitMq.lazy()){
+            args.put(BaseRabbitMqCode.QUEUE_MODE, "lazy");
+        }
         return args;
     }
 }

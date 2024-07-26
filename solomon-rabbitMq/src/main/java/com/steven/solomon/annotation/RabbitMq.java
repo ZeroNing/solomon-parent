@@ -92,4 +92,9 @@ public @interface RabbitMq {
      * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
      */
     String[] headers() default {};
+
+    /**
+     * 是否创建惰性队列
+     */
+    boolean lazy() default false;
 }

@@ -9,4 +9,6 @@ public interface BaseRabbitMqCode {
   String DLX_TTL = "x-message-ttl";
 
   String DLX_PREFIX = "dlx_";
+
+  String QUEUE_MODE = "x-queue-mode";
 }
