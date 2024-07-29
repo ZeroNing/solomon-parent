@@ -269,7 +269,7 @@ DelFlagEnum.DELETE=删除
  * rabbitmq标注注解
  * @author huangweihua
  */
-@Target(value = { ElementType.FIELD, ElementType.TYPE })
+@Target(value = {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Component
 public @interface RabbitMq {
@@ -285,7 +285,7 @@ public @interface RabbitMq {
     /**
      * 交换器
      */
-    String exchange();
+    String exchange() default "";
 
     /**
      * 路由规则
@@ -345,9 +345,13 @@ public @interface RabbitMq {
     /**
      * 需要匹配的头部消息,如matchAll为True清空则需要匹配全部headers存在,才可通过,false为只要匹配中其中一个即可通过
      * 如果matchValue为true,headers结果应为 0:key,1:value,2:key,3:value.........如此下去,false的话则全部为key
-     * @return
      */
     String[] headers() default {};
+
+    /**
+     * 是否创建惰性队列
+     */
+    boolean lazy() default false;
 }
 ```
 
