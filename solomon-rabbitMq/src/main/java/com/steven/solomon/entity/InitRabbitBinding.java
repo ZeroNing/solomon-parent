@@ -85,11 +85,13 @@ public class InitRabbitBinding implements Serializable {
      */
     private Map<String, Object> initArgs(RabbitMq rabbitMq, boolean isInitDlxMap) {
         boolean dlx = !void.class.equals(rabbitMq.dlxClazz()) || rabbitMq.delay() != 0L;
-
-        if (!dlx || !isInitDlxMap) {
-            return null;
-        }
         Map<String, Object> args = new HashMap<>(3);
+        if(rabbitMq.lazy()){
+            args.put(BaseRabbitMqCode.QUEUE_MODE, BaseRabbitMqCode.QUEUE_LAZY);
+        }
+        if (!dlx || !isInitDlxMap) {
+            return args;
+        }
         args.put(BaseRabbitMqCode.DLX_EXCHANGE_KEY, BaseRabbitMqCode.DLX_PREFIX + rabbitMq.exchange());
 
         if (ValidateUtils.isNotEmpty(rabbitMq.routingKey())) {
@@ -102,9 +104,6 @@ public class InitRabbitBinding implements Serializable {
          */
         if (rabbitMq.delay() != 0L && !rabbitMq.isDelayExchange()) {
             args.put(BaseRabbitMqCode.DLX_TTL, rabbitMq.delay());
-        }
-        if(rabbitMq.lazy()){
-            args.put(BaseRabbitMqCode.QUEUE_MODE, "lazy");
         }
         return args;
     }
