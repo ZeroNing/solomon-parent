@@ -32,7 +32,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         MessageProperties messageProperties = message.getMessageProperties();
         long deliveryTag = messageProperties.getDeliveryTag();
         String correlationId = messageProperties.getHeader("spring_returned_message_correlation");
-        boolean isAutoAck = getIsAutoAck();
         try {
             // 消费者内容
             String json = new String(message.getBody(), StandardCharsets.UTF_8);
@@ -44,7 +43,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
             }
             // 消费消息
             R result = this.handleMessage(rabbitMqModel.getBody());
-            if (!isAutoAck) {
+            if (!isAutoAck()) {
                 // 手动确认消息
                 channel.basicAck(deliveryTag, false);
             }
@@ -96,7 +95,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     /**
      * 获取是否是自动确认
      */
-    public boolean getIsAutoAck() {
+    public boolean isAutoAck() {
         RabbitMq rabbitMq = getClass().getAnnotation(RabbitMq.class);
         return ValidateUtils.isNotEmpty(rabbitMq) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), rabbitMq.mode().toString());
     }
