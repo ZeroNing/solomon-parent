@@ -1,6 +1,8 @@
 package com.steven.solomon.consumer;
 
 
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.entiy.RedisQueueModel;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.json.JackJsonUtils;
@@ -23,9 +25,9 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
         String topic = new String(message.getChannel());
         try {
           logger.debug("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
-          RedisQueueModel model = JackJsonUtils.conversionClass(body, RedisQueueModel.class);
+          RedisQueueModel<T> model = JSONUtil.toBean(body, new TypeReference<RedisQueueModel<T>>(){},true);
           RequestHeaderHolder.setTenantCode(model.getTenantCode());
-          R result = this.handleMessage((T) model.getBody(),topic);
+          R result = this.handleMessage(model.getBody(),topic);
           // 保存消费成功消息
           saveLog(result, topic, model);
         } catch (Throwable e){
@@ -51,5 +53,5 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
     /**
      * 保存消费成功消息
      */
-    public abstract void saveLog(R result, String topic, RedisQueueModel model);
+    public abstract void saveLog(R result, String topic, RedisQueueModel<T> model);
 }

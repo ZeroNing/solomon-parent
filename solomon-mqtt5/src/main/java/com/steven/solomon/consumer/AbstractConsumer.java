@@ -1,5 +1,7 @@
 package com.steven.solomon.consumer;
 
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.exception.BaseException;
@@ -20,7 +22,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
   public void messageArrived(String topic, MqttMessage message) throws Exception {
     String json          = new String(message.getPayload(), StandardCharsets.UTF_8);
     try {
-      MqttModel mqttModel = JackJsonUtils.conversionClass(json, MqttModel.class);
+      MqttModel<T> mqttModel = JSONUtil.toBean(json, new TypeReference<MqttModel<T>>(){},true);
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),topic, json);
       // 判断是否重复消费
@@ -28,7 +30,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
       // 消费消息
-      R result = this.handleMessage(topic,mqttModel.getTenantCode(),(T) mqttModel.getBody());
+      R result = this.handleMessage(topic,mqttModel.getTenantCode(),mqttModel.getBody());
       // 保存消费成功消息
       saveLog(result,message,mqttModel);
     } catch (Throwable e){
@@ -59,7 +61,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    * 判断是否重复消费
    * @return true 重复消费 false 不重复消费
    */
-  public boolean checkMessageKey(String topic, MqttMessage message,MqttModel mqttModel){
+  public boolean checkMessageKey(String topic, MqttMessage message,MqttModel<T> mqttModel){
     return false;
   }
 
@@ -69,7 +71,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    * @param message mqtt消息题
    * @param model 收到的消息体
    */
-  public abstract void saveLog(R result,MqttMessage message,MqttModel model);
+  public abstract void saveLog(R result,MqttMessage message,MqttModel<T> model);
 
   /**
    * 删除判断重复消费Key
