@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
-public class IPAddressUitls {
+public class IPAddressUtils {
 
 //	private final static String TAO_BAO_URL = "http://ip.taobao.com/service/getIpInfo.php?ip=";
 
-	private static final Logger logger = LoggerUtils.logger(IPAddressUitls.class);
+	private static final Logger logger = LoggerUtils.logger(IPAddressUtils.class);
 	/**
 	 * 功能：判断IPv4地址的正则表达式：
 	 */
@@ -89,9 +89,6 @@ public class IPAddressUitls {
 	 * 192.168.1.100
 	 * <p>
 	 * 用户真实IP为： 192.168.1.110
-	 *
-	 * @param request
-	 * @return
 	 */
 	public static String getIpAddress(HttpServletRequest request) {
 
@@ -103,22 +100,22 @@ public class IPAddressUitls {
 			logger.debug("------nextElement ={} ,\n ------------request.getHeader(nextElement) ={}", key, value);
 		}
 		String ip = request.getHeader("x-forwarded-for");
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("x-real-ip");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("WL-Proxy-Client-IP");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("HTTP_CLIENT_IP");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
 		}
-		if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+		if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
 			ip = request.getRemoteAddr();
 		}
 		// 返回多个ip 处理
@@ -140,9 +137,6 @@ public class IPAddressUitls {
 
 	/**
 	 * 获取二进制字节
-	 * 
-	 * @param hexStr
-	 * @return
 	 */
 	public static byte[] parseHexStr2Byte(String hexStr) {
 		if (hexStr.length() < 1) {

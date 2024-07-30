@@ -72,20 +72,20 @@ public class ControllerAspect {
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
     Double second      = Double.parseDouble(String.valueOf(millisecond)) / 1000;
     StringBuilder sb = new StringBuilder();
-    sb.append("==========================================="+System.lineSeparator());
-    sb.append("请求时间:"+startTime+System.lineSeparator());
-    sb.append("请求ID:"+uuid+System.lineSeparator());
-    sb.append("请求URL:"+url+System.lineSeparator());
-    sb.append("请求参数:"+targetMethodParams+System.lineSeparator());
+    sb.append("===========================================").append(System.lineSeparator());
+    sb.append("请求时间:").append(startTime).append(System.lineSeparator());
+    sb.append("请求ID:").append(uuid).append(System.lineSeparator());
+    sb.append("请求URL:").append(url).append(System.lineSeparator());
+    sb.append("请求参数:").append(targetMethodParams).append(System.lineSeparator());
 //    sb.append("调用controller方法::"+proceedingJoinPoint+System.lineSeparator());
-    sb.append("执行耗时:"+millisecond+"毫秒"+System.lineSeparator());
-    sb.append("执行耗时:"+second+"秒"+System.lineSeparator());
-    sb.append("响应数据:"+JackJsonUtils.formatJsonByFilter(obj)+System.lineSeparator());
+    sb.append("执行耗时:").append(millisecond).append("毫秒").append(System.lineSeparator());
+    sb.append("执行耗时:").append(second).append("秒").append(System.lineSeparator());
+    sb.append("响应数据:").append(JackJsonUtils.formatJsonByFilter(obj)).append(System.lineSeparator());
     if(ValidateUtils.isNotEmpty(ex)){
       String message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
-      sb.append("异常为:"+message+System.lineSeparator());
+      sb.append("异常为:").append(message).append(System.lineSeparator());
     }
-    sb.append("请求结束时间:"+DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))+System.lineSeparator());
+    sb.append("请求结束时间:").append(DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))).append(System.lineSeparator());
     sb.append("===========================================");
     logger.debug(System.lineSeparator()+sb.toString());
 
