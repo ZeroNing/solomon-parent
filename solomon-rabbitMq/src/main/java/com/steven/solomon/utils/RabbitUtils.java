@@ -167,7 +167,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
                 msg.getMessageProperties().setExpiration(String.valueOf(expiration));
             }
             return msg;
-        }, new CorrelationData(UUID.randomUUID().toString()));
+        }, new CorrelationData());
         return true;
     }
 
