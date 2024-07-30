@@ -25,7 +25,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
-    private final int retryNumber = 1;
+    private final int defaultRetryNumber = 1;
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
@@ -72,8 +72,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         Integer actualLock = ValidateUtils.isEmpty(lock) ? 1 : lock + 1;
         logger.error("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, deliveryTag, actualLock);
         int retryNumber = getRetryNumber();
-        if (retryNumber <= this.retryNumber || actualLock >= retryNumber) {
-            if (retryNumber <= this.retryNumber) {
+        if (retryNumber <= this.defaultRetryNumber || actualLock >= retryNumber) {
+            if (retryNumber <= this.defaultRetryNumber) {
                 logger.error("rabbitMQ 失败记录:因记录不需要重试因此直接拒绝此消息,消费者correlationId为:{},消费者设置重试次数为:{}", correlationId, retryNumber);
             } else {
                 logger.error("rabbitMQ 失败记录:已满足重试次数,删除redis消息并且拒绝此消息,消费者correlationId为:{},重试次数为:{}", correlationId, actualLock);
@@ -90,7 +90,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
      */
     public int getRetryNumber() {
         RabbitMqRetry rabbitMqRetry = getClass().getAnnotation(RabbitMqRetry.class);
-        return ValidateUtils.isEmpty(rabbitMqRetry) ? retryNumber : rabbitMqRetry.retryNumber();
+        return ValidateUtils.isEmpty(rabbitMqRetry) ? defaultRetryNumber : rabbitMqRetry.retryNumber();
     }
 
     /**
