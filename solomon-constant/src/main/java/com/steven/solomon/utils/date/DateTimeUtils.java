@@ -26,7 +26,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取LocalTime所有时区
-	 * @return
 	 */
 	public static Set<String> getZoneIds(){
 		 return ZoneId.getAvailableZoneIds();
@@ -41,8 +40,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统时间
-	 *
-	 * @return
 	 */
 	public static LocalTime getLocalTime(String zoneId) {
 		return LocalTime.now(getZoneId(zoneId));
@@ -50,8 +47,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统时间
-	 *
-	 * @return
 	 */
 	public static LocalTime getLocalTime(ZoneId zoneId) {
 		return LocalTime.now(zoneId);
@@ -60,8 +55,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统时间
-	 * 
-	 * @return
 	 */
 	public static LocalTime getLocalTime() {
 		return LocalTime.now();
@@ -69,8 +62,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期
-	 *
-	 * @return
 	 */
 	public static LocalDate getLocalDate(String zoneId) {
 		return LocalDate.now(getZoneId(zoneId));
@@ -78,8 +69,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期
-	 *
-	 * @return
 	 */
 	public static LocalDate getLocalDate(ZoneId zoneId) {
 		return LocalDate.now(zoneId);
@@ -87,8 +76,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期
-	 * 
-	 * @return
 	 */
 	public static LocalDate getLocalDate() {
 		return LocalDate.now();
@@ -96,8 +83,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间
-	 *
-	 * @return
 	 */
 	public static LocalDateTime getLocalDateTime(String zoneId) {
 		return LocalDateTime.now(getZoneId(zoneId));
@@ -105,8 +90,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间
-	 *
-	 * @return
 	 */
 	public static LocalDateTime getLocalDateTime(ZoneId zoneId) {
 		return LocalDateTime.now(zoneId);
@@ -114,8 +97,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间
-	 * 
-	 * @return
 	 */
 	public static LocalDateTime getLocalDateTime() {
 		return LocalDateTime.now();
@@ -123,8 +104,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统时间字符串
-	 * 
-	 * @return
 	 */
 	public static String getLocalTimeString() {
 		return LocalTime.now().format(TIME_FORMATTER);
@@ -132,8 +111,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统时间字符串
-	 *
-	 * @return
 	 */
 	public static String getLocalTimeString(LocalTime time,DateTimeFormatter formatter) {
 		return time.format(formatter);
@@ -141,8 +118,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期字符串
-	 * 
-	 * @return
 	 */
 	public static String getLocalDateString() {
 		return LocalDate.now().format(DATE_FORMATTER);
@@ -150,8 +125,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期字符串
-	 *
-	 * @return
 	 */
 	public static String getLocalDateString(LocalDate local,DateTimeFormatter formatter) {
 		return local.format(formatter);
@@ -159,8 +132,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期字符串
-	 * 
-	 * @return
 	 */
 	public static String getLocalTimeString(DateTimeFormatter dateTimeFormatter) {
 		return LocalTime.now().format(dateTimeFormatter);
@@ -168,8 +139,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间字符串
-	 * 
-	 * @return
 	 */
 	public static String getLocalDateTimeString() {
 		return LocalDateTime.now().format(DATETIME_FORMATTER);
@@ -177,8 +146,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间字符串
-	 *
-	 * @return
 	 */
 	public static String getLocalDateTimeString(LocalDateTime time,DateTimeFormatter dateTimeFormatter) {
 		return time.format(dateTimeFormatter);
@@ -186,8 +153,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间字符串
-	 * 
-	 * @return
 	 */
 	public static String getLocalDateTimeString(DateTimeFormatter dateTimeFormatter) {
 		return LocalDateTime.now().format(dateTimeFormatter);
@@ -195,8 +160,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统日期时间字符串
-	 *
-	 * @return
 	 */
 	public static String getLocalDateTimeString(String  dateTimeFormatter) {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern(dateTimeFormatter));
@@ -204,8 +167,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统年份
-	 * 
-	 * @return
 	 */
 	public static String getLocalYearString() {
 		return LocalDateTime.now().format(YEAR_FORMATTER);
@@ -213,8 +174,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统月份
-	 * 
-	 * @return
 	 */
 	public static String getLocalMonthString() {
 		return LocalDateTime.now().format(MONTH_FORMATTER);
@@ -222,8 +181,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当前系统天数
-	 *
-	 * @return
 	 */
 	public static String getLocalDayString() {
 		return LocalDateTime.now().format(DAY_FORMATTER);
@@ -231,9 +188,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalTime
-	 * 
-	 * @param time
-	 * @return
 	 */
 	public static LocalTime string2LocalTime(String time) {
 		return LocalTime.parse(time, TIME_FORMATTER);
@@ -241,9 +195,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalTime
-	 * 
-	 * @param time
-	 * @return
 	 */
 	public static LocalTime string2LocalTime(String time, DateTimeFormatter dateTimeFormatter) {
 		return LocalTime.parse(time, dateTimeFormatter);
@@ -251,9 +202,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalDate
-	 * 
-	 * @param date
-	 * @return
 	 */
 	public static LocalDate string2LocalDate(String date) {
 		return LocalDate.parse(date, DATE_FORMATTER);
@@ -261,9 +209,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalDateTime
-	 * 
-	 * @param dateTime
-	 * @return
 	 */
 	public static LocalDateTime string2LocalDateTime(String dateTime) {
 		return LocalDateTime.parse(dateTime, DATETIME_FORMATTER);
@@ -271,9 +216,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalDateTime
-	 *
-	 * @param dateTime
-	 * @return
 	 */
 	public static LocalDateTime string2LocalDateTime(String dateTime,DateTimeFormatter dateTimeFormatter) {
 		return LocalDateTime.parse(dateTime, dateTimeFormatter);
@@ -281,9 +223,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 字符串转LocalDate
-	 * 
-	 * @param date
-	 * @return
 	 */
 	public static LocalDate string2LocalDate(String date, DateTimeFormatter dateTimeFormatter) {
 		return LocalDate.parse(date, dateTimeFormatter);
@@ -291,9 +230,6 @@ public class DateTimeUtils {
 
 	/**
 	 * Date转LocalDateTime
-	 * 
-	 * @param date
-	 * @return
 	 */
 	public static LocalDateTime date2LocalDateTime(Date date) {
 		// An instantaneous point on the time-line.(时间线上的一个瞬时点。)
@@ -306,9 +242,6 @@ public class DateTimeUtils {
 
 	/**
 	 * Date转LocalDate
-	 * 
-	 * @param date
-	 * @return
 	 */
 	public static LocalDate date2LocalDate(Date date) {
 		// An instantaneous point on the time-line.(时间线上的一个瞬时点。)
@@ -329,9 +262,6 @@ public class DateTimeUtils {
 
 	/**
 	 * Date转LocalDate
-	 * 
-	 * @param date
-	 * @return
 	 */
 	public static LocalTime date2LocalTime(Date date) {
 		// An instantaneous point on the time-line.(时间线上的一个瞬时点。)
@@ -344,8 +274,6 @@ public class DateTimeUtils {
 
 	/**
 	 * LocalDateTime转换为Date
-	 * 
-	 * @param localDateTime
 	 */
 	public static Date localDateTime2Date(LocalDateTime localDateTime) {
 		ZoneId zoneId = ZoneId.systemDefault();
@@ -358,10 +286,9 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取时间差
-	 * 
+	 *
 	 * @param minMillisecond 最小毫秒数
 	 * @param maxMillisecond 最大毫秒数
-	 * @return
 	 */
 	public static Duration remainDuration(Long minMillisecond, Long maxMillisecond) {
 		LocalDateTime  minLocal = date2LocalDateTime(new Date(minMillisecond));
@@ -373,9 +300,8 @@ public class DateTimeUtils {
 	/**
 	 * 获取相差多少分钟
 	 *
-	 * @param minMillisecond
-	 * @param maxMillisecond
-	 * @return
+	 * @param minMillisecond 最小毫秒数
+	 * @param maxMillisecond 最大毫秒数
 	 */
 	public static Long remainMinute(Long minMillisecond, Long maxMillisecond) {
 		Duration duration = remainDuration(minMillisecond, maxMillisecond);
@@ -385,9 +311,8 @@ public class DateTimeUtils {
 	/**
 	 * 获取相差多少天
 	 *
-	 * @param minMillisecond
-	 * @param maxMillisecond
-	 * @return
+	 * @param minMillisecond 最小毫秒数
+	 * @param maxMillisecond 最大毫秒数
 	 */
 	public static Long remainDays(Long minMillisecond, Long maxMillisecond) {
 		Duration duration = remainDuration(minMillisecond, maxMillisecond);
@@ -397,9 +322,8 @@ public class DateTimeUtils {
 	/**
 	 * 获取相差多少小时
 	 *
-	 * @param minMillisecond
-	 * @param maxMillisecond
-	 * @return
+	 * @param minMillisecond 最小毫秒数
+	 * @param maxMillisecond 最大毫秒数
 	 */
 	public static Long remainHours(Long minMillisecond, Long maxMillisecond) {
 		Duration duration = remainDuration(minMillisecond, maxMillisecond);
@@ -408,7 +332,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取某天0点0分0秒
-	 * @return
 	 */
 	public static LocalDateTime getNowZeroDayTime(LocalDateTime date){
 		return date.toLocalDate().atStartOfDay();
@@ -416,16 +339,13 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取某天0点0分0秒
-	 * @return
 	 */
 	public static LocalDateTime getNowZeroDayTime(Date date){
-		LocalDateTime nowZeroDayTime = LocalDateTime.of(date2LocalDate(date),LocalTime.MIN);
-		return nowZeroDayTime;
+		return LocalDateTime.of(date2LocalDate(date),LocalTime.MIN);
 	}
 
 	/**
 	 * 获取某天0点0分0秒
-	 * @return
 	 */
 	public static Date getNowZeroDayDate(Date date){
 		return localDateTime2Date(getNowZeroDayTime(date));
@@ -433,7 +353,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取某天0点0分0秒字符串
-	 * @return
 	 */
 	public static String getNowZeroDayTimeStr(Date date,DateTimeFormatter dateTimeFormatter){
 		return dateTimeFormatter.format(getNowZeroDayTime(date));
@@ -441,34 +360,27 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取某天23点59分59秒
-	 * @return
 	 */
 	public static LocalDateTime getNowMaxDayTime(LocalDate date){
-		LocalDateTime nowZeroDayTime = LocalDateTime.of(date,LocalTime.MAX);
-		return nowZeroDayTime;
+		return LocalDateTime.of(date,LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
-	 * @return
 	 */
 	public static LocalDateTime getNowMaxDayTime(LocalDateTime date){
-		LocalDateTime nowZeroDayTime = LocalDateTime.of(date.toLocalDate(),LocalTime.MAX);
-		return nowZeroDayTime;
+		return LocalDateTime.of(date.toLocalDate(),LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
-	 * @return
 	 */
 	public static LocalDateTime getNowMaxDayTime(Date date){
-		LocalDateTime nowZeroDayTime = LocalDateTime.of(date2LocalDate(date),LocalTime.MAX);
-		return nowZeroDayTime;
+		return LocalDateTime.of(date2LocalDate(date),LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
-	 * @return
 	 */
 	public static Date getNowMaxDayDate(Date date){
 		return localDateTime2Date(getNowMaxDayTime(date));
@@ -476,7 +388,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取某天23点59分59秒
-	 * @return
 	 */
 	public static String getNowMaxDayTime(Date date,DateTimeFormatter dateTimeFormatter){
 		return dateTimeFormatter.format(getNowMaxDayTime(date));
@@ -484,7 +395,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当月第一天
-	 * @return
 	 */
 	public static LocalDate getNowMonthFirstDayTime(){
 		LocalDateTime firstday = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth());
@@ -493,7 +403,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当月第一天字符串
-	 * @return
 	 */
 	public static String getNowMonthFirstDayTimeStr(DateTimeFormatter dateTimeFormatter){
 		return dateTimeFormatter.format(getNowMonthFirstDayTime());
@@ -501,7 +410,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当月最后一天
-	 * @return
 	 */
 	public static LocalDate getNowMonthLaseDayTime(){
 		LocalDateTime lastDay = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth());
@@ -510,7 +418,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 获取当月第一天字符串
-	 * @return
 	 */
 	public static String getNowMonthLaseDayTimeStr(DateTimeFormatter dateTimeFormatter){
 		return dateTimeFormatter.format(getNowMonthLaseDayTime());
@@ -520,7 +427,6 @@ public class DateTimeUtils {
 	 * 减少天数/月份/年份
 	 * @param number 减少数量
 	 * @param chronoUnit 减少年还是月还是天
-	 * @return
 	 */
 	public static LocalDate minus(int number, ChronoUnit chronoUnit){
 		LocalDate localDate = getLocalDate();
@@ -531,7 +437,6 @@ public class DateTimeUtils {
 	 * 减少天数/月份/年份
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
-	 * @return
 	 */
 	public static LocalDate minus(LocalDate localDate,int number, ChronoUnit chronoUnit){
 		localDate = localDate.minus(number,chronoUnit);
@@ -547,7 +452,6 @@ public class DateTimeUtils {
 	 * 新增天数/月份/年份
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
-	 * @return
 	 */
 	public static LocalDate add(int number, ChronoUnit chronoUnit){
 		LocalDate localDate = getLocalDate();
@@ -558,7 +462,6 @@ public class DateTimeUtils {
 	 * 新增天数/月份/年份
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
-	 * @return
 	 */
 	public static LocalDate add(LocalDate localDate,int number, ChronoUnit chronoUnit){
 		localDate = localDate.plus(number,chronoUnit);
@@ -577,8 +480,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 判断传入的时间是否在当前时间之前
-	 * @param dateTime
-	 * @return
 	 */
 	public static boolean isBefore(LocalDateTime dateTime){
 		return dateTime.isBefore(LocalDateTime.now());
@@ -586,8 +487,6 @@ public class DateTimeUtils {
 
 	/**
 	 * 判断传入的时间是否在当前时间之后
-	 * @param dateTime
-	 * @return
 	 */
 	public static boolean isAfter(LocalDateTime dateTime){
 		return dateTime.isAfter(LocalDateTime.now());
@@ -598,7 +497,6 @@ public class DateTimeUtils {
 	 * @param localDateTime 时间
 	 * @param originZoneId  原时区
 	 * @param targetZoneId	需要转换的时区
-	 * @return
 	 */
 	public static LocalDateTime convertLocalDateTime(LocalDateTime localDateTime, ZoneId originZoneId,
 			ZoneId targetZoneId) {
