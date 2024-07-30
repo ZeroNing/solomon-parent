@@ -1,12 +1,13 @@
 package com.steven.solomon.consumer;
 
+import cn.hutool.core.lang.TypeReference;
+import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.RabbitMq;
 import com.steven.solomon.annotation.RabbitMqRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
             // 消费者内容
             String json = new String(message.getBody(), StandardCharsets.UTF_8);
             logger.debug("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
-            RabbitMqModel<T> rabbitMqModel = JackJsonUtils.conversionClass(json, RabbitMqModel.class);
+            RabbitMqModel<T> rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>(){},true);
             // 判断是否重复消费
             if (checkMessageKey(messageProperties,rabbitMqModel)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
