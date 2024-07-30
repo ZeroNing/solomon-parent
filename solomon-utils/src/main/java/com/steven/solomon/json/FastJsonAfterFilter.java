@@ -20,7 +20,7 @@ import org.slf4j.Logger;
  */
 public class FastJsonAfterFilter extends AfterFilter {
 
-    private Logger logger = LoggerUtils.logger(getClass());
+    private final Logger logger = LoggerUtils.logger(getClass());
 
     @Override
     public void writeAfter(Object o) {

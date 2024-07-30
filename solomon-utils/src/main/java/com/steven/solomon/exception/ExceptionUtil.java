@@ -23,7 +23,7 @@ public class ExceptionUtil {
         if (ValidateUtils.isEmpty(AbstractExceptionHandler.exceptionHandlerMap)) {
             AbstractExceptionHandler.exceptionHandlerMap = SpringUtil.getBeansOfType(AbstractExceptionHandler.class);
         }
-        return AbstractExceptionHandler.exceptionHandlerMap.get(new StringBuilder(exceptionSimpleName).append(AbstractExceptionHandler.HANDLER_NAME).toString());
+        return AbstractExceptionHandler.exceptionHandlerMap.get(exceptionSimpleName + AbstractExceptionHandler.HANDLER_NAME);
     }
 
     public static BaseExceptionVO getBaseExceptionVO(String exceptionSimpleName, Throwable ex) {

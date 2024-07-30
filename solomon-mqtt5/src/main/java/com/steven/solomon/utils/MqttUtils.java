@@ -26,7 +26,7 @@ import java.util.*;
 @Configuration
 public class MqttUtils implements SendService<MqttModel> {
 
-  private Logger logger = LoggerUtils.logger(MqttUtils.class);
+  private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
   private Map<String, MqttClient> clientMap = new HashMap<>();
 

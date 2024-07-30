@@ -40,7 +40,7 @@ import java.util.UUID;
 @Configuration
 public class RabbitUtils implements SendService<RabbitMqModel> {
 
-    private Logger logger = LoggerUtils.logger(RabbitUtils.class);
+    private final Logger logger = LoggerUtils.logger(RabbitUtils.class);
 
     private final RabbitTemplate rabbitTemplate;
 

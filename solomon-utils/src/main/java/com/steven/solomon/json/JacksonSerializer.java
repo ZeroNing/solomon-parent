@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 
 public class JacksonSerializer extends JsonSerializer<String> implements ContextualSerializer {
 
-    private Logger logger = LoggerUtils.logger(getClass());
+    private final Logger logger = LoggerUtils.logger(getClass());
 
     private Class<? extends Enum> enumClass;
 

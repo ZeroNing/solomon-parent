@@ -42,7 +42,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 @Order(2)
 public class MongoConfig {
 
-  private Logger logger = LoggerUtils.logger(getClass());
+  private final Logger logger = LoggerUtils.logger(getClass());
 
   private final TenantMongoProperties mongoProperties;
 

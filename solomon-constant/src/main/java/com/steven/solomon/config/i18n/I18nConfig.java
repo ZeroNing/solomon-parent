@@ -14,7 +14,7 @@ import java.util.*;
 @Configuration(proxyBeanMethods=false)
 public class I18nConfig {
 
-  private Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger logger = LoggerFactory.getLogger(getClass());
 
   @Value("${i18n.language: zh}")
   public Locale DEFAULT_LOCALE;

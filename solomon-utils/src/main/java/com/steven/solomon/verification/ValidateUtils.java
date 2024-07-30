@@ -13,7 +13,7 @@ public class ValidateUtils {
 
     private static final Pattern IS_NUMBER_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
 
-    private static Logger logger = LoggerUtils.logger(ValidateUtils.class);
+    private static final Logger logger = LoggerUtils.logger(ValidateUtils.class);
 
     public String valueOf(Number target, String def) {
         if (isEmpty(target)) {

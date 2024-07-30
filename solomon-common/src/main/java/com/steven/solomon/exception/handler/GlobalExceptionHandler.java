@@ -25,7 +25,7 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  private Logger logger = LoggerUtils.logger(getClass());
+  private final Logger logger = LoggerUtils.logger(getClass());
 
   @Value("${spring.application.id:default}")
   private String serverId;
