@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 public abstract class AbsReceiptService<T extends BaseReceipt>{
 
   //行高
-  protected Integer rowheight;
+  protected Integer rowHeight;
   //余留上方像素
   protected Integer startHeight;
   //余留左方像素

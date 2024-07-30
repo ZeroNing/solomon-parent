@@ -19,6 +19,6 @@ public class SnowflakeNamingRulesGenerationService implements FileNamingRulesGen
   @Override
   public String getFileName(MultipartFile file) {
     String contentType = getExtensionName(file.getOriginalFilename());
-    return new StringBuilder().append(generator.nextIdStr()).append(".").append(contentType).toString();
+    return generator.nextIdStr() + "." + contentType;
   }
 }
