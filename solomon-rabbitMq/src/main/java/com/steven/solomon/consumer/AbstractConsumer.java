@@ -119,7 +119,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     /**
      * 判断是否重复消费
      */
-    public boolean checkMessageKey(MessageProperties messageProperties,RabbitMqModel rabbitMqModel) {
+    public boolean checkMessageKey(MessageProperties messageProperties,RabbitMqModel<T> rabbitMqModel) {
         return false;
     }
 
@@ -133,6 +133,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     /**
      * 保存消费成功消息
      */
-    public abstract void saveLog(R result, Message message, RabbitMqModel rabbitMqModel);
+    public abstract void saveLog(R result, Message message, RabbitMqModel<T> rabbitMqModel);
 
 }
