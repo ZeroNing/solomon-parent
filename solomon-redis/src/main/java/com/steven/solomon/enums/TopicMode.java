@@ -6,9 +6,9 @@ public enum TopicMode implements BaseEnum<String> {
     CHANNEL("CHANNEL","直连模式"),
     PATTERN("PATTERN","主题模式"),;
 
-    private String label;
+    private final String label;
 
-    private String desc;
+    private final String desc;
 
     TopicMode(String label,String desc) {
         this.label = label;

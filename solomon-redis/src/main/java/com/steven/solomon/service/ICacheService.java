@@ -13,7 +13,6 @@ public interface ICacheService {
    * @param group 组
    * @param key   键
    * @param time  时间(秒)
-   * @return
    */
   boolean expire(String group, String key, int time);
 

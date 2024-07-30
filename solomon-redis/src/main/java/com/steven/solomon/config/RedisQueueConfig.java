@@ -38,8 +38,6 @@ public class RedisQueueConfig implements CommandLineRunner {
 
     private final RedisTenantContext redisTenantContext;
 
-    private RedisQueue redisQueue;
-
     public RedisQueueConfig(ApplicationContext applicationContext, RedisTenantContext redisTenantContext){
         SpringUtil.setContext(applicationContext);
         this.redisTenantContext = redisTenantContext;
@@ -65,7 +63,7 @@ public class RedisQueueConfig implements CommandLineRunner {
         for(Map.Entry<String,RedisConnectionFactory> entry: tenantFactoryMap.entrySet()){
             RedisConnectionFactory factory = entry.getValue();
             for(Object abstractConsumer : clazzList){
-                redisQueue = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RedisQueue.class);
+                RedisQueue redisQueue = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RedisQueue.class);
                 if(ValidateUtils.isEmpty(redisQueue)){
                     continue;
                 }

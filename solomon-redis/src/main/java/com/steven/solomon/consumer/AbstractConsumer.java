@@ -5,7 +5,6 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.entiy.RedisQueueModel;
 import com.steven.solomon.holder.RequestHeaderHolder;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.data.redis.connection.Message;

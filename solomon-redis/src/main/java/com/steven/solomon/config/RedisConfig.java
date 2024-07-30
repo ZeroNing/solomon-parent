@@ -15,13 +15,11 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
-import org.springframework.boot.autoconfigure.cache.CacheType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
-import org.springframework.cache.support.NoOpCacheManager;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,13 +39,13 @@ import java.util.Map;
 @Import(value = {RedisTenantContext.class,JacksonConfig.class})
 public class RedisConfig extends CachingConfigurerSupport {
 
-  private Logger logger = LoggerUtils.logger(getClass());
+  private final Logger logger = LoggerUtils.logger(getClass());
 
   private final TenantRedisProperties properties;
 
   private final RedisTenantContext context;
 
-  private boolean isSwitchDb;
+  private final boolean isSwitchDb;
 
   private final RedisProperties redisProperties;
 
@@ -80,7 +78,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   @Bean(name = "redisTemplate")
   @ConditionalOnMissingBean(RedisTemplate.class)
-  public RedisTemplate dynamicRedisTemplate() {
+  public RedisTemplate<String,Object> dynamicRedisTemplate() {
     logger.info("初始化Redis·················");
     RedisTemplate<String, Object> redisTemplate;
     if (isSwitchDb) {
@@ -122,13 +120,8 @@ public class RedisConfig extends CachingConfigurerSupport {
   @Override
   @ConditionalOnMissingBean(CacheManager.class)
   public CacheManager cacheManager() {
-    switch (CacheType.REDIS){
-      case REDIS:
-        RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
-        return new SpringRedisAutoManager(DynamicDefaultRedisCacheWriter.nonLockingRedisCacheWriter(context.getFactoryMap().values().iterator().next()), defaultCacheConfig);
-      default :
-        return new NoOpCacheManager();
-    }
+    RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
+    return new SpringRedisAutoManager(DynamicDefaultRedisCacheWriter.nonLockingRedisCacheWriter(context.getFactoryMap().values().iterator().next()), defaultCacheConfig);
   }
 }
 

@@ -19,7 +19,7 @@ import java.time.Duration;
 
 public class SpringRedisAutoManager extends RedisCacheManager {
 
-  private Logger log = LoggerUtils.logger(SpringRedisAutoManager.class);
+  private final Logger log = LoggerUtils.logger(SpringRedisAutoManager.class);
 
   @Resource
   private CacheProfile cacheProfile;
@@ -45,7 +45,7 @@ public class SpringRedisAutoManager extends RedisCacheManager {
   @Override
   public Cache getCache(String name) {
     String tenantCode = RequestHeaderHolder.getTenantCode();
-    if(SwitchModeEnum.TENANT_PREFIX.toString().equals(cacheProfile.getMode()) && ValidateUtils.isNotEmpty(tenantCode)) {
+    if(ValidateUtils.equalsIgnoreCase(SwitchModeEnum.TENANT_PREFIX.toString(),cacheProfile.getMode().toString()) && ValidateUtils.isNotEmpty(tenantCode)) {
       name = tenantCode + StrUtil.COLON + name;
     } else if(ValidateUtils.isEmpty(tenantCode)){
       log.info("在{}模式下,获取到的租户id为空,将redis的Key转为默认模式",cacheProfile.getMode());
