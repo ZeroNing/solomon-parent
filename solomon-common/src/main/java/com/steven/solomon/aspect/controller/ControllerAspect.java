@@ -1,16 +1,13 @@
 package com.steven.solomon.aspect.controller;
 
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.exception.ExceptionUtil;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.date.DateTimeUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import javax.servlet.http.HttpServletRequest;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -19,7 +16,6 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -66,7 +62,7 @@ public class ControllerAspect {
 //    String proceedingJoinPoint = pjp.getSignature().toString();
 
     //获取请求参数
-    String targetMethodParams= JackJsonUtils.formatJsonByFilter(pjp.getArgs());
+    String targetMethodParams= JSONUtil.toJsonStr(pjp.getArgs());
 
     stopWatch.stop();
     Long   millisecond = stopWatch.getLastTaskTimeMillis();
@@ -80,14 +76,14 @@ public class ControllerAspect {
 //    sb.append("调用controller方法::"+proceedingJoinPoint+System.lineSeparator());
     sb.append("执行耗时:").append(millisecond).append("毫秒").append(System.lineSeparator());
     sb.append("执行耗时:").append(second).append("秒").append(System.lineSeparator());
-    sb.append("响应数据:").append(JackJsonUtils.formatJsonByFilter(obj)).append(System.lineSeparator());
+    sb.append("响应数据:").append(JSONUtil.toJsonStr(obj)).append(System.lineSeparator());
     if(ValidateUtils.isNotEmpty(ex)){
       String message = ExceptionUtil.getMessage(ex.getClass().getSimpleName(),ex,ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : DEFAULT_LOCALE);
       sb.append("异常为:").append(message).append(System.lineSeparator());
     }
     sb.append("请求结束时间:").append(DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))).append(System.lineSeparator());
     sb.append("===========================================");
-    logger.debug(System.lineSeparator()+sb.toString());
+    logger.info(System.lineSeparator()+sb.toString());
 
   }
 }
