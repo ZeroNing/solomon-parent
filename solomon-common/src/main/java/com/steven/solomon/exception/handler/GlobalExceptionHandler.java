@@ -1,5 +1,6 @@
 package com.steven.solomon.exception.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.json.JackJsonUtils;
@@ -42,7 +43,7 @@ public class GlobalExceptionHandler {
       ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
       requestParameter = StringUtils.toEncodedString(wrapper.getContentAsByteArray(), Charset.forName(wrapper.getCharacterEncoding()));
     }
-    logger.error("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), JackJsonUtils.formatJsonByFilter(requestParameter), ex);
+    logger.error("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), JSONUtil.toJsonStr(requestParameter), ex);
     return BaseGlobalExceptionHandler.handlerMap(ex,serverId,locale,response);
   }
 
