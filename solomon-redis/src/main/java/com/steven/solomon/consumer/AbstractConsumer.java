@@ -22,18 +22,21 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
     public void onMessage(Message message, @Nullable byte[] pattern) {
         String body = new String(message.getBody());
         String topic = new String(message.getChannel());
+        Throwable throwable = null;
+        RedisQueueModel<T> model = null;
+        R result = null;
         try {
           logger.debug("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
-          RedisQueueModel<T> model = JSONUtil.toBean(body, new TypeReference<RedisQueueModel<T>>(){},true);
+          model = JSONUtil.toBean(body, new TypeReference<RedisQueueModel<T>>(){},true);
           RequestHeaderHolder.setTenantCode(model.getTenantCode());
-          R result = this.handleMessage(model.getBody(),topic);
-          // 保存消费成功消息
-          saveLog(result, topic, model);
+          result = this.handleMessage(model.getBody(),topic);
         } catch (Throwable e){
           // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
           logger.error("AbstractConsumer:消费报错 异常为:", e);
-          // 将消费失败的记录保存到数据库或者不处理也可以
-          this.saveFailMessage(body,topic, e);
+          throwable = e;
+        } finally {
+          // 保存消费成功/失败的消息
+          saveLog(result, topic, model,throwable);
         }
     }
 
@@ -43,14 +46,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
     public abstract R handleMessage(T body,String topic) throws Exception;
 
     /**
-     * 保存消费失败的消息
-     */
-    public void saveFailMessage(String body,String topic, Throwable e) {
-
-    }
-
-    /**
      * 保存消费成功消息
      */
-    public abstract void saveLog(R result, String topic, RedisQueueModel<T> model);
+    public abstract void saveLog(R result, String topic, RedisQueueModel<T> model, Throwable e);
 }
