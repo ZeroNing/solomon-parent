@@ -83,7 +83,7 @@ public class ControllerAspect {
     }
     sb.append("请求结束时间:").append(DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"))).append(System.lineSeparator());
     sb.append("===========================================");
-    logger.info(System.lineSeparator()+sb.toString());
+    logger.info("{}{}", System.lineSeparator(),sb);
 
   }
 }
