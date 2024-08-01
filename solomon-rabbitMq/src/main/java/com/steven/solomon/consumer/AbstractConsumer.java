@@ -37,6 +37,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         // 消费者内容
         String json = new String(message.getBody(), StandardCharsets.UTF_8);
         RabbitMqModel<T> rabbitMqModel = null;
+        Throwable throwable = null;
+        R result = null;
         try {
             logger.debug("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
             rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>(){},true);
@@ -45,24 +47,21 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
             }
             // 消费消息
-            R result = this.handleMessage(rabbitMqModel.getBody());
+            result = this.handleMessage(rabbitMqModel.getBody());
             if (!isAutoAck()) {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
             }
-            // 保存消费成功消息
-            saveLog(result, rabbitMqModel);
         } catch (Throwable e) {
-            // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
-            logger.error("AbstractConsumer:消费报错 异常为:", e);
-            // 将消费失败的记录保存到数据库或者不处理也可以
-            this.saveFailMessage(e);
             // 保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
-            saveFailNumber(channel);
+            saveFailNumber(channel,e);
+            throwable = e;
             throw e;
         } finally {
             // 删除判断重复消费Key
             deleteCheckMessageKey(rabbitMqModel);
+            // 保存消费成功/失败的消息
+            saveLog(result,throwable, rabbitMqModel);
         }
     }
 
@@ -74,11 +73,15 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     /**
      * 记录失败次数并决定是否拒绝此消息
      */
-    public void saveFailNumber(Channel channel) throws Exception {
+    public void saveFailNumber(Channel channel,Throwable e) throws Exception {
+        // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
+        logger.error("AbstractConsumer:消费报错 异常为:", e);
+
         Integer lock = messageProperties.getHeader("retryNumber");
         Integer actualLock = ValidateUtils.isEmpty(lock) ? 1 : lock + 1;
-        logger.error("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, messageProperties.getDeliveryTag(), actualLock);
         int retryNumber = getRetryNumber();
+        logger.error("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, messageProperties.getDeliveryTag(), actualLock);
+
         if (retryNumber <= this.defaultRetryNumber || actualLock >= retryNumber) {
             if (retryNumber <= this.defaultRetryNumber) {
                 logger.error("rabbitMQ 失败记录:因记录不需要重试因此直接拒绝此消息,消费者correlationId为:{},消费者设置重试次数为:{}", correlationId, retryNumber);
@@ -115,14 +118,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     public abstract R handleMessage(T body) throws Exception;
 
     /**
-     * 保存消费失败的消息
-     * @param e       异常
-     */
-    public void saveFailMessage(Throwable e) {
-
-    }
-
-    /**
      * 判断是否重复消费
      */
     public boolean checkMessageKey(RabbitMqModel<T> rabbitMqModel) {
@@ -137,8 +132,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     }
 
     /**
-     * 保存消费成功消息
+     * 保存消费成功/失败的消息
      */
-    public abstract void saveLog(R result,RabbitMqModel<T> rabbitMqModel);
+    public abstract void saveLog(R result,Throwable throwable,RabbitMqModel<T> rabbitMqModel);
 
 }
