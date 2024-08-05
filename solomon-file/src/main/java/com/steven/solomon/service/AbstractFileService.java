@@ -255,4 +255,11 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * @param filePath 文件名
    */
   protected abstract void abortMultipartUpload(String uploadId,String bucketName,String filePath) throws Exception;
+
+  /**
+   * 初始化分片任务
+   * @param bucketName 桶名
+   * @param objectName 文件名
+   */
+  protected abstract String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
 }

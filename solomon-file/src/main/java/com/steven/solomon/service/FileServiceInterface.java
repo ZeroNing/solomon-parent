@@ -18,8 +18,6 @@ public interface FileServiceInterface {
    * @param file 文件
    * @param bucketName 桶名
    * @param isUseOriginalName 是否使用原名,不使用原名则使用配置的文件名生成器生成
-   * @return
-   * @throws Exception
    */
   FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception;
 
@@ -27,8 +25,6 @@ public interface FileServiceInterface {
    * 上传（默认使用文件名生成器生成,支持大文件上传）
    * @param file 文件
    * @param bucketName 桶名
-   * @return
-   * @throws Exception
    */
   FileUpload upload(MultipartFile file,String bucketName) throws Exception;
 
@@ -38,8 +34,6 @@ public interface FileServiceInterface {
    * @param bucketName 桶名
    * @param fileName   文件名
    * @param isUseOriginalName 是否使用原名,不使用原名则使用配置的文件名生成器生成
-   * @return
-   * @throws Exception
    */
   FileUpload upload(InputStream is,String bucketName,String fileName,boolean isUseOriginalName) throws Exception;
 
@@ -48,8 +42,6 @@ public interface FileServiceInterface {
    * @param is 文件输入流
    * @param bucketName 桶名
    * @param fileName   文件名
-   * @return
-   * @throws Exception
    */
   FileUpload upload(InputStream is,String bucketName,String fileName) throws Exception;
 
@@ -58,8 +50,6 @@ public interface FileServiceInterface {
    * @param bucketName 桶名
    * @param bi         缓冲区图像类
    * @param fileName   文件名
-   * @return
-   * @throws Exception
    */
   FileUpload upload(String bucketName, BufferedImage bi, String fileName) throws Exception;
 
@@ -92,8 +82,6 @@ public interface FileServiceInterface {
    * 检查桶内文件是否存在
    * @param bucketName 桶名
    * @param objectName 文件名
-   * @return
-   * @throws Exception
    */
   boolean objectExist(String bucketName,String objectName) throws Exception;
 
@@ -103,8 +91,6 @@ public interface FileServiceInterface {
    * @param targetBucket 目标桶名
    * @param sourceObjectName 原文件名
    * @param targetObjectName 目标文件名
-   * @return
-   * @throws Exception
    */
   boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
 
@@ -123,17 +109,8 @@ public interface FileServiceInterface {
    * 获取桶内文件名（文件名为空则返回所有文件名）
    * @param bucketName 桶名
    * @param key 文件名
-   * @return
    */
   List<String> listObjects(String bucketName,String key) throws Exception;
-
-  /**
-   * 初始化分片任务
-   * @param bucketName 桶名
-   * @param objectName 文件名
-   * @return
-   */
-  String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
 
   /**
    * 删除桶名
