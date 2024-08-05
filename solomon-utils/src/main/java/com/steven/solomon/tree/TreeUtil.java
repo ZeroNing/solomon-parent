@@ -50,14 +50,12 @@ public class TreeUtil {
      * @param ids       要搜索对应子节点的id集合
      */
     public static <T extends BaseTreeNode> List<T> getChildList(List<T> listNodes, List<String> ids) {
-        return ValidateUtils.isEmpty(ids) ? null : getChildList(listNodes, ids.toArray(new String[ids.size()]));
+        return ValidateUtils.isEmpty(ids) ? null : getChildList(listNodes, ids.toArray(new String[0]));
     }
 
     /**
      * @param listNodes 要处理列表集合节点数据(不是组合成树状图后的数据)
      * @param id        要搜索对应子节点的id
-     * @param <T>
-     * @return
      */
     public static <T extends BaseTreeNode> List<T> getChildList(List<T> listNodes, String id) {
         return ValidateUtils.isEmpty(id) ? null : getChildList(listNodes, new String[]{id});
@@ -66,8 +64,6 @@ public class TreeUtil {
     /**
      * @param listNodes 要处理列表集合节点数据(不是组合成树状图后的数据)
      * @param ids       要搜索对应子节点的id(数组)
-     * @param <T>
-     * @return
      */
     public static <T extends BaseTreeNode> List<T> getChildList(List<T> listNodes, String[] ids) {
         if (ids == null || ids.length == 0 || ValidateUtils.isEmpty(listNodes)) {
@@ -113,12 +109,9 @@ public class TreeUtil {
      * @param listNodes 要处理列表集合节点数据
      */
     public static <T extends BaseTreeNode> List<T> assembleTree(List<T> listNodes) {
-        List<T> newTreeNodes = new ArrayList<>();
         // 循环赋值最上面的节点数据
         // 赋值最上面节点的值
-        newTreeNodes.addAll(listNodes.stream()
-                .filter(t -> ValidateUtils.isEmpty(t.getpId()) || "null".equals(t.getpId()) || "0".equals(t.getpId()))
-                .collect(Collectors.toList()));
+        List<T> newTreeNodes = listNodes.stream().filter(t -> ValidateUtils.isEmpty(t.getpId()) || ValidateUtils.equalsIgnoreCase("null", t.getpId()) || ValidateUtils.equalsIgnoreCase("0", t.getpId())).collect(Collectors.toList());
         // 循环处理子节点数据
         for (T t : newTreeNodes) {
             //递归
