@@ -3,17 +3,7 @@ package com.steven.solomon.service;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
-import com.baidubce.services.bos.model.AbortMultipartUploadRequest;
-import com.baidubce.services.bos.model.BucketSummary;
-import com.baidubce.services.bos.model.CompleteMultipartUploadRequest;
-import com.baidubce.services.bos.model.InitiateMultipartUploadRequest;
-import com.baidubce.services.bos.model.InitiateMultipartUploadResponse;
-import com.baidubce.services.bos.model.ListBucketsResponse;
-import com.baidubce.services.bos.model.ListObjectsResponse;
-import com.baidubce.services.bos.model.PartETag;
-import com.baidubce.services.bos.model.PutObjectRequest;
-import com.baidubce.services.bos.model.UploadPartRequest;
-import com.baidubce.services.bos.model.UploadPartResponse;
+import com.baidubce.services.bos.model.*;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -122,7 +112,7 @@ public class BOSService extends AbstractFileService {
      return new ArrayList<>();
     }
     ListObjectsResponse response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
-    return Lambda.toList(response.getContents(),data->data.getKey());
+    return Lambda.toList(response.getContents(), BosObjectSummary::getKey);
   }
 
   @Override

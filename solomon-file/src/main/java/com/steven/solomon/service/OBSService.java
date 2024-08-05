@@ -1,19 +1,7 @@
 package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
-import com.obs.services.model.AbortMultipartUploadRequest;
-import com.obs.services.model.CompleteMultipartUploadRequest;
-import com.obs.services.model.HttpMethodEnum;
-import com.obs.services.model.InitiateMultipartUploadRequest;
-import com.obs.services.model.InitiateMultipartUploadResult;
-import com.obs.services.model.ListObjectsRequest;
-import com.obs.services.model.ObjectListing;
-import com.obs.services.model.PartEtag;
-import com.obs.services.model.S3Bucket;
-import com.obs.services.model.TemporarySignatureRequest;
-import com.obs.services.model.TemporarySignatureResponse;
-import com.obs.services.model.UploadPartRequest;
-import com.obs.services.model.UploadPartResult;
+import com.obs.services.model.*;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -27,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class OBSService extends AbstractFileService {
 
-  private ObsClient client;
+  private final ObsClient client;
 
   public OBSService(FileChoiceProperties properties) {
     super(properties);
@@ -126,7 +114,7 @@ public class OBSService extends AbstractFileService {
     ListObjectsRequest request = new ListObjectsRequest(bucketName);
     request.setPrefix(key);
     ObjectListing      response = client.listObjects(request);
-    return Lambda.toList(response.getObjects(),data->data.getObjectKey());
+    return Lambda.toList(response.getObjects(), ObsObject::getObjectKey);
   }
 
   @Override
@@ -151,10 +139,11 @@ public class OBSService extends AbstractFileService {
 
   @Override
   public List<String> getBucketList() throws Exception {
-    List<S3Bucket> listBucketsResponse = client.listBuckets();
+    ListBucketsResult result = client.listBucketsV2(new ListBucketsRequest());
+    List<ObsBucket> bucketList = result.getBuckets();
     List<String>   bucketNameList      = new ArrayList<>();
-    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
-      for(S3Bucket bucket : listBucketsResponse){
+    if(ValidateUtils.isNotEmpty(bucketList)){
+      for(ObsBucket bucket : bucketList){
         bucketNameList.add(bucket.getBucketName());
       }
     }

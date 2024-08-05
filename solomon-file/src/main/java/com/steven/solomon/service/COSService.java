@@ -4,16 +4,7 @@ import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
-import com.qcloud.cos.model.AbortMultipartUploadRequest;
-import com.qcloud.cos.model.Bucket;
-import com.qcloud.cos.model.CompleteMultipartUploadRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadRequest;
-import com.qcloud.cos.model.InitiateMultipartUploadResult;
-import com.qcloud.cos.model.ObjectListing;
-import com.qcloud.cos.model.PartETag;
-import com.qcloud.cos.model.PutObjectRequest;
-import com.qcloud.cos.model.UploadPartRequest;
-import com.qcloud.cos.model.UploadPartResult;
+import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -30,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class COSService extends AbstractFileService {
 
-  private COSClient client;
+  private final COSClient client;
 
   public COSService(FileChoiceProperties properties) {
     super(properties);
@@ -126,7 +117,7 @@ public class COSService extends AbstractFileService {
       return new ArrayList<>();
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
-    return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
+    return Lambda.toList(response.getObjectSummaries(), COSObjectSummary::getKey);
   }
 
   @Override

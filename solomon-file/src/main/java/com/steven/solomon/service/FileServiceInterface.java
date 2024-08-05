@@ -129,8 +129,8 @@ public interface FileServiceInterface {
 
   /**
    * 初始化分片任务
-   * @param bucketName
-   * @param objectName
+   * @param bucketName 桶名
+   * @param objectName 文件名
    * @return
    */
   String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
@@ -138,7 +138,6 @@ public interface FileServiceInterface {
   /**
    * 删除桶名
    * @param bucketName 桶名
-   * @throws Exception
    */
   void deleteBucket(String bucketName) throws Exception;
 

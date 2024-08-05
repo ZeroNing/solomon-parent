@@ -2,16 +2,7 @@ package com.steven.solomon.service;
 
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.model.AbortMultipartUploadRequest;
-import com.aliyun.oss.model.Bucket;
-import com.aliyun.oss.model.CompleteMultipartUploadRequest;
-import com.aliyun.oss.model.InitiateMultipartUploadRequest;
-import com.aliyun.oss.model.InitiateMultipartUploadResult;
-import com.aliyun.oss.model.ObjectListing;
-import com.aliyun.oss.model.PartETag;
-import com.aliyun.oss.model.PutObjectRequest;
-import com.aliyun.oss.model.UploadPartRequest;
-import com.aliyun.oss.model.UploadPartResult;
+import com.aliyun.oss.model.*;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
@@ -26,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class OSSService extends AbstractFileService {
 
-  private OSS client;
+  private final OSS client;
 
   public OSSService(FileChoiceProperties properties) {
     super(properties);
@@ -122,7 +113,7 @@ public class OSSService extends AbstractFileService {
       return new ArrayList<>();
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
-    return Lambda.toList(response.getObjectSummaries(),data->data.getKey());
+    return Lambda.toList(response.getObjectSummaries(), OSSObjectSummary::getKey);
   }
 
   @Override
