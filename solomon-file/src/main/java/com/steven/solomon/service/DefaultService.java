@@ -77,7 +77,7 @@ public class DefaultService extends AbstractFileService {
   }
 
   @Override
-  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+  protected void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
       throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }

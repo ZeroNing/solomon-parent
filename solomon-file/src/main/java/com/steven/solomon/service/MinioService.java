@@ -106,10 +106,9 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
-  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
+  protected void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName)
       throws Exception {
     client.copyObject(CopyObjectArgs.builder().source(CopySource.builder().bucket(sourceBucket).object(sourceObjectName).build()).bucket(targetBucket).object(targetObjectName).build());
-    return true;
   }
 
   @Override

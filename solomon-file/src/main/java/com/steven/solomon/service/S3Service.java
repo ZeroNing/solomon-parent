@@ -80,9 +80,8 @@ public class S3Service extends AbstractFileService {
   }
 
   @Override
-  protected boolean copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception {
+  protected void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception {
     client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
-    return true;
   }
 
   @Override

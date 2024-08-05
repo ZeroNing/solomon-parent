@@ -35,11 +35,11 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   public AbstractFileService(FileChoiceProperties properties){
     this.properties = properties;
-    this.partSize = Long.valueOf(this.properties.getPartSize() * 1024*1024);
+    this.partSize = (long) (this.properties.getPartSize() * 1024 * 1024);
   }
 
   public AbstractFileService(){
-    this.partSize = Long.valueOf(5 * 1024*1024);
+    this.partSize = (long) (5 * 1024 * 1024);
   }
 
   @Override
@@ -191,7 +191,6 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * @param fileSize 文件大小
    * @param uploadId 上传id
    * @param filePath 文件名
-   * @throws Exception
    */
   protected abstract void multipartUpload(MultipartFile file, String bucketName,long fileSize,String uploadId,String filePath,int partCount) throws Exception;
 
@@ -241,12 +240,13 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   /**
    * 复制文件
-   * @param sourceBucket 来源桶
-   * @param targetBucket 目标桶
+   *
+   * @param sourceBucket     来源桶
+   * @param targetBucket     目标桶
    * @param sourceObjectName 来源文件名
    * @param targetObjectName 目标文件名
    */
-  protected abstract boolean copyFile(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception;
+  protected abstract void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception;
 
   /**
    * 取消分片上传
