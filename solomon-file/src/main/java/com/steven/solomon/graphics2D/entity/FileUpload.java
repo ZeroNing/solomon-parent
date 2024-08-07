@@ -32,7 +32,7 @@ public class FileUpload implements Serializable {
   public FileUpload(String bucket, String fileName, InputStream is) throws IOException {
     this.bucket = bucket;
     this.fileName = fileName;
-    this.size = Long.valueOf(is.available());
+    this.size = (long) is.available();
     this.md5 = DigestUtil.md5Hex(IoUtil.readBytes(is));
   }
 
