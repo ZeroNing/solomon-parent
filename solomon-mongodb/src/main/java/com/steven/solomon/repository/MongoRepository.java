@@ -252,7 +252,7 @@ public class MongoRepository<T, I> {
     List<AggregationOperation> aggregationList = new ArrayList<>();
     int skip = (param.getPageNo() - 1) * param.getPageSize();
 
-    aggregationList.add(Aggregation.skip(Long.valueOf(skip)));
+    aggregationList.add(Aggregation.skip((long)skip));
     aggregationList.add(Aggregation.limit(param.getPageSize()));
     return aggregationList;
   }

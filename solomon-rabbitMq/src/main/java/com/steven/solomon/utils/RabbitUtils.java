@@ -208,6 +208,9 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
         Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(RabbitMq.class);
         for (Object obj : annotationMap.values()) {
             RabbitMq rabbitMq = AnnotationUtils.findAnnotation(obj.getClass(), RabbitMq.class);
+            if(ValidateUtils.isEmpty(rabbitMq)){
+                continue;
+            }
             List<String> queues = Arrays.asList(rabbitMq.queues());
             if (!queues.contains(queueName)) {
                 continue;

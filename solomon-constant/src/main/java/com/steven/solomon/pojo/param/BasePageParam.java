@@ -41,7 +41,7 @@ public class BasePageParam implements Serializable {
         }
 
         public String getSort(){
-            if(orderByField == null || orderByField == ""){
+            if(orderByField == null || orderByField.isEmpty()){
                 return "";
             }
             return orderByField + " " + orderByMethod.label();

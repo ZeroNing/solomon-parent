@@ -172,7 +172,7 @@ public class MongoDbUtils {
    * @return
    */
   public static boolean createUser(String mongoClient,String userName,String password, MongoDbRoleEnum roleEnum,String dbName){
-    if(ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(dbName) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(dbName)){
+    if(ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(dbName)){
       return false;
     }
     try {
