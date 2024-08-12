@@ -91,7 +91,6 @@ public class MongoDbUtils {
   /**
    * 检测数据库是否是固定集合
    * @param collectionName 集合名称
-   * @return
    */
   public static Document cherCheckCapped(String collectionName){
     return new Document("collStats", collectionName);

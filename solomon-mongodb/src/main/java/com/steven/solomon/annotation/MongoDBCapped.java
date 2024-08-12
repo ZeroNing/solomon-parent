@@ -21,13 +21,11 @@ public @interface MongoDBCapped {
 
   /**
    * 限制记录大小使用的是(字节)
-   * @return
    */
   long size() default 1024;
 
   /**
    * 限制记录行数
-   * @return
    */
   long maxDocuments() default 0;
 

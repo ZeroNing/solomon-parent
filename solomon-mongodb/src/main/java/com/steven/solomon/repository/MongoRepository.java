@@ -1,7 +1,6 @@
 package com.steven.solomon.repository;
 
 import com.steven.solomon.pojo.enums.OrderByEnum;
-import com.steven.solomon.template.DynamicMongoTemplate;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,11 +95,9 @@ public class MongoRepository<T, I> {
   /**
    * 保存(非覆盖保存)
    */
-  public Collection<T> save(Collection<T> entity) {
-    entity.forEach(data -> {
-      this.save(data);
-    });
-    return entity;
+  public Collection<T> save(Collection<T> entityList) {
+    entityList.forEach(this::save);
+    return entityList;
   }
 
   /**
@@ -119,9 +116,6 @@ public class MongoRepository<T, I> {
 
   /**
    * 统计记录数
-   *
-   * @param query
-   * @return
    */
   public long count(Query query) {
     return mongoTemplate.count(query, modelClass);
@@ -150,9 +144,6 @@ public class MongoRepository<T, I> {
 
   /**
    * 更新记录
-   *
-   * @param query
-   * @param update
    */
   public void update(Query query, Update update) {
     mongoTemplate.updateFirst(query, update, modelClass);
@@ -163,7 +154,7 @@ public class MongoRepository<T, I> {
    */
   public boolean exists(Query query) {
     long count = count(query);
-    return count > 0 ? true : false;
+    return count > 0;
   }
 
   /**
@@ -194,7 +185,7 @@ public class MongoRepository<T, I> {
   public PageVO<T> page(Query query, BasePageParam basePageParam,Class<T> clazz) {
     //统计记录数
     long   total = count(query);
-    PageVO page  = new PageVO<>(null, total, basePageParam.getPageNo(), basePageParam.getPageSize());
+    PageVO<T> page  = new PageVO<>(null, total, basePageParam.getPageNo(), basePageParam.getPageSize());
     if (total <= 0) {
       return page;
     }
@@ -211,7 +202,7 @@ public class MongoRepository<T, I> {
 
   public PageVO<T> aggregate(List<AggregationOperation> list, Criteria criteria,BasePageParam basePageParam,Class<T> clazz) {
     long   total = count(ValidateUtils.isNotEmpty(criteria) ? new Query(criteria) : new Query());
-    PageVO page  = new PageVO<>(null, total, basePageParam.getPageNo(), basePageParam.getPageSize());
+    PageVO<T> page  = new PageVO<>(null, total, basePageParam.getPageNo(), basePageParam.getPageSize());
     if (total <= 0) {
       return page;
     }
