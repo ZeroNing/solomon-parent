@@ -33,9 +33,9 @@ public class MqttUtils implements SendService<MqttModel> {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
-  private Map<String,MqttClient> clientMap = new HashMap<>();
+  private final Map<String,MqttClient> clientMap = new HashMap<>();
 
-  private Map<String,MqttConnectOptions> optionsMap = new HashMap<>();
+  private final Map<String,MqttConnectOptions> optionsMap = new HashMap<>();
 
   public Map<String, MqttConnectOptions> getOptionsMap() {
     return optionsMap;
@@ -108,8 +108,10 @@ public class MqttUtils implements SendService<MqttModel> {
         if (ValidateUtils.isEmpty(mqtt)) {
           continue;
         }
-        for (String topic : mqtt.topics()) {
-          client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+        if(ValidateUtils.isNotEmpty(mqtt.topics())){
+          for (String topic : mqtt.topics()) {
+            client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+          }
         }
       }
     }

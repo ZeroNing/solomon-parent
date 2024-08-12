@@ -28,9 +28,9 @@ public class MqttUtils implements SendService<MqttModel> {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
-  private Map<String, MqttClient> clientMap = new HashMap<>();
+  private final Map<String, MqttClient> clientMap = new HashMap<>();
 
-  private Map<String,MqttConnectionOptions> optionsMap = new HashMap<>();
+  private final Map<String,MqttConnectionOptions> optionsMap = new HashMap<>();
 
   public Map<String, MqttConnectionOptions> getOptionsMap() {
     return optionsMap;
