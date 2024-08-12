@@ -64,7 +64,7 @@ public class RedisQueueConfig implements CommandLineRunner {
             RedisConnectionFactory factory = entry.getValue();
             for(Object abstractConsumer : clazzList){
                 RedisQueue redisQueue = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RedisQueue.class);
-                if(ValidateUtils.isEmpty(redisQueue)){
+                if(ValidateUtils.isEmpty(redisQueue) || ValidateUtils.isEmpty(redisQueue.topic())){
                     continue;
                 }
                 String topicName = SpringUtil.getElValue(redisQueue.topic(),ValidateUtils.getElDefaultValue(redisQueue.topic()));

@@ -39,8 +39,6 @@ public class SpringRedisAutoManager extends RedisCacheManager {
 
   /**
    * 从上下文中获取租户ID，重写@Cacheable value 值
-   * @param name
-   * @return
    */
   @Override
   public Cache getCache(String name) {
