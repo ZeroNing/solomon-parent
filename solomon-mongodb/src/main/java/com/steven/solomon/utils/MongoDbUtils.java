@@ -16,7 +16,6 @@ import com.steven.solomon.enums.MongoDbRoleEnum;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Map.Entry;
 import org.bson.Document;
@@ -43,19 +42,13 @@ public class MongoDbUtils {
   public static void init(String tenantCode,MongoProperties properties,MongoTenantsContext context){
     SimpleMongoClientDatabaseFactory factory = initFactory(properties);
     context.setFactory(tenantCode,factory);
-
-    List<String>  collectionNameList = new ArrayList<>();
-    MongoDatabase mongoDatabase      = factory.getMongoDatabase();
-    mongoDatabase.listCollectionNames().forEach(name->{
-      collectionNameList.add(name);
-    });
     initDocument(factory);
   }
 
   public static SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties){
     MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
     MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
-      builder.hosts(Arrays.asList(new ServerAddress(properties.getHost(),properties.getPort()))).mode(
+      builder.hosts(List.of(new ServerAddress(properties.getHost(), properties.getPort()))).mode(
           ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
     }).build();
     return new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),properties.getDatabase());
@@ -65,9 +58,7 @@ public class MongoDbUtils {
 
     List<String>  collectionNameList = new ArrayList<>();
     MongoDatabase mongoDatabase      = factory.getMongoDatabase();
-    mongoDatabase.listCollectionNames().forEach(name->{
-      collectionNameList.add(name);
-    });
+    mongoDatabase.listCollectionNames().forEach(collectionNameList::add);
 
     for(Object obj : SpringUtil.getBeansWithAnnotation(MongoDBCapped.class).values()){
       MongoDBCapped                                          mongoDBCapped = AnnotationUtils
@@ -108,9 +99,7 @@ public class MongoDbUtils {
 
   public static void checkCapped(MongoDatabase database, String collectionName, int size, int maxDocuments) {
     List<String> collectionNameList= new ArrayList<>();
-    database.listCollectionNames().forEach(s -> {
-      collectionNameList.add(s);
-    });
+    database.listCollectionNames().forEach(collectionNameList::add);
     if (collectionNameList.contains(collectionName)) {
       Document command = new Document("collStats", collectionName);
       Boolean isCapped = database.runCommand(command, ReadPreference.primary()).getBoolean("capped");
@@ -147,11 +136,10 @@ public class MongoDbUtils {
   }
 
   /**
-   * 创建mongodb数据库以及集合（创建数据库不创建集合会导致mongdb数据库自动删除）
+   * 创建mongodb数据库以及集合（创建数据库不创建集合会导致mongodb数据库自动删除）
    * @param mongoClient mongodb连接
    * @param dbName 数据库名称
    * @param collectionName 集合名词
-   * @return
    */
   public static MongoDatabase createDb(String mongoClient,String dbName,String collectionName){
     if(ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(dbName) || ValidateUtils.isEmpty(collectionName)){
@@ -169,7 +157,6 @@ public class MongoDbUtils {
    * @param password 密码
    * @param roleEnum mongodb权限
    * @param dbName 数据库名（用户获取连接中的数据库名以及赋予数据库权限）
-   * @return
    */
   public static boolean createUser(String mongoClient,String userName,String password, MongoDbRoleEnum roleEnum,String dbName){
     if(ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(dbName)){
@@ -191,7 +178,6 @@ public class MongoDbUtils {
    * @param userName 用户名
    * @param password 密码
    * @param roleEnum mongodb权限
-   * @return
    */
   public static boolean createUser(MongoDatabase mongoDatabase,String userName,String password, MongoDbRoleEnum roleEnum){
     if(ValidateUtils.isEmpty(mongoDatabase) || ValidateUtils.isEmpty(userName) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(password)){
@@ -211,14 +197,13 @@ public class MongoDbUtils {
       return null;
     }
     MongoClient mongoClients = MongoClients.create(mongoClient);
-    MongoDatabase mongoDatabase = mongoClients.getDatabase(dbName);
-    return mongoDatabase;
+    return mongoClients.getDatabase(dbName);
   }
 
   private static void createCollection(MongoDatabase mongoDatabase,String collectionName){
     if(ValidateUtils.isNotEmpty(mongoDatabase)){
       List<String> collectionNames = new ArrayList<>();
-      mongoDatabase.listCollectionNames().forEach(name -> collectionNames.add(name));
+      mongoDatabase.listCollectionNames().forEach(collectionNames::add);
       if(!collectionNames.contains(collectionName)){
         mongoDatabase.createCollection(collectionName);
       }

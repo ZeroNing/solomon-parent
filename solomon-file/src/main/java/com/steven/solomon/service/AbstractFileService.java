@@ -150,7 +150,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
         ImgUtil.scale(getObject(bucketName,objectName+"."+extensionName), baos, width, height, Color.decode("0xFFFFFF"));
         try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
           bais.reset();
-          try(InputStream is = new ByteArrayInputStream(bais.readAllBytes());){
+          try(InputStream is = new ByteArrayInputStream(bais.readAllBytes())){
             if(isUpload){
               file = new MockMultipartFile(thumbnailName,thumbnailName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
               upload(file,bucketName,true);
