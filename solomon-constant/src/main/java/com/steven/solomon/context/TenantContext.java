@@ -11,7 +11,6 @@ public abstract class TenantContext<F> {
 
   /**
    * 获取工厂
-   * @return
    */
   public F getFactory() {
     return THREAD_LOCAL.get();
@@ -19,7 +18,7 @@ public abstract class TenantContext<F> {
 
   /**
    * 设置工厂
-   * @param key
+   * @param key 租户编码
    */
   public void setFactory(String key) {
     THREAD_LOCAL.set(FACTORY_MAP.get(key));
@@ -34,7 +33,6 @@ public abstract class TenantContext<F> {
 
   /**
    * 获取所有工厂
-   * @return
    */
   public Map<String, F> getFactoryMap() {
     return FACTORY_MAP;
@@ -42,7 +40,6 @@ public abstract class TenantContext<F> {
 
   /**
    * set工厂
-   * @param factoryMap
    */
   public void setFactory(Map<String, F> factoryMap) {
     FACTORY_MAP.putAll(factoryMap);
@@ -50,8 +47,8 @@ public abstract class TenantContext<F> {
 
   /**
    * set工厂
-   * @param key
-   * @param factory
+   * @param key 租户编码
+   * @param factory 工厂
    */
   public void setFactory(String key, F factory) {
     FACTORY_MAP.put(key,factory);
