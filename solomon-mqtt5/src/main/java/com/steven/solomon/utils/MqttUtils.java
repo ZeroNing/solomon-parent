@@ -96,7 +96,14 @@ public class MqttUtils implements SendService<MqttModel> {
    * @param client mqtt连接
    */
   public void subscribe(MqttClient client) throws MqttException {
-    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+    subscribe(client,new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values()));
+  }
+
+  /**
+   * 订阅消息
+   * @param client mqtt连接
+   */
+  public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);

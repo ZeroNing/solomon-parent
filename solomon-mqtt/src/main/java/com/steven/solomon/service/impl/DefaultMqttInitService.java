@@ -26,13 +26,13 @@ public class DefaultMqttInitService implements MqttInitService {
     }
 
     @Override
-    public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
+    public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> clazzList) throws Exception {
         MqttClient mqttClient = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
         MqttConnectOptions options = utils.initMqttConnectOptions(mqttProfile);
         mqttClient.connect(options);
         utils.putOptionsMap(tenantCode,options);
         // 订阅主题
-        utils.subscribe(mqttClient);
+        utils.subscribe(mqttClient,clazzList);
 
         //配置callback
         mqttClient.setCallback(new MqttCallbackExtended() {
@@ -40,18 +40,18 @@ public class DefaultMqttInitService implements MqttInitService {
             public void connectComplete(boolean reconnect, String serverURI) {
                 logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
                 if(reconnect){
-                    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
                     for (Object abstractConsumer : clazzList) {
                         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-                        if (ValidateUtils.isNotEmpty(mqtt)) {
-                            try {
-                                for(String topic : mqtt.topics()){
-                                    logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                                    mqttClient.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
-                                }
-                            } catch (MqttException e) {
-                                logger.error("重连重新订阅主题失败,异常为:",e);
+                        if(ValidateUtils.isEmpty(mqtt) || ValidateUtils.isEmpty(mqtt.topics())){
+                            continue;
+                        }
+                        try {
+                            for(String topic : mqtt.topics()){
+                                logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
+                                mqttClient.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
                             }
+                        } catch (MqttException e) {
+                            logger.error("重连重新订阅主题失败,异常为:",e);
                         }
                     }
                 }
@@ -74,5 +74,10 @@ public class DefaultMqttInitService implements MqttInitService {
         });
         //保存client
         utils.putClient(tenantCode,mqttClient);
+    }
+
+    @Override
+    public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
+        this.initMqttClient(tenantCode,mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values()));
     }
 }

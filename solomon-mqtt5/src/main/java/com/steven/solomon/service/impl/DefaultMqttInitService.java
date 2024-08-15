@@ -32,6 +32,11 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
+        initMqttClient(tenantCode, mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values()));
+    }
+
+    @Override
+    public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> clazzList) throws Exception {
         MqttClient client = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
         MqttConnectionOptions options = utils.initMqttConnectOptions(mqttProfile);
         client.connect(options);
@@ -61,7 +66,6 @@ public class DefaultMqttInitService implements MqttInitService {
             public void connectComplete(boolean reconnect, String serverURI) {
                 logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
                 if(reconnect){
-                    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
                     for (Object abstractConsumer : clazzList) {
                         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
                         if (ValidateUtils.isNotEmpty(mqtt)) {
@@ -84,7 +88,7 @@ public class DefaultMqttInitService implements MqttInitService {
             }
         });
         // 订阅主题
-        utils.subscribe(client);
+        utils.subscribe(client,clazzList);
         //保存client
         utils.putClient(tenantCode,client);
     }

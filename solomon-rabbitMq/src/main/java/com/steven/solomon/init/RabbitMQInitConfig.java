@@ -24,7 +24,6 @@ import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -39,7 +38,7 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 @EnableConfigurationProperties(value = {RabbitProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
-public class RabbitMQInitConfig implements CommandLineRunner {
+public class RabbitMQInitConfig extends AbstractMessageLineRunner {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
@@ -61,20 +60,10 @@ public class RabbitMQInitConfig implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        //根据RabbitMq注解找出使用这个注解的类并初始化消费队列
-        this.init(new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values()));
-    }
-
-    /**
-     * 初始化MQ
-     *
-     * @param clazzList 消费者集合数组
-     */
-    private void init(List<Object> clazzList) {
+    public void init(List<Object> clazzList) throws Exception {
         // 判断消费者队列是否存在
         if (ValidateUtils.isEmpty(clazzList)) {
-            logger.debug("MessageListenerConfig:没有rabbitMq消费者");
+            logger.debug("AbstractMessageLineRunner:没有rabbitMq消费者");
             return;
         }
 
@@ -95,6 +84,11 @@ public class RabbitMQInitConfig implements CommandLineRunner {
                 }
             }
         }
+    }
+
+    @Override
+    public List<Object> getQueueClazzList() {
+        return new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values());
     }
 
     /**
