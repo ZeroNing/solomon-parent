@@ -44,11 +44,6 @@ public class RedisQueueConfig extends AbstractMessageLineRunner {
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        // 判断消费者队列是否存在
-        if (ValidateUtils.isEmpty(clazzList)) {
-            logger.debug("AbstractMessageLineRunner:没有RedisQueue消费者");
-            return;
-        }
         Map<String, RedisConnectionFactory> tenantFactoryMap = redisTenantContext.getFactoryMap();
         for (Map.Entry<String, RedisConnectionFactory> entry : tenantFactoryMap.entrySet()) {
             RedisConnectionFactory factory = entry.getValue();
@@ -71,5 +66,10 @@ public class RedisQueueConfig extends AbstractMessageLineRunner {
     @Override
     public List<Object> getQueueClazzList() {
         return new ArrayList<>(SpringUtil.getBeansWithAnnotation(RedisQueue.class).values());
+    }
+
+    @Override
+    public String getName() {
+        return "RedisQueue";
     }
 }

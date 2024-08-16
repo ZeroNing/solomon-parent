@@ -61,12 +61,6 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner {
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        // 判断消费者队列是否存在
-        if (ValidateUtils.isEmpty(clazzList)) {
-            logger.debug("AbstractMessageLineRunner:没有rabbitMq消费者");
-            return;
-        }
-
         Map<String, AbstractMQService> abstractMQMap = SpringUtil.getBeansOfType(AbstractMQService.class);
         // 遍历消费者队列进行初始化绑定以及监听
         for (Object abstractConsumer : clazzList) {
@@ -89,6 +83,11 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner {
     @Override
     public List<Object> getQueueClazzList() {
         return new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values());
+    }
+
+    @Override
+    public String getName() {
+        return "Rabbitmq";
     }
 
     /**

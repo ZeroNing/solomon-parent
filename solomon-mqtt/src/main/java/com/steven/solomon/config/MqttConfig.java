@@ -69,4 +69,9 @@ public class MqttConfig extends AbstractMessageLineRunner {
   public List<Object> getQueueClazzList() {
     return new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
   }
+
+  @Override
+  public String getName() {
+    return "MQTT";
+  }
 }
