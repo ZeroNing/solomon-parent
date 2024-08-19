@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: admin          # PostgreSQL 用户名
+      POSTGRES_PASSWORD: admin  # PostgreSQL 用户密码
+      POSTGRES_DB: default        # 默认数据库名
+    ports:
+      - "5432:5432"                  # 映射端口
+    volumes:
+      - ./data:/var/lib/postgresql/data  # 数据持久化

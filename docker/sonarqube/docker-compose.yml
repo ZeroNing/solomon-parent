@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  sonarqube:
+    image: sonarqube:9.9.6-community
+    container_name: sonarqube
+    ports:
+      - "9020:9000"
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://127.0.0.1:5432/sonar #数据库连接
+      - SONAR_JDBC_USERNAME=admin #数据库账号
+      - SONAR_JDBC_PASSWORD=admin #数据库密码
+    volumes:
+      - ./data:/opt/sonarqube/data
+      - ./extensions:/opt/sonarqube/extensions
+      - ./plugins:/opt/sonarqube/lib/bundled-plugins
+      - ./logs:/opt/sonarqube/logs
+      - ./pdf:/opt/sonarqube/pdf-files
