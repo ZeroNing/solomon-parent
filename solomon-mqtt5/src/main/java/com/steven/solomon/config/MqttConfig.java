@@ -24,7 +24,7 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(value={TenantMqttProfile.class,})
 @Import(value = {MqttUtils.class})
-public class MqttConfig extends AbstractMessageLineRunner {
+public class MqttConfig extends AbstractMessageLineRunner<Mqtt> {
 
     private final TenantMqttProfile profile;
 
@@ -48,15 +48,5 @@ public class MqttConfig extends AbstractMessageLineRunner {
         for(Map.Entry<String,MqttProfile> entry: tenantProfileMap.entrySet()){
             mqttInitService.initMqttClient(entry.getKey(),entry.getValue(), clazzList);
         }
-    }
-
-    @Override
-    public List<Object> getQueueClazzList() {
-        return new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
-    }
-
-    @Override
-    public String getName() {
-        return "MQTT";
     }
 }

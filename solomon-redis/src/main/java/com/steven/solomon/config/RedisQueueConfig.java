@@ -31,7 +31,7 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class, TenantRedisProperties.class, CacheProfile.class, CacheProperties.class})
 @Import(value = {RedisTenantContext.class, JacksonConfig.class})
-public class RedisQueueConfig extends AbstractMessageLineRunner {
+public class RedisQueueConfig extends AbstractMessageLineRunner<RedisQueue> {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
@@ -61,15 +61,5 @@ public class RedisQueueConfig extends AbstractMessageLineRunner {
                 container.start();
             }
         }
-    }
-
-    @Override
-    public List<Object> getQueueClazzList() {
-        return new ArrayList<>(SpringUtil.getBeansWithAnnotation(RedisQueue.class).values());
-    }
-
-    @Override
-    public String getName() {
-        return "RedisQueue";
     }
 }

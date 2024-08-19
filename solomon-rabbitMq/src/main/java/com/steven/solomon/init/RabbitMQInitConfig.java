@@ -38,7 +38,7 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 @EnableConfigurationProperties(value = {RabbitProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
-public class RabbitMQInitConfig extends AbstractMessageLineRunner {
+public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
@@ -78,16 +78,6 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner {
                 }
             }
         }
-    }
-
-    @Override
-    public List<Object> getQueueClazzList() {
-        return new ArrayList<>(SpringUtil.getBeansWithAnnotation(RabbitMq.class).values());
-    }
-
-    @Override
-    public String getName() {
-        return "Rabbitmq";
     }
 
     /**
