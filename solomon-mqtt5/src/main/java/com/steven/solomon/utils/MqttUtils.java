@@ -107,7 +107,7 @@ public class MqttUtils implements SendService<MqttModel> {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
         Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-        if (ValidateUtils.isEmpty(mqtt)) {
+        if (ValidateUtils.isEmpty(mqtt) || ValidateUtils.isEmpty(mqtt.topics())) {
           continue;
         }
         for (String topic : mqtt.topics()) {
