@@ -13,10 +13,7 @@ public abstract class AbstractExceptionHandler {
 
   /**
    * 根据不同的异常返回不同的异常信息
-   *
-   * @param ex
    * @return 异常对象
-   * @throws IOException
    */
   public abstract BaseExceptionVO handleBaseException(Throwable ex);
 }

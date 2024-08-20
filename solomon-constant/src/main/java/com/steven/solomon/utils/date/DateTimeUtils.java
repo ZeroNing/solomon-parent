@@ -236,8 +236,7 @@ public class DateTimeUtils {
 		Instant instant = date.toInstant();
 		// A time-zone ID, such as {@code Europe/Paris}.(时区)
 		ZoneId zoneId = ZoneId.systemDefault();
-		LocalDateTime localDateTime = instant.atZone(zoneId).toLocalDateTime();
-		return localDateTime;
+		return instant.atZone(zoneId).toLocalDateTime();
 	}
 
 	/**
@@ -248,8 +247,7 @@ public class DateTimeUtils {
 		Instant instant = date.toInstant();
 		// A time-zone ID, such as {@code Europe/Paris}.(时区)
 		ZoneId zoneId = ZoneId.systemDefault();
-		LocalDate localDate = instant.atZone(zoneId).toLocalDate();
-		return localDate;
+		return instant.atZone(zoneId).toLocalDate();
 	}
 
 	public static Date localDate2Date(LocalDate localDate) {
@@ -268,8 +266,7 @@ public class DateTimeUtils {
 		Instant instant = date.toInstant();
 		// A time-zone ID, such as {@code Europe/Paris}.(时区)
 		ZoneId zoneId = ZoneId.systemDefault();
-		LocalTime localTime = instant.atZone(zoneId).toLocalTime();
-		return localTime;
+		return instant.atZone(zoneId).toLocalTime();
 	}
 
 	/**
@@ -278,10 +275,8 @@ public class DateTimeUtils {
 	public static Date localDateTime2Date(LocalDateTime localDateTime) {
 		ZoneId zoneId = ZoneId.systemDefault();
 		// Combines this date-time with a time-zone to create a
-		ZonedDateTime zdt = localDateTime.atZone(zoneId);
-															// ZonedDateTime.
-		Date date = Date.from(zdt.toInstant());
-		return date;
+		ZonedDateTime zdt = localDateTime.atZone(zoneId);// ZonedDateTime.
+		return Date.from(zdt.toInstant());
 	}
 
 	/**
@@ -293,8 +288,7 @@ public class DateTimeUtils {
 	public static Duration remainDuration(Long minMillisecond, Long maxMillisecond) {
 		LocalDateTime  minLocal = date2LocalDateTime(new Date(minMillisecond));
 		LocalDateTime  maxLocal = date2LocalDateTime(new Date(maxMillisecond));
-		Duration duration = Duration.between(minLocal, maxLocal);
-		return duration;
+		return Duration.between(minLocal, maxLocal);
 	}
 
 	/**
@@ -397,8 +391,7 @@ public class DateTimeUtils {
 	 * 获取当月第一天
 	 */
 	public static LocalDate getNowMonthFirstDayTime(){
-		LocalDateTime firstday = LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth());
-		return firstday.toLocalDate();
+		return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).toLocalDate();
 	}
 
 	/**
