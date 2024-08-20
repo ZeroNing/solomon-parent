@@ -267,7 +267,6 @@ DelFlagEnum.DELETE=删除
 ```java
 /**
  * rabbitmq标注注解
- * @author huangweihua
  */
 @Target(value = {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
