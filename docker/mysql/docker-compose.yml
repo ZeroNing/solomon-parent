@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root #超级管理员密码
+      MYSQL_DATABASE: admin     #初始数据库名称
+      MYSQL_USER: admin        #数据库用户账号
+      MYSQL_PASSWORD: admin    #数据库用户账号
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data:/var/lib/mysql
