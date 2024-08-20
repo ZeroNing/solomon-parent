@@ -670,3 +670,6 @@ public class Entity implements Serializable {
     private Date updated;
 }
 ```
+
+## Docker Compose安装组件文件
+详细的配置都在docker文件夹内，内涵Emqx的Mqtt组件、Minio对象存储组件、Mongodb组件、Mysql数据库、Portainer管理Docker可视化界面组件、PostgresSql数据库、RabbitMq消息队列组件、Redis缓存组件、RocketMq消息队列组件、sonarqube代码检查组件
