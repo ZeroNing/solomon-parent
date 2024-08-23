@@ -23,6 +23,7 @@
     <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
       <module>solomon-redis</module>
+      <module>solomon-sql</module>
   </modules>
 
   <properties>
@@ -84,6 +85,8 @@
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
     <dingtalk.version>2.0.0</dingtalk.version>
+    <hikaricp.version>5.1.0</hikaricp.version>
+    <mysql.version>8.0.28</mysql.version>
   </properties>
 
   <parent>
@@ -95,6 +98,18 @@
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>${hikaricp.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>com.aliyun</groupId>

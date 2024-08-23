@@ -1027,8 +1027,8 @@ public class Lambda {
      * @return sku_custom_field_value_03
      */
     public static String toSnakeCase(String input,String regex) {
-        if (input == null) {
-            return null;
+        if (ValidateUtils.isEmpty(input)) {
+            return input;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -1054,8 +1054,8 @@ public class Lambda {
      * @return skuCustomFieldValue03
      */
     public static String toCamelCase(String input,String regex) {
-        if (input == null) {
-            return null;
+        if (ValidateUtils.isEmpty(input)) {
+            return input;
         }
 
         String[] parts = input.split(regex);
