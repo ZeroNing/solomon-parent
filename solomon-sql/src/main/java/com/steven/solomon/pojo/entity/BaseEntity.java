@@ -1,6 +1,7 @@
 package com.steven.solomon.pojo.entity;
 
 
+import com.steven.solomon.annotation.Column;
 import com.steven.solomon.annotation.JsonEnum;
 import com.steven.solomon.pojo.enums.DelFlagEnum;
 import com.steven.solomon.utils.date.DateTimeUtils;
@@ -25,36 +26,43 @@ public class BaseEntity<I> implements Serializable {
   /**
    * 主键id
    */
+  @Column
   private              I        id;
 
   /**
    * 创建人id
    */
+  @Column
   private              I        createId;
 
   /**
    * 创建时间
    */
+  @Column
   private              LocalDateTime createDate;
 
   /**
    * 更新人id
    */
+  @Column
   private              I        updateId;
 
   /**
    * 更新时间
    */
+  @Column
   private              LocalDateTime updateDate;
   /**
    * 删除标记
    */
   @JsonEnum(enumClass = DelFlagEnum.class)
+  @Column
   private              String        delFlag;
 
   /**
    * 备注
    */
+  @Column
   private              String        remark;
 
   public BaseEntity() {

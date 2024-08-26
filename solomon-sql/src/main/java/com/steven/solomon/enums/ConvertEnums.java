@@ -4,6 +4,10 @@ import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.convert.impl.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 public enum ConvertEnums {
 
@@ -16,7 +20,11 @@ public enum ConvertEnums {
     CHAR_CONVERT(Character.class, new CharColumnConvert()),
     BYTE_CONVERT(Byte.class, new ByteColumnConvert()),
     BOOLEAN_CONVERT(Boolean.class, new BooleanColumnConvert()),
-    BIGDECIMAL_CONVERT(BigDecimal.class, new BigDecimalColumnConvert()),
+    BIG_DECIMAL_CONVERT(BigDecimal.class, new BigDecimalColumnConvert()),
+    DATE_CONVERT(Date.class, new DateColumnConvert()),
+    BIG_INTEGER_CONVERT(BigInteger.class, new BigIntegerColumnConvert()),
+    LOCALDATE_CONVERT(LocalDate.class, new LocalDateColumnConvert()),
+    LOCALDATE_TIME_CONVERT(LocalDateTime.class, new LocalDateTimeColumnConvert()),
     ;
 
     private Class clazz;
