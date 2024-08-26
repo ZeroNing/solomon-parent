@@ -1,6 +1,8 @@
 package com.steven.solomon.execute;
 
 import com.steven.solomon.convert.ColumnConvert;
+import com.steven.solomon.enums.DbTypeEnums;
+import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.temple.SqlTemple;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -23,10 +25,13 @@ public abstract class AbstractExecuteSql {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
-    protected AbstractExecuteSql(SqlTemple temple) {
+    private final SqlProfile profile;
+
+    protected AbstractExecuteSql(SqlTemple temple, SqlProfile profile) {
         this.temple = temple;
         this.datasource = temple.getDataSource();
         this.columnConvertMap = temple.getConvertMap();
+        this.profile = profile;
     }
 
     public Object execute(String sql,Class<?> clazz,boolean isList) throws Exception {
@@ -59,4 +64,11 @@ public abstract class AbstractExecuteSql {
      * @param columnCount 字段数
      */
     protected abstract List<Object> execute(Class<?> clazz,ResultSetMetaData metaData,ResultSet resultSet, int columnCount) throws Exception;
+
+    /**
+     * 获取数据库类型
+     */
+    protected DbTypeEnums getDbType(){
+        return profile.getDyType();
+    }
 }

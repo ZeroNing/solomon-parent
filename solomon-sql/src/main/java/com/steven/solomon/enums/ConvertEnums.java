@@ -23,24 +23,24 @@ public enum ConvertEnums {
     BIG_DECIMAL_CONVERT(BigDecimal.class, new BigDecimalColumnConvert()),
     DATE_CONVERT(Date.class, new DateColumnConvert()),
     BIG_INTEGER_CONVERT(BigInteger.class, new BigIntegerColumnConvert()),
-    LOCALDATE_CONVERT(LocalDate.class, new LocalDateColumnConvert()),
-    LOCALDATE_TIME_CONVERT(LocalDateTime.class, new LocalDateTimeColumnConvert()),
+    LOCAL_DATE_CONVERT(LocalDate.class, new LocalDateColumnConvert()),
+    LOCAL_DATE_TIME_CONVERT(LocalDateTime.class, new LocalDateTimeColumnConvert()),
     ;
 
-    private Class clazz;
+    private final Class<?> clazz;
 
-    private ColumnConvert convert;
+    private final ColumnConvert<?> convert;
 
-    ConvertEnums(Class clazz, ColumnConvert convert) {
+    ConvertEnums(Class<?> clazz, ColumnConvert<?> convert) {
         this.clazz = clazz;
         this.convert = convert;
     }
 
-    public Class getClazz() {
+    public Class<?> getClazz() {
         return clazz;
     }
 
-    public ColumnConvert getConvert() {
+    public ColumnConvert<?> getConvert() {
         return convert;
     }
 }

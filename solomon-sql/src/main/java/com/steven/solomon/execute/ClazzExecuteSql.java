@@ -1,6 +1,7 @@
 package com.steven.solomon.execute;
 
 import com.steven.solomon.annotation.Column;
+import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.temple.SqlTemple;
@@ -19,8 +20,8 @@ import java.util.Map;
  */
 public class ClazzExecuteSql extends AbstractExecuteSql {
 
-    public ClazzExecuteSql(SqlTemple temple) {
-        super(temple);
+    public ClazzExecuteSql(SqlTemple temple, SqlProfile profile) {
+        super(temple, profile);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.profile.SqlProfile;
+import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.temple.SqlTemple;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 public class SqlConfig {
 
     @Bean
-    public HikariDataSource hikariDataSource(SqlProfile sqlProfile) {
+    public DataSource hikariDataSource(SqlProfile sqlProfile) {
         SqlProfile.HikariData hikariData = sqlProfile.getHikariData();
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(hikariData.getUrl());
@@ -25,7 +25,7 @@ public class SqlConfig {
         config.setConnectionInitSql(hikariData.getConnectionInitSql());
         config.setValidationTimeout(hikariData.getValidationTimeout());
         config.setIdleTimeout(hikariData.getIdleTimeout());
-        config.setLeakDetectionThreshold(hikariData.getLeakDetectionThreshold())    ;
+        config.setLeakDetectionThreshold(hikariData.getLeakDetectionThreshold());
         config.setMaxLifetime(hikariData.getMaxLifetime());
         config.setMaximumPoolSize(hikariData.getMaxPoolSize());
         config.setMinimumIdle(hikariData.getMinIdle());

@@ -1,5 +1,6 @@
-package com.steven.solomon.profile;
+package com.steven.solomon.config.profile;
 
+import com.steven.solomon.enums.DbTypeEnums;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.io.Serializable;
@@ -8,6 +9,16 @@ import java.io.Serializable;
 public class SqlProfile {
 
     private HikariData hikariData;
+
+    private DbTypeEnums dyType;
+
+    public DbTypeEnums getDyType() {
+        return dyType;
+    }
+
+    public void setDyType(DbTypeEnums dyType) {
+        this.dyType = dyType;
+    }
 
     public HikariData getHikariData() {
         return hikariData;

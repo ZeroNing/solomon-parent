@@ -1,5 +1,6 @@
 package com.steven.solomon.execute;
 
+import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;
 import com.steven.solomon.verification.ValidateUtils;
@@ -14,11 +15,10 @@ import java.util.Map;
 /**
  * 八大基础类型数据库转换结果集
  */
-
 public class BasicTypeExecuteSql extends AbstractExecuteSql {
 
-    protected BasicTypeExecuteSql(SqlTemple temple) {
-        super(temple);
+    protected BasicTypeExecuteSql(SqlTemple temple, SqlProfile profile) {
+        super(temple, profile);
     }
 
     @Override

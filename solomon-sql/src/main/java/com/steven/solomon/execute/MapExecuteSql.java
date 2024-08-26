@@ -1,5 +1,6 @@
 package com.steven.solomon.execute;
 
+import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;
 import com.steven.solomon.verification.ValidateUtils;
@@ -16,8 +17,8 @@ import java.util.Map;
  */
 public class MapExecuteSql extends AbstractExecuteSql {
 
-    protected MapExecuteSql(SqlTemple temple) {
-        super(temple);
+    protected MapExecuteSql(SqlTemple temple, SqlProfile profile) {
+        super(temple, profile);
     }
 
     @Override
