@@ -5,6 +5,7 @@ import com.steven.solomon.convert.impl.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -25,6 +26,7 @@ public enum ConvertEnums {
     BIG_INTEGER_CONVERT(BigInteger.class, new BigIntegerColumnConvert()),
     LOCAL_DATE_CONVERT(LocalDate.class, new LocalDateColumnConvert()),
     LOCAL_DATE_TIME_CONVERT(LocalDateTime.class, new LocalDateTimeColumnConvert()),
+    TIMESTAMP_CONVERT(Timestamp.class, new LocalDateTimeColumnConvert()),
     ;
 
     private final Class<?> clazz;

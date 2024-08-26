@@ -20,8 +20,8 @@ import java.util.Map;
  */
 public class ClazzExecuteSql extends AbstractExecuteSql {
 
-    public ClazzExecuteSql(SqlTemple temple, SqlProfile profile) {
-        super(temple, profile);
+    public ClazzExecuteSql(SqlTemple temple) {
+        super(temple);
     }
 
     @Override

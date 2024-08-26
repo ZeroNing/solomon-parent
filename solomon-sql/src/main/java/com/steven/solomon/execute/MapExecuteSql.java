@@ -17,8 +17,8 @@ import java.util.Map;
  */
 public class MapExecuteSql extends AbstractExecuteSql {
 
-    protected MapExecuteSql(SqlTemple temple, SqlProfile profile) {
-        super(temple, profile);
+    protected MapExecuteSql(SqlTemple temple) {
+        super(temple);
     }
 
     @Override

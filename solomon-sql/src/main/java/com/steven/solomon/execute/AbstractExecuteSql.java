@@ -25,13 +25,10 @@ public abstract class AbstractExecuteSql {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
-    private final SqlProfile profile;
-
-    protected AbstractExecuteSql(SqlTemple temple, SqlProfile profile) {
+    protected AbstractExecuteSql(SqlTemple temple) {
         this.temple = temple;
         this.datasource = temple.getDataSource();
         this.columnConvertMap = temple.getConvertMap();
-        this.profile = profile;
     }
 
     public Object execute(String sql,Class<?> clazz,boolean isList) throws Exception {
@@ -65,10 +62,4 @@ public abstract class AbstractExecuteSql {
      */
     protected abstract List<Object> execute(Class<?> clazz,ResultSetMetaData metaData,ResultSet resultSet, int columnCount) throws Exception;
 
-    /**
-     * 获取数据库类型
-     */
-    protected DbTypeEnums getDbType(){
-        return profile.getDyType();
-    }
 }
