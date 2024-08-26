@@ -5,41 +5,64 @@ import com.steven.solomon.convert.impl.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public enum ConvertEnums {
 
-    STRING_CONVERT(String.class, new StringColumnConvert()),
-    SHORT_CONVERT(Short.class, new ShortColumnConvert()),
-    LONG_CONVERT(Long.class, new LongColumnConvert()),
-    INTEGER_CONVERT(Integer.class, new IntegerColumnConvert()),
-    FLOAT_CONVERT(Float.class, new FloatColumnConvert()),
-    DOUBLE_CONVERT(Double.class, new DoubleColumnConvert()),
-    CHAR_CONVERT(Character.class, new CharColumnConvert()),
-    BYTE_CONVERT(Byte.class, new ByteColumnConvert()),
-    BOOLEAN_CONVERT(Boolean.class, new BooleanColumnConvert()),
-    BIG_DECIMAL_CONVERT(BigDecimal.class, new BigDecimalColumnConvert()),
-    DATE_CONVERT(Date.class, new DateColumnConvert()),
-    BIG_INTEGER_CONVERT(BigInteger.class, new BigIntegerColumnConvert()),
-    LOCAL_DATE_CONVERT(LocalDate.class, new LocalDateColumnConvert()),
-    LOCAL_DATE_TIME_CONVERT(LocalDateTime.class, new LocalDateTimeColumnConvert()),
-    TIMESTAMP_CONVERT(Timestamp.class, new LocalDateTimeColumnConvert()),
+    BIT_CONVERT(Types.BIT,new BooleanColumnConvert()),
+    BOOLEAN_CONVERT(Types.BOOLEAN, new BooleanColumnConvert()),
+
+    TINYINT_CONVERT(Types.TINYINT,new ByteColumnConvert()),
+
+    FLOAT_CONVERT(Types.FLOAT,new FloatColumnConvert()),
+    REAL_CONVERT(Types.REAL,new FloatColumnConvert()),
+
+    SMALLINT_CONVERT(Types.SMALLINT,new ShortColumnConvert()),
+
+    INTEGER_CONVERT(Types.INTEGER,new IntegerColumnConvert()),
+
+    BIGINT_CONVERT(Types.BIGINT,new LongColumnConvert()),
+
+    DOUBLE_CONVERT(Types.DOUBLE,new DoubleColumnConvert()),
+
+    NUMERIC_CONVERT(Types.NUMERIC,new BigDecimalColumnConvert()),
+    DECIMAL_CONVERT(Types.DECIMAL,new BigDecimalColumnConvert()),
+
+    DATE_CONVERT(Types.DATE,new DateColumnConvert()),
+
+    TIMESTAMP_CONVERT(Types.TIMESTAMP, new LocalDateTimeColumnConvert()),
+
+    BINARY_CONVERT(Types.BINARY, new BytesColumnConvert()),
+    VARBINARY_CONVERT(Types.VARBINARY, new BytesColumnConvert()),
+    LONG_VARBINARY_CONVERT(Types.LONGVARBINARY, new BytesColumnConvert()),
+
+    CHAR_CONVERT(Types.CHAR,new StringColumnConvert()),
+    VARCHAR_CONVERT(Types.VARCHAR,new StringColumnConvert()),
+    LONG_VARCHAR_CONVERT(Types.LONGVARCHAR,new StringColumnConvert()),
+    BLOB_CONVERT(Types.BLOB, new StringColumnConvert()),
+    CLOB_CONVERT(Types.CLOB, new StringColumnConvert()),
+    NCHAR_CONVERT(Types.NCHAR, new StringColumnConvert()),
+    NVARCHAR_CONVERT(Types.NVARCHAR, new StringColumnConvert()),
+    LONG_NVARCHAR_CONVERT(Types.LONGNVARCHAR, new StringColumnConvert()),
     ;
 
-    private final Class<?> clazz;
+    private final Integer columnType;
 
     private final ColumnConvert<?> convert;
 
-    ConvertEnums(Class<?> clazz, ColumnConvert<?> convert) {
-        this.clazz = clazz;
+    ConvertEnums(Integer columnType, ColumnConvert<?> convert) {
+        this.columnType = columnType;
         this.convert = convert;
     }
 
-    public Class<?> getClazz() {
-        return clazz;
+    public Integer getColumnType() {
+        return columnType;
     }
 
     public ColumnConvert<?> getConvert() {

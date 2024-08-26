@@ -21,7 +21,7 @@ public abstract class AbstractExecuteSql {
 
     protected final DataSource datasource;
 
-    protected final Map<String,ColumnConvert<?>> columnConvertMap;
+    protected final Map<Integer,ColumnConvert<?>> columnConvertMap;
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 

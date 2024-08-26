@@ -31,10 +31,10 @@ public class MapExecuteSql extends AbstractExecuteSql {
                 String columnLabelName = metaData.getColumnLabel(i);
                 //获取字段的key
                 String objectKey = ValidateUtils.isEmpty(columnLabelName) ? metaData.getColumnName(i) : columnLabelName;
-                //获取字段ClassName
-                String columnClassName = metaData.getColumnClassName(i);
+                //获取数据库字段
+                Integer columnType = metaData.getColumnType(i);
                 //获取转换器
-                ColumnConvert<?> convert = temple.getConvert(columnClassName);
+                ColumnConvert<?> convert = temple.getConvert(columnType);
                 //获取数据库值
                 Object value = resultSet.getObject(objectKey);
                 //设置值

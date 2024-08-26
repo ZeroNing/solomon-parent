@@ -17,13 +17,13 @@ public class SqlTemple {
     /**
      * 转换器
      */
-    private Map<String,ColumnConvert<?>> convertMap;
+    private Map<Integer,ColumnConvert<?>> convertMap;
 
     public SqlTemple() {
         super();
         this.convertMap = new HashMap<>();
         for(ConvertEnums convertEnum : ConvertEnums.values()){
-            convertMap.put(convertEnum.getClazz().getName(),convertEnum.getConvert());
+            convertMap.put(convertEnum.getColumnType(),convertEnum.getConvert());
         }
     }
 
@@ -40,15 +40,15 @@ public class SqlTemple {
         this.dataSource = dataSource;
     }
 
-    public void setConvertMap(Class<?> clazz,ColumnConvert<?> columnConvert) {
-        convertMap.put(clazz.getName(),columnConvert);
+    public void setConvertMap(Integer columnType,ColumnConvert<?> columnConvert) {
+        convertMap.put(columnType,columnConvert);
     }
 
-    public Map<String, ColumnConvert<?>> getConvertMap() {
+    public Map<Integer, ColumnConvert<?>> getConvertMap() {
         return convertMap;
     }
 
-    public ColumnConvert getConvert(String clazzName) {
-        return convertMap.get(clazzName);
+    public ColumnConvert<?> getConvert(Integer clazzType) {
+        return convertMap.get(clazzType);
     }
 }
