@@ -33,6 +33,11 @@ public class SqlConfig {
         config.setConnectionInitSql(hikariData.getConnectionInitSql());
         config.setConnectionTestQuery(hikariData.getConnectionTestQuery());
         config.setKeepaliveTime(hikariData.getKeepaliveTime());
+        config.setAutoCommit(hikariData.getIsAutoCommit());
+        config.setReadOnly(hikariData.getIsReadOnly());
+        config.setIsolateInternalQueries(hikariData.getIsIsolateInternalQueries());
+        config.setRegisterMbeans(hikariData.getIsRegisterMbeans());
+        config.setAllowPoolSuspension(hikariData.getIsAllowPoolSuspension());
         return new HikariDataSource(config);
     }
 

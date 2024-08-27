@@ -75,6 +75,76 @@ public class SqlProfile {
         //保持连接活跃的时间间隔（毫秒）
         private long keepaliveTime = 0;
 
+        /**
+         * 连接是否应开启自动提交模式。
+         * 默认值为 true，表示每个数据库操作都会自动提交。
+         */
+        private boolean isAutoCommit = true;
+
+        /**
+         * 连接是否应处于只读模式。
+         * 默认值为 false，表示连接可以进行写操作。
+         */
+        private boolean isReadOnly = false;
+
+        /**
+         * 连接池是否应隔离内部查询与用户提供的查询。
+         * 默认值为 false，表示不隔离内部查询。
+         */
+        private boolean isIsolateInternalQueries = false;
+
+        /**
+         * 连接池是否应注册JMX MBeans，以通过JMX监控连接池的性能和状态。
+         * 默认值为 false，表示不注册MBeans。
+         */
+        private boolean isRegisterMbeans = false;
+
+        /**
+         * 连接池是否允许挂起。
+         * 默认值为 false，表示不允许挂起。如果需要在运行时暂停连接池，可以设置为 true。
+         */
+        private boolean isAllowPoolSuspension = false;
+
+        public boolean getIsAutoCommit() {
+            return isAutoCommit;
+        }
+
+        public void setAutoCommit(boolean autoCommit) {
+            isAutoCommit = autoCommit;
+        }
+
+        public boolean getIsReadOnly() {
+            return isReadOnly;
+        }
+
+        public void setReadOnly(boolean readOnly) {
+            isReadOnly = readOnly;
+        }
+
+        public boolean getIsIsolateInternalQueries() {
+            return isIsolateInternalQueries;
+        }
+
+        public void setIsolateInternalQueries(boolean isolateInternalQueries) {
+            isIsolateInternalQueries = isolateInternalQueries;
+        }
+
+        public boolean getIsRegisterMbeans() {
+            return isRegisterMbeans;
+        }
+
+        public void setRegisterMbeans(boolean registerMbeans) {
+            isRegisterMbeans = registerMbeans;
+        }
+
+        public boolean getIsAllowPoolSuspension() {
+            return isAllowPoolSuspension;
+        }
+
+        public void setAllowPoolSuspension(boolean allowPoolSuspension) {
+            isAllowPoolSuspension = allowPoolSuspension;
+        }
+
         public long getConnectionTimeout() {
             return connectionTimeout;
         }

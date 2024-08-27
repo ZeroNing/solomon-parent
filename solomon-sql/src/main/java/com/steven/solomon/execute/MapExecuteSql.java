@@ -22,7 +22,7 @@ public class MapExecuteSql extends AbstractExecuteSql {
     }
 
     @Override
-    protected List<Object> execute(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
+    protected List<Object> executeQuery(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
         List<Object> list = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         while (resultSet.next()) {

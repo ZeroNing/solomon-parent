@@ -1,6 +1,5 @@
 package com.steven.solomon.execute;
 
-import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;
 import com.steven.solomon.verification.ValidateUtils;
@@ -8,9 +7,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 八大基础类型数据库转换结果集
@@ -22,7 +19,7 @@ public class BasicTypeExecuteSql extends AbstractExecuteSql {
     }
 
     @Override
-    protected List<Object> execute(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
+    protected List<Object> executeQuery(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
         List<Object> list = new ArrayList<>();
         while (resultSet.next()) {
             for(int i = 1; i <= columnCount; i++){

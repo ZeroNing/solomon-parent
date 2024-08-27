@@ -25,7 +25,7 @@ public class ClazzExecuteSql extends AbstractExecuteSql {
     }
 
     @Override
-    protected List<Object> execute(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
+    protected List<Object> executeQuery(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
         List<Object> list = new ArrayList<>();
         Constructor<?> constructor = clazz.getConstructor();
         Map<String,Field> fieldMap = new HashMap<>();
@@ -53,7 +53,7 @@ public class ClazzExecuteSql extends AbstractExecuteSql {
                 //获取Class内的字段
                 Field field = fieldMap.get(objectKey);
                 if(ValidateUtils.isEmpty(field)){
-                    logger.info("{}在{}的Class对象中不存在",objectKey,clazz.getName());
+                    logger.info("{}在{}的Class对象中不存在",objectKey,clazz.getSimpleName());
                     continue;
                 }
                 field.setAccessible(true);
