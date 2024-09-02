@@ -66,16 +66,18 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
             rabbitMq = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RabbitMq.class);
-            if (ValidateUtils.isNotEmpty(rabbitMq)) {
-                String[] queues = rabbitMq.queues();
-                for (String queueName : queues) {
-                    // 初始化队列绑定
-                    Queue queue = initBinding(abstractMQMap, queueName, true, false);
-                    // 启动监听器并保存已启动的MQ
-                    allQueueContainerMap.put(queue.getName(), this.startContainer(abstractConsumer, queue));
-                    // 初始化死信队列
-                    this.initDlx(queue, abstractMQMap);
-                }
+            if(ValidateUtils.isEmpty(rabbitMq)){
+                logger.error("{}没有RabbitMq注解,不进行初始化",abstractConsumer.getClass().getSimpleName());
+                continue;
+            }
+            String[] queues = rabbitMq.queues();
+            for (String queueName : queues) {
+                // 初始化队列绑定
+                Queue queue = initBinding(abstractMQMap, queueName, true, false);
+                // 启动监听器并保存已启动的MQ
+                allQueueContainerMap.put(queue.getName(), this.startContainer(abstractConsumer, queue));
+                // 初始化死信队列
+                this.initDlx(queue, abstractMQMap);
             }
         }
     }

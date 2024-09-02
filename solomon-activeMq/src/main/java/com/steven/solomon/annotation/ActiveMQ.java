@@ -6,6 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
+import org.springframework.util.backoff.BackOff;
 
 @Target(value = { ElementType.FIELD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
@@ -50,4 +51,30 @@ public @interface ActiveMQ {
    * 默认使用queue模式，使用topic则需要设置为true
    */
   boolean pubSubDomain() default false;
+
+  /**
+   * 指定订阅是否为共享订阅。共享订阅允许多个消费者共享同一个订阅，负载均衡地接收消息
+   */
+  boolean subscriptionShared() default false;
+
+  /**
+   * 它定义了监听器容器的并发级别，即同时处理消息的消费者线程数量
+   */
+  String concurrency() default "1";
+
+  /**
+   * 设置每个任务处理的最大消息数。可以限制每个线程在一次执行中处理的消息数，防止某个线程长期占用资源
+   */
+  int maxMessagesPerTask() default 10;
+
+  /**
+   * 设置接收消息的超时时间，单位为毫秒 默认:30秒
+   */
+  long receiveTimeout() default 30000L;
+
+  /**
+   * 设置监听器在尝试恢复连接之前的等待时间，单位为毫秒 默认: 5秒
+   */
+  long recoveryInterval() default 5000L;
+
 }
