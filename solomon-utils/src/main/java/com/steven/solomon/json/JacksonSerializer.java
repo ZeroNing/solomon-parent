@@ -20,7 +20,7 @@ public class JacksonSerializer extends JsonSerializer<String> implements Context
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
-    private Class<? extends Enum> enumClass;
+    private Class<? extends Enum<?>> enumClass;
 
     private String prefix;
 
@@ -32,7 +32,7 @@ public class JacksonSerializer extends JsonSerializer<String> implements Context
         super();
     }
 
-    public JacksonSerializer(Class<? extends Enum> enumClass, String prefix, String methodName, String fieldName) {
+    public JacksonSerializer(Class<? extends Enum<?>> enumClass, String prefix, String methodName, String fieldName) {
         this.enumClass = enumClass;
         this.prefix = prefix;
         this.methodName = methodName;
@@ -45,7 +45,7 @@ public class JacksonSerializer extends JsonSerializer<String> implements Context
 
         jsonGenerator.writeString(o);
         try {
-            Enum enums = EnumUtils.codeOf(enumClass, o);
+            Enum<?> enums = EnumUtils.codeOf(enumClass, o);
             if (ValidateUtils.isEmpty(enums)) {
                 logger.debug("EnumSerializer 转换枚举为空,值:{},类名:{}", o, enumClass.getName());
                 return;

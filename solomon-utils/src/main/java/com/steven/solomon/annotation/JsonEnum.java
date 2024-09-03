@@ -21,7 +21,7 @@ import java.lang.annotation.Target;
 @JsonSerialize(using = JacksonSerializer.class)
 public @interface JsonEnum {
 
-    Class<? extends Enum> enumClass();
+    Class<? extends Enum<?>> enumClass();
 
     /**
      * 调用enumClass的Get方法，然后在返回字段后面添加后缀
@@ -35,8 +35,6 @@ public @interface JsonEnum {
 
     /**
      * 是否输出这个结果
-     *
-     * @return
      */
     boolean ignore() default true;
 }

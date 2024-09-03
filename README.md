@@ -262,16 +262,16 @@ DelFlagEnum.DELETE=删除
 
 ## Rabbit队列注册以及消费用例
 
-@Rabbit注解描述：
+@MessageListener注解描述：
 
 ```java
 /**
- * rabbitmq标注注解
+ * MessageListener标注注解
  */
 @Target(value = {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface RabbitMq {
+public @interface MessageListener {
 
     @AliasFor(annotation = Component.class)
     String value() default "";
@@ -356,10 +356,10 @@ public @interface RabbitMq {
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
-2.加上@RabbitMq注解，并填写队列名以及交换器名
+2.加上@MessageListener注解，并填写队列名以及交换器名
 
 ```java
-@RabbitMq(queues = "test1",exchange = "test1")
+@MessageListener(queues = "test1",exchange = "test1")
 public class TestMq extends AbstractConsumer<String> {
 
     @Override
@@ -373,11 +373,11 @@ public class TestMq extends AbstractConsumer<String> {
 }
 ```
 
-3.如果需要重试则加上@RabbitMqRetry注解，配置重试次数
+3.如果需要重试则加上@MessageListenerRetry注解，配置重试次数
 
 ```java
-@RabbitMq(queues = "test1",exchange = "test1")
-@RabbitMqRetry(retryNumber = 5)
+@MessageListener(queues = "test1",exchange = "test1")
+@MessageListenerRetry(retryNumber = 5)
 public class TestMq extends AbstractConsumer<String> {
 
     @Override
@@ -391,11 +391,11 @@ public class TestMq extends AbstractConsumer<String> {
 }
 ```
 
-4.死信队列使用，需要在@RabbitMq注解增加dlxClazz配置
+4.死信队列使用，需要在@MessageListener注解增加dlxClazz配置
 
 ```java
-@RabbitMq(queues = "test1",exchange = "test1",dlxClazz = TestDlxMq.class)
-@RabbitMqRetry(retryNumber = 5)
+@MessageListener(queues = "test1",exchange = "test1",dlxClazz = TestDlxMq.class)
+@MessageListenerRetry(retryNumber = 5)
 public class TestMq extends AbstractConsumer<String> {
 
     @Override
@@ -429,10 +429,10 @@ public class TestDlxMq extends AbstractConsumer<String> {
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
-2.加上@Mqtt注解，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题
+2.加上@MessageListener，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题
 
 ```java
-@Mqtt(topics = "topic",qos = 2)
+@MessageListener(topics = "topic",qos = 2)
 public class Test extends AbstractConsumer<String> {
 
     private Logger logger = LoggerUtils.logger(Test.class);
@@ -489,9 +489,9 @@ spring:
 ## Redis消息队列用例
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
-2.加上@RedisQueue注解，并填写主题名,并设置主题模式
+2.加上@MessageListener注解，并填写主题名,并设置主题模式
 ```java
-@RedisQueue(topic = "test",mode = TopicMode.CHANNEL)
+@MessageListener(topic = "test",mode = TopicMode.CHANNEL)
 public class Test extends AbstractConsumer<String,String> {
 
     @Override

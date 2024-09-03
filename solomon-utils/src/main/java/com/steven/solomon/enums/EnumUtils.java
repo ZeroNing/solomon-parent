@@ -15,7 +15,7 @@ public class EnumUtils {
      * @param object    枚举值
      * @return true 有枚举值 false 没有枚举值
      */
-    public static boolean exist(Class<? extends Enum> enumClass, Object object) {
+    public static boolean exist(Class<? extends Enum<?>> enumClass, Object object) {
         if (ValidateUtils.isEmpty(object)) {
             return false;
         }
@@ -40,7 +40,7 @@ public class EnumUtils {
      * @param value     枚举值
      * @return 返回枚举类
      */
-    public static <E extends Enum<?> & BaseEnum> E codeOf(Class<? extends Enum> enumClass, Object value) {
+    public static <E extends Enum<?> & BaseEnum<?>> E codeOf(Class<? extends Enum<?>> enumClass, Object value) {
         if (ValidateUtils.isEmpty(value)) {
             return null;
         }

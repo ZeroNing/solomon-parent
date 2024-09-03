@@ -17,10 +17,9 @@ public class ClassUtils {
      * @param fieldName                 字段名
      * @param annotationClazz           注解类Class
      * @param annotationNameAndValueMap 注解内值参数名以及对应修改的值
-     * @param <T>
      * @throws Exception
      */
-    public static <T extends Annotation> void updateClassField(Class clazz, String fieldName, Class<T> annotationClazz, Map<String, Object> annotationNameAndValueMap) throws Exception {
+    public static <T extends Annotation> void updateClassField(Class<?> clazz, String fieldName, Class<T> annotationClazz, Map<String, Object> annotationNameAndValueMap) throws Exception {
         updateClassField(clazz.getDeclaredField(fieldName), annotationClazz, annotationNameAndValueMap);
     }
 
@@ -36,8 +35,6 @@ public class ClassUtils {
         memberValues.setAccessible(true);
 
         Map<String, Object> values = (Map<String, Object>) memberValues.get(invocatiOnHandler);
-        for (Map.Entry<String, Object> entry : annotationNameAndValueMap.entrySet()) {
-            values.put(entry.getKey(), entry.getValue());
-        }
+        values.putAll(annotationNameAndValueMap);
     }
 }

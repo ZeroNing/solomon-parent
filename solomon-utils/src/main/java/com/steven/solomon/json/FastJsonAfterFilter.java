@@ -39,9 +39,9 @@ public class FastJsonAfterFilter extends AfterFilter {
                     continue;
                 }
                 Method method = clazz.getMethod("get" + field.getName().substring(0, 1).toUpperCase() + field.getName().substring(1));
-                Class<? extends Enum> enumClass = fastJsonEnum.enumClass();
+                Class<? extends Enum<?>> enumClass = fastJsonEnum.enumClass();
                 String enumValue = (String) method.invoke(o);
-                Enum enums = EnumUtils.codeOf(enumClass, enumValue);
+                Enum<?> enums = EnumUtils.codeOf(enumClass, enumValue);
                 if (ValidateUtils.isEmpty(enums)) {
                     logger.debug("fastJson 转换枚举为空,值:{},类名:{}", enumValue, enumClass.getName());
                     continue;
