@@ -2,7 +2,7 @@ package com.steven.solomon.utils;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
-import com.steven.solomon.annotation.RabbitMq;
+import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MessageQueueDetail;
@@ -35,7 +35,6 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 @Configuration
 public class RabbitUtils implements SendService<RabbitMqModel> {
@@ -205,13 +204,13 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
             logger.debug("没有从{}队列中获取到消息", queueName);
             return;
         }
-        Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(RabbitMq.class);
+        Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(MessageListener.class);
         for (Object obj : annotationMap.values()) {
-            RabbitMq rabbitMq = AnnotationUtils.findAnnotation(obj.getClass(), RabbitMq.class);
-            if(ValidateUtils.isEmpty(rabbitMq)){
+            MessageListener messageListener = AnnotationUtils.findAnnotation(obj.getClass(), MessageListener.class);
+            if(ValidateUtils.isEmpty(messageListener)){
                 continue;
             }
-            List<String> queues = Arrays.asList(rabbitMq.queues());
+            List<String> queues = Arrays.asList(messageListener.queues());
             if (!queues.contains(queueName)) {
                 continue;
             }

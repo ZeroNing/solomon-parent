@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 @Target(value = {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RabbitMqRetry {
+public @interface MessageListenerRetry {
 
     /**
      * 重试次数

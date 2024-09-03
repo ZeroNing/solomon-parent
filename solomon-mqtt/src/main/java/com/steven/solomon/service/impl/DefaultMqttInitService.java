@@ -2,7 +2,7 @@ package com.steven.solomon.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
-import com.steven.solomon.annotation.Mqtt;
+import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.service.MqttInitService;
 import com.steven.solomon.spring.SpringUtil;
@@ -41,14 +41,14 @@ public class DefaultMqttInitService implements MqttInitService {
                 logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
                 if(reconnect){
                     for (Object abstractConsumer : clazzList) {
-                        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-                        if(ValidateUtils.isEmpty(mqtt) || ValidateUtils.isEmpty(mqtt.topics())){
+                        MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+                        if(ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())){
                             continue;
                         }
                         try {
-                            for(String topic : mqtt.topics()){
+                            for(String topic : messageListener.topics()){
                                 logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
-                                mqttClient.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+                                mqttClient.subscribe(topic, messageListener.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
                             }
                         } catch (MqttException e) {
                             logger.error("重连重新订阅主题失败,异常为:",e);
@@ -78,6 +78,6 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
-        this.initMqttClient(tenantCode,mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values()));
+        this.initMqttClient(tenantCode,mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values()));
     }
 }

@@ -1,11 +1,9 @@
 package com.steven.solomon.utils;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.UUID;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.steven.solomon.annotation.Mqtt;
-import com.steven.solomon.consumer.AbstractConsumer;
+import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
@@ -15,18 +13,14 @@ import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import javax.annotation.Resource;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 
 @Configuration
 public class MqttUtils implements SendService<MqttModel> {
@@ -101,7 +95,7 @@ public class MqttUtils implements SendService<MqttModel> {
    * @param client mqtt连接
    */
   public void subscribe(MqttClient client) throws MqttException {
-    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values());
+    List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values());
     this.subscribe(client,clazzList);
   }
 
@@ -112,12 +106,12 @@ public class MqttUtils implements SendService<MqttModel> {
   public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
-        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-        if (ValidateUtils.isEmpty(mqtt) || ValidateUtils.isEmpty(mqtt.topics())) {
+        MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+        if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
           continue;
         }
-        for (String topic : mqtt.topics()) {
-          client.subscribe(topic, mqtt.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+        for (String topic : messageListener.topics()) {
+          client.subscribe(topic, messageListener.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
         }
       }
     }

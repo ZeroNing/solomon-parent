@@ -3,7 +3,7 @@ package com.steven.solomon.utils;
 import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.steven.solomon.annotation.Mqtt;
+import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
@@ -96,7 +96,7 @@ public class MqttUtils implements SendService<MqttModel> {
    * @param client mqtt连接
    */
   public void subscribe(MqttClient client) throws MqttException {
-    subscribe(client,new ArrayList<>(SpringUtil.getBeansWithAnnotation(Mqtt.class).values()));
+    subscribe(client,new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values()));
   }
 
   /**
@@ -106,12 +106,12 @@ public class MqttUtils implements SendService<MqttModel> {
   public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
-        Mqtt mqtt = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), Mqtt.class);
-        if (ValidateUtils.isEmpty(mqtt) || ValidateUtils.isEmpty(mqtt.topics())) {
+        MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+        if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
           continue;
         }
-        for (String topic : mqtt.topics()) {
-          client.subscribe(new MqttSubscription[]{new MqttSubscription(topic,mqtt.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});
+        for (String topic : messageListener.topics()) {
+          client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});
         }
       }
     }

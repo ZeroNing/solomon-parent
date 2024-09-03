@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.FIELD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-public @interface RabbitMq {
+public @interface MessageListener {
 
     @AliasFor(annotation = Component.class)
     String value() default "";

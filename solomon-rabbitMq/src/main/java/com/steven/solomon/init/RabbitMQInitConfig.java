@@ -1,7 +1,7 @@
 package com.steven.solomon.init;
 
-import com.steven.solomon.annotation.RabbitMq;
-import com.steven.solomon.annotation.RabbitMqRetry;
+import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.service.*;
@@ -10,7 +10,6 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -38,11 +37,11 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 @EnableConfigurationProperties(value = {RabbitProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
-public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
+public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListener> {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
-    private RabbitMq rabbitMq;
+    private MessageListener messageListener;
 
     private final RabbitAdmin admin;
 
@@ -65,12 +64,12 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
         // 遍历消费者队列进行初始化绑定以及监听
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
-            rabbitMq = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RabbitMq.class);
-            if(ValidateUtils.isEmpty(rabbitMq)){
+            messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+            if(ValidateUtils.isEmpty(messageListener)){
                 logger.error("{}没有RabbitMq注解,不进行初始化",abstractConsumer.getClass().getSimpleName());
                 continue;
             }
-            String[] queues = rabbitMq.queues();
+            String[] queues = messageListener.queues();
             for (String queueName : queues) {
                 // 初始化队列绑定
                 Queue queue = initBinding(abstractMQMap, queueName, true, false);
@@ -87,7 +86,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
      */
     private void initDlx(Queue queue, Map<String, AbstractMQService> abstractMQMap) {
         // 判断消费队列是否需要死信队列 只要死信队列或者延时队列为true即可判断为开启死信队列
-        Class<?> clazz = rabbitMq.dlxClazz();
+        Class<?> clazz = messageListener.dlxClazz();
 
         String queueName = queue.getName();
         if (void.class.equals(clazz)) {
@@ -128,25 +127,25 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
         // 是否自动声明 队列、交换机、绑定
         container.setAutoDeclare(true);
         // 设置消费者提交方式
-        container.setAcknowledgeMode(rabbitMq.mode());
+        container.setAcknowledgeMode(messageListener.mode());
         //为每个队列添加多个消费者 增加并行度
-        container.setConsumersPerQueue(rabbitMq.consumersPerQueue());
-        container.setPrefetchCount(rabbitMq.prefetchCount());
+        container.setConsumersPerQueue(messageListener.consumersPerQueue());
+        container.setPrefetchCount(messageListener.prefetchCount());
         container.setAmqpAdmin(admin);
-        RabbitMqRetry rabbitMqRetry = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RabbitMqRetry.class);
-        if (ValidateUtils.isNotEmpty(rabbitMqRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
+        MessageListenerRetry messageListenerRetry = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
+        if (ValidateUtils.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
-            container.setAdviceChain(setRabbitRetry(rabbitMqRetry));
+            container.setAdviceChain(setRabbitRetry(messageListenerRetry));
         }
         // 启动对应的适配器
         container.start();
         return container;
     }
 
-    public RetryOperationsInterceptor setRabbitRetry(RabbitMqRetry rabbitMqRetry) {
+    public RetryOperationsInterceptor setRabbitRetry(MessageListenerRetry messageListenerRetry) {
         RetryTemplate retryTemplate = new RetryTemplate();
-        retryTemplate.setBackOffPolicy(backOffPolicyByProperties(rabbitMqRetry));
-        retryTemplate.setRetryPolicy(retryPolicyByProperties(rabbitMqRetry));
+        retryTemplate.setBackOffPolicy(backOffPolicyByProperties(messageListenerRetry));
+        retryTemplate.setRetryPolicy(retryPolicyByProperties(messageListenerRetry));
         return RetryInterceptorBuilder
                 .stateless()
                 .retryOperations(retryTemplate)
@@ -154,28 +153,28 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<RabbitMq> {
                 .build();
     }
 
-    public ExponentialBackOffPolicy backOffPolicyByProperties(RabbitMqRetry rabbitMqRetry) {
+    public ExponentialBackOffPolicy backOffPolicyByProperties(MessageListenerRetry messageListenerRetry) {
         ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
         // 重试间隔
-        backOffPolicy.setInitialInterval(rabbitMqRetry.initialInterval());
+        backOffPolicy.setInitialInterval(messageListenerRetry.initialInterval());
         // 重试最大间隔
-        backOffPolicy.setMaxInterval(rabbitMqRetry.maxInterval());
+        backOffPolicy.setMaxInterval(messageListenerRetry.maxInterval());
         // 重试间隔乘法策略
-        backOffPolicy.setMultiplier(rabbitMqRetry.multiplier());
+        backOffPolicy.setMultiplier(messageListenerRetry.multiplier());
         return backOffPolicy;
     }
 
-    public SimpleRetryPolicy retryPolicyByProperties(RabbitMqRetry rabbitMqRetry) {
+    public SimpleRetryPolicy retryPolicyByProperties(MessageListenerRetry messageListenerRetry) {
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
-        retryPolicy.setMaxAttempts(rabbitMqRetry.retryNumber());
+        retryPolicy.setMaxAttempts(messageListenerRetry.retryNumber());
         return retryPolicy;
     }
 
     private Queue initBinding(Map<String, AbstractMQService> abstractMQMap, String queue, boolean isInitDlxMap,
                               boolean isAddDlxPrefix) {
-        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(rabbitMq) && rabbitMq.isDelayExchange())
+        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
                 ? abstractMQMap.get("delayedMQService") : abstractMQMap
-                .get(rabbitMq.exchangeTypes() + AbstractMQService.SERVICE_NAME);
-        return abstractMQService.initBinding(rabbitMq, queue, admin, isInitDlxMap, isAddDlxPrefix);
+                .get(messageListener.exchangeTypes() + AbstractMQService.SERVICE_NAME);
+        return abstractMQService.initBinding(messageListener, queue, admin, isInitDlxMap, isAddDlxPrefix);
     }
 }

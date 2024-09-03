@@ -18,7 +18,7 @@ public abstract class AbstractMessageLineRunner<T extends Annotation> implements
     @Override
     public void run(String... args) throws Exception {
         ResolvableType resolvableType = ResolvableType.forClass(getClass());
-        String clazzName = resolvableType.getSuperType().getSuperType().getGeneric(0).getType().getTypeName();
+        String clazzName = resolvableType.getSuperType().getGeneric(0).getType().getTypeName();
         Class<T> clazz = (Class<T>) Class.forName(clazzName);
         List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(clazz).values());
         if(ValidateUtils.isEmpty(clazzList)){

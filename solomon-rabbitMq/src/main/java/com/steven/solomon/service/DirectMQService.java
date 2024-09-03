@@ -1,8 +1,7 @@
 package com.steven.solomon.service;
 
-import com.steven.solomon.annotation.RabbitMq;
+import com.steven.solomon.annotation.MessageListener;
 import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,12 +11,12 @@ import org.springframework.stereotype.Service;
 public class DirectMQService extends AbstractMQService {
 
     @Override
-    protected AbstractExchange initExchange(String exchangeName, RabbitMq rabbitMq) {
+    protected AbstractExchange initExchange(String exchangeName, MessageListener messageListener) {
         return new DirectExchange(exchangeName);
     }
 
     @Override
-    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, RabbitMq rabbitMq) {
+    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener) {
         return BindingBuilder.bind(queue).to((DirectExchange) exchange).with(routingKey);
     }
 

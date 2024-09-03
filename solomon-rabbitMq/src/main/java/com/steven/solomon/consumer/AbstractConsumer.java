@@ -3,8 +3,8 @@ package com.steven.solomon.consumer;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;
-import com.steven.solomon.annotation.RabbitMq;
-import com.steven.solomon.annotation.RabbitMqRetry;
+import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
@@ -99,16 +99,16 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
      * 获取重试次数，默认为2
      */
     public int getRetryNumber() {
-        RabbitMqRetry rabbitMqRetry = getClass().getAnnotation(RabbitMqRetry.class);
-        return ValidateUtils.isEmpty(rabbitMqRetry) ? defaultRetryNumber : rabbitMqRetry.retryNumber();
+        MessageListenerRetry messageListenerRetry = getClass().getAnnotation(MessageListenerRetry.class);
+        return ValidateUtils.isEmpty(messageListenerRetry) ? defaultRetryNumber : messageListenerRetry.retryNumber();
     }
 
     /**
      * 获取是否是自动确认
      */
     public boolean isAutoAck() {
-        RabbitMq rabbitMq = getClass().getAnnotation(RabbitMq.class);
-        return ValidateUtils.isNotEmpty(rabbitMq) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), rabbitMq.mode().toString());
+        MessageListener messageListener = getClass().getAnnotation(MessageListener.class);
+        return ValidateUtils.isNotEmpty(messageListener) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), messageListener.mode().toString());
     }
 
     /**

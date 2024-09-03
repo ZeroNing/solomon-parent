@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.annotation.RedisQueue;
+import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.enums.TopicMode;
 import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.json.config.JacksonConfig;
@@ -17,21 +17,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class, TenantRedisProperties.class, CacheProfile.class, CacheProperties.class})
 @Import(value = {RedisTenantContext.class, JacksonConfig.class})
-public class RedisQueueConfig extends AbstractMessageLineRunner<RedisQueue> {
+public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener> {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
@@ -48,15 +46,15 @@ public class RedisQueueConfig extends AbstractMessageLineRunner<RedisQueue> {
         for (Map.Entry<String, RedisConnectionFactory> entry : tenantFactoryMap.entrySet()) {
             RedisConnectionFactory factory = entry.getValue();
             for (Object abstractConsumer : clazzList) {
-                RedisQueue redisQueue = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), RedisQueue.class);
-                if (ValidateUtils.isEmpty(redisQueue) || ValidateUtils.isEmpty(redisQueue.topic())) {
+                MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+                if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topic())) {
                     continue;
                 }
-                String topicName = SpringUtil.getElValue(redisQueue.topic(), ValidateUtils.getElDefaultValue(redisQueue.topic()));
-                Topic topic = ValidateUtils.equalsIgnoreCase(redisQueue.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
+                String topicName = SpringUtil.getElValue(messageListener.topic(), ValidateUtils.getElDefaultValue(messageListener.topic()));
+                Topic topic = ValidateUtils.equalsIgnoreCase(messageListener.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
                 RedisMessageListenerContainer container = new RedisMessageListenerContainer();
                 container.setConnectionFactory(factory);
-                container.addMessageListener((MessageListener) abstractConsumer, topic);
+                container.addMessageListener((org.springframework.data.redis.connection.MessageListener) abstractConsumer, topic);
                 container.afterPropertiesSet();
                 container.start();
             }
