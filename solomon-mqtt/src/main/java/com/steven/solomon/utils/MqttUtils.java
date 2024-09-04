@@ -1,9 +1,11 @@
 package com.steven.solomon.utils;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
@@ -21,9 +23,11 @@ import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.integration.channel.DirectChannel;
+import org.springframework.integration.dsl.IntegrationFlows;
 
 @Configuration
-public class MqttUtils implements SendService<MqttModel> {
+public class MqttUtils implements SendService<MqttModel<?>> {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
@@ -52,7 +56,7 @@ public class MqttUtils implements SendService<MqttModel> {
    *   @param data 消息内容
    */
   @Override
-  public void send(MqttModel data) throws Exception {
+  public void send(MqttModel<?> data) throws Exception {
     // 获取客户端实例
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -67,12 +71,12 @@ public class MqttUtils implements SendService<MqttModel> {
   }
 
   @Override
-  public void sendDelay(MqttModel data, long delay) throws Exception {
+  public void sendDelay(MqttModel<?> data, long delay) throws Exception {
     send(data);
   }
 
   @Override
-  public void sendExpiration(MqttModel data, long expiration) throws Exception {
+  public void sendExpiration(MqttModel<?> data, long expiration) throws Exception {
     send(data);
   }
 
@@ -111,7 +115,8 @@ public class MqttUtils implements SendService<MqttModel> {
           continue;
         }
         for (String topic : messageListener.topics()) {
-          client.subscribe(topic, messageListener.qos(), (IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null));
+          AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+          client.subscribe(topic, messageListener.qos(), consumer);
         }
       }
     }

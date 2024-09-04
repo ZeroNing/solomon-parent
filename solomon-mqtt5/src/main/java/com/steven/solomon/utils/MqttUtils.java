@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
@@ -24,7 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Configuration
-public class MqttUtils implements SendService<MqttModel> {
+public class MqttUtils implements SendService<MqttModel<?>> {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
@@ -53,7 +54,7 @@ public class MqttUtils implements SendService<MqttModel> {
    *   @param data 消息内容
    */
   @Override
-  public void send(MqttModel data) throws Exception {
+  public void send(MqttModel<?> data) throws Exception {
     // 获取客户端实例
     ObjectMapper mapper = new ObjectMapper();
     try {
@@ -68,12 +69,12 @@ public class MqttUtils implements SendService<MqttModel> {
   }
 
   @Override
-  public void sendDelay(MqttModel data, long delay) throws Exception {
+  public void sendDelay(MqttModel<?> data, long delay) throws Exception {
     send(data);
   }
 
   @Override
-  public void sendExpiration(MqttModel data, long expiration) throws Exception {
+  public void sendExpiration(MqttModel<?> data, long expiration) throws Exception {
     send(data);
   }
 
@@ -111,7 +112,8 @@ public class MqttUtils implements SendService<MqttModel> {
           continue;
         }
         for (String topic : messageListener.topics()) {
-          client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});
+          AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+          client.subscribe(topic, messageListener.qos(), consumer);
         }
       }
     }
