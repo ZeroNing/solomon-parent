@@ -11,3 +11,4 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root #账号
       MONGO_INITDB_ROOT_PASSWORD: root #密码
+    restart:  always

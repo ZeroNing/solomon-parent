@@ -4,6 +4,7 @@ services:
   sonarqube:
     image: sonarqube:9.9.6-community
     container_name: sonarqube
+    restart:  always
     ports:
       - "9020:9000"
     environment:

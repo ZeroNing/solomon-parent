@@ -13,3 +13,4 @@ services:
     volumes:
       - ./data:/data
     command: server /data --console-address ":9001"
+    restart:  always
