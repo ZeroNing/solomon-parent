@@ -62,8 +62,6 @@ public class ValidateUtils {
      *
      * @param obj 参数
      * @param def 默认值
-     * @param <T>
-     * @return
      */
     public static <T> T getOrDefault(T obj, T def) {
         return isEmpty(obj) ? def : obj;
@@ -228,9 +226,6 @@ public class ValidateUtils {
 
     /**
      * 判断传入的数字类型的值是否等于0或者是否为空，如果等于0或者等于空都会返回一个true
-     *
-     * @param number
-     * @return
      */
     public static boolean isZero(Object number) {
         boolean flag = false;
@@ -242,9 +237,6 @@ public class ValidateUtils {
 
     /**
      * 判断是否为数字
-     *
-     * @param str
-     * @return
      */
     public static boolean isNumber(String str) {
         return regular(IS_NUMBER_PATTERN, str);
@@ -264,7 +256,7 @@ public class ValidateUtils {
         try {
             bigStr = object.toString();
         } catch (Throwable e) {
-            logger.error("正则校验报错异常,传入的值为:{},异常为:{}", object, e);
+            logger.error("正则校验报错异常,传入的值为:{},异常为:", object, e);
             return false;
         }
         Matcher matcher = pattern.matcher(bigStr);
@@ -282,7 +274,7 @@ public class ValidateUtils {
             return name.substring(0, 1).toLowerCase() + name.substring(1).toLowerCase();
         }
         // 用下划线将原始字符串分割
-        String camels[] = name.split("_");
+        String[] camels = name.split("_");
         for (String camel : camels) {
             // 跳过原始字符串中开头、结尾的下换线或双重下划线
             if (camel.isEmpty()) {
@@ -303,15 +295,9 @@ public class ValidateUtils {
 
     /**
      * 判断是否为空
-     *
-     * @param obj
-     * @return
      */
-    public static final Boolean isEmpty(Object obj) {
-        if (ObjectUtil.isEmpty(obj)) {
-            return true;
-        }
-        return false;
+    public static Boolean isEmpty(Object obj) {
+        return ObjectUtil.isEmpty(obj);
     }
 
     /**
@@ -321,7 +307,7 @@ public class ValidateUtils {
      * @param errorCode 报错异常
      */
     public static <T> T isEmpty(T obj, String errorCode) throws BaseException {
-        return isEmpty(obj, errorCode, (String[]) null);
+        return isEmpty(obj, errorCode, (Object) null);
     }
 
     /**
@@ -356,7 +342,7 @@ public class ValidateUtils {
      * @param errorCode 报错异常
      */
     public static <T> T isNotEmpty(T obj, String errorCode) throws BaseException {
-        return isNotEmpty(obj, errorCode, (String[]) null);
+        return isNotEmpty(obj, errorCode, (Object) null);
     }
 
     /**
@@ -378,7 +364,6 @@ public class ValidateUtils {
      *
      * @param value 枚举名称
      * @param clazz 枚举class
-     * @return
      */
     public static boolean checkEnumValueIsEmpty(String value, Class clazz) {
         Enum<?> enums = Enum.valueOf(clazz, value);
@@ -390,7 +375,6 @@ public class ValidateUtils {
      *
      * @param value 枚举名称
      * @param clazz 枚举class
-     * @return
      */
     public static void checkEnumValueIsEmpty(String value, Class clazz, String errorCode, String[] args) throws BaseException {
         if (checkEnumValueIsEmpty(value, clazz)) {
@@ -409,13 +393,12 @@ public class ValidateUtils {
      *
      * @param value 枚举名称
      * @param clazz 枚举class
-     * @return
      */
     public static boolean checkEnumValueIsNotEmpty(String value, Class clazz) {
         return !checkEnumValueIsEmpty(value, clazz);
     }
 
-    public static void checkEnumValueIsNotEmpty(String value, Class clazz, String errorCode, String[] args) throws BaseException {
+    public static void checkEnumValueIsNotEmpty(String value, Class clazz, String errorCode, Object[] args) throws BaseException {
         if (checkEnumValueIsNotEmpty(value, clazz)) {
             throw new BaseException(errorCode, args);
         }
