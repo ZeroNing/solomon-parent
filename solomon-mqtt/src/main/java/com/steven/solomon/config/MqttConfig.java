@@ -50,7 +50,7 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
   public void init(List<Object> clazzList) throws Exception {
     Map<String,MqttProfile> tenantProfileMap = profile.getTenant();
     if(ValidateUtils.isEmpty(tenantProfileMap)){
-      logger.debug("AbstractMessageLineRunner:没有MQTT配置");
+      logger.error("AbstractMessageLineRunner:没有MQTT配置");
       return;
     }
     Map<String, MqttInitService> abstractMQMap = SpringUtil.getBeansOfType(MqttInitService.class);

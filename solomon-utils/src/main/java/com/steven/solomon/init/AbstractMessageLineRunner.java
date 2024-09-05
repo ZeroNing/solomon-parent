@@ -1,5 +1,7 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -8,6 +10,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.ResolvableType;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +20,13 @@ public abstract class AbstractMessageLineRunner<T extends Annotation> implements
 
     @Override
     public void run(String... args) throws Exception {
-        ResolvableType resolvableType = ResolvableType.forClass(getClass());
-        String clazzName = resolvableType.getSuperType().getGeneric(0).getType().getTypeName();
-        Class<T> clazz = (Class<T>) Class.forName(clazzName);
+        Type type = TypeUtil.toParameterizedType(getClass());
+        Type[] typeArguments = TypeUtil.getTypeArguments(type);
+        Class<T> clazz = ClassUtil.loadClass(typeArguments[0].getTypeName());
+
         List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(clazz).values());
         if(ValidateUtils.isEmpty(clazzList)){
-            logger.debug("AbstractMessageLineRunner:没有{}消费者",clazz.getSimpleName());
+            logger.error("AbstractMessageLineRunner:没有{}消费者",clazz.getSimpleName());
             return;
         }
         this.init(clazzList);

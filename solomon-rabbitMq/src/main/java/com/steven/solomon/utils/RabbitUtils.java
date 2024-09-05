@@ -95,12 +95,12 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      */
     public boolean restartMessageListener(String queueName) {
         if (ValidateUtils.isEmpty(queueName)) {
-            logger.debug("restartMessageListener 重启队列失败,传入队列名为空!");
+            logger.error("restartMessageListener 重启队列失败,传入队列名为空!");
             return false;
         }
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
         if (ValidateUtils.isEmpty(container)) {
-            logger.debug("restartMessageListener 停止队列失败,没有这个监听器");
+            logger.error("restartMessageListener 停止队列失败,没有这个监听器");
             return false;
         }
         Assert.state(!container.isRunning(), String.format("消息队列%s对应的监听容器正在运行！", queueName));
@@ -113,12 +113,12 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      */
     public boolean stopMessageListener(String queueName) {
         if (ValidateUtils.isEmpty(queueName)) {
-            logger.debug("stopMessageListener 停止队列失败,传入队列名为空!");
+            logger.error("stopMessageListener 停止队列失败,传入队列名为空!");
             return false;
         }
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
         if (ValidateUtils.isEmpty(container)) {
-            logger.debug("stopMessageListener 停止队列失败,没有这个监听器");
+            logger.error("stopMessageListener 停止队列失败,没有这个监听器");
             return false;
         }
         Assert.state(container.isRunning(), String.format("消息队列%s对应的监听容器未运行！", queueName));
@@ -201,7 +201,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
         GetResponse response = channel.basicGet(queueName, false);
         if (ValidateUtils.isEmpty(response)) {
-            logger.debug("没有从{}队列中获取到消息", queueName);
+            logger.error("没有从{}队列中获取到消息", queueName);
             return;
         }
         Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(MessageListener.class);
@@ -214,8 +214,8 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
             if (!queues.contains(queueName)) {
                 continue;
             }
-            logger.debug("从{}队列找到消费者类:{}", queueName, obj.getClass().getSimpleName());
-            AbstractConsumer abstractConsumer = (AbstractConsumer) obj;
+            logger.info("从{}队列找到消费者类:{}", queueName, obj.getClass().getSimpleName());
+            AbstractConsumer<?,?> abstractConsumer = (AbstractConsumer<?,?>) obj;
             abstractConsumer.onMessage(new Message(response.getBody(), new MessageProperties()), channel);
         }
     }

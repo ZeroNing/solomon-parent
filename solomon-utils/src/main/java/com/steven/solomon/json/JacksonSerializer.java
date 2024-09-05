@@ -47,17 +47,17 @@ public class JacksonSerializer extends JsonSerializer<String> implements Context
         try {
             Enum<?> enums = EnumUtils.codeOf(enumClass, o);
             if (ValidateUtils.isEmpty(enums)) {
-                logger.debug("EnumSerializer 转换枚举为空,值:{},类名:{}", o, enumClass.getName());
+                logger.error("EnumSerializer 转换枚举为空,值:{},类名:{}", o, enumClass.getName());
                 return;
             }
             String value = (String) enumClass.getMethod(methodName).invoke(enums);
             if (ValidateUtils.isEmpty(fieldName)) {
-                jsonGenerator.writeStringField(new StringBuilder(prefix).append(methodName).toString(), value);
+                jsonGenerator.writeStringField(prefix + methodName, value);
             } else {
                 jsonGenerator.writeStringField(fieldName, value);
             }
         } catch (Throwable e) {
-            logger.error("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:{}", o, enumClass.getName(), methodName, e);
+            logger.error("EnumSerializer 转换失败,值:{},枚举类为:{},调用方法名为:{}报错异常为 e:", o, enumClass.getName(), methodName, e);
             return;
         }
     }

@@ -90,13 +90,13 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
         String queueName = queue.getName();
         if (void.class.equals(clazz)) {
-            logger.debug("MessageListenerConfig:initDlx 队列:{}不需要死信队列", queueName);
+            logger.info("MessageListenerConfig:initDlx 队列:{}不需要死信队列", queueName);
             return;
         }
 
         // 判断设置死信队列的类必须是为AbstractDlxConsumer下的子类
         if (!AbstractConsumer.class.isAssignableFrom(clazz) || AbstractConsumer.class.equals(clazz)) {
-            logger.debug("MessageListenerConfig:队列:{}死信队列设置错误,死信队列类名为:{}", queueName, clazz.getName());
+            logger.info("MessageListenerConfig:队列:{}死信队列设置错误,死信队列类名为:{}", queueName, clazz.getName());
             return;
         }
         // 获取死信队列类
@@ -105,7 +105,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         Queue queues = initBinding(abstractMQMap, queueName, false, true);
         // 启动监听器
         allQueueContainerMap.put(queues.getName(), this.startContainer(abstractConsumer, queues));
-        logger.debug("MessageListenerConfig队列:{}绑定{}死信队列", queue.getName(), queues.getName());
+        logger.info("MessageListenerConfig队列:{}绑定{}死信队列", queue.getName(), queues.getName());
     }
 
     /**

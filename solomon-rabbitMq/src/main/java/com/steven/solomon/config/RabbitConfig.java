@@ -67,7 +67,7 @@ public class RabbitConfig {
     @ConditionalOnMissingBean(RabbitAdmin.class)
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
-        logger.debug("RabbitAdmin启动了。。。");
+        logger.info("RabbitAdmin启动了。。。");
         // 设置启动spring容器时自动加载这个类(这个参数现在默认已经是true，可以不用设置)
         rabbitAdmin.setAutoStartup(true);
         return rabbitAdmin;

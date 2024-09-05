@@ -28,6 +28,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,31 +64,29 @@ public class ExcelUtils {
 		//更新Class注解值
 		StopWatch stopWatch = new StopWatch();
 		stopWatch.start();
-		logger.debug("开始更新Class注解值国际化");
+		logger.info("开始更新Class注解值国际化");
 		updateClassExcelPropertyValue(clazz);
 		stopWatch.stop();
-		logger.debug("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+		logger.info("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 		//开始导出
 		stopWatch = new StopWatch();
 		stopWatch.start();
-		logger.debug("开始导出Excel");
+		logger.info("开始导出Excel");
 		EasyExcel.write(response.getOutputStream(), clazz)
 				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
 				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
 				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
 				.doWrite(data);
 		stopWatch.stop();
-		logger.debug("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+		logger.info("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 	}
 
 	/**
 	 * 导出
-	 * @param response
 	 * @param excelName 文件名需要带上后缀名
 	 * @param sheetName 表名 不填默认为sheet
 	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
 	 * @param data      数据
-	 * @throws Exception
 	 */
 	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data) throws Exception {
 		export(response, excelName, sheetName, clazz, data, null, null);
@@ -107,14 +106,14 @@ public class ExcelUtils {
 			//更新Class注解值
 			StopWatch stopWatch = new StopWatch();
 			stopWatch.start();
-			logger.debug("开始更新Class注解值国际化");
+			logger.info("开始更新Class注解值国际化");
 			updateClassExcelPropertyValue(clazz);
 			stopWatch.stop();
-			logger.debug("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+			logger.info("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 			//开始导出
 			stopWatch = new StopWatch();
 			stopWatch.start();
-			logger.debug("开始导出Excel");
+			logger.info("开始导出Excel");
 			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
@@ -126,7 +125,7 @@ public class ExcelUtils {
 			// 必须要finish才会写入，不finish只会创建empty的文件
 			excelWriter.finish();
 			stopWatch.stop();
-			logger.debug("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+			logger.info("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 			byte[] content = os.toByteArray();
 			//生成文件
 			try(InputStream is = new ByteArrayInputStream(content);){
@@ -142,7 +141,6 @@ public class ExcelUtils {
 	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
 	 * @param data      数据
 	 * @return          文件
-	 * @throws Exception
 	 */
 	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data) throws Exception {
 		return export(excelName, sheetName, clazz, data, null, null);
@@ -168,12 +166,8 @@ public class ExcelUtils {
 		response.setContentType("application/vnd.ms-excel");
 		response.setCharacterEncoding(BaseCode.UTF8);
 		// 这里URLEncoder.encode可以防止中文乱码
-		try {
-			fileName = URLEncoder.encode(fileName, BaseCode.UTF8);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
-		response.setHeader("Content-disposition", "attachment;filename=" + fileName);
+        fileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+        response.setHeader("Content-disposition", "attachment;filename=" + fileName);
 	}
 
 	private static HorizontalCellStyleStrategy formatExcel() {

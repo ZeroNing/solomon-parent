@@ -40,7 +40,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         Throwable throwable = null;
         R result = null;
         try {
-            logger.debug("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
+            logger.info("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
             rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>(){},true);
             // 判断是否重复消费
             if (checkMessageKey(rabbitMqModel)) {

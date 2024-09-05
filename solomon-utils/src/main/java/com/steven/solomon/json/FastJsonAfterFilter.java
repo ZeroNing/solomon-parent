@@ -43,7 +43,7 @@ public class FastJsonAfterFilter extends AfterFilter {
                 String enumValue = (String) method.invoke(o);
                 Enum<?> enums = EnumUtils.codeOf(enumClass, enumValue);
                 if (ValidateUtils.isEmpty(enums)) {
-                    logger.debug("fastJson 转换枚举为空,值:{},类名:{}", enumValue, enumClass.getName());
+                    logger.error("fastJson 转换枚举为空,值:{},类名:{}", enumValue, enumClass.getName());
                     continue;
                 }
                 String methodName = fastJsonEnum.methodName();

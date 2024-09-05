@@ -17,9 +17,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description Spring上下文工具类
- * @Author Sans
- * @CreateTime 2019/6/17 13:40
+ * Spring上下文工具类
  */
 @Configuration
 @Order(1)
@@ -67,7 +65,6 @@ public class SpringUtil implements ApplicationContextAware {
      * 根据注解找到使用注解的类
      *
      * @param annotationType 注解class
-     * @return
      */
     public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
         return context.getBeansWithAnnotation(annotationType);

@@ -26,7 +26,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
         RedisQueueModel<T> model = null;
         R result = null;
         try {
-          logger.debug("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
+          logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
           model = JSONUtil.toBean(body, new TypeReference<RedisQueueModel<T>>(){},true);
           RequestHeaderHolder.setTenantCode(model.getTenantCode());
           result = this.handleMessage(model.getBody(),topic);
