@@ -19,12 +19,14 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class BOSService extends AbstractFileService {
 
-  private BosClient client;
+  private final BosClient client;
 
   private BosClient client() {
     BosClientConfiguration config = new BosClientConfiguration();
     config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
     config.setEndpoint(properties.getEndpoint());
+    config.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
+    config.setSocketTimeoutInMillis(properties.getSocketTimeout());
     return new BosClient(config);
   }
 

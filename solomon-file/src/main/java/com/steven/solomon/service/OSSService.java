@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.model.*;
@@ -25,7 +26,10 @@ public class OSSService extends AbstractFileService {
   }
 
   public OSS client() {
-    return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey());
+    ClientBuilderConfiguration config = new ClientBuilderConfiguration();
+    config.setConnectionTimeout(properties.getConnectionTimeout());
+    config.setSocketTimeout(properties.getSocketTimeout());
+    return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey(),config);
   }
 
   @Override

@@ -1,6 +1,7 @@
 package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
+import com.obs.services.ObsConfiguration;
 import com.obs.services.model.*;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -23,7 +24,11 @@ public class OBSService extends AbstractFileService {
   }
 
   private ObsClient client() {
-    return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), properties.getEndpoint());
+    ObsConfiguration obsConfiguration = new ObsConfiguration();
+    obsConfiguration.setEndPoint(properties.getEndpoint());
+    obsConfiguration.setConnectionTimeout(properties.getConnectionTimeout());
+    obsConfiguration.setSocketTimeout(properties.getSocketTimeout());
+    return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), obsConfiguration);
   }
 
   @Override

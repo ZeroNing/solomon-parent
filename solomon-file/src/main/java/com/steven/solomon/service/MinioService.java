@@ -28,6 +28,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import org.springframework.web.multipart.MultipartFile;
 /**
  * Minio文件实现类
@@ -38,10 +40,17 @@ public class MinioService extends AbstractFileService {
 
   public MinioService(FileChoiceProperties properties) {
     super(properties);
+
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(properties.getConnectionTimeout(), TimeUnit.MILLISECONDS)  // 设置连接超时时间为10秒
+            .readTimeout(properties.getSocketTimeout(), TimeUnit.MILLISECONDS)
+            .build();
+
     MinioClient.Builder builder = MinioClient.builder().credentials(properties.getAccessKey(), properties.getSecretKey()).endpoint(properties.getEndpoint());
     if(ValidateUtils.isNotEmpty(properties.getRegionName())){
       builder.region(properties.getRegionName());
     }
+    builder.httpClient(okHttpClient);
     client = builder.build();
   }
 

@@ -53,6 +53,32 @@ public class FileChoiceProperties {
    */
   private Integer partSize = 5;
 
+  /**
+   * 连接超时 默认60秒
+   */
+  private Integer connectionTimeout = 60000;
+
+  /**
+   * socket的超时时间 默认60秒
+   */
+  private Integer socketTimeout = 60000;
+
+  public Integer getConnectionTimeout() {
+    return connectionTimeout;
+  }
+
+  public void setConnectionTimeout(Integer connectionTimeout) {
+    this.connectionTimeout = connectionTimeout;
+  }
+
+  public Integer getSocketTimeout() {
+    return socketTimeout;
+  }
+
+  public void setSocketTimeout(Integer socketTimeout) {
+    this.socketTimeout = socketTimeout;
+  }
+
   public Integer getPartSize() {
     return partSize;
   }

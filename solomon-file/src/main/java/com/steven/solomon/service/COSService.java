@@ -32,6 +32,8 @@ public class COSService extends AbstractFileService {
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
     Region         region       = new Region(properties.getRegionName());
     ClientConfig   clientConfig = new ClientConfig(region);
+    clientConfig.setConnectionTimeout(properties.getConnectionTimeout());
+    clientConfig.setSocketTimeout(properties.getSocketTimeout());
     return new COSClient(credentials, clientConfig);
   }
 
