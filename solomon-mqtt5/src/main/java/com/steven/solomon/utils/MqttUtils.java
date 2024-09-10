@@ -155,8 +155,6 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     mqttConnectOptions.setServerURIs(new String[]{mqttProfile.getUrl()});
     //客户端愿意接收的 QoS 1 和 QoS 2 消息的最大数量
     mqttConnectOptions.setReceiveMaximum(mqttProfile.getReceiveMaximum());
-    //设置超时时间
-    mqttConnectOptions.setConnectionTimeout(mqttProfile.getCompletionTimeout());
     //设置自动重连
     mqttConnectOptions.setAutomaticReconnect(mqttProfile.getAutomaticReconnect());
     //客户端是否应该在连接时重置会话状态。如果设置为 true，客户端将不会恢复之前的会话状态，而是开始一个新的会话。如果设置为 false，客户端将尝试恢复之前的会话状态。
