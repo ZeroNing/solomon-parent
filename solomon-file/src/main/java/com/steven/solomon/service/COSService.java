@@ -1,9 +1,11 @@
 package com.steven.solomon.service;
 
+import com.baidubce.Protocol;
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
+import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.steven.solomon.lambda.Lambda;
@@ -39,6 +41,8 @@ public class COSService extends AbstractFileService {
     }
     clientConfig.setConnectionTimeout(properties.getConnectionTimeout());
     clientConfig.setSocketTimeout(properties.getSocketTimeout());
+    boolean             isHttps         = properties.getEndpoint().contains("https");
+    clientConfig.setHttpProtocol(isHttps ? HttpProtocol.https : HttpProtocol.http);
     return new COSClient(credentials, clientConfig);
   }
 

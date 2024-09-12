@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.baidubce.Protocol;
 import com.baidubce.Region;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
@@ -31,6 +32,8 @@ public class BOSService extends AbstractFileService {
     if(ValidateUtils.isNotEmpty(properties.getRegionName())){
       config.setRegion(Region.fromValue(properties.getRegionName()));
     }
+    boolean             isHttps         = properties.getEndpoint().contains("https");
+    config.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
     return new BosClient(config);
   }
 

@@ -3,6 +3,7 @@ package com.steven.solomon.service;
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
+import com.aliyun.oss.common.comm.Protocol;
 import com.aliyun.oss.model.*;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -29,6 +30,8 @@ public class OSSService extends AbstractFileService {
     ClientBuilderConfiguration config = new ClientBuilderConfiguration();
     config.setConnectionTimeout(properties.getConnectionTimeout());
     config.setSocketTimeout(properties.getSocketTimeout());
+    boolean             isHttps         = properties.getEndpoint().contains("https");
+    config.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
     return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey(),config);
   }
 
