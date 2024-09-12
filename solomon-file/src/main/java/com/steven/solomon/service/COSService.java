@@ -30,8 +30,13 @@ public class COSService extends AbstractFileService {
 
   private static COSClient initClient(FileChoiceProperties properties){
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    Region         region       = new Region(properties.getRegionName());
-    ClientConfig   clientConfig = new ClientConfig(region);
+    ClientConfig clientConfig = null;
+    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+      Region         region       = new Region(properties.getRegionName());
+      clientConfig = new ClientConfig(region);
+    } else {
+      clientConfig = new ClientConfig();
+    }
     clientConfig.setConnectionTimeout(properties.getConnectionTimeout());
     clientConfig.setSocketTimeout(properties.getSocketTimeout());
     return new COSClient(credentials, clientConfig);

@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.baidubce.Region;
 import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
@@ -27,6 +28,9 @@ public class BOSService extends AbstractFileService {
     config.setEndpoint(properties.getEndpoint());
     config.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
     config.setSocketTimeoutInMillis(properties.getSocketTimeout());
+    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+      config.setRegion(Region.fromValue(properties.getRegionName()));
+    }
     return new BosClient(config);
   }
 
