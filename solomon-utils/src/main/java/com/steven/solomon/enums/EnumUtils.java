@@ -29,7 +29,7 @@ public class EnumUtils {
             }
             return true;
         } else {
-            return ValidateUtils.isEmpty(codeOf(enumClass, object)) ? false : true;
+            return !ValidateUtils.isEmpty(codeOf(enumClass, object));
         }
     }
 

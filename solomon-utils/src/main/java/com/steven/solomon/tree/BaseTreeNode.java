@@ -30,11 +30,11 @@ public class BaseTreeNode implements Serializable {
         this.id = id;
     }
 
-    public String getpId() {
+    public String getPId() {
         return this.pId;
     }
 
-    public void setpId(String pId) {
+    public void setPId(String pId) {
         this.pId = pId;
     }
 

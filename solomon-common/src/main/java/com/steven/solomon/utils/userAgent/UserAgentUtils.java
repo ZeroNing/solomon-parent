@@ -1,7 +1,6 @@
 package com.steven.solomon.utils.userAgent;
 
 import com.steven.solomon.verification.ValidateUtils;
-import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserAgentUtils {
 
-  private static String USER_AGENT = "User-Agent";
   private UserAgentAnalyzer userAgentAnalyzer = null;
 
   public UserAgentUtils(){
@@ -25,7 +23,7 @@ public class UserAgentUtils {
    * 获取agent字符串
    */
   public String getAgentString(HttpServletRequest request) {
-    return request.getHeader(USER_AGENT);
+      return request.getHeader("User-Agent");
   }
 
   /**

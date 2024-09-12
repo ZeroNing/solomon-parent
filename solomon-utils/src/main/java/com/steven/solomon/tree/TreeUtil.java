@@ -31,7 +31,7 @@ public class TreeUtil {
             if (id.equals(t.getId()) && nodeIndex[i] == 0) {
                 nodeIndex[i] = 1;
                 treeNodes.add(t);
-                id = t.getpId();
+                id = t.getPId();
                 // 父主键为空,null,"0",结束循环
                 if (ValidateUtils.isEmpty(id) || "null".equals(id) || "0".equals(id)) {
                     break;
@@ -92,7 +92,7 @@ public class TreeUtil {
             if (!ValidateUtils.isEmpty(tempId)) {
                 for (int i = 0; i < length; i++) {
                     t = listNodes.get(i);
-                    if (tempId.equals(t.getpId()) && nodeIndex[i] == 0) {
+                    if (tempId.equals(t.getPId()) && nodeIndex[i] == 0) {
                         nodeIndex[i] = 1;
                         treeNodes.add(t);
                     }
@@ -111,7 +111,7 @@ public class TreeUtil {
     public static <T extends BaseTreeNode> List<T> assembleTree(List<T> listNodes) {
         // 循环赋值最上面的节点数据
         // 赋值最上面节点的值
-        List<T> newTreeNodes = listNodes.stream().filter(t -> ValidateUtils.isEmpty(t.getpId()) || ValidateUtils.equalsIgnoreCase("null", t.getpId()) || ValidateUtils.equalsIgnoreCase("0", t.getpId())).collect(Collectors.toList());
+        List<T> newTreeNodes = listNodes.stream().filter(t -> ValidateUtils.isEmpty(t.getPId()) || ValidateUtils.equalsIgnoreCase("null", t.getPId()) || ValidateUtils.equalsIgnoreCase("0", t.getPId())).collect(Collectors.toList());
         // 循环处理子节点数据
         for (T t : newTreeNodes) {
             //递归
@@ -151,7 +151,7 @@ public class TreeUtil {
     static <T extends BaseTreeNode> void assembleTree(T node, List<T> listNodes) {
         if (node != null && !ValidateUtils.isEmpty(listNodes)) {
             // 循环节点数据，如果是子节点则添加起来
-            listNodes.stream().filter(t -> Objects.equals(t.getpId(), node.getId())).forEachOrdered(node::addChild);
+            listNodes.stream().filter(t -> Objects.equals(t.getPId(), node.getId())).forEachOrdered(node::addChild);
             // 循环处理子节点数据,递归
             if (!ValidateUtils.isEmpty(node.getChild())) {
                 for (Object t : node.getChild()) {
