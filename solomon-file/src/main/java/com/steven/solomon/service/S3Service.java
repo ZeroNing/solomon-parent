@@ -35,12 +35,12 @@ public class S3Service extends AbstractFileService {
     if(ValidateUtils.isNotEmpty(properties.getEndpoint()) && ValidateUtils.isNotEmpty(properties.getRegionName())){
       builder.withEndpointConfiguration(new EndpointConfiguration(properties.getEndpoint(),properties.getRegionName()));
     }
-    ClientConfiguration awsClientConfig = new ClientConfiguration();
+    ClientConfiguration configuration = new ClientConfiguration();
     boolean             isHttps         = properties.getEndpoint().contains("https");
-    awsClientConfig.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
-    awsClientConfig.setSocketTimeout(properties.getSocketTimeout());
-    awsClientConfig.setConnectionTimeout(properties.getConnectionTimeout());
-    builder.setClientConfiguration(awsClientConfig);
+    configuration.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
+    configuration.setSocketTimeout(properties.getSocketTimeout());
+    configuration.setConnectionTimeout(properties.getConnectionTimeout());
+    builder.setClientConfiguration(configuration);
     client = builder.build();
   }
 

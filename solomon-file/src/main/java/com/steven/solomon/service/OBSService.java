@@ -24,11 +24,11 @@ public class OBSService extends AbstractFileService {
   }
 
   private ObsClient client() {
-    ObsConfiguration obsConfiguration = new ObsConfiguration();
-    obsConfiguration.setEndPoint(properties.getEndpoint());
-    obsConfiguration.setConnectionTimeout(properties.getConnectionTimeout());
-    obsConfiguration.setSocketTimeout(properties.getSocketTimeout());
-    return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), obsConfiguration);
+    ObsConfiguration configuration = new ObsConfiguration();
+    configuration.setEndPoint(properties.getEndpoint());
+    configuration.setConnectionTimeout(properties.getConnectionTimeout());
+    configuration.setSocketTimeout(properties.getSocketTimeout());
+    return new ObsClient(properties.getAccessKey(), properties.getSecretKey(), configuration);
   }
 
   @Override

@@ -24,17 +24,17 @@ public class BOSService extends AbstractFileService {
   private final BosClient client;
 
   private BosClient client() {
-    BosClientConfiguration config = new BosClientConfiguration();
-    config.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
-    config.setEndpoint(properties.getEndpoint());
-    config.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
-    config.setSocketTimeoutInMillis(properties.getSocketTimeout());
+    BosClientConfiguration configuration = new BosClientConfiguration();
+    configuration.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
+    configuration.setEndpoint(properties.getEndpoint());
+    configuration.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
+    configuration.setSocketTimeoutInMillis(properties.getSocketTimeout());
     if(ValidateUtils.isNotEmpty(properties.getRegionName())){
-      config.setRegion(Region.fromValue(properties.getRegionName()));
+      configuration.setRegion(Region.fromValue(properties.getRegionName()));
     }
     boolean             isHttps         = properties.getEndpoint().contains("https");
-    config.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
-    return new BosClient(config);
+    configuration.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
+    return new BosClient(configuration);
   }
 
   public BOSService(FileChoiceProperties properties) {

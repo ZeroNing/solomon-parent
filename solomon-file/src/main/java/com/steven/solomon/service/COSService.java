@@ -32,18 +32,18 @@ public class COSService extends AbstractFileService {
 
   private static COSClient initClient(FileChoiceProperties properties){
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    ClientConfig clientConfig = null;
+    ClientConfig configuration = null;
     if(ValidateUtils.isNotEmpty(properties.getRegionName())){
       Region         region       = new Region(properties.getRegionName());
-      clientConfig = new ClientConfig(region);
+      configuration = new ClientConfig(region);
     } else {
-      clientConfig = new ClientConfig();
+      configuration = new ClientConfig();
     }
-    clientConfig.setConnectionTimeout(properties.getConnectionTimeout());
-    clientConfig.setSocketTimeout(properties.getSocketTimeout());
+    configuration.setConnectionTimeout(properties.getConnectionTimeout());
+    configuration.setSocketTimeout(properties.getSocketTimeout());
     boolean             isHttps         = properties.getEndpoint().contains("https");
-    clientConfig.setHttpProtocol(isHttps ? HttpProtocol.https : HttpProtocol.http);
-    return new COSClient(credentials, clientConfig);
+    configuration.setHttpProtocol(isHttps ? HttpProtocol.https : HttpProtocol.http);
+    return new COSClient(credentials, configuration);
   }
 
   @Override

@@ -27,12 +27,12 @@ public class OSSService extends AbstractFileService {
   }
 
   public OSS client() {
-    ClientBuilderConfiguration config = new ClientBuilderConfiguration();
-    config.setConnectionTimeout(properties.getConnectionTimeout());
-    config.setSocketTimeout(properties.getSocketTimeout());
+    ClientBuilderConfiguration configuration = new ClientBuilderConfiguration();
+    configuration.setConnectionTimeout(properties.getConnectionTimeout());
+    configuration.setSocketTimeout(properties.getSocketTimeout());
     boolean             isHttps         = properties.getEndpoint().contains("https");
-    config.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
-    return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey(),config);
+    configuration.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
+    return new OSSClientBuilder().build(properties.getEndpoint(), properties.getAccessKey(), properties.getSecretKey(),configuration);
   }
 
   @Override
