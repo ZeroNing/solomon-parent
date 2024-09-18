@@ -1,5 +1,7 @@
 package com.steven.solomon.repository;
 
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.TypeUtil;
 import com.steven.solomon.pojo.enums.OrderByEnum;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -22,7 +24,7 @@ import org.springframework.data.mongodb.core.query.Update;
 
 public class MongoRepository<T, I> {
 
-  protected Class<T> modelClass = (Class) ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
+  protected Class<T> modelClass = ClassUtil.loadClass(TypeUtil.getTypeArgument(getClass(),0).getTypeName());
 
   protected final MongoTemplate mongoTemplate;
 
