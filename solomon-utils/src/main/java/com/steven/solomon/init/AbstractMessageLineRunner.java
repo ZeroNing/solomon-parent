@@ -20,10 +20,7 @@ public abstract class AbstractMessageLineRunner<T extends Annotation> implements
 
     @Override
     public void run(String... args) throws Exception {
-        Type type = TypeUtil.toParameterizedType(getClass());
-        Type[] typeArguments = TypeUtil.getTypeArguments(type);
-        Class<T> clazz = ClassUtil.loadClass(typeArguments[0].getTypeName());
-
+        Class<T> clazz = ClassUtil.loadClass(TypeUtil.getTypeArgument(getClass(),0).getTypeName());
         List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(clazz).values());
         if(ValidateUtils.isEmpty(clazzList)){
             logger.error("AbstractMessageLineRunner:没有{}消费者",clazz.getSimpleName());
