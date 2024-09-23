@@ -10,11 +10,6 @@ public class BaseException extends Exception {
 
   protected Object[] args;
 
-  public BaseException(String code, String message){
-    super(message);
-    this.code = code;
-  }
-
   public BaseException(String code) {
     super(I18nUtils.getErrorMessage(code));
     this.code = code;

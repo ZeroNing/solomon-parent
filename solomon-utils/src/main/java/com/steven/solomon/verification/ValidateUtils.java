@@ -376,13 +376,13 @@ public class ValidateUtils {
      * @param value 枚举名称
      * @param clazz 枚举class
      */
-    public static void checkEnumValueIsEmpty(String value, Class clazz, String errorCode, String[] args) throws BaseException {
+    public static void checkEnumValueIsEmpty(String value, Class<?> clazz, String errorCode, Object[] args) throws BaseException {
         if (checkEnumValueIsEmpty(value, clazz)) {
             throw new BaseException(errorCode, args);
         }
     }
 
-    public static void checkEnumValueIsEmpty(String value, Class clazz, String errorCode) throws BaseException {
+    public static void checkEnumValueIsEmpty(String value, Class<?> clazz, String errorCode) throws BaseException {
         if (checkEnumValueIsEmpty(value, clazz)) {
             throw new BaseException(errorCode, (String) null);
         }
@@ -394,17 +394,17 @@ public class ValidateUtils {
      * @param value 枚举名称
      * @param clazz 枚举class
      */
-    public static boolean checkEnumValueIsNotEmpty(String value, Class clazz) {
+    public static boolean checkEnumValueIsNotEmpty(String value, Class<?> clazz) {
         return !checkEnumValueIsEmpty(value, clazz);
     }
 
-    public static void checkEnumValueIsNotEmpty(String value, Class clazz, String errorCode, Object[] args) throws BaseException {
+    public static void checkEnumValueIsNotEmpty(String value, Class<?> clazz, String errorCode, Object[] args) throws BaseException {
         if (checkEnumValueIsNotEmpty(value, clazz)) {
             throw new BaseException(errorCode, args);
         }
     }
 
-    public static void checkEnumValueIsNotEmpty(String value, Class clazz, String errorCode) throws BaseException {
+    public static void checkEnumValueIsNotEmpty(String value, Class<?> clazz, String errorCode) throws BaseException {
         if (checkEnumValueIsNotEmpty(value, clazz)) {
             throw new BaseException(errorCode, (String) null);
         }
@@ -435,11 +435,5 @@ public class ValidateUtils {
             defaultValue = expression.substring(expression.indexOf(":") + 1, expression.indexOf("}"));
         }
         return defaultValue;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(extractPropertyName("${server.port:2000}"));
-        System.out.println(getElDefaultValue("${server.port:2000}"));
-
     }
 }
