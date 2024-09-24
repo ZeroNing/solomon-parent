@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ./start-rabbitmq-with-plugin.sh:/usr/local/bin/start-rabbitmq-with-plugin.sh
+      - ./data:/usr/etc/rabbitmq/data
+    command: ["/bin/bash", "-c", "chmod +x /usr/local/bin/start-rabbitmq-with-plugin.sh && /usr/local/bin/start-rabbitmq-with-plugin.sh"]
