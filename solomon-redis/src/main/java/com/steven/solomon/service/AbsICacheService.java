@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 
 public abstract class AbsICacheService implements  ICacheService {
 
-  private final Logger logger = LoggerUtils.logger(AbsICacheService.class);
+  protected final Logger logger = LoggerUtils.logger(AbsICacheService.class);
 
   @Resource
   private CacheProfile properties;

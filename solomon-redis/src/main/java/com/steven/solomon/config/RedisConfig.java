@@ -9,6 +9,8 @@ import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.profile.TenantRedisProperties;
+import com.steven.solomon.service.ICacheService;
+import com.steven.solomon.service.impl.RedisService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -122,6 +124,13 @@ public class RedisConfig extends CachingConfigurerSupport {
   public CacheManager cacheManager() {
     RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
     return new SpringRedisAutoManager(DynamicDefaultRedisCacheWriter.nonLockingRedisCacheWriter(context.getFactoryMap().values().iterator().next()), defaultCacheConfig);
+  }
+
+
+  @Bean
+  @ConditionalOnMissingBean(ICacheService.class)
+  public ICacheService cacheService(RedisTemplate<String,Object> redisTemplate){
+    return new RedisService(redisTemplate);
   }
 }
 

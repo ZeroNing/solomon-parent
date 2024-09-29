@@ -10,8 +10,7 @@ public class DefaultService extends AbsICacheService {
 
 
   @Override
-  public boolean expire(String group, String key, int time) {
-    return false;
+  public void expire(String group, String key, int time) {
   }
 
   @Override
