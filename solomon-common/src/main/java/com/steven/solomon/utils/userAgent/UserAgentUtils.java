@@ -87,7 +87,7 @@ public class UserAgentUtils {
 
   public static void main(String[] args) {
     com.steven.solomon.utils.userAgent.entity.UserAgent userAgent = new UserAgentUtils().getUserAgentVO(
-          "Mozilla/5.0 (Linux; Android 9; EVR-L29 Build/HUAWEIEVR-L29; xx-xx) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/70.0.3538.110 Mobile Safari/537.36"
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
       );
       System.out.println("系统以及版本:" + userAgent.getOsNameVersion());
       System.out.println("型号:" + userAgent.getDevice());

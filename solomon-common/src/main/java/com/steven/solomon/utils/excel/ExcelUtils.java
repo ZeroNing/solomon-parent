@@ -52,12 +52,10 @@ public class ExcelUtils {
 
 	/**
 	 * 导出
-	 * @param response
 	 * @param excelName 文件名需要带上后缀名
 	 * @param sheetName 表名 不填默认为sheet
 	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
 	 * @param data      数据
-	 * @throws Exception
 	 */
 	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		setHead(response, excelName);

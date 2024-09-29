@@ -22,8 +22,8 @@
     <module>solomon-rabbitMq</module>
     <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
-      <module>solomon-redis</module>
-      <module>solomon-sql</module>
+    <module>solomon-redis</module>
+    <module>solomon-sql</module>
   </modules>
 
   <properties>
@@ -32,7 +32,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
-    <yauaa.version>7.26.0</yauaa.version>
+    <yauaa.version>7.28.1</yauaa.version>
     <easy.excel.version>3.3.4</easy.excel.version>
     <spring.boot.version>2.4.13</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
