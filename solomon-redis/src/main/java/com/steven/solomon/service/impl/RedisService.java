@@ -74,6 +74,20 @@ public class RedisService extends AbsICacheService {
   }
 
   @Override
+  public <T> T set(String group, String key, T value) {
+    return set(group,key,value,0);
+  }
+
+  @Override
+  public <T> T set(String group, String key, T value, int time) {
+    redisTemplate.opsForValue().set(assembleKey(group,key),value);
+    if(time > 0){
+      expire(group,key,time);
+    }
+    return value;
+  }
+
+  @Override
   public Long delete(String group, String key, Object... hashKey) {
     return redisTemplate.opsForHash().delete(assembleKey(group,key),hashKey);
   }

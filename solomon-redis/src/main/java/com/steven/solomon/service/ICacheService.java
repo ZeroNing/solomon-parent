@@ -47,6 +47,27 @@ public interface ICacheService {
   <T> T get(String group, String key);
 
   /**
+   * 普通缓存放入
+   *
+   * @param group 组
+   * @param key   键
+   * @param value 值
+   * @return true成功 false失败
+   */
+  <T> T set(String group, String key, T value);
+
+  /**
+   * 普通缓存放入并设置时间
+   *
+   * @param group 组
+   * @param key   键
+   * @param value 值
+   * @param time  时间(秒) time要大于0 如果time小于等于0 将设置无限期
+   * @return true成功 false 失败
+   */
+  <T> T set(String group, String key, T value, int time);
+
+  /**
    * 哈希缓存设值
    * @param group 组
    * @param key   键
