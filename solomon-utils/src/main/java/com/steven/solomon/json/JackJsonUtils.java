@@ -50,10 +50,6 @@ public class JackJsonUtils {
 
     /**
      * 转换json
-     *
-     * @param result
-     * @return
-     * @throws JsonProcessingException
      */
     public static String formatJsonByFilter(Object result) {
         return formatJsonByFilter(result, null);
@@ -62,17 +58,12 @@ public class JackJsonUtils {
 
     /**
      * 转换json
-     *
-     * @param result
-     * @param filter
-     * @return
-     * @throws JsonProcessingException
      */
     public static String formatJsonByFilter(Object result, Class<?> filter) {
         try {
             return ValidateUtils.isEmpty(filter) ? mapper.writeValueAsString(result) : mapper.writerWithView(filter).writeValueAsString(result);
         } catch (Throwable e) {
-            logger.error("转换Json出现异常:{}", e);
+            logger.error("转换Json出现异常:", e);
             return "";
         }
     }

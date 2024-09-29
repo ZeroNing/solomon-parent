@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 public class CustomLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
-    private DateTimeFormatter formatter;
+    private final DateTimeFormatter formatter;
 
     public CustomLocalDateTimeSerializer(DateTimeFormatter formatter) {
         super();

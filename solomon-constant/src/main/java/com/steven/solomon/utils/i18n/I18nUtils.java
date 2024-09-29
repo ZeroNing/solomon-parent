@@ -48,7 +48,7 @@ public class I18nUtils {
    * @param code 枚举编码
    * @param enumClazz 枚举Class
    */
-  public static String getEnumMessage(String code, Class enumClazz) {
+  public static String getEnumMessage(String code, Class<?> enumClazz) {
     if(code == null || code.isBlank()){
       return null;
     }
@@ -61,7 +61,7 @@ public class I18nUtils {
    * @param enumCode 枚举名
    * @param enumClazz 枚举Class
    */
-  public static String getEnumMessage(Enum enumCode, Class enumClazz) {
+  public static String getEnumMessage(Enum<?> enumCode, Class<?> enumClazz) {
     if(enumCode == null){
       return null;
     }
@@ -72,7 +72,7 @@ public class I18nUtils {
     if(code == null || code.isBlank()){
       return null;
     }
-    return getMessage(code, null);
+    return getMessage(code, "");
   }
 
   /**
@@ -81,7 +81,7 @@ public class I18nUtils {
    * @param code 异常编码
    */
   public static String getErrorMessage(String code) {
-    return getErrorMessage(code, null);
+    return getErrorMessage(code, "");
   }
 
   /**

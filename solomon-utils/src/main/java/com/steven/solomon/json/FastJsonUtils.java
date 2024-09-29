@@ -17,10 +17,6 @@ public class FastJsonUtils {
 
     /**
      * 转换json
-     *
-     * @param result
-     * @return
-     * @throws JsonProcessingException
      */
     public static String formatJsonByFilter(Object result, SerializeFilter... filter) {
         List<SerializeFilter> serializeFilters = new ArrayList<>();
@@ -33,10 +29,6 @@ public class FastJsonUtils {
 
     /**
      * 转换json
-     *
-     * @param result
-     * @return
-     * @throws JsonProcessingException
      */
     public static byte[] formatBytesByFilter(Object result, SerializeFilter... filter) {
         List<SerializeFilter> serializeFilters = new ArrayList<>();

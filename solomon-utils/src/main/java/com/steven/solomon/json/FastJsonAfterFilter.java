@@ -24,10 +24,10 @@ public class FastJsonAfterFilter extends AfterFilter {
 
     @Override
     public void writeAfter(Object o) {
-        Class clazz = o.getClass();
+        Class<?> clazz = o.getClass();
         List<Field> fields = new ArrayList<>();
         Arrays.asList(o.getClass().getDeclaredFields()).forEach(field -> {
-            Optional.ofNullable(field).filter(a -> a.isAnnotationPresent(JsonEnum.class)).ifPresent(a -> fields.add(a));
+            Optional.ofNullable(field).filter(a -> a.isAnnotationPresent(JsonEnum.class)).ifPresent(fields::add);
         });
         if (ValidateUtils.isEmpty(fields)) {
             return;
@@ -51,12 +51,12 @@ public class FastJsonAfterFilter extends AfterFilter {
 
                 String value = (String) enumClass.getMethod(methodName).invoke(enums);
                 if (ValidateUtils.isEmpty(fastJsonEnum.fieldName())) {
-                    super.writeKeyValue(new StringBuilder(prefix).append(methodName).toString(), value);
+                    super.writeKeyValue(prefix + methodName, value);
                 } else {
                     super.writeKeyValue(fastJsonEnum.fieldName(), value);
                 }
             } catch (Throwable e) {
-                logger.error("fastJson 转义注解失败,失败异常为 e:{}", e);
+                logger.error("fastJson 转义注解失败,失败异常为 e:", e);
 //        throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
             }
         }
