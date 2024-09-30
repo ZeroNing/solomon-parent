@@ -1,0 +1,30 @@
+version: '3.8'  # Docker Compose 文件版本
+
+services:
+  elasticsearch:
+    image: elasticsearch:8.15.2  # 使用官方的 Elasticsearch Docker 镜像，版本为 8.15.2
+    container_name: elasticsearch  # 容器的名称
+    environment:  # 配置信息，通过环境变量传递到 Elasticsearch
+      - node.name=elasticsearch  # 节点名称
+      - cluster.name=es-docker-cluster  # 集群名称
+      - discovery.type=single-node  # 启用单节点模式（适用于单机部署）
+      - bootstrap.memory_lock=true  # 启用内存锁定，防止 Elasticsearch 将内存交换到磁盘
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # 设置 JVM 内存分配，最小和最大内存都为 512MB
+      - xpack.security.enabled=false  # 禁用 Elasticsearch 内置的安全功能
+      - xpack.security.transport.ssl.enabled=false  # 禁用传输层的 SSL/TLS 加密
+    ulimits:
+      memlock:
+        soft: -1  # 设置内存锁定的软限制
+        hard: -1  # 设置内存锁定的硬限制
+    volumes:
+      - ./data:/usr/share/elasticsearch/data  # 挂载卷，将容器中的数据目录映射到主机
+      - ./logs:/usr/share/elasticsearch/logs  # 持久化存储 Elasticsearch 日志
+    ports:
+      - 9200:9200  # 端口映射，将容器的 9200 端口映射到主机
+      - 9300:9300  # 端口映射，将容器的 9300 端口映射到主机
+    deploy:
+      resources:
+        limits:
+          memory: 4g  # 限制容器使用的最大内存为 4GB
+        reservations:
+          memory: 512m  # 保留 512MB 内存，保证至少有 512MB 内存分配给容器
