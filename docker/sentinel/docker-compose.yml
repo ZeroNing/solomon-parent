@@ -11,3 +11,4 @@ services:
       - sentinel.dashboard.auth.password=sentinel #密码
     volumes:
       - ./logs:/root/logs/csp #挂载日志
+    restart : always
