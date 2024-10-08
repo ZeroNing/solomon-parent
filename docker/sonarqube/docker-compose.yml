@@ -4,7 +4,6 @@ services:
   sonarqube:
     image: sonarqube:9.9.6-community
     container_name: sonarqube
-    restart:  always
     ports:
       - "9020:9000"
     environment:
@@ -17,3 +16,4 @@ services:
       - ./plugins:/opt/sonarqube/lib/bundled-plugins
       - ./logs:/opt/sonarqube/logs
       - ./pdf:/opt/sonarqube/pdf-files
+    restart:  always

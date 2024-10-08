@@ -28,3 +28,4 @@ services:
           memory: 4g  # 限制容器使用的最大内存为 4GB
         reservations:
           memory: 512m  # 保留 512MB 内存，保证至少有 512MB 内存分配给容器
+    restart:  always

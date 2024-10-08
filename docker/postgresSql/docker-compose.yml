@@ -4,7 +4,6 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres
-    restart: always
     environment:
       POSTGRES_USER: admin          # PostgreSQL 用户名
       POSTGRES_PASSWORD: admin  # PostgreSQL 用户密码
@@ -13,3 +12,4 @@ services:
       - "5432:5432"                  # 映射端口
     volumes:
       - ./data:/var/lib/postgresql/data  # 数据持久化
+    restart:  always

@@ -4,7 +4,6 @@ services:
   nacos:
     image: nacos/nacos-server:latest
     container_name: nacos
-    restart: always
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -18,3 +17,4 @@ services:
     volumes:
       - ./data:/home/nacos/data
       - ./logs:/home/nacos/logs
+    restart:  always

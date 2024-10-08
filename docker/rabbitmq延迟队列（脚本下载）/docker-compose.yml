@@ -11,3 +11,4 @@ services:
       - ./start-rabbitmq-with-plugin.sh:/usr/local/bin/start-rabbitmq-with-plugin.sh
       - ./data:/usr/etc/rabbitmq/data
     command: ["/bin/bash", "-c", "chmod +x /usr/local/bin/start-rabbitmq-with-plugin.sh && /usr/local/bin/start-rabbitmq-with-plugin.sh"]
+    restart: always

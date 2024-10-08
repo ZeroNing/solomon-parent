@@ -7,6 +7,6 @@ services:
     ports:
       - 15672:15672
       - 5672:5672
-    restart: always
     volumes:
       - ./data:/usr/etc/rabbitmq/data
+    restart: always
