@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  sentinel-dashboard:
+    image: bladex/sentinel-dashboard:latest
+    container_name: sentinel-dashboard
+    ports:
+      - "8858:8858" #默认8858端口 挂载8858端口
+    environment:
+      - sentinel.dashboard.auth.username=sentinel #账号
+      - sentinel.dashboard.auth.password=sentinel #密码
+    volumes:
+      - ./logs:/root/logs/csp #挂载日志
