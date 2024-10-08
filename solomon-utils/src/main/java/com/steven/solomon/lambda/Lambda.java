@@ -1,6 +1,8 @@
 package com.steven.solomon.lambda;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
+import cn.hutool.core.map.MapUtil;
 import com.steven.solomon.sort.SortUtil;
 import com.steven.solomon.sort.enums.SortTypeEnum;
 import com.steven.solomon.verification.ValidateUtils;
@@ -26,7 +28,7 @@ public class Lambda {
      */
     public static <T, S> List<T> toList(Collection<S> list, Predicate<S> predicate, Function<S, T> func, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new ArrayList<>();
+            return CollUtil.newArrayList();
         }
 
         Stream<S> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -65,7 +67,7 @@ public class Lambda {
      */
     public static <T, S> Set<T> toSet(Collection<S> list, Predicate<S> predicate, Function<S, T> func, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashSet<>();
+            return CollUtil.newHashSet();
         }
 
         Stream<S> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -103,7 +105,7 @@ public class Lambda {
      */
     public static <K, T> Map<K, T> toMap(Collection<T> list, Function<T, K> keyFunc, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -140,7 +142,7 @@ public class Lambda {
      */
     public static <K, T> Map<K, T> toMapPredicate(Collection<T> list, Predicate<T> predicate, Function<T, K> keyFunc, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -161,7 +163,7 @@ public class Lambda {
     public static <K, V, T> Map<K, V> toMapPredicate(Collection<T> list, Predicate<T> predicate, Function<T, K> keyFunc,
                                                      Function<T, V> valFunc, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -193,7 +195,7 @@ public class Lambda {
      */
     public static <K, V, T> Map<K, V> toMap(Collection<T> list, Function<T, K> keyFunc, Function<T, V> valFunc, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -220,7 +222,7 @@ public class Lambda {
      */
     public static <K, T> Map<K, List<T>> groupBy(Collection<T> list, Predicate<T> predicate, Function<T, K> groupByFunc, boolean isParallelStream) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         Stream<T> stream = isParallelStream ? list.parallelStream() : list.stream();
@@ -249,7 +251,7 @@ public class Lambda {
      */
     public static <K, T> Map<K, List<T>> groupBy(Collection<T> list, Function<T, K> groupByFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
         return groupBy(list, null, groupByFunc, false);
     }
@@ -412,7 +414,7 @@ public class Lambda {
      */
     public static <K, T> Map<K, Long> groupByCount(Collection<T> list, Function<T, K> groupByFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.counting()));
@@ -428,7 +430,7 @@ public class Lambda {
     public static <K, T> Map<K, Long> groupByCount(Collection<T> list, Function<T, K> groupByFunc,
                                                    Predicate<T> predicate) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.counting()));
@@ -444,7 +446,7 @@ public class Lambda {
     public static <K, T> Map<K, Integer> groupBySum(Collection<T> list, Function<T, K> groupByFunc,
                                                     ToIntFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingInt(sumFunc)));
@@ -461,7 +463,7 @@ public class Lambda {
     public static <K, T> Map<K, Integer> groupBySum(Collection<T> list, Function<T, K> groupByFunc,
                                                     Predicate<T> predicate, ToIntFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.summingInt(sumFunc)));
@@ -477,7 +479,7 @@ public class Lambda {
     public static <K, T> Map<K, Long> groupBySum(Collection<T> list, Function<T, K> groupByFunc,
                                                  ToLongFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingLong(sumFunc)));
@@ -494,7 +496,7 @@ public class Lambda {
     public static <K, T> Map<K, Long> groupBySum(Collection<T> list, Function<T, K> groupByFunc, Predicate<T> predicate,
                                                  ToLongFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().filter(predicate).collect(Collectors.groupingBy(groupByFunc, Collectors.summingLong(sumFunc)));
@@ -510,7 +512,7 @@ public class Lambda {
     public static <K, T> Map<K, Double> groupBySum(Collection<T> list, Function<T, K> groupByFunc,
                                                    ToDoubleFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().collect(Collectors.groupingBy(groupByFunc, Collectors.summingDouble(sumFunc)));
@@ -527,7 +529,7 @@ public class Lambda {
     public static <K, T> Map<K, Double> groupBySum(Collection<T> list, Function<T, K> groupByFunc, Predicate<T> predicate,
                                                    ToDoubleFunction<T> sumFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new HashMap<>();
+            return MapUtil.newHashMap();
         }
 
         return list.stream().filter(predicate)
@@ -542,7 +544,7 @@ public class Lambda {
      */
     public static <T> List<T> cross(Collection<T> sourceList, Predicate<T> predicate) {
         if (ValidateUtils.isEmpty(sourceList)) {
-            return new ArrayList<>();
+            return CollUtil.newArrayList();
         }
         return sourceList.stream().filter(predicate).collect(Collectors.toList());
     }
@@ -844,7 +846,7 @@ public class Lambda {
      */
     public static <T> List<T> sort(Collection<T> list, Comparator<? super T> comparator) {
         if (ValidateUtils.isEmpty(list)) {
-            return new ArrayList<>();
+            return CollUtil.newArrayList();
         }
 
         return list.stream().sorted(comparator).collect(Collectors.toList());
@@ -948,7 +950,7 @@ public class Lambda {
      */
     public static <T, S> List<S> distinct(List<T> list, Function<T, S> func) {
         if (ValidateUtils.isEmpty(list)) {
-            return new ArrayList<>();
+            return CollUtil.newArrayList();
         }
 
         return list.stream().map(func).distinct().collect(Collectors.toList());
@@ -1004,7 +1006,7 @@ public class Lambda {
      */
     public static <K, T> List<K> repeat(List<T> list, Function<T, K> groupByFunc) {
         if (ValidateUtils.isEmpty(list)) {
-            return new ArrayList<>();
+            return CollUtil.newArrayList();
         }
 
         Map<K, List<T>> groupByMap = groupBy(list, groupByFunc);
@@ -1071,7 +1073,7 @@ public class Lambda {
 
 
     public static void main(String[] args) {
-        List<Person> b = new ArrayList<>();
+        List<Person> b = CollUtil.newArrayList();
         for (Integer i = 0; i < 10000000; i++) {
             b.add(new Person(String.valueOf(i*21), i*13));
         }
