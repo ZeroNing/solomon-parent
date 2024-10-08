@@ -17,4 +17,5 @@ services:
     volumes:
       - ./data:/home/nacos/data
       - ./logs:/home/nacos/logs
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     restart:  always

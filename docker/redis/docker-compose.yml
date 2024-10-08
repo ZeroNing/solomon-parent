@@ -8,5 +8,6 @@ services:
     volumes:
       -  ./data:/data
       - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
     restart:  always

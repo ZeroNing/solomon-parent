@@ -12,4 +12,5 @@ services:
       - "5432:5432"                  # 映射端口
     volumes:
       - ./data:/var/lib/postgresql/data  # 数据持久化
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     restart:  always

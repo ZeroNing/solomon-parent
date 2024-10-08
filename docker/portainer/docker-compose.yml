@@ -9,4 +9,5 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     restart:  always

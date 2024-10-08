@@ -12,5 +12,6 @@ services:
       MINIO_SECRET_KEY: admin
     volumes:
       - ./data:/data
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     command: server /data --console-address ":9001"
     restart:  always

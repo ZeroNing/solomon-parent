@@ -10,6 +10,7 @@ services:
     volumes:
       - ./nameserver/logs:/home/rocketmq/logs
       - ./nameserver/bin/runserver.sh:/home/rocketmq/rocketmq-5.1.0/bin/runserver.sh
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     environment:
       - MAX_HEAP_SIZE=256M
       - HEAP_NEWSIZE=128M
@@ -27,6 +28,7 @@ services:
       - ./broker/store:/root/store
       - ./broker/conf/broker.conf:/home/rocketmq/broker.conf
       - ./broker/bin/runbroker.sh:/home/rocketmq/rocketmq-5.1.0/bin/runbroker.sh
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     depends_on:
       - 'rmqnamesrv'
     environment:

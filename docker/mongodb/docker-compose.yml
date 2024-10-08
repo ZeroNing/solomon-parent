@@ -8,6 +8,7 @@ services:
       - "27017:27017"
     volumes:
       - ./data:/data/db
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     environment:
       MONGO_INITDB_ROOT_USERNAME: root #账号
       MONGO_INITDB_ROOT_PASSWORD: root #密码

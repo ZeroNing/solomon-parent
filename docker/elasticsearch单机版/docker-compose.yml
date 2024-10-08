@@ -17,6 +17,7 @@ services:
         soft: -1  # 设置内存锁定的软限制
         hard: -1  # 设置内存锁定的硬限制
     volumes:
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
       - ./data:/usr/share/elasticsearch/data  # 挂载卷，将容器中的数据目录映射到主机
       - ./logs:/usr/share/elasticsearch/logs  # 持久化存储 Elasticsearch 日志
     ports:

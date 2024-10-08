@@ -16,4 +16,5 @@ services:
       - ./plugins:/opt/sonarqube/lib/bundled-plugins
       - ./logs:/opt/sonarqube/logs
       - ./pdf:/opt/sonarqube/pdf-files
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     restart:  always

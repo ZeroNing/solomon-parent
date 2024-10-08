@@ -10,5 +10,6 @@ services:
     volumes:
       - ./start-rabbitmq-with-plugin.sh:/usr/local/bin/start-rabbitmq-with-plugin.sh
       - ./data:/usr/etc/rabbitmq/data
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     command: ["/bin/bash", "-c", "chmod +x /usr/local/bin/start-rabbitmq-with-plugin.sh && /usr/local/bin/start-rabbitmq-with-plugin.sh"]
     restart: always

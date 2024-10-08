@@ -13,4 +13,5 @@ services:
       - "3306:3306"
     volumes:
       - ./data:/var/lib/mysql
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     restart:  always
