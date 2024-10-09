@@ -11,6 +11,6 @@ services:
         -  EMQX_LOADED_PLUGINS="emqx_dashboard,emqx_retainer,emqx_webhook"
       volumes:
         - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-        -  ./data:/opt/emqx/data  #  挂载数据卷
-        -  ./logs:/opt/emqx/logs  #  挂载日志卷
+        - ./data:/opt/emqx/data  #  挂载数据卷
+        - ./logs:/opt/emqx/logs  #  挂载日志卷
       restart:  always

@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  emqx1:
+    image: emqx/emqx:latest  # 使用最新的 EMQX 镜像
+    container_name: emqx1    # 容器名称为 emqx1
+    volumes:
+      - ./data/1:/opt/emqx/data  # 数据目录映射，用于持久化数据
+      - ./logs/1:/opt/emqx/log   # 日志目录映射，用于持久化日志
+    environment:
+      - EMQX_NODE_NAME=emqx@node1.emqx.com  # 节点名称，用于集群识别
+      - EMQX_CLUSTER__DISCOVERY_STRATEGY=static  # 使用静态集群发现策略
+      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.com,emqx@node2.emqx.com]  # 定义集群中的种子节点
+    networks:
+      emqx-bridge:
+        aliases:
+          - node1.emqx.com  # 设置网络别名，便于节点通信
+    ports:
+      - 1883:1883   # 映射 MQTT 端口
+      - 8083:8083   # 映射 WebSocket 端口
+      - 8084:8084   # 映射加密 WebSocket 端口
+      - 8883:8883   # 映射加密 MQTT 端口
+      - 18083:18083 # 映射管理接口端口
+
+  emqx2:
+    image: emqx/emqx:latest  # 使用最新的 EMQX 镜像
+    container_name: emqx2    # 容器名称为 emqx2
+    volumes:
+      - ./data/2:/opt/emqx/data  # 数据目录映射，用于持久化数据
+      - ./logs/2:/opt/emqx/log   # 日志目录映射，用于持久化日志
+    environment:
+      - EMQX_NODE_NAME=emqx@node2.emqx.com  # 节点名称，用于集群识别
+      - EMQX_CLUSTER__DISCOVERY_STRATEGY=static  # 使用静态集群发现策略
+      - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.com,emqx@node2.emqx.com]  # 定义集群中的种子节点
+    networks:
+      emqx-bridge:
+        aliases:
+          - node2.emqx.com  # 设置网络别名，便于节点通信
+
+networks:
+  emqx-bridge:
+    driver: bridge  # 使用桥接网络模式，确保两个节点可以相互通信
