@@ -32,6 +32,11 @@ services:
       - EMQX_NODE_NAME=emqx@node2.emqx.com  # 节点名称，用于集群识别
       - EMQX_CLUSTER__DISCOVERY_STRATEGY=static  # 使用静态集群发现策略
       - EMQX_CLUSTER__STATIC__SEEDS=[emqx@node1.emqx.com,emqx@node2.emqx.com]  # 定义集群中的种子节点
+    ports:
+      - 21883:1883   # 映射 MQTT 端口
+      - 28083:8083   # 映射 WebSocket 端口
+      - 28084:8084   # 映射加密 WebSocket 端口
+      - 28883:8883   # 映射加密 MQTT 端口
     networks:
       emqx-bridge:
         aliases:

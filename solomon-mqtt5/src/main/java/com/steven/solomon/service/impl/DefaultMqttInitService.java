@@ -37,7 +37,8 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> clazzList) throws Exception {
-        MqttClient client = new MqttClient(mqttProfile.getUrl(), ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
+        String url = mqttProfile.getUrl().split(",")[0];
+        MqttClient client = new MqttClient(url, ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString()));
         MqttConnectionOptions options = utils.initMqttConnectOptions(mqttProfile);
         client.connect(options);
         utils.putOptionsMap(tenantCode,options);

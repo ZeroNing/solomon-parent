@@ -152,7 +152,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     MqttConnectionOptions mqttConnectOptions = new MqttConnectionOptions();
     mqttConnectOptions.setUserName(mqttProfile.getUserName());
     mqttConnectOptions.setPassword(mqttProfile.getPassword().getBytes());
-    mqttConnectOptions.setServerURIs(new String[]{mqttProfile.getUrl()});
+    mqttConnectOptions.setServerURIs(mqttProfile.getUrl().split(","));
     //客户端愿意接收的 QoS 1 和 QoS 2 消息的最大数量
     mqttConnectOptions.setReceiveMaximum(mqttProfile.getReceiveMaximum());
     //设置自动重连
