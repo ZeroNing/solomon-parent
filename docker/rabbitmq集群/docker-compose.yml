@@ -1,26 +1,28 @@
-version: '3'
+version: '3'  # 使用 Docker Compose 的版本 3
+
 services:
   rabbitmq1:
-    image: rabbitmq:management
-    container_name: rabbitmq1
-    hostname: rabbitmq1
+    image: rabbitmq:management  # 使用带管理插件的 RabbitMQ 镜像
+    container_name: rabbitmq1  # 容器名称
+    hostname: rabbitmq1  # 容器内的主机名
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5672:5672"  # 映射 AMQP 默认端口
+      - "15672:15672"  # 映射管理界面端口
     environment:
-      - RABBITMQ_ERLANG_COOKIE=rabbit-cookie
-      - RABBITMQ_NODENAME=rabbit@rabbitmq1
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_ERLANG_COOKIE=rabbit-cookie  # 用于集群节点间通信的 cookie
+      - RABBITMQ_NODENAME=rabbit@rabbitmq1  # 节点名称
+      - RABBITMQ_DEFAULT_USER=admin  # 默认管理员用户
+      - RABBITMQ_DEFAULT_PASS=admin  # 默认管理员密码
     volumes:
-      - ./init-rabbitmq-cluster.sh:/usr/local/bin/init-rabbitmq-cluster.sh
-      - ./data/1:/var/lib/rabbitmq
-      - ./logs/1:/var/log/rabbitmq
+      - ./init-rabbitmq-cluster.sh:/usr/local/bin/init-rabbitmq-cluster.sh  # 挂载初始化脚本
+      - ./data/1:/var/lib/rabbitmq  # 持久化数据存储路径
+      - ./logs/1:/var/log/rabbitmq  # 持久化日志存储路径
     command: [ "/bin/bash", "-c", "chmod +x /usr/local/bin/init-rabbitmq-cluster.sh && /usr/local/bin/init-rabbitmq-cluster.sh" ]
+    # 给予脚本执行权限并运行
     networks:
       rabbitmq-cluster:
         aliases:
-          - node1.rabbitmq.com
+          - node1.rabbitmq.com  # 网络别名
 
   rabbitmq2:
     image: rabbitmq:management
@@ -42,6 +44,7 @@ services:
       rabbitmq-cluster:
         aliases:
           - node2.rabbitmq.com
+
 networks:
   rabbitmq-cluster:
-    driver: bridge
+    driver: bridge  # 使用桥接网络驱动
