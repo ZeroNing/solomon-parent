@@ -1,0 +1,47 @@
+version: '3'
+services:
+  rabbitmq1:
+    image: rabbitmq:management
+    container_name: rabbitmq1
+    hostname: rabbitmq1
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=rabbit-cookie
+      - RABBITMQ_NODENAME=rabbit@rabbitmq1
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - ./init-rabbitmq-cluster.sh:/usr/local/bin/init-rabbitmq-cluster.sh
+      - ./data/1:/var/lib/rabbitmq
+      - ./logs/1:/var/log/rabbitmq
+    command: [ "/bin/bash", "-c", "chmod +x /usr/local/bin/init-rabbitmq-cluster.sh && /usr/local/bin/init-rabbitmq-cluster.sh" ]
+    networks:
+      rabbitmq-cluster:
+        aliases:
+          - node1.rabbitmq.com
+
+  rabbitmq2:
+    image: rabbitmq:management
+    container_name: rabbitmq2
+    hostname: rabbitmq2
+    ports:
+      - "5673:5672"
+    environment:
+      - RABBITMQ_ERLANG_COOKIE=rabbit-cookie
+      - RABBITMQ_NODENAME=rabbit@rabbitmq2
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    volumes:
+      - ./init-rabbitmq-cluster.sh:/usr/local/bin/init-rabbitmq-cluster.sh
+      - ./data/2:/var/lib/rabbitmq
+      - ./logs/2:/var/log/rabbitmq
+    command: [ "/bin/bash", "-c", "chmod +x /usr/local/bin/init-rabbitmq-cluster.sh && /usr/local/bin/init-rabbitmq-cluster.sh" ]
+    networks:
+      rabbitmq-cluster:
+        aliases:
+          - node2.rabbitmq.com
+networks:
+  rabbitmq-cluster:
+    driver: bridge
