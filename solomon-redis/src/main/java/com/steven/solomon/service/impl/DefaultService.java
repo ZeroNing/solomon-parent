@@ -34,6 +34,16 @@ public class DefaultService extends AbsICacheService {
   }
 
   @Override
+  public <T> T set(String group, String key, T value) {
+    return null;
+  }
+
+  @Override
+  public <T> T set(String group, String key, T value, int time) {
+    return null;
+  }
+
+  @Override
   public Long delete(String group, String key, Object... hashKey) {
     return null;
   }
