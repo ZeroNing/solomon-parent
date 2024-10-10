@@ -2,86 +2,86 @@ version: '3.8'
 
 services:
   redis-master:
-    image: redis:latest
-    container_name: redis-master
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-master  # 设置容器名称为 redis-master
     ports:
-      - 6379:6379
+      - 6379:6379  # 将主机的 6379 端口映射到容器的 6379 端口
     volumes:
-      - ./data/1:/data
+      - ./data/1:/data  # 将主机的 ./data/1 目录挂载到容器的 /data 目录中
     networks:
       redis-network:
         aliases:
           - redis-master  # 为主节点设置网络别名
-    command: ["redis-server", "--appendonly", "yes"]  # 开启持久化
+    command: ["redis-server", "--appendonly", "yes"]  # 启动 Redis 服务器并开启持久化 (Append Only File 模式)
 
   redis-slave1:
-    image: redis:latest
-    container_name: redis-slave1
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-slave1  # 设置容器名称为 redis-slave1
     ports:
-      - 6380:6379
+      - 6380:6379  # 将主机的 6380 端口映射到容器的 6379 端口
     volumes:
-      - ./data/2:/data
+      - ./data/2:/data  # 将主机的 ./data/2 目录挂载到容器的 /data 目录中
     networks:
       redis-network:
         aliases:
           - redis-slave1  # 为从节点1设置网络别名
-    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]  # 启动 Redis 服务器并配置为从节点，连接到主节点 redis-master
 
   redis-slave2:
-    image: redis:latest
-    container_name: redis-slave2
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-slave2  # 设置容器名称为 redis-slave2
     ports:
-      - 6381:6379
+      - 6381:6379  # 将主机的 6381 端口映射到容器的 6379 端口
     volumes:
-      - ./data/3:/data
+      - ./data/3:/data  # 将主机的 ./data/3 目录挂载到容器的 /data 目录中
     networks:
       redis-network:
         aliases:
           - redis-slave2  # 为从节点2设置网络别名
-    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]  # 启动 Redis 服务器并配置为从节点，连接到主节点 redis-master
 
   redis-sentinel1:
-    image: redis:latest
-    container_name: redis-sentinel1
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-sentinel1  # 设置容器名称为 redis-sentinel1
     ports:
-      - 26379:26379
+      - 26379:26379  # 将主机的 26379 端口映射到容器的 26379 端口
     networks:
       redis-network:
         aliases:
           - redis-sentinel1  # 为哨兵1设置网络别名
     command: >
-      redis-sentinel /etc/sentinel.conf
+      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
     volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
 
   redis-sentinel2:
-    image: redis:latest
-    container_name: redis-sentinel2
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-sentinel2  # 设置容器名称为 redis-sentinel2
     ports:
-      - 26380:26379
+      - 26380:26379  # 将主机的 26380 端口映射到容器的 26379 端口
     networks:
       redis-network:
         aliases:
           - redis-sentinel2  # 为哨兵2设置网络别名
     command: >
-      redis-sentinel /etc/sentinel.conf
+      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
     volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
 
   redis-sentinel3:
-    image: redis:latest
-    container_name: redis-sentinel3
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-sentinel3  # 设置容器名称为 redis-sentinel3
     ports:
-      - 26381:26379
+      - 26381:26379  # 将主机的 26381 端口映射到容器的 26379 端口
     networks:
       redis-network:
         aliases:
           - redis-sentinel3  # 为哨兵3设置网络别名
     command: >
-      redis-sentinel /etc/sentinel.conf
+      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
     volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
 
 networks:
   redis-network:
-    driver: bridge
+    driver: bridge  # 使用 bridge 模式创建 Docker 网络
