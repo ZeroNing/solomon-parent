@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
+    ports:
+      - 6379:6379  # 暴露 Redis 主节点的默认端口
+    volumes:
+      - ./data/1:/data  # 持久化数据
+    networks:
+      redis-network:
+        aliases:
+          - master.redis.com  # 设置网络别名，便于从节点连接
+
+  redis-slave1:
+    image: redis:latest
+    container_name: redis-slave1
+    ports:
+      - 6380:6379  # 暴露 Redis 从节点的端口
+    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点
+    volumes:
+      - ./data/2:/data  # 持久化数据
+    networks:
+      redis-network:
+        aliases:
+          - slave1.redis.com  # 设置网络别名
+
+  redis-slave2:
+    image: redis:latest
+    container_name: redis-slave2
+    ports:
+      - 6381:6379  # 暴露 Redis 从节点的端口
+    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点
+    volumes:
+      - ./data/3:/data  # 持久化数据
+    networks:
+      redis-network:
+        aliases:
+          - slave2.redis.com  # 设置网络别名
+
+networks:
+  redis-network:
+    driver: bridge  # 使用 bridge 网络
