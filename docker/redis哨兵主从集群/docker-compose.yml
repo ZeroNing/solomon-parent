@@ -1,0 +1,99 @@
+version: '3.8'
+
+services:
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/1:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-master
+    command: ["redis-server", "--appendonly", "yes"]
+
+  redis-replica1:
+    image: redis:latest
+    container_name: redis-replica1
+    ports:
+      - 6380:6379
+    volumes:
+      - ./data/2:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-replica1
+    command: ["redis-server", "--replicaof", "redis-master", "6379"]
+
+  redis-replica2:
+    image: redis:latest
+    container_name: redis-replica2
+    ports:
+      - 6381:6379
+    volumes:
+      - ./data/3:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-replica2
+    command: ["redis-server", "--replicaof", "redis-master", "6379"]
+
+  redis-sentinel1:
+    image: redis:latest
+    container_name: redis-sentinel1
+    ports:
+      - 26379:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel1
+    depends_on:
+      - redis-master
+      - redis-replica1
+      - redis-replica2
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+  redis-sentinel2:
+    image: redis:latest
+    container_name: redis-sentinel2
+    ports:
+      - 26380:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel2
+    depends_on:
+      - redis-master
+      - redis-replica1
+      - redis-replica2
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+  redis-sentinel3:
+    image: redis:latest
+    container_name: redis-sentinel3
+    ports:
+      - 26381:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel3
+    depends_on:
+      - redis-master
+      - redis-replica1
+      - redis-replica2
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+networks:
+  redis-network:
+    driver: bridge
