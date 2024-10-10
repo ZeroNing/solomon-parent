@@ -1,46 +1,44 @@
-version: '3.8'
+version: '3.8'  # 定义 Docker Compose 文件的版本
 
 services:
   redis-master:
-    image: redis:latest
-    container_name: redis-master
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-master  # 设置容器名称为 redis-master
     ports:
-      - 6379:6379  # 暴露 Redis 主节点的默认端口
+      - 6379:6379  # 暴露 Redis 主节点的默认端口 6379
     volumes:
-      - ./data/1:/data  # 持久化数据
-      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/1:/data  # 将主机的 ./data/1 目录挂载到容器的 /data 目录，实现数据持久化
     networks:
       redis-network:
         aliases:
-          - master.redis.com  # 设置网络别名，便于从节点连接
+          - master.redis.com  # 设置网络别名为 master.redis.com，便于从节点连接
 
   redis-slave1:
-    image: redis:latest
-    container_name: redis-slave1
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-slave1  # 设置容器名称为 redis-slave1
     ports:
-      - 6380:6379  # 暴露 Redis 从节点的端口
-    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点
+      - 6380:6379  # 把 Redis 从节点的端口 6379 映射到主机的 6380 端口
+    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点，连接到主节点 master.redis.com 的 6379 端口
     volumes:
-      - ./data/2:/data  # 持久化数据
-      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/2:/data  # 将主机的 ./data/2 目录挂载到容器的 /data 目录，实现数据持久化
     networks:
       redis-network:
         aliases:
-          - slave1.redis.com  # 设置网络别名
+          - slave1.redis.com  # 设置网络别名为 slave1.redis.com
 
   redis-slave2:
-    image: redis:latest
-    container_name: redis-slave2
+    image: redis:latest  # 使用最新版本的 Redis 镜像
+    container_name: redis-slave2  # 设置容器名称为 redis-slave2
     ports:
-      - 6381:6379  # 暴露 Redis 从节点的端口
-    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点
+      - 6381:6379  # 把 Redis 从节点的端口 6379 映射到主机的 6381 端口
+    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点，连接到主节点 master.redis.com 的 6379 端口
     volumes:
-      - ./data/3:/data  # 持久化数据
-      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data/3:/data  # 将主机的 ./data/3 目录挂载到容器的 /data 目录，实现数据持久化
     networks:
       redis-network:
         aliases:
-          - slave2.redis.com  # 设置网络别名
+          - slave2.redis.com  # 设置网络别名为 slave2.redis.com
+
 networks:
   redis-network:
-    driver: bridge  # 使用 bridge 网络
+    driver: bridge  # 使用 bridge 网络驱动，创建一个独立的网络供 Redis 主从节点通信
