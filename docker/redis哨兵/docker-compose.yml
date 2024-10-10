@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  redis-master:
+    image: redis:latest
+    container_name: redis-master
+    ports:
+      - 6379:6379
+    volumes:
+      - ./data/1:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-master  # 为主节点设置网络别名
+    command: ["redis-server", "--appendonly", "yes"]  # 开启持久化
+
+  redis-slave1:
+    image: redis:latest
+    container_name: redis-slave1
+    ports:
+      - 6380:6379
+    volumes:
+      - ./data/2:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-slave1  # 为从节点1设置网络别名
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+
+  redis-slave2:
+    image: redis:latest
+    container_name: redis-slave2
+    ports:
+      - 6381:6379
+    volumes:
+      - ./data/3:/data
+    networks:
+      redis-network:
+        aliases:
+          - redis-slave2  # 为从节点2设置网络别名
+    command: ["redis-server", "--slaveof", "redis-master", "6379"]
+
+  redis-sentinel1:
+    image: redis:latest
+    container_name: redis-sentinel1
+    ports:
+      - 26379:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel1  # 为哨兵1设置网络别名
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+  redis-sentinel2:
+    image: redis:latest
+    container_name: redis-sentinel2
+    ports:
+      - 26380:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel2  # 为哨兵2设置网络别名
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+  redis-sentinel3:
+    image: redis:latest
+    container_name: redis-sentinel3
+    ports:
+      - 26381:26379
+    networks:
+      redis-network:
+        aliases:
+          - redis-sentinel3  # 为哨兵3设置网络别名
+    command: >
+      redis-sentinel /etc/sentinel.conf
+    volumes:
+      - ./sentinel/sentinel.conf:/etc/sentinel.conf
+
+networks:
+  redis-network:
+    driver: bridge
