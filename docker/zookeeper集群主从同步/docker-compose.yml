@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  zookeeper1:
+    image: zookeeper:latest
+    container_name: zookeeper1
+    ports:
+      - 2181:2181  # 将容器内的 2181 端口映射到主机的 2181 端口
+    environment:
+      ZOO_MY_ID: 1  # 当前 Zookeeper 节点的唯一 ID
+      ZOO_SERVERS: server.1=zookeeper1:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=zookeeper3:2888:3888;2181
+      # 定义 Zookeeper 集群中的所有节点，包括主机名和端口号
+    volumes:
+      - ./data/1/data:/data  # 挂载数据目录，用于存储 Zookeeper 的数据
+      - ./data/1/datalog:/datalog  # 挂载事务日志目录，用于存储 Zookeeper 的事务日志
+      - ./logs/1:/logs  # 挂载日志目录，用于存储 Zookeeper 的操作日志
+    networks:
+      zookeeper-network:
+        aliases:
+          - node1.zookeeper.com  # 设置网络别名，便于节点通信
+
+  zookeeper2:
+    image: zookeeper:latest
+    container_name: zookeeper2
+    ports:
+      - 2182:2181  # 将容器内的 2181 端口映射到主机的 2182 端口以避免冲突
+    environment:
+      ZOO_MY_ID: 2  # 当前 Zookeeper 节点的唯一 ID
+      ZOO_SERVERS: server.1=zookeeper1:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=zookeeper3:2888:3888;2181
+      # 定义 Zookeeper 集群中的所有节点，包括主机名和端口号
+    volumes:
+      - ./data/2/data:/data  # 挂载数据目录，用于存储 Zookeeper 的数据
+      - ./data/2/datalog:/datalog  # 挂载事务日志目录，用于存储 Zookeeper 的事务日志
+      - ./logs/2:/logs  # 挂载日志目录，用于存储 Zookeeper 的操作日志
+    networks:
+      zookeeper-network:
+        aliases:
+          - node2.zookeeper.com  # 设置网络别名，便于节点通信
+
+  zookeeper3:
+    image: zookeeper:latest
+    container_name: zookeeper3
+    ports:
+      - 2183:2181  # 将容器内的 2181 端口映射到主机的 2183 端口以避免冲突
+    environment:
+      ZOO_MY_ID: 3  # 当前 Zookeeper 节点的唯一 ID
+      ZOO_SERVERS: server.1=zookeeper1:2888:3888;2181 server.2=zookeeper2:2888:3888;2181 server.3=zookeeper3:2888:3888;2181
+      # 定义 Zookeeper 集群中的所有节点，包括主机名和端口号
+    volumes:
+      - ./data/3/data:/data  # 挂载数据目录，用于存储 Zookeeper 的数据
+      - ./data/3/datalog:/datalog  # 挂载事务日志目录，用于存储 Zookeeper 的事务日志
+      - ./logs/3:/logs  # 挂载日志目录，用于存储 Zookeeper 的操作日志
+    networks:
+      zookeeper-network:
+        aliases:
+          - node3.zookeeper.com  # 设置网络别名，便于节点通信
+
+networks:
+  zookeeper-network:
+    driver: bridge  # 使用 bridge 网络驱动
