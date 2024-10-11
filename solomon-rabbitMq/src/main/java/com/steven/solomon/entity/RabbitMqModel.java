@@ -30,6 +30,19 @@ public class RabbitMqModel<T> extends BaseMq<T> {
      */
     private boolean messagePersistent = true;
 
+    /**
+     * 响应队列
+     */
+    private String replyTo;
+
+    public String getReplyTo() {
+        return replyTo;
+    }
+
+    public void setReplyTo(String replyTo) {
+        this.replyTo = replyTo;
+    }
+
     public boolean getMessagePersistent() {
         return messagePersistent;
     }

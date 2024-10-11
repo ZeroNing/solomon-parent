@@ -4,6 +4,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.code.RabbitMqErrorCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MessageQueueDetail;
 import com.steven.solomon.entity.RabbitMqModel;
@@ -15,8 +16,7 @@ import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,12 +33,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 @Configuration
-public class RabbitUtils implements SendService<RabbitMqModel> {
+public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
     private final Logger logger = LoggerUtils.logger(RabbitUtils.class);
 
@@ -52,7 +48,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      * 发送消息
      */
     @Override
-    public void send(RabbitMqModel mq) throws Exception {
+    public void send(RabbitMqModel<?> mq) throws Exception {
         if (!convertAndSend(mq, 0, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -62,7 +58,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      * 发送延缓信息
      */
     @Override
-    public void sendDelay(RabbitMqModel mq, long delay) throws Exception {
+    public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
         if (!convertAndSend(mq, delay, true)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -72,7 +68,7 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
      * 发送消息,并设置消息过期时间
      */
     @Override
-    public void sendExpiration(RabbitMqModel mq, long expiration) throws Exception {
+    public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
         if (!convertAndSend(mq, expiration, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -219,6 +215,17 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
             AbstractConsumer<?,?> abstractConsumer = (AbstractConsumer<?,?>) obj;
             abstractConsumer.onMessage(new Message(response.getBody(), new MessageProperties()), channel);
         }
+    }
+
+    public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
+        if(ValidateUtils.isEmpty(model.getReplyTo())){
+            throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
+        }
+        return rabbitTemplate.convertSendAndReceive(model.getRoutingKey(), model, message -> {
+            message.getMessageProperties().setReplyTo(model.getReplyTo());
+            message.getMessageProperties().setCorrelationId(UUID.randomUUID().toString());
+            return message;
+        });
     }
 
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
