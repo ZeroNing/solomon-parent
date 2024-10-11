@@ -217,6 +217,9 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         }
     }
 
+    /**
+     * 请求回复消息发送
+     */
     public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
         if(ValidateUtils.isEmpty(model.getReplyTo())){
             throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
@@ -228,6 +231,9 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         });
     }
 
+    /**
+     * 回复消息发送
+     */
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
         rabbitTemplate.send(routingKey, object);
     }
