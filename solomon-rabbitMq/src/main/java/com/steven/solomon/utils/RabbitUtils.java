@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
@@ -218,5 +219,9 @@ public class RabbitUtils implements SendService<RabbitMqModel> {
             AbstractConsumer<?,?> abstractConsumer = (AbstractConsumer<?,?>) obj;
             abstractConsumer.onMessage(new Message(response.getBody(), new MessageProperties()), channel);
         }
+    }
+
+    public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
+        rabbitTemplate.send(routingKey, object);
     }
 }

@@ -53,6 +53,8 @@ public class RabbitConfig {
         }
         if (ValidateUtils.isNotEmpty(properties.getTemplate().getReplyTimeout())) {
             rabbitTemplate.setReplyTimeout(properties.getTemplate().getReplyTimeout().toMillis());
+        } else {
+            rabbitTemplate.setReplyTimeout(120000);
         }
         Map<String, AbstractRabbitCallBack> callBackMap = SpringUtil.getBeansOfType(AbstractRabbitCallBack.class);
         if (ValidateUtils.isNotEmpty(callBackMap)) {

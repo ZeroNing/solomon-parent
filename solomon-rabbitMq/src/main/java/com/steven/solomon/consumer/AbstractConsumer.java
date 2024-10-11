@@ -8,12 +8,15 @@ import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 
 import java.nio.charset.StandardCharsets;
@@ -30,6 +33,13 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
     protected String correlationId;
 
     protected MessageProperties messageProperties;
+
+    protected final RabbitUtils rabbitUtils;
+
+    protected AbstractConsumer(RabbitUtils rabbitUtils) {
+        this.rabbitUtils = rabbitUtils;
+    }
+
 
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
@@ -51,6 +61,13 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
             if (!isAutoAck()) {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
+            }
+            if(ValidateUtils.isNotEmpty(messageProperties.getReplyTo())){
+                // 创建响应消息 Result必须是JSON结构才可以
+                MessageProperties replyMessageProperties = new MessageProperties();
+                replyMessageProperties.setCorrelationId(messageProperties.getCorrelationId());
+                Message replyMessage = MessageBuilder.withBody(result.toString().getBytes()).andProperties(replyMessageProperties).build();
+                rabbitUtils.sendReplyTo(messageProperties.getReplyTo(), replyMessage);
             }
         } catch (Throwable e) {
             // 保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
