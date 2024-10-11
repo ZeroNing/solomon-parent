@@ -516,6 +516,45 @@ public class TestDlxMq extends AbstractConsumer<String> {
     }
 }
 ```
+5.请求回复发送消息用例，最后会返回AbstractConsumer的Json结果，如果是非Json结构会报错
+```java
+@RestController
+@RequestMapping
+public class TestController {
+
+    @Autowired
+    private RabbitUtils utils;
+
+    @PostMapping("/test")
+    public Object test() throws Exception {
+        RabbitMqModel<String> mqModel = new RabbitMqModel<String>("test","test","test");
+        mqModel.setReplyTo("test");
+        return  utils.convertSendAndReceive(mqModel);
+    }
+}
+```
+```java
+@MessageListener(queues = "test",exchange = "test",routingKey = "test")
+public class Handler extends AbstractConsumer<String,String> {
+
+    protected Handler(RabbitUtils rabbitUtils) {
+        super(rabbitUtils);
+    }
+
+    @Override
+    public String handleMessage(String body) throws Exception {
+        Map<String,Object> a = new HashMap<>();
+        a.put("msg",body);
+        return JSONUtil.toJsonStr(a);
+    }
+
+    @Override
+    public void saveLog(String result, Throwable throwable, RabbitMqModel<String> rabbitMqModel) {
+
+    }
+}
+```
+
 
 ## MQTT消费用例
 
