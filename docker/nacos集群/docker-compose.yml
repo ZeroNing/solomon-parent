@@ -1,16 +1,12 @@
 version: '3'
 # 指定 Docker Compose 配置文件的版本，这里使用的是版本 3。
-
 services:
   # 定义了三个 Nacos 服务实例 nacos1、nacos2 和 nacos3。
-
   nacos1:
     image: nacos/nacos-server:latest
     # 使用最新版本的 Nacos 镜像。
-
     container_name: nacos1
     # 指定容器名称为 nacos1。
-
     ports:
       - "8848:8848"
       - "9848:9848"
@@ -45,7 +41,6 @@ services:
       - ./logs/1:/home/nacos/logs
       - /etc/localtime:/etc/localtime
     # 挂载本地目录到容器内，保存数据和日志，并保持宿主机和容器的时间同步。
-
     networks:
       nacos-bridge:
         aliases:
@@ -118,7 +113,6 @@ services:
         aliases:
           - node3.nacos.com
     restart: always
-
 networks:
   nacos-bridge:
     driver: bridge
