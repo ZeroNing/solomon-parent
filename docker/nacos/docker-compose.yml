@@ -14,6 +14,7 @@ services:
       - NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789 #密钥需要用Base64加密的得到 如果不知道给什么值可以给旧版本的值（会有安全问题）: SecretKey012345678901234567890123456789012345678901234567890123456789
       - NACOS_AUTH_IDENTITY_KEY=identity #自定义键 旧版本默认:serverIdentity,但不要使用旧版本的默认值会有安全问题
       - NACOS_AUTH_IDENTITY_VALUE=security #自定义键值 旧版本默认:security,但不要使用旧版本的默认值会有安全问题
+      - JAVA_OPT=-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m
     volumes:
       - ./data:/home/nacos/data
       - ./logs:/home/nacos/logs
