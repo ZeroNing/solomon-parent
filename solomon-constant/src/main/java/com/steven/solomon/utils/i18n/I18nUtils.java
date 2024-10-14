@@ -23,7 +23,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    */
   public static String getErrorMessage(String code, Object... args) {
-    if(code == null || code.isBlank()){
+    if(code == null || code.isEmpty()){
       return null;
     }
     return getMessage(BaseCode.BASE_EXCEPTION_CODE + code, args);
@@ -36,7 +36,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    */
   public static String getErrorMessage(String code,Locale locale, Object... args) {
-    if(code == null || code.isBlank()){
+    if(code == null || code.isEmpty()){
       return null;
     }
     return getMessage(BaseCode.BASE_EXCEPTION_CODE + code,locale, args);
@@ -49,7 +49,7 @@ public class I18nUtils {
    * @param enumClazz 枚举Class
    */
   public static String getEnumMessage(String code, Class<?> enumClazz) {
-    if(code == null || code.isBlank()){
+    if(code == null || code.isEmpty()){
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName()+"."+code);
@@ -69,7 +69,7 @@ public class I18nUtils {
   }
 
   public static String getEnumMessage(String code) {
-    if(code == null || code.isBlank()){
+    if(code == null || code.isEmpty()){
       return null;
     }
     return getMessage(code, "");
