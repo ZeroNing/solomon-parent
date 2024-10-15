@@ -13,4 +13,8 @@ public interface BaseRabbitMqCode {
   String QUEUE_MODE = "x-queue-mode";
 
   String QUEUE_LAZY = "lazy";
+
+  String QUEUE_MAX_LENGTH = "x-max-length";
+
+  String QUEUE_OVER_FLOW = "x-overflow";
 }

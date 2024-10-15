@@ -105,6 +105,10 @@ public class InitRabbitBinding implements Serializable {
         if (messageListener.delay() != 0L && !messageListener.isDelayExchange()) {
             args.put(BaseRabbitMqCode.DLX_TTL, messageListener.delay());
         }
+        if(!ValidateUtils.equals(messageListener.queueMaxLength(),-1)){
+            args.put(BaseRabbitMqCode.QUEUE_MAX_LENGTH, messageListener.queueMaxLength());
+            args.put(BaseRabbitMqCode.QUEUE_OVER_FLOW, messageListener.queueOverflow().label());
+        }
         return args;
     }
 }

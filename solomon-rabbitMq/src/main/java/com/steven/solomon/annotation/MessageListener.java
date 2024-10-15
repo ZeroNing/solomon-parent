@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import com.steven.solomon.code.RabbitMqOverFlowEnum;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
@@ -97,4 +98,14 @@ public @interface MessageListener {
      * 是否创建惰性队列
      */
     boolean lazy() default false;
+
+    /**
+     * 队列中可以存储处于ready状态消息的数量(-1不设置)
+     */
+    int queueMaxLength() default -1;
+
+    /**
+     * 队列的处于ready状态存储消息的个数或消息占用的容量超过设定值后的处理策略
+     */
+    RabbitMqOverFlowEnum queueOverflow() default RabbitMqOverFlowEnum.REJECT_PUBLISH_DLX;
 }
