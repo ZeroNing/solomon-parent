@@ -1,10 +1,13 @@
 package com.steven.solomon.entity;
 
 
+import com.rabbitmq.client.AMQP;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseRabbitMqCode;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -14,7 +17,7 @@ public class InitRabbitBinding implements Serializable {
     /**
      * 队列名
      */
-    String queue;
+    String queueName;
     /**
      * 交换器名
      */
@@ -24,24 +27,32 @@ public class InitRabbitBinding implements Serializable {
      */
     String routingKey;
 
-    Map<String, Object> args;
+    Queue queue;
 
     public InitRabbitBinding(MessageListener messageListener, String queueName, boolean isInitDlxMap, boolean isAddDlxPrefix) {
         // 队列名
-        this.queue = this.getName(queueName, isAddDlxPrefix);
+        this.queueName = this.getName(queueName, isAddDlxPrefix);
         // 交换机名
         this.exchange = this.getName(messageListener.exchange(), isAddDlxPrefix);
         // 路由
         this.routingKey = this.getName(messageListener.routingKey(), isAddDlxPrefix);
-        this.args = this.initArgs(messageListener, isInitDlxMap);
+        this.queue = this.initQueue(messageListener,isInitDlxMap,this.queueName);
     }
 
-    public String getQueue() {
+    public Queue getQueue() {
         return queue;
     }
 
-    public void setQueue(String queue) {
+    public void setQueue(Queue queue) {
         this.queue = queue;
+    }
+
+    public String getQueueName() {
+        return queueName;
+    }
+
+    public void setQueueName(String queueName) {
+        this.queueName = queueName;
     }
 
     public String getExchange() {
@@ -60,14 +71,6 @@ public class InitRabbitBinding implements Serializable {
         this.routingKey = routingKey;
     }
 
-    public Map<String, Object> getArgs() {
-        return args;
-    }
-
-    public void setArgs(Map<String, Object> args) {
-        this.args = args;
-    }
-
     private String getName(String name, boolean isAddDlxPrefix) {
         if (ValidateUtils.isEmpty(name)) {
             return name;
@@ -76,39 +79,29 @@ public class InitRabbitBinding implements Serializable {
         return isAddDlxPrefix ? BaseRabbitMqCode.DLX_PREFIX + name : name;
     }
 
-    /**
-     * 绑定死信队列参数
-     *
-     * @param messageListener     MQ注解
-     * @param isInitDlxMap 是否初始化死信队列参数
-     * @return 死信队列参数
-     */
-    private Map<String, Object> initArgs(MessageListener messageListener, boolean isInitDlxMap) {
-        boolean dlx = !void.class.equals(messageListener.dlxClazz()) || messageListener.delay() != 0L;
-        Map<String, Object> args = new HashMap<>(3);
+    private Queue initQueue(MessageListener messageListener, boolean isInitDlxMap,String queueName){
+        boolean dlx = !void.class.equals(messageListener.dlxClazz()) || messageListener.ttl() != 0;
+        QueueBuilder queueBuilder = messageListener.isPersistence() ? QueueBuilder.durable(queueName) : QueueBuilder.nonDurable(queueName);
         if(messageListener.lazy()){
-            args.put(BaseRabbitMqCode.QUEUE_MODE, BaseRabbitMqCode.QUEUE_LAZY);
+            queueBuilder.lazy();
         }
         if (!dlx || !isInitDlxMap) {
-            return args;
+            return queueBuilder.build();
         }
-        args.put(BaseRabbitMqCode.DLX_EXCHANGE_KEY, BaseRabbitMqCode.DLX_PREFIX + messageListener.exchange());
-
+        queueBuilder.deadLetterExchange(BaseRabbitMqCode.DLX_PREFIX + messageListener.exchange());
         if (ValidateUtils.isNotEmpty(messageListener.routingKey())) {
-            args.put(BaseRabbitMqCode.DLX_ROUTING_KEY, BaseRabbitMqCode.DLX_PREFIX + messageListener.routingKey());
+            queueBuilder.deadLetterRoutingKey(BaseRabbitMqCode.DLX_PREFIX + messageListener.routingKey());
         }
-        /**
-         * x-message-ttl 在创建队列时设置的消息TTL，表示消息在队列中最多能存活多久（ms）；
-         * Expiration 发布消息时设置的消息TTL，消息自产生后的存活时间（ms）；
-         * x-delay 由rabbitmq_delayed_message_exchange插件提供TTL，从交换机延迟投递到队列的时间（ms）；
-         */
-        if (messageListener.delay() != 0L && !messageListener.isDelayExchange()) {
-            args.put(BaseRabbitMqCode.DLX_TTL, messageListener.delay());
+        if (messageListener.ttl() != 0L && !messageListener.isDelayExchange()) {
+            queueBuilder.ttl(messageListener.ttl());
         }
+        queueBuilder.overflow(messageListener.queueOverflow());
         if(!ValidateUtils.equals(messageListener.queueMaxLength(),-1)){
-            args.put(BaseRabbitMqCode.QUEUE_MAX_LENGTH, messageListener.queueMaxLength());
-            args.put(BaseRabbitMqCode.QUEUE_OVER_FLOW, messageListener.queueOverflow().label());
+            queueBuilder.maxLength(messageListener.queueMaxLength());
         }
-        return args;
+        if(!ValidateUtils.equals(messageListener.queueMaxLengthByte(),-1)){
+            queueBuilder.maxLengthBytes(messageListener.queueMaxLengthByte());
+        }
+        return queueBuilder.build();
     }
 }

@@ -1,8 +1,8 @@
 package com.steven.solomon.annotation;
 
-import com.steven.solomon.code.RabbitMqOverFlowEnum;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.ExchangeTypes;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
@@ -66,7 +66,7 @@ public @interface MessageListener {
     /**
      * 消息最大存活时间
      */
-    long delay() default 0L;
+    int ttl() default 0;
 
     /**
      * 死信队列Class
@@ -105,7 +105,12 @@ public @interface MessageListener {
     int queueMaxLength() default -1;
 
     /**
+     * 队列的最大内存容量(-1不设置)
+     */
+    int queueMaxLengthByte() default -1;
+
+    /**
      * 队列的处于ready状态存储消息的个数或消息占用的容量超过设定值后的处理策略
      */
-    RabbitMqOverFlowEnum queueOverflow() default RabbitMqOverFlowEnum.REJECT_PUBLISH_DLX;
+    QueueBuilder.Overflow queueOverflow() default QueueBuilder.Overflow.dropHead;
 }

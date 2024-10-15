@@ -34,7 +34,7 @@
     <commons.lang.version>2.6</commons.lang.version>
     <yauaa.version>7.28.1</yauaa.version>
     <easy.excel.version>3.3.4</easy.excel.version>
-    <spring.boot.version>2.4.13</spring.boot.version>
+    <spring.boot.version>2.7.18</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
     <javax.validation>2.0.1.Final</javax.validation>
     <thumbnailator.version>0.4.20</thumbnailator.version>
@@ -92,7 +92,8 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.4.13</version>
+    <version>2.7.18</version>
+    <relativePath/>
   </parent>
 
 

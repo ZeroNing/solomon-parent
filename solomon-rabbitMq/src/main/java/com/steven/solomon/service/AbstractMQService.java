@@ -14,7 +14,7 @@ public abstract class AbstractMQService {
     public Queue initBinding(MessageListener messageListener, String queueName, RabbitAdmin admin, boolean isInitDlxMap, boolean isAddDlxPrefix) {
         InitRabbitBinding initRabbitBinding = new InitRabbitBinding(messageListener, queueName, isInitDlxMap, isAddDlxPrefix);
         // 初始化队列
-        Queue queue = new Queue(initRabbitBinding.getQueue(), messageListener.isPersistence(), false, false, initRabbitBinding.getArgs());
+        Queue queue = initRabbitBinding.getQueue();
         // 绑定队列
         admin.declareQueue(queue);
         // 绑定交换机
