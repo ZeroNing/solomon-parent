@@ -1,7 +1,6 @@
 package com.steven.solomon.entity;
 
 
-import com.rabbitmq.client.AMQP;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseRabbitMqCode;
 import com.steven.solomon.spring.SpringUtil;
@@ -10,8 +9,6 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 
 public class InitRabbitBinding implements Serializable {
     /**

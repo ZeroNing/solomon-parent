@@ -1,6 +1,7 @@
 package com.steven.solomon.spring;
 
 import java.lang.annotation.Annotation;
+import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
@@ -10,6 +11,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.Order;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -92,5 +95,16 @@ public class SpringUtil implements ApplicationContextAware {
             }
         }
         return elKey;
+    }
+
+    public static <T> Map<String, ParameterizedTypeReference<?>> getAllMQServicesWithGenerics(Class<T> clazz) {
+        Map<String, ParameterizedTypeReference<?>> result = new HashMap<>();
+        Map<String, T> beans = context.getBeansOfType(clazz);
+
+        for (Map.Entry<String, T> entry : beans.entrySet()) {
+            ParameterizedTypeReference<?> typeRef = new ParameterizedTypeReference<T>() {};
+            result.put(entry.getKey(), typeRef);
+        }
+        return result;
     }
 }

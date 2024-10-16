@@ -10,6 +10,7 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +29,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
@@ -47,6 +49,8 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
     private final CachingConnectionFactory connectionFactory;
 
+    private final Map<String, AbstractMQService<?>> abstractMQMap = new HashMap<>();
+
     /**
      * 所有的队列监听容器MAP
      */
@@ -56,11 +60,14 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         this.admin = admin;
         this.connectionFactory = connectionFactory;
         SpringUtil.setContext(applicationContext);
+        Map<String,ParameterizedTypeReference<?>> parameterizedTypeReferenceMap = SpringUtil.getAllMQServicesWithGenerics(AbstractMQService.class);
+        for (Map.Entry<String, ParameterizedTypeReference<?>> entry : parameterizedTypeReferenceMap.entrySet()) {
+            abstractMQMap.put(entry.getKey(), (AbstractMQService<?>) applicationContext.getBean(entry.getKey()));
+        }
     }
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        Map<String, AbstractMQService> abstractMQMap = SpringUtil.getBeansOfType(AbstractMQService.class);
         // 遍历消费者队列进行初始化绑定以及监听
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
@@ -84,7 +91,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
     /**
      * 初始化死信队列MQ
      */
-    private void initDlx(Queue queue, Map<String, AbstractMQService> abstractMQMap) {
+    private void initDlx(Queue queue, Map<String, AbstractMQService<?>> abstractMQMap) {
         // 判断消费队列是否需要死信队列 只要死信队列或者延时队列为true即可判断为开启死信队列
         Class<?> clazz = messageListener.dlxClazz();
 
@@ -170,9 +177,9 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         return retryPolicy;
     }
 
-    private Queue initBinding(Map<String, AbstractMQService> abstractMQMap, String queue, boolean isInitDlxMap,
+    private Queue initBinding(Map<String, AbstractMQService<?>> abstractMQMap, String queue, boolean isInitDlxMap,
                               boolean isAddDlxPrefix) {
-        AbstractMQService abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
+        AbstractMQService<?> abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
                 ? abstractMQMap.get("delayedMQService") : abstractMQMap
                 .get(messageListener.exchangeTypes() + AbstractMQService.SERVICE_NAME);
         return abstractMQService.initBinding(messageListener, queue, admin, isInitDlxMap, isAddDlxPrefix);
