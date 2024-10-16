@@ -7,7 +7,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 
-public abstract class AbstractMQService {
+public abstract class AbstractMQService<E extends AbstractExchange> {
 
     public static String SERVICE_NAME = "MQService";
 
@@ -18,7 +18,7 @@ public abstract class AbstractMQService {
         // 绑定队列
         admin.declareQueue(queue);
         // 绑定交换机
-        AbstractExchange exchange = initExchange(initRabbitBinding.getExchange(), messageListener);
+        E exchange = initExchange(initRabbitBinding.getExchange(), messageListener);
         admin.declareExchange(exchange);
         // 绑定
         admin.declareBinding(this.initBinding(queue, exchange, initRabbitBinding.getRoutingKey(), messageListener));
@@ -28,10 +28,10 @@ public abstract class AbstractMQService {
     /**
      * 初始化交换机
      */
-    protected abstract AbstractExchange initExchange(String exchange, MessageListener messageListener);
+    protected abstract E initExchange(String exchange, MessageListener messageListener);
 
     /**
      * 初始化绑定
      */
-    protected abstract Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener);
+    protected abstract Binding initBinding(Queue queue, E exchange, String routingKey, MessageListener messageListener);
 }

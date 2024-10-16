@@ -11,10 +11,10 @@ import java.util.Map;
  * RabbitMq延迟队列注册
  */
 @Service("delayedMQService")
-public class DelayedMQService extends AbstractMQService {
+public class DelayedMQService extends AbstractMQService<CustomExchange> {
 
     @Override
-    protected AbstractExchange initExchange(String exchangeName, MessageListener messageListener) {
+    protected CustomExchange initExchange(String exchangeName, MessageListener messageListener) {
         Map<String, Object> props = new HashMap<>(1);
         //延迟交换器类型
         props.put("x-delayed-type", messageListener.exchangeTypes());
@@ -22,7 +22,7 @@ public class DelayedMQService extends AbstractMQService {
     }
 
     @Override
-    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener) {
+    protected Binding initBinding(Queue queue, CustomExchange exchange, String routingKey, MessageListener messageListener) {
         return BindingBuilder.bind(queue).to(exchange).with(routingKey).noargs();
     }
 }

@@ -8,15 +8,15 @@ import org.springframework.stereotype.Service;
  * RabbitMq广播队列注册
  */
 @Service("fanoutMQService")
-public class FanoutMQService extends AbstractMQService {
+public class FanoutMQService extends AbstractMQService<FanoutExchange> {
 
     @Override
-    protected AbstractExchange initExchange(String exchangeName, MessageListener messageListener) {
+    protected FanoutExchange initExchange(String exchangeName, MessageListener messageListener) {
         return new FanoutExchange(exchangeName);
     }
 
     @Override
-    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener) {
-        return BindingBuilder.bind(queue).to((FanoutExchange) exchange);
+    protected Binding initBinding(Queue queue, FanoutExchange exchange, String routingKey, MessageListener messageListener) {
+        return BindingBuilder.bind(queue).to(exchange);
     }
 }

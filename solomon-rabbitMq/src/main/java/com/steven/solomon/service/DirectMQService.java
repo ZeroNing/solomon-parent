@@ -8,16 +8,16 @@ import org.springframework.stereotype.Service;
  * RabbitMq直连队列注册
  */
 @Service("directMQService")
-public class DirectMQService extends AbstractMQService {
+public class DirectMQService extends AbstractMQService<DirectExchange> {
 
     @Override
-    protected AbstractExchange initExchange(String exchangeName, MessageListener messageListener) {
+    protected DirectExchange initExchange(String exchangeName, MessageListener messageListener) {
         return new DirectExchange(exchangeName);
     }
 
     @Override
-    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener) {
-        return BindingBuilder.bind(queue).to((DirectExchange) exchange).with(routingKey);
+    protected Binding initBinding(Queue queue, DirectExchange exchange, String routingKey, MessageListener messageListener) {
+        return BindingBuilder.bind(queue).to(exchange).with(routingKey);
     }
 
 }

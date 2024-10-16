@@ -14,16 +14,16 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.stereotype.Service;
 
 @Service("headersMQService")
-public class HeadersMQService extends AbstractMQService {
+public class HeadersMQService extends AbstractMQService<HeadersExchange> {
 
     @Override
-    protected AbstractExchange initExchange(String exchange, MessageListener messageListener) {
+    protected HeadersExchange initExchange(String exchange, MessageListener messageListener) {
         return new HeadersExchange(exchange);
     }
 
     @Override
-    protected Binding initBinding(Queue queue, AbstractExchange exchange, String routingKey, MessageListener messageListener) {
-        HeadersExchangeMapConfigurer headersExchangeMapConfigurer = BindingBuilder.bind(queue).to((HeadersExchange) exchange);
+    protected Binding initBinding(Queue queue, HeadersExchange exchange, String routingKey, MessageListener messageListener) {
+        HeadersExchangeMapConfigurer headersExchangeMapConfigurer = BindingBuilder.bind(queue).to(exchange);
         String[] headers = messageListener.headers();
         Map<String, Object> headerMap = new HashMap<>();
         if (messageListener.matchValue()) {
