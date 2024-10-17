@@ -63,17 +63,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
             }
             T body = rabbitMqModel.getBody();
-            if(body instanceof JSONObject){
-                body = JSONUtil.toBean((JSONObject) body,  ClassUtil.loadClass(TypeUtil.getTypeArgument(getClass(),0).getTypeName()));
-            } else if (body instanceof JSONArray){
-                Type listType = TypeUtil.getTypeArgument(getClass(), 0);
-                if (listType instanceof ParameterizedType) {
-                    Type[] typeArguments = ((ParameterizedType) listType).getActualTypeArguments();
-                    body = (T) JSONUtil.toList((JSONArray) body,Class.forName(typeArguments[0].getTypeName()));
-                }
-            }
             // 消费消息
-            result = this.handleMessage(rabbitMqModel.getBody());
+            result = this.handleMessage(conversion(body));
             if (!isAutoAck()) {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
@@ -169,4 +160,22 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
      */
     public abstract void saveLog(R result,Throwable throwable,RabbitMqModel<T> rabbitMqModel);
 
+    private T conversion(T body){
+        boolean isJsonObject = body instanceof JSONObject;
+        boolean isJsonArray = body instanceof JSONArray;
+        if(!isJsonObject && !isJsonArray){
+            return body;
+        }
+        Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
+        String typeName = typeArgument.getTypeName();
+
+        if(isJsonObject){
+            body = JSONUtil.toBean((JSONObject) body,ClassUtil.loadClass(typeName));
+        }
+        if(isJsonArray && typeArgument instanceof ParameterizedType){
+            Type[] typeArguments = ((ParameterizedType) typeArgument).getActualTypeArguments();
+            body = (T) JSONUtil.toList((JSONArray) body,ClassUtil.loadClass(typeArguments[0].getTypeName()));
+        }
+        return body;
+    }
 }
