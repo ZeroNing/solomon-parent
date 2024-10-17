@@ -1,6 +1,7 @@
 package com.steven.solomon.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
@@ -36,6 +37,10 @@ public class JackJsonUtils {
      */
     public static <T> T conversionClass(String json, Class<T> t) throws IOException {
         return mapper.readValue(json, t);
+    }
+
+    public static <T> T conversionClass(String json, TypeReference<T> typeReference) throws IOException {
+        return mapper.readValue(json, typeReference);
     }
 
     /**

@@ -1,6 +1,10 @@
 package com.steven.solomon.consumer;
 
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.ClassUtil;
+import cn.hutool.core.util.TypeUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.MessageListener;
@@ -16,10 +20,12 @@ import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * RabbitMq消费器
@@ -55,6 +61,16 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
             // 判断是否重复消费
             if (checkMessageKey(rabbitMqModel)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+            }
+            T body = rabbitMqModel.getBody();
+            if(body instanceof JSONObject){
+                body = JSONUtil.toBean((JSONObject) body,  ClassUtil.loadClass(TypeUtil.getTypeArgument(getClass(),0).getTypeName()));
+            } else if (body instanceof JSONArray){
+                Type listType = TypeUtil.getTypeArgument(getClass(), 0);
+                if (listType instanceof ParameterizedType) {
+                    Type[] typeArguments = ((ParameterizedType) listType).getActualTypeArguments();
+                    body = (T) JSONUtil.toList((JSONArray) body,Class.forName(typeArguments[0].getTypeName()));
+                }
             }
             // 消费消息
             result = this.handleMessage(rabbitMqModel.getBody());

@@ -140,8 +140,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //    return allQueueContainerMap;
 //  }
 
-    private boolean convertAndSend(BaseMq baseMq, long expiration, boolean isDelayed) {
-        RabbitMqModel rabbitMQModel = (RabbitMqModel) baseMq;
+    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) {
+        RabbitMqModel<?> rabbitMQModel = (RabbitMqModel<?>) baseMq;
         if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
             return false;
         }
