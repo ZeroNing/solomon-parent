@@ -82,6 +82,7 @@ public class InitRabbitBinding implements Serializable {
         if(messageListener.lazy()){
             queueBuilder.lazy();
         }
+        queueBuilder.overflow(messageListener.queueOverflow());
         if (!dlx || !isInitDlxMap) {
             return queueBuilder.build();
         }
@@ -92,12 +93,14 @@ public class InitRabbitBinding implements Serializable {
         if (messageListener.ttl() != 0L && !messageListener.isDelayExchange()) {
             queueBuilder.ttl(messageListener.ttl());
         }
-        queueBuilder.overflow(messageListener.queueOverflow());
         if(!ValidateUtils.equals(messageListener.queueMaxLength(),-1)){
             queueBuilder.maxLength(messageListener.queueMaxLength());
         }
         if(!ValidateUtils.equals(messageListener.queueMaxLengthByte(),-1)){
             queueBuilder.maxLengthBytes(messageListener.queueMaxLengthByte());
+        }
+        if(!ValidateUtils.equals(messageListener.maxPriority(),-1)){
+            queueBuilder.maxPriority(messageListener.maxPriority());
         }
         return queueBuilder.build();
     }

@@ -113,4 +113,9 @@ public @interface MessageListener {
      * 队列的处于ready状态存储消息的个数或消息占用的容量超过设定值后的处理策略
      */
     QueueBuilder.Overflow queueOverflow() default QueueBuilder.Overflow.dropHead;
+
+    /**
+     * 队列的优先级(-1不设置)
+     */
+    int maxPriority() default -1;
 }
