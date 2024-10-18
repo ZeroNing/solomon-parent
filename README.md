@@ -355,6 +355,7 @@ DelFlagEnum.DELETE=删除
 ## Rabbit队列注册以及消费用例
 ### Rabbitmq自定义配置
 ```properties
+spring:
   rabbitmq:
     username: guest
     password: guest
