@@ -11,6 +11,7 @@ import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -64,13 +65,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
             }
-            if(ValidateUtils.isNotEmpty(messageProperties.getReplyTo())){
-                // 创建响应消息 Result必须是JSON结构才可以
-                MessageProperties replyMessageProperties = new MessageProperties();
-                replyMessageProperties.setCorrelationId(messageProperties.getCorrelationId());
-                Message replyMessage = MessageBuilder.withBody(result.toString().getBytes()).andProperties(replyMessageProperties).build();
-                rabbitUtils.sendReplyTo(messageProperties.getReplyTo(), replyMessage);
-            }
+            //发送请求回应
+            sendReplyTo(result);
         } catch (Throwable e) {
             // 保存重试失败次数达到retryNumber上线后拒绝此消息入队列并删除redis
             saveFailNumber(channel,e);
@@ -170,5 +166,20 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
         model.setBody(body);
         return model;
+    }
+
+    /**
+     * 发送请求-回应方法
+     */
+    public void sendReplyTo(R result){
+        if(ValidateUtils.isEmpty(messageProperties.getReplyTo())){
+            return;
+        }
+        ResultVO<R> resultVO = new ResultVO<>(result);
+        // 创建响应消息 Result必须是JSON结构才可以
+        MessageProperties replyMessageProperties = new MessageProperties();
+        replyMessageProperties.setCorrelationId(messageProperties.getCorrelationId());
+        Message replyMessage = MessageBuilder.withBody(JSONUtil.toJsonStr(resultVO).getBytes()).andProperties(replyMessageProperties).build();
+        rabbitUtils.sendReplyTo(messageProperties.getReplyTo(), replyMessage);
     }
 }
