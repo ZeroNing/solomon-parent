@@ -12,6 +12,7 @@ import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -46,7 +47,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         this.rabbitUtils = rabbitUtils;
     }
 
-
     @Override
     public void onMessage(Message message, Channel channel) throws Exception {
         setProperties(message);
@@ -57,7 +57,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         R result = null;
         try {
             logger.info("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
-            rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>(){},true);
+            rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>() {},true);
             // 判断是否重复消费
             if (checkMessageKey(rabbitMqModel)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
@@ -166,16 +166,9 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         if(!isJsonObject && !isJsonArray){
             return body;
         }
+        String json = JSONUtil.toJsonStr(body);
         Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
-        String typeName = typeArgument.getTypeName();
-
-        if(isJsonObject){
-            body = JSONUtil.toBean((JSONObject) body,ClassUtil.loadClass(typeName));
-        }
-        if(isJsonArray && typeArgument instanceof ParameterizedType){
-            Type[] typeArguments = ((ParameterizedType) typeArgument).getActualTypeArguments();
-            body = (T) JSONUtil.toList((JSONArray) body,ClassUtil.loadClass(typeArguments[0].getTypeName()));
-        }
+        body = JSONUtil.toBean(json,typeArgument,true);
         return body;
     }
 }
