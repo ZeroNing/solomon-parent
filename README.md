@@ -353,6 +353,16 @@ DelFlagEnum.DELETE=删除
 ```
 
 ## Rabbit队列注册以及消费用例
+### Rabbitmq自定义配置
+```properties
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    customized:
+      auto-delete-queue: true  #是否自动删除队列以及交换机 true：自动删除 false：不删除
+```
 
 @MessageListener注解描述：
 
@@ -452,10 +462,15 @@ public @interface MessageListener {
 
 ```java
 @MessageListener(queues = "test1",exchange = "test1")
-public class TestMq extends AbstractConsumer<String> {
+public class TestMq extends AbstractConsumer<String,String> {
 
+    public TestMq(RabbitUtils rabbitUtils) {
+        this.rabbitUtils = rabbitUtils;
+    }
+    
     @Override
-    public void handleMessage(String body) throws Exception {
+    public String handleMessage(String body) throws Exception {
+        return "";
     }
 
     @Override
@@ -470,10 +485,15 @@ public class TestMq extends AbstractConsumer<String> {
 ```java
 @MessageListener(queues = "test1",exchange = "test1")
 @MessageListenerRetry(retryNumber = 5)
-public class TestMq extends AbstractConsumer<String> {
+public class TestMq extends AbstractConsumer<String,String> {
 
+    public TestMq(RabbitUtils rabbitUtils) {
+        this.rabbitUtils = rabbitUtils;
+    }
+    
     @Override
-    public void handleMessage(String body) throws Exception {
+    public String handleMessage(String body) throws Exception {
+        return "";
     }
 
     @Override
@@ -488,10 +508,15 @@ public class TestMq extends AbstractConsumer<String> {
 ```java
 @MessageListener(queues = "test1",exchange = "test1",dlxClazz = TestDlxMq.class)
 @MessageListenerRetry(retryNumber = 5)
-public class TestMq extends AbstractConsumer<String> {
+public class TestMq extends AbstractConsumer<String,String> {
+
+    public TestMq(RabbitUtils rabbitUtils) {
+        this.rabbitUtils = rabbitUtils;
+    }
 
     @Override
-    public void handleMessage(String body) throws Exception {
+    public String handleMessage(String body) throws Exception {
+        return "";
     }
 
     @Override
@@ -503,11 +528,15 @@ public class TestMq extends AbstractConsumer<String> {
 
 ```java
 @Component
-public class TestDlxMq extends AbstractConsumer<String> {
+public class TestDlxMq extends AbstractConsumer<String,String> {
+
+    public TestDlxMq(RabbitUtils rabbitUtils) {
+        this.rabbitUtils = rabbitUtils;
+    }
 
     @Override
-    public void handleMessage(String body) throws Exception {
-
+    public String handleMessage(String body) throws Exception {
+        return "";
     }
 
     @Override
