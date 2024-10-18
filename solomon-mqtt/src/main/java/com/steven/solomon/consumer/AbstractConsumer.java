@@ -1,6 +1,9 @@
 package com.steven.solomon.consumer;
 
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.TypeUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.MqttModel;
@@ -8,6 +11,8 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
+
+import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -24,7 +29,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
     R result = null;
     MqttModel<T> mqttModel = null;
     try {
-      mqttModel = JSONUtil.toBean(json, new TypeReference<MqttModel<T>>(){},true);
+      mqttModel = conversion(json);
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
       logger.info("线程名:{},租户编码为:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),topic, json);
       // 判断是否重复消费
@@ -70,5 +75,19 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    */
   public void deleteCheckMessageKey(String topic, MqttMessage message){
 
+  }
+
+  private MqttModel<T> conversion(String json) {
+    MqttModel<T> model = JSONUtil.toBean(json, new TypeReference<MqttModel<T>>() {},true);
+    T body = model.getBody();
+    boolean isJsonObject = body instanceof JSONObject;
+    boolean isJsonArray = body instanceof JSONArray;
+    if(!isJsonObject && !isJsonArray){
+      return model;
+    }
+    Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
+    body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
+    model.setBody(body);
+    return model;
   }
 }

@@ -2,6 +2,9 @@ package com.steven.solomon.consumer;
 
 
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.TypeUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.entiy.RedisQueueModel;
 import com.steven.solomon.holder.RequestHeaderHolder;
@@ -10,6 +13,8 @@ import org.slf4j.Logger;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.lang.Nullable;
+
+import java.lang.reflect.Type;
 
 /**
  * Redis消费器
@@ -27,7 +32,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
         R result = null;
         try {
           logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
-          model = JSONUtil.toBean(body, new TypeReference<RedisQueueModel<T>>(){},true);
+          model = conversion(body);
           RequestHeaderHolder.setTenantCode(model.getTenantCode());
           result = this.handleMessage(model.getBody(),topic);
         } catch (Throwable e){
@@ -49,4 +54,18 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter {
      * 保存消费成功消息
      */
     public abstract void saveLog(R result, String topic, RedisQueueModel<T> model, Throwable e);
+
+    private RedisQueueModel<T> conversion(String json) {
+        RedisQueueModel<T> model = JSONUtil.toBean(json, new TypeReference<RedisQueueModel<T>>() {},true);
+        T body = model.getBody();
+        boolean isJsonObject = body instanceof JSONObject;
+        boolean isJsonArray = body instanceof JSONArray;
+        if(!isJsonObject && !isJsonArray){
+            return model;
+        }
+        Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
+        body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
+        model.setBody(body);
+        return model;
+    }
 }
