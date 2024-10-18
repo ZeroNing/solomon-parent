@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(
-        prefix = "spring.rabbitmq.customized"
+        prefix = "spring.rabbitmq"
 )
 public class RabbitMqProperties  {
 
