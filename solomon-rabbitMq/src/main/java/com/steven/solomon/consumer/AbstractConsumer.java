@@ -57,14 +57,13 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         R result = null;
         try {
             logger.info("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
-            rabbitMqModel = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>() {},true);
+            rabbitMqModel = conversion(json);
             // 判断是否重复消费
             if (checkMessageKey(rabbitMqModel)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
             }
-            T body = rabbitMqModel.getBody();
             // 消费消息
-            result = this.handleMessage(conversion(body));
+            result = this.handleMessage(rabbitMqModel.getBody());
             if (!isAutoAck()) {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
@@ -160,15 +159,20 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
      */
     public abstract void saveLog(R result,Throwable throwable,RabbitMqModel<T> rabbitMqModel);
 
-    private T conversion(T body){
+    /**
+     * 转换消息
+     */
+    private RabbitMqModel<T> conversion(String json) {
+        RabbitMqModel<T> model = JSONUtil.toBean(json, new TypeReference<RabbitMqModel<T>>() {},true);
+        T body = model.getBody();
         boolean isJsonObject = body instanceof JSONObject;
         boolean isJsonArray = body instanceof JSONArray;
         if(!isJsonObject && !isJsonArray){
-            return body;
+            return model;
         }
-        String json = JSONUtil.toJsonStr(body);
         Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
-        body = JSONUtil.toBean(json,typeArgument,true);
-        return body;
+        body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
+        model.setBody(body);
+        return model;
     }
 }
