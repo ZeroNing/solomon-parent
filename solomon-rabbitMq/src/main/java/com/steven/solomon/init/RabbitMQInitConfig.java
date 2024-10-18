@@ -4,6 +4,7 @@ import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.consumer.AbstractConsumer;
+import com.steven.solomon.properties.RabbitMqProperties;
 import com.steven.solomon.service.*;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -37,7 +38,7 @@ import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 @Configuration
-@EnableConfigurationProperties(value = {RabbitProperties.class})
+@EnableConfigurationProperties(value = {RabbitProperties.class,RabbitMqProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
 public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListener> {
 
@@ -51,14 +52,17 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
     private final Map<String, AbstractMQService<?>> abstractMQMap = new HashMap<>();
 
+    private final RabbitMqProperties properties;
+
     /**
      * 所有的队列监听容器MAP
      */
     public final static Map<String, AbstractMessageListenerContainer> allQueueContainerMap = new ConcurrentHashMap<>();
 
-    public RabbitMQInitConfig(RabbitAdmin admin, CachingConnectionFactory connectionFactory, ApplicationContext applicationContext) {
+    public RabbitMQInitConfig(RabbitAdmin admin, CachingConnectionFactory connectionFactory, ApplicationContext applicationContext, RabbitMqProperties properties) {
         this.admin = admin;
         this.connectionFactory = connectionFactory;
+        this.properties = properties;
         SpringUtil.setContext(applicationContext);
         Map<String,ParameterizedTypeReference<?>> parameterizedTypeReferenceMap = SpringUtil.getAllMQServicesWithGenerics(AbstractMQService.class);
         for (Map.Entry<String, ParameterizedTypeReference<?>> entry : parameterizedTypeReferenceMap.entrySet()) {
@@ -182,6 +186,6 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         AbstractMQService<?> abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
                 ? abstractMQMap.get("delayedMQService") : abstractMQMap
                 .get(messageListener.exchangeTypes() + AbstractMQService.SERVICE_NAME);
-        return abstractMQService.initBinding(messageListener, queue, admin, isInitDlxMap, isAddDlxPrefix);
+        return abstractMQService.initBinding(properties,messageListener, queue, admin, isInitDlxMap, isAddDlxPrefix);
     }
 }

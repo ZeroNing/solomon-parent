@@ -2,17 +2,19 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.entity.InitRabbitBinding;
+import com.steven.solomon.properties.RabbitMqProperties;
 import org.springframework.amqp.core.AbstractExchange;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 
 public abstract class AbstractMQService<E extends AbstractExchange> {
 
     public static String SERVICE_NAME = "MQService";
 
-    public Queue initBinding(MessageListener messageListener, String queueName, RabbitAdmin admin, boolean isInitDlxMap, boolean isAddDlxPrefix) {
-        InitRabbitBinding initRabbitBinding = new InitRabbitBinding(messageListener, queueName, isInitDlxMap, isAddDlxPrefix);
+    public Queue initBinding(RabbitMqProperties properties, MessageListener messageListener, String queueName, RabbitAdmin admin, boolean isInitDlxMap, boolean isAddDlxPrefix) {
+        InitRabbitBinding initRabbitBinding = new InitRabbitBinding(properties,messageListener,admin, queueName, isInitDlxMap, isAddDlxPrefix);
         // 初始化队列
         Queue queue = initRabbitBinding.getQueue();
         // 绑定队列

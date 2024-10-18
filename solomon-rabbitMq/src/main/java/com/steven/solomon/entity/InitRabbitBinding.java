@@ -3,10 +3,13 @@ package com.steven.solomon.entity;
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseRabbitMqCode;
+import com.steven.solomon.properties.RabbitMqProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 
 import java.io.Serializable;
 
@@ -26,14 +29,15 @@ public class InitRabbitBinding implements Serializable {
 
     Queue queue;
 
-    public InitRabbitBinding(MessageListener messageListener, String queueName, boolean isInitDlxMap, boolean isAddDlxPrefix) {
+    public InitRabbitBinding(RabbitMqProperties properties, MessageListener messageListener, RabbitAdmin admin, String queueName, boolean isInitDlxMap, boolean isAddDlxPrefix) {
         // 队列名
         this.queueName = this.getName(queueName, isAddDlxPrefix);
         // 交换机名
         this.exchange = this.getName(messageListener.exchange(), isAddDlxPrefix);
         // 路由
         this.routingKey = this.getName(messageListener.routingKey(), isAddDlxPrefix);
-        this.queue = this.initQueue(messageListener,isInitDlxMap,this.queueName);
+        //初始化队列
+        this.queue = this.initQueue(properties,messageListener,admin,isInitDlxMap);
     }
 
     public Queue getQueue() {
@@ -76,7 +80,11 @@ public class InitRabbitBinding implements Serializable {
         return isAddDlxPrefix ? BaseRabbitMqCode.DLX_PREFIX + name : name;
     }
 
-    private Queue initQueue(MessageListener messageListener, boolean isInitDlxMap,String queueName){
+    private Queue initQueue(RabbitMqProperties properties,MessageListener messageListener, RabbitAdmin admin, boolean isInitDlxMap){
+        if(ValidateUtils.isNotEmpty(properties) && properties.getDeleteQueue()){
+            admin.deleteQueue(queueName);
+            admin.deleteExchange(exchange);
+        }
         boolean dlx = !void.class.equals(messageListener.dlxClazz()) || messageListener.ttl() != 0;
         QueueBuilder queueBuilder = messageListener.isPersistence() ? QueueBuilder.durable(queueName) : QueueBuilder.nonDurable(queueName);
         if(messageListener.lazy()){
