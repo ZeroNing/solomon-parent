@@ -81,7 +81,7 @@ public class InitRabbitBinding implements Serializable {
     }
 
     private Queue initQueue(RabbitMqProperties properties,MessageListener messageListener, RabbitAdmin admin, boolean isInitDlxMap){
-        if(ValidateUtils.isNotEmpty(properties) && properties.getDeleteQueue()){
+        if(ValidateUtils.isNotEmpty(properties) && properties.getAutoDeleteQueue()){
             admin.deleteQueue(queueName);
             admin.deleteExchange(exchange);
         }

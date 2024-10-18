@@ -8,13 +8,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 )
 public class RabbitMqProperties  {
 
-    private boolean deleteQueue = false;
+    private boolean autoDeleteQueue = false;
 
-    public boolean getDeleteQueue() {
-        return deleteQueue;
+    public boolean getAutoDeleteQueue() {
+        return autoDeleteQueue;
     }
 
-    public void setDeleteQueue(boolean deleteQueue) {
-        this.deleteQueue = deleteQueue;
+    public void setAutoDeleteQueue(boolean autoDeleteQueue) {
+        this.autoDeleteQueue = autoDeleteQueue;
     }
 }
