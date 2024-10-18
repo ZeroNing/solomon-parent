@@ -7,8 +7,23 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
         prefix = "spring.rabbitmq"
 )
 public class RabbitMqProperties  {
-
+    /**
+     * 是否自动删除队列
+     */
     private boolean autoDeleteQueue = false;
+
+    /**
+     * 是否自动删除交换机
+     */
+    private boolean autoDeleteExchange = false;
+
+    public boolean getAutoDeleteExchange() {
+        return autoDeleteExchange;
+    }
+
+    public void setAutoDeleteExchange(boolean autoDeleteExchange) {
+        this.autoDeleteExchange = autoDeleteExchange;
+    }
 
     public boolean getAutoDeleteQueue() {
         return autoDeleteQueue;

@@ -81,9 +81,13 @@ public class InitRabbitBinding implements Serializable {
     }
 
     private Queue initQueue(RabbitMqProperties properties,MessageListener messageListener, RabbitAdmin admin, boolean isInitDlxMap){
-        if(ValidateUtils.isNotEmpty(properties) && properties.getAutoDeleteQueue()){
-            admin.deleteQueue(queueName);
-            admin.deleteExchange(exchange);
+        if(ValidateUtils.isNotEmpty(properties)){
+            if(properties.getAutoDeleteQueue()){
+                admin.deleteQueue(queueName);
+            }
+            if(properties.getAutoDeleteExchange()){
+                admin.deleteExchange(exchange);
+            }
         }
         boolean dlx = !void.class.equals(messageListener.dlxClazz()) || messageListener.ttl() != 0;
         QueueBuilder queueBuilder = messageListener.isPersistence() ? QueueBuilder.durable(queueName) : QueueBuilder.nonDurable(queueName);

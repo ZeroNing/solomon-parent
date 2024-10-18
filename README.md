@@ -361,7 +361,8 @@ spring:
     password: guest
     host: localhost
     port: 5672
-    auto-delete-queue: true  #是否自动删除队列以及交换机 true：自动删除 false：不删除
+    auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
+    auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
 ```
 
 @MessageListener注解描述：
