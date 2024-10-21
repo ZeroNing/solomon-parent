@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.enums.TopicMode;
 import com.steven.solomon.init.AbstractMessageLineRunner;
@@ -16,7 +17,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -46,7 +46,7 @@ public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener>
         for (Map.Entry<String, RedisConnectionFactory> entry : tenantFactoryMap.entrySet()) {
             RedisConnectionFactory factory = entry.getValue();
             for (Object abstractConsumer : clazzList) {
-                MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+                MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
                 if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topic())) {
                     continue;
                 }

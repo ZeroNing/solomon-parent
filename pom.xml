@@ -87,10 +87,17 @@
     <dingtalk.version>2.0.0</dingtalk.version>
     <hikaricp.version>5.1.0</hikaricp.version>
     <mysql.version>8.0.28</mysql.version>
+    <integration.version>6.3.4</integration.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-core</artifactId>
+        <version>5.5.20</version>
+      </dependency>
 
       <dependency>
         <groupId>org.springframework.boot</groupId>
@@ -169,6 +176,12 @@
         <groupId>org.springframework.integration</groupId>
         <artifactId>spring-integration-mqtt</artifactId>
         <version>${mqtt.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>
@@ -424,18 +437,12 @@
         <version>${thumbnailator.version}</version>
       </dependency>
 
-      <!-- websocket -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-websocket</artifactId>
-        <version>${spring.boot.version}</version>
-      </dependency>
-
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
         <version>${jackson.version}</version>
       </dependency>
+
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>

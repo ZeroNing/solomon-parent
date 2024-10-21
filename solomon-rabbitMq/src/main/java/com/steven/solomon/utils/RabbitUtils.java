@@ -1,5 +1,6 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import com.steven.solomon.annotation.MessageListener;
@@ -30,7 +31,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
 @Configuration
@@ -203,7 +203,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         }
         Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(MessageListener.class);
         for (Object obj : annotationMap.values()) {
-            MessageListener messageListener = AnnotationUtils.findAnnotation(obj.getClass(), MessageListener.class);
+            MessageListener messageListener = AnnotationUtil.getAnnotation(obj.getClass(), MessageListener.class);
             if(ValidateUtils.isEmpty(messageListener)){
                 continue;
             }

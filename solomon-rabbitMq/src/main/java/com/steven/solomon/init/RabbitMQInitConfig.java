@@ -1,5 +1,6 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.BaseCode;
@@ -31,7 +32,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -75,7 +75,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         // 遍历消费者队列进行初始化绑定以及监听
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
-            messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+            messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
             if(ValidateUtils.isEmpty(messageListener)){
                 logger.error("{}没有RabbitMq注解,不进行初始化",abstractConsumer.getClass().getSimpleName());
                 continue;
@@ -143,7 +143,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         container.setConsumersPerQueue(messageListener.consumersPerQueue());
         container.setPrefetchCount(messageListener.prefetchCount());
         container.setAmqpAdmin(admin);
-        MessageListenerRetry messageListenerRetry = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
+        MessageListenerRetry messageListenerRetry = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
         if (ValidateUtils.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
             container.setAdviceChain(setRabbitRetry(messageListenerRetry));
