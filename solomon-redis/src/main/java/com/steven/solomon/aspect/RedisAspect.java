@@ -34,7 +34,10 @@ public class RedisAspect {
   @Pointcut("@annotation(org.springframework.cache.annotation.CachePut) ||"
       + "@annotation(org.springframework.cache.annotation.CacheEvict) ||"
       + "@annotation(org.springframework.cache.annotation.Cacheable) || "
-      + "execution(* com.steven.solomon.service.impl.RedisService.*(..)) ")
+      + "execution(* com.steven.solomon.service.impl.RedisService.*(..)) || "
+      + "execution(* org.springframework.data.repository.Repository.*(..)) ||"
+      + "execution(* org.springframework.data.repository.CrudRepository.*(..)) ||"
+      + "execution(* org.springframework.data.repository.PagingAndSortingRepository.*(..))")
   void cutPoint() {}
 
   @Around("cutPoint()")

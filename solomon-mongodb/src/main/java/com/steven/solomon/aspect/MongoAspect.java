@@ -31,7 +31,10 @@ public class MongoAspect {
   private String mode;
 
   @Pointcut("execution(* org.springframework.data.mongodb.core.MongoTemplate.*(..)) ||"
-      + "execution(* org.springframework.data.mongodb.core.MongoOperations.*(..)) ")
+      + "execution(* org.springframework.data.mongodb.core.MongoOperations.*(..)) ||"
+      + "execution(* org.springframework.data.mongodb.repository.MongoRepository.*(..)) ||"
+      + "execution(* org.springframework.data.mongodb.repository.support.SimpleMongoRepository.*(..)) ||"
+      + "execution(* org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery.*(..))")
   void cutPoint() {}
 
   @Around("cutPoint()")
