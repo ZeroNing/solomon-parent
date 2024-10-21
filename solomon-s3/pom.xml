@@ -9,7 +9,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>solomon-file</artifactId>
+  <artifactId>solomon-s3</artifactId>
 
   <dependencies>
 

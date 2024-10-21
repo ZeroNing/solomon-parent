@@ -13,7 +13,7 @@
     <module>solomon-base</module>
     <module>solomon-common</module>
     <module>solomon-constant</module>
-    <module>solomon-file</module>
+    <module>solomon-s3</module>
     <module>solomon-utils</module>
     <module>solomon-mongodb</module>
     <module>solomon-mybatis</module>
