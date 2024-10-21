@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.steven</groupId>
@@ -77,8 +77,8 @@
     <rocketMq.version>2.2.3</rocketMq.version>
     <mqtt.version>6.2.2</mqtt.version>
     <druid.version>1.2.18</druid.version>
-<!--    <okhttp.version>4.11.0</okhttp.version>-->
-<!--    <okio.version>2.10.0</okio.version>-->
+    <!--    <okhttp.version>4.11.0</okhttp.version>-->
+    <!--    <okio.version>2.10.0</okio.version>-->
     <elasticsearch.version>5.1.0</elasticsearch.version>
     <elasticsearch-java>8.8.1</elasticsearch-java>
     <aws.s3.version>1.12.687</aws.s3.version>
@@ -89,16 +89,26 @@
     <mysql.version>8.0.28</mysql.version>
   </properties>
 
-  <parent>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.18</version>
-    <relativePath/>
-  </parent>
-
-
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-activemq</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jdbc</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-json</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>mysql</groupId>
@@ -136,18 +146,18 @@
         <version>${aws.s3.version}</version>
       </dependency>
 
-<!--      <dependency>-->
-<!--        <groupId>com.squareup.okio</groupId>-->
-<!--        <artifactId>okio</artifactId>-->
-<!--        <version>${okio.version}</version>-->
-<!--      </dependency>-->
+      <!--      <dependency>-->
+      <!--        <groupId>com.squareup.okio</groupId>-->
+      <!--        <artifactId>okio</artifactId>-->
+      <!--        <version>${okio.version}</version>-->
+      <!--      </dependency>-->
 
-<!--      <dependency>-->
-<!--        <groupId>com.squareup.okhttp3</groupId>-->
-<!--        <artifactId>okhttp</artifactId>-->
-<!--        <version>${okhttp.version}</version>-->
-<!--        <scope>compile</scope>-->
-<!--      </dependency>-->
+      <!--      <dependency>-->
+      <!--        <groupId>com.squareup.okhttp3</groupId>-->
+      <!--        <artifactId>okhttp</artifactId>-->
+      <!--        <version>${okhttp.version}</version>-->
+      <!--        <scope>compile</scope>-->
+      <!--      </dependency>-->
 
       <dependency>
         <groupId>com.alibaba</groupId>
