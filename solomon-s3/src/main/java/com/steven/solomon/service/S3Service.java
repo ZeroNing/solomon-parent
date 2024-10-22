@@ -41,6 +41,7 @@ public class S3Service extends AbstractFileService {
     configuration.setSocketTimeout(properties.getSocketTimeout());
     configuration.setConnectionTimeout(properties.getConnectionTimeout());
     builder.setClientConfiguration(configuration);
+    builder.withPathStyleAccessEnabled(properties.getPathStyleAccessEnabled());
     client = builder.build();
   }
 

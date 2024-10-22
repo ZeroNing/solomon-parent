@@ -63,6 +63,19 @@ public class FileChoiceProperties {
    */
   private Integer socketTimeout = 60000;
 
+  /**
+   * S3客户端以使用路径样式访问，而不是虚拟主机样式访问
+   */
+  private boolean pathStyleAccessEnabled = false;
+
+  public boolean getPathStyleAccessEnabled() {
+    return pathStyleAccessEnabled;
+  }
+
+  public void setPathStyleAccessEnabled(boolean pathStyleAccessEnabled) {
+    this.pathStyleAccessEnabled = pathStyleAccessEnabled;
+  }
+
   public Integer getConnectionTimeout() {
     return connectionTimeout;
   }
