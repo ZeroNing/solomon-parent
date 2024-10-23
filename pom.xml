@@ -9,6 +9,13 @@
   <version>1.0</version>
   <artifactId>solomon-parent</artifactId>
 
+  <developers>
+    <developer>
+      <name>steven</name>
+      <email>cao136623@163.com</email>
+    </developer>
+  </developers>
+
   <modules>
     <module>solomon-base</module>
     <module>solomon-common</module>
