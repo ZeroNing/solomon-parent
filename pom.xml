@@ -152,19 +152,6 @@
         <version>${aws.s3.version}</version>
       </dependency>
 
-      <!--      <dependency>-->
-      <!--        <groupId>com.squareup.okio</groupId>-->
-      <!--        <artifactId>okio</artifactId>-->
-      <!--        <version>${okio.version}</version>-->
-      <!--      </dependency>-->
-
-      <!--      <dependency>-->
-      <!--        <groupId>com.squareup.okhttp3</groupId>-->
-      <!--        <artifactId>okhttp</artifactId>-->
-      <!--        <version>${okhttp.version}</version>-->
-      <!--        <scope>compile</scope>-->
-      <!--      </dependency>-->
-
       <dependency>
         <groupId>com.alibaba</groupId>
         <artifactId>druid</artifactId>
@@ -211,12 +198,6 @@
         <groupId>com.aliyun.oss</groupId>
         <artifactId>aliyun-sdk-oss</artifactId>
         <version>${oss.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt</artifactId>
-        <version>${jwt.version}</version>
       </dependency>
 
       <dependency>
@@ -366,12 +347,6 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-collections4</artifactId>
         <version>${commons.collections4.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-        <version>${spring.boot.version}</version>
       </dependency>
 
       <dependency>
