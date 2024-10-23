@@ -181,15 +181,11 @@
         <artifactId>mybatis-plus-boot-starter</artifactId>
         <version>${mybatis-plus.version}</version>
       </dependency>
+
       <dependency>
         <groupId>com.baomidou</groupId>
         <artifactId>mybatis-plus-extension</artifactId>
         <version>${mybatis-plus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.baomidou</groupId>
-        <artifactId>mybatis-plus</artifactId>
-        <version>${mybatis.plus.version}</version>
       </dependency>
 
       <!-- MySQL 数据库连接器 -->
@@ -426,11 +422,6 @@
       <dependency>
         <groupId>org.apache.dubbo</groupId>
         <artifactId>dubbo-spring-boot-starter</artifactId>
-        <version>${dubbo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.dubbo</groupId>
-        <artifactId>dubbo</artifactId>
         <version>${dubbo.version}</version>
       </dependency>
 
