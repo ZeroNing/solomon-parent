@@ -41,7 +41,6 @@
     <commons.collections4.version>4.4</commons.collections4.version>
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
-    <jackson.version>2.11.4</jackson.version>
     <spring.cloud.version>2020.0</spring.cloud.version>
     <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
@@ -435,23 +434,6 @@
         <groupId>net.coobird</groupId>
         <artifactId>thumbnailator</artifactId>
         <version>${thumbnailator.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
       </dependency>
 
       <dependency>
