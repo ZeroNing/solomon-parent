@@ -45,7 +45,7 @@ public class JacksonConfig {
         javaTimeModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        javaTimeModule.addDeserializer(Date.class, new DateDeserializers.DateDeserializer());
+        javaTimeModule.addDeserializer(Date.class, new CustomDateDeserializer());
 
         SimpleModule simpleModule = new SimpleModule();
         simpleModule.addSerializer(Long.class, ToStringSerializer.instance);
