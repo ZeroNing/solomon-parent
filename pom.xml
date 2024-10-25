@@ -23,7 +23,6 @@
     <module>solomon-s3</module>
     <module>solomon-utils</module>
     <module>solomon-mongodb</module>
-    <module>solomon-mybatis</module>
     <module>solomon-gateway-sentinel</module>
     <module>solomon-mqtt</module>
     <module>solomon-rabbitMq</module>
