@@ -38,8 +38,8 @@
 | solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
 | solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方 |
 | solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
+| solomon-mqtt5            | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
-| solomon-mybatis          | 主要是加入了一个通用实体类，未来或许考虑加入动态切换数据源   |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
 
 ## 自定义配置说明
