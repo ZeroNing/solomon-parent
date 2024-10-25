@@ -26,7 +26,6 @@
     <module>solomon-gateway-sentinel</module>
     <module>solomon-mqtt</module>
     <module>solomon-rabbitMq</module>
-    <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
     <module>solomon-redis</module>
     <module>solomon-sql</module>
