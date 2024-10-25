@@ -12,6 +12,7 @@ import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -96,8 +97,8 @@ public class COSService extends AbstractFileService {
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception  {
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception  {
+    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(expiry))).toString();
   }
 
   @Override

@@ -7,6 +7,7 @@ import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -81,8 +82,8 @@ public class OBSService extends AbstractFileService {
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception  {
-    TemporarySignatureRequest request = new TemporarySignatureRequest(HttpMethodEnum.GET, unit.toSeconds(expiry));
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception  {
+    TemporarySignatureRequest request = new TemporarySignatureRequest(HttpMethodEnum.GET, TimeUnit.SECONDS.toMillis(expiry));
     request.setBucketName(bucketName);
     request.setObjectKey(filePath);
     TemporarySignatureResponse response = client.createTemporarySignature(request);

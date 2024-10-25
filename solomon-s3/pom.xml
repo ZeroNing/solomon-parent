@@ -12,10 +12,15 @@
   <artifactId>solomon-s3</artifactId>
 
   <dependencies>
+    <!-- AWS S3 SDK，用于与 Amazon S3 进行交互 -->
+    <dependency>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>s3</artifactId>
+    </dependency>
 
     <dependency>
-      <groupId>com.amazonaws</groupId>
-      <artifactId>aws-java-sdk-s3</artifactId>
+      <groupId>software.amazon.awssdk</groupId>
+      <artifactId>apache-client</artifactId>
     </dependency>
 
     <dependency>

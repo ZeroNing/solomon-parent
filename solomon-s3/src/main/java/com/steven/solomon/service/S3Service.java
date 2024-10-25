@@ -1,27 +1,38 @@
 package com.steven.solomon.service;
 
-import com.amazonaws.ClientConfiguration;
-import com.amazonaws.Protocol;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.*;
+import com.aliyun.oss.ClientConfiguration;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
+import java.net.URI;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.core.Protocol;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.http.SdkHttpClient;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.S3ClientBuilder;
+import software.amazon.awssdk.services.s3.S3Configuration;
+import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 public class S3Service extends AbstractFileService {
 
-  protected AmazonS3 client;
+  protected S3Client client;
+
+  private S3Presigner presigner;
 
   public S3Service(){
     super();
@@ -29,60 +40,90 @@ public class S3Service extends AbstractFileService {
 
   public S3Service(FileChoiceProperties properties) {
     super(properties);
-    AWSCredentials        credentials = new BasicAWSCredentials(properties.getAccessKey(), properties.getSecretKey());
-    AmazonS3ClientBuilder builder     = AmazonS3ClientBuilder.standard();
-    builder.withCredentials(new AWSStaticCredentialsProvider(credentials));
-    if(ValidateUtils.isNotEmpty(properties.getEndpoint()) && ValidateUtils.isNotEmpty(properties.getRegionName())){
-      builder.withEndpointConfiguration(new EndpointConfiguration(properties.getEndpoint(),properties.getRegionName()));
-    }
-    ClientConfiguration configuration = new ClientConfiguration();
-    boolean             isHttps         = properties.getEndpoint().contains("https");
-    configuration.setProtocol(isHttps ? Protocol.HTTPS : Protocol.HTTP);
-    configuration.setSocketTimeout(properties.getSocketTimeout());
-    configuration.setConnectionTimeout(properties.getConnectionTimeout());
-    builder.setClientConfiguration(configuration);
-    builder.withPathStyleAccessEnabled(properties.getPathStyleAccessEnabled());
-    client = builder.build();
+    AwsBasicCredentials credentials = AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey());
+    client = S3Client.builder()
+            .endpointOverride(URI.create(properties.getEndpoint()))
+            .region(Region.of(properties.getRegionName()))
+            .credentialsProvider(StaticCredentialsProvider.create(credentials))
+            .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(properties.getPathStyleAccessEnabled()).chunkedEncodingEnabled(false).build())
+            .httpClient(ApacheHttpClient.builder()
+                    .connectionTimeout(Duration.ofSeconds(properties.getConnectionTimeout()))  // 连接超时
+                    .socketTimeout(Duration.ofSeconds(properties.getSocketTimeout()))      // 读取数据超时
+                    .build())
+            .build();
+
+    presigner = S3Presigner.builder()
+            .endpointOverride(URI.create(properties.getEndpoint()))
+            .region(Region.of(properties.getRegionName()))
+            .credentialsProvider(StaticCredentialsProvider.create(credentials))
+            .build();
   }
 
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
-    client.putObject(bucketName,filePath,file.getInputStream(), null);
+    client.putObject(PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(filePath)
+            .build(), RequestBody.fromInputStream(file.getInputStream(),file.getSize()));
   }
 
   @Override
   protected void delete(String bucketName, String filePath) throws Exception {
-    client.deleteObject(bucketName,filePath);
+    client.deleteObject(DeleteObjectRequest.builder().bucket(bucketName).key(filePath).build());
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
-    return client.generatePresignedUrl(bucketName,filePath,new Date(System.currentTimeMillis()+unit.toMillis(expiry))).toString();
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception {
+    GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(filePath)
+            .build();
+    GetObjectPresignRequest getObjectPresignRequest = GetObjectPresignRequest.builder()
+            .getObjectRequest(getObjectRequest)
+            .signatureDuration(Duration.ofSeconds(expiry))
+            .build();
+
+    return presigner.presignGetObject(getObjectPresignRequest).url().toString();
   }
 
   @Override
   protected InputStream getObject(String bucketName, String filePath) throws Exception {
-    return client.getObject(bucketName, filePath).getObjectContent();
+    return client.getObject(GetObjectRequest.builder().bucket(bucketName).key(filePath).build());
   }
 
   @Override
   protected void createBucket(String bucketName) throws Exception {
-    client.createBucket(bucketName);
+    client.createBucket(CreateBucketRequest.builder().bucket(bucketName).build());
   }
 
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
-    return client.doesObjectExist(bucketName,objectName);
+    try{
+      client.headObject(HeadObjectRequest.builder().bucket(bucketName).key(objectName).build());
+      return true;
+    } catch (Throwable e){
+      return false;
+    }
   }
 
   @Override
   protected void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception {
-    client.copyObject(sourceBucket,sourceObjectName,targetBucket,targetObjectName);
+    client.copyObject(CopyObjectRequest.builder()
+            .sourceBucket(sourceBucket)
+            .sourceKey(sourceObjectName)
+            .destinationBucket(targetBucket)
+            .destinationKey(targetObjectName)
+            .build());
   }
 
   @Override
   public boolean bucketExists(String bucketName) throws Exception {
-    return client.doesBucketExistV2(bucketName);
+    try{
+      client.headBucket(HeadBucketRequest.builder().bucket(bucketName).build());
+      return true;
+    } catch (Throwable e){
+      return false;
+    }
   }
 
   @Override
@@ -90,28 +131,36 @@ public class S3Service extends AbstractFileService {
     if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
       return new ArrayList<>();
     }
-    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
-    return Lambda.toList(response.getObjectSummaries(), S3ObjectSummary::getKey);
+    ListObjectsV2Request.Builder requestBuilder = ListObjectsV2Request.builder()
+            .bucket(bucketName);
+    if (ValidateUtils.isNotEmpty(key)) {
+      requestBuilder.prefix(key);
+    }
+    ListObjectsV2Request request = requestBuilder.build();
+    ListObjectsV2Response response = client.listObjectsV2(request);
+    return Lambda.toList(response.contents(),S3Object::key);
   }
 
 
   @Override
   public String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception {
-    InitiateMultipartUploadRequest initRequest  = new InitiateMultipartUploadRequest(bucketName, objectName);
-    InitiateMultipartUploadResult  initResponse = client.initiateMultipartUpload(initRequest);
-    return initResponse.getUploadId();
+    CreateMultipartUploadRequest initRequest = CreateMultipartUploadRequest.builder()
+            .bucket(bucketName)
+            .key(objectName)
+            .build();
+    return client.createMultipartUpload(initRequest).uploadId();
   }
 
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
-    client.abortMultipartUpload(new AbortMultipartUploadRequest(bucketName,filePath,uploadId));
+    client.abortMultipartUpload(AbortMultipartUploadRequest.builder().bucket(bucketName).key(filePath).uploadId(uploadId).build());
   }
 
   @Override
   protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
-    List<PartETag> partETags = new ArrayList<>();
+    List<CompletedPart> partETags = new ArrayList<>();
     for (int i = 0; i < partCount; i++) {
       InputStream inputStream = file.getInputStream();
       // 跳到每个分块的开头
@@ -121,22 +170,30 @@ public class S3Service extends AbstractFileService {
       // 计算每个分块的大小
       long size = partSize < fileSize - skipBytes ?
                   partSize : fileSize - skipBytes;
+      byte[] buffer = new byte[(int) size];
+      inputStream.read(buffer);
 
-      UploadPartRequest uploadPartRequest = new UploadPartRequest();
-      uploadPartRequest.setBucketName(bucketName);
-      uploadPartRequest.setKey(filePath);
-      uploadPartRequest.setUploadId(uploadId);
-      uploadPartRequest.setPartSize(size);
-      uploadPartRequest.setInputStream(inputStream);
-      uploadPartRequest.setPartNumber(i + 1);
+      UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
+              .bucket(bucketName)
+              .key(filePath)
+              .uploadId(uploadId)
+              .partNumber(i + 1)
+              .contentLength(size)
+              .build();
       // 上传分片并添加到列表
-      partETags.add(client.uploadPart(uploadPartRequest).getPartETag());
+      UploadPartResponse uploadPartResponse = client.uploadPart(uploadPartRequest, RequestBody.fromBytes(buffer));
+      partETags.add(CompletedPart.builder()
+              .partNumber(i + 1)
+              .eTag(uploadPartResponse.eTag())
+              .build());
     }
 
     // 完成分片上传
-    CompleteMultipartUploadRequest compRequest = new CompleteMultipartUploadRequest(
-        bucketName, filePath, uploadId, partETags);
-
+    CompleteMultipartUploadRequest compRequest =CompleteMultipartUploadRequest.builder()
+            .bucket(bucketName)
+            .key(filePath)
+            .uploadId(uploadId)
+            .multipartUpload(CompletedMultipartUpload.builder().parts(partETags).build()).build();
     client.completeMultipartUpload(compRequest);
   }
 
@@ -146,16 +203,16 @@ public class S3Service extends AbstractFileService {
     if(ValidateUtils.isEmpty(bucketName)){
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
-    client.deleteBucket(bucketName);
+    client.deleteBucket(DeleteBucketRequest.builder().bucket(bucketName).build());
   }
 
   @Override
   public List<String> getBucketList() throws Exception {
-    List<Bucket> bucketList = client.listBuckets();
+    List<Bucket> bucketList = client.listBuckets().buckets();
     List<String> bucketNameList = new ArrayList<>();
     if(ValidateUtils.isNotEmpty(bucketList)){
       for(Bucket bucket : bucketList){
-        bucketNameList.add(bucket.getName());
+        bucketNameList.add(bucket.name());
       }
     }
     return bucketNameList;

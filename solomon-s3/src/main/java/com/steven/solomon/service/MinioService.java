@@ -85,12 +85,12 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception  {
     Builder builder = GetPresignedObjectUrlArgs.builder().bucket(bucketName);
     if(expiry >= Integer.MAX_VALUE){
       throw new BaseException(FileErrorCode.MORE_THAN_THE_SHARING_TIME);
     }
-    return client.getPresignedObjectUrl(builder.expiry((int)expiry,unit).object(filePath).method(Method.GET).build());
+    return client.getPresignedObjectUrl(builder.expiry((int)expiry,TimeUnit.SECONDS).object(filePath).method(Method.GET).build());
   }
 
   @Override

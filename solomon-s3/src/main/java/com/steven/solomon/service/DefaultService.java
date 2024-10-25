@@ -29,7 +29,7 @@ public class DefaultService extends AbstractFileService {
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception {
     throw new BaseException(FileErrorCode.NO_STORAGE_IMPLEMENTATION);
   }
 

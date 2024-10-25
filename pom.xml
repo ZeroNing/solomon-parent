@@ -34,6 +34,7 @@
     <module>test-solomon-rabbitmq</module>
     <module>test-solomon-mqtt</module>
     <module>test-solomon-mqtt5</module>
+    <module>test-solomon-s3</module>
   </modules>
 
   <properties>
@@ -82,7 +83,7 @@
     <rocketMq.version>2.2.3</rocketMq.version>
     <mqtt.version>6.2.2</mqtt.version>
     <druid.version>1.2.18</druid.version>
-    <aws.s3.version>1.12.687</aws.s3.version>
+    <aws.s3.version>2.28.29</aws.s3.version>
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
     <dingtalk.version>2.0.0</dingtalk.version>
@@ -263,8 +264,13 @@
       <!-- S3相关 start -->
       <!-- AWS S3 SDK，用于与 Amazon S3 进行交互 -->
       <dependency>
-        <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-s3</artifactId>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>s3</artifactId>
+        <version>${aws.s3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>apache-client</artifactId>
         <version>${aws.s3.version}</version>
       </dependency>
 

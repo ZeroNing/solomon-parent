@@ -87,8 +87,8 @@ public class OSSService extends AbstractFileService {
   }
 
   @Override
-  protected String shareUrl(String bucketName, String filePath, long expiry, TimeUnit unit) throws Exception {
-    return client.generatePresignedUrl(bucketName, filePath, new Date(System.currentTimeMillis() + unit.toMillis(expiry)))
+  protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception {
+    return client.generatePresignedUrl(bucketName, filePath, new Date(System.currentTimeMillis() + TimeUnit.SECONDS.toMillis(expiry)))
         .toString();
   }
 

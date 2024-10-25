@@ -98,8 +98,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
   }
 
   @Override
-  public String share(String fileName, String bucketName, long expiry, TimeUnit unit) throws Exception {
-    return shareUrl(bucketName,getFilePath(fileName,properties),expiry,unit);
+  public String share(String fileName, String bucketName, long expiry) throws Exception {
+    return shareUrl(bucketName,getFilePath(fileName,properties),expiry);
   }
 
   @Override
@@ -214,9 +214,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * @param bucketName 桶名
    * @param filePath 文件名
    * @param expiry 时间
-   * @param unit 时间单位
    */
-  protected abstract String shareUrl(String bucketName,String filePath,long expiry, TimeUnit unit) throws Exception;
+  protected abstract String shareUrl(String bucketName,String filePath,long expiry) throws Exception;
 
   /**
    * 获取文件流

@@ -60,8 +60,9 @@ public interface FileServiceInterface {
 
   /**
    * 分享
+   * @param expiry 默认秒
    */
-  String share(String fileName,String bucketName,long expiry, TimeUnit unit) throws Exception;
+  String share(String fileName,String bucketName,long expiry) throws Exception;
 
   /**
    * 下载
