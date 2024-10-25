@@ -33,6 +33,7 @@
     <module>solomon-sql</module>
     <module>test-solomon-rabbitmq</module>
     <module>test-solomon-mqtt</module>
+    <module>test-solomon-mqtt5</module>
   </modules>
 
   <properties>

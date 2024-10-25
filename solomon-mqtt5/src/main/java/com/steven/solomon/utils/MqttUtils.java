@@ -113,7 +113,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         }
         for (String topic : messageListener.topics()) {
           AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-          client.subscribe(topic, messageListener.qos(), consumer);
+          client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{consumer});
         }
       }
     }
