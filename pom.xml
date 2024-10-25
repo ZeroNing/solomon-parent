@@ -31,7 +31,8 @@
     <module>solomon-mqtt5</module>
     <module>solomon-redis</module>
     <module>solomon-sql</module>
-    <module>solomon-rabbitmq-test</module>
+    <module>test-solomon-rabbitmq</module>
+    <module>test-solomon-mqtt</module>
   </modules>
 
   <properties>
