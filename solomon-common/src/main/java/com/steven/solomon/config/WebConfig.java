@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -34,5 +36,10 @@ public class WebConfig implements WebMvcConfigurer {
     messageConverter.setObjectMapper(mapper);
     //将上面的消息转换器对象追加到mvc框架的转换器集合中
     converters.add(0, messageConverter);
+  }
+
+  @Override
+  public void configurePathMatch(PathMatchConfigurer configurer) {
+    configurer.setPathMatcher(new AntPathMatcher());
   }
 }

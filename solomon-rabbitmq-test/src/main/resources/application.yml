@@ -8,6 +8,9 @@ knife4j:
   title: rabbitmq测试用例
   open: true
 spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
   jmx:
     enabled: true
   servlet:

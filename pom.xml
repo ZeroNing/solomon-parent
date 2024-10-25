@@ -49,22 +49,18 @@
     <commons.collections4.version>4.4</commons.collections4.version>
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
-    <spring.cloud.version>2020.0</spring.cloud.version>
-    <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
     <fastJson.version>1.2.56</fastJson.version>
     <dubbo.version>3.2.1</dubbo.version>
     <strive.version>1.0</strive.version>
     <Spring.cloud.gateway.version>3.0.4</Spring.cloud.gateway.version>
-    <Spring.cloud.loadbalancer.version>3.0.4</Spring.cloud.loadbalancer.version>
+    <spring.cloud.loadbalancer.version>3.0.4</spring.cloud.loadbalancer.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.context.support.version>1.0.11</spring.context.support.version>
     <nacos.client.version>2.2.2</nacos.client.version>
     <seata.version>2.0.0</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
     <hutool.version>5.8.27</hutool.version>
-    <spring.loadbalancer.version>3.0.4</spring.loadbalancer.version>
-    <spring.bootstrap.version>3.0.4</spring.bootstrap.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>8.0.28</mysql.java.version>
@@ -91,6 +87,7 @@
     <hikaricp.version>5.1.0</hikaricp.version>
     <mysql.version>8.0.28</mysql.version>
     <integration.version>5.5.20</integration.version>
+    <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
   </properties>
 
   <dependencyManagement>
@@ -115,13 +112,6 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-autoconfigure</artifactId>
         <version>${spring.boot.version}</version>
-      </dependency>
-
-      <!-- Spring Cloud 启动引导程序，帮助加载外部配置 -->
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        <version>${spring.bootstrap.version}</version>
       </dependency>
 
       <!-- Spring Data Redis，提供与 Redis 交互的支持 -->
@@ -431,24 +421,6 @@
         <groupId>org.apache.dubbo</groupId>
         <artifactId>dubbo-spring-boot-starter</artifactId>
         <version>${dubbo.version}</version>
-      </dependency>
-
-      <!-- Spring Cloud 依赖管理 -->
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-dependencies</artifactId>
-        <version>${spring.cloud.version}</version>
-        <type>pom</type>
-        <scope>runtime</scope>
-      </dependency>
-
-      <!-- Spring Cloud Alibaba 依赖管理 -->
-      <dependency>
-        <groupId>com.alibaba.cloud</groupId>
-        <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-        <version>${spring.cloud.alibab.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
 
       <!-- FastJSON，用于高效 JSON 序列化和反序列化 -->
