@@ -64,7 +64,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         this.connectionFactory = connectionFactory;
         this.properties = properties;
         SpringUtil.setContext(applicationContext);
-        Map<String,ParameterizedTypeReference<?>> parameterizedTypeReferenceMap = SpringUtil.getAllMQServicesWithGenerics(AbstractMQService.class);
+        Map<String,ParameterizedTypeReference<?>> parameterizedTypeReferenceMap = SpringUtil.getAllServicesWithGenerics(AbstractMQService.class);
         for (Map.Entry<String, ParameterizedTypeReference<?>> entry : parameterizedTypeReferenceMap.entrySet()) {
             abstractMQMap.put(entry.getKey(), (AbstractMQService<?>) applicationContext.getBean(entry.getKey()));
         }
