@@ -97,7 +97,7 @@ public class SpringUtil implements ApplicationContextAware {
         return elKey;
     }
 
-    public static <T> Map<String, ParameterizedTypeReference<?>> getAllMQServicesWithGenerics(Class<T> clazz) {
+    public static <T> Map<String, ParameterizedTypeReference<?>> getAllServicesWithGenerics(Class<T> clazz) {
         Map<String, ParameterizedTypeReference<?>> result = new HashMap<>();
         Map<String, T> beans = context.getBeansOfType(clazz);
 
