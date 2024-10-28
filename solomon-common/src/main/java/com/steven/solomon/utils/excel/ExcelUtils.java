@@ -148,7 +148,7 @@ public class ExcelUtils {
 		for(Field field : clazz.getDeclaredFields()){
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
-			annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,null));
+			annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
 			ClassUtils.updateClassField(field,ExcelProperty.class,annotationNameAndValueMap);
 		}
 	}

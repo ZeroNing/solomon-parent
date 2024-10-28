@@ -9,21 +9,30 @@
   <version>1.0</version>
   <artifactId>solomon-parent</artifactId>
 
+  <developers>
+    <developer>
+      <name>steven</name>
+      <email>cao136623@163.com</email>
+    </developer>
+  </developers>
+
   <modules>
     <module>solomon-base</module>
     <module>solomon-common</module>
     <module>solomon-constant</module>
-    <module>solomon-file</module>
+    <module>solomon-s3</module>
     <module>solomon-utils</module>
     <module>solomon-mongodb</module>
-    <module>solomon-mybatis</module>
     <module>solomon-gateway-sentinel</module>
     <module>solomon-mqtt</module>
     <module>solomon-rabbitMq</module>
-    <module>solomon-activeMq</module>
     <module>solomon-mqtt5</module>
     <module>solomon-redis</module>
     <module>solomon-sql</module>
+    <module>test-solomon-rabbitmq</module>
+    <module>test-solomon-mqtt</module>
+    <module>test-solomon-mqtt5</module>
+    <module>test-solomon-s3</module>
   </modules>
 
   <properties>
@@ -41,23 +50,18 @@
     <commons.collections4.version>4.4</commons.collections4.version>
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
-    <jackson.version>2.11.4</jackson.version>
-    <spring.cloud.version>2020.0</spring.cloud.version>
-    <spring.cloud.alibab.version>2021.1</spring.cloud.alibab.version>
     <commons.codec.version>1.13</commons.codec.version>
     <fastJson.version>1.2.56</fastJson.version>
     <dubbo.version>3.2.1</dubbo.version>
     <strive.version>1.0</strive.version>
     <Spring.cloud.gateway.version>3.0.4</Spring.cloud.gateway.version>
-    <Spring.cloud.loadbalancer.version>3.0.4</Spring.cloud.loadbalancer.version>
+    <spring.cloud.loadbalancer.version>3.0.4</spring.cloud.loadbalancer.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.context.support.version>1.0.11</spring.context.support.version>
     <nacos.client.version>2.2.2</nacos.client.version>
     <seata.version>2.0.0</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
     <hutool.version>5.8.27</hutool.version>
-    <spring.loadbalancer.version>3.0.4</spring.loadbalancer.version>
-    <spring.bootstrap.version>3.0.4</spring.bootstrap.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>8.0.28</mysql.java.version>
@@ -77,303 +81,69 @@
     <rocketMq.version>2.2.3</rocketMq.version>
     <mqtt.version>6.2.2</mqtt.version>
     <druid.version>1.2.18</druid.version>
-<!--    <okhttp.version>4.11.0</okhttp.version>-->
-<!--    <okio.version>2.10.0</okio.version>-->
-    <elasticsearch.version>5.1.0</elasticsearch.version>
-    <elasticsearch-java>8.8.1</elasticsearch-java>
-    <aws.s3.version>1.12.687</aws.s3.version>
+    <aws.s3.version>2.28.29</aws.s3.version>
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
     <dingtalk.version>2.0.0</dingtalk.version>
     <hikaricp.version>5.1.0</hikaricp.version>
     <mysql.version>8.0.28</mysql.version>
+    <integration.version>5.5.20</integration.version>
+    <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-activemq</artifactId>
-        <version>${spring.boot.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-jdbc</artifactId>
-        <version>${spring.boot.version}</version>
-      </dependency>
-
+      <!-- SpringBoot 框架 start-->
+      <!-- 用于处理 JSON 数据，默认包含 Jackson 库 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-json</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${mysql.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.zaxxer</groupId>
-        <artifactId>HikariCP</artifactId>
-        <version>${hikaricp.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.aliyun</groupId>
-        <artifactId>alibaba-dingtalk-service-sdk</artifactId>
-        <version>${dingtalk.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.eclipse.paho</groupId>
-        <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
-        <version>${mqtt5.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk15on</artifactId>
-        <version>${bcprov.jdk15on.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.amazonaws</groupId>
-        <artifactId>aws-java-sdk-s3</artifactId>
-        <version>${aws.s3.version}</version>
-      </dependency>
-
-<!--      <dependency>-->
-<!--        <groupId>com.squareup.okio</groupId>-->
-<!--        <artifactId>okio</artifactId>-->
-<!--        <version>${okio.version}</version>-->
-<!--      </dependency>-->
-
-<!--      <dependency>-->
-<!--        <groupId>com.squareup.okhttp3</groupId>-->
-<!--        <artifactId>okhttp</artifactId>-->
-<!--        <version>${okhttp.version}</version>-->
-<!--        <scope>compile</scope>-->
-<!--      </dependency>-->
-
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>druid</artifactId>
-        <version>${druid.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.integration</groupId>
-        <artifactId>spring-integration-mqtt</artifactId>
-        <version>${mqtt.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.rocketmq</groupId>
-        <artifactId>rocketmq-spring-boot-starter</artifactId>
-        <version>${rocketMq.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.baidubce</groupId>
-        <artifactId>bce-java-sdk</artifactId>
-        <version>${bos.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.qcloud</groupId>
-        <artifactId>cos_api</artifactId>
-        <version>${cos.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.huaweicloud</groupId>
-        <artifactId>esdk-obs-java-bundle</artifactId>
-        <version>${obs.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.aliyun.oss</groupId>
-        <artifactId>aliyun-sdk-oss</artifactId>
-        <version>${oss.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.jsonwebtoken</groupId>
-        <artifactId>jjwt</artifactId>
-        <version>${jwt.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.github.xiaoymin</groupId>
-        <artifactId>knife4j-spring-boot-starter</artifactId>
-        <version>${knife4j.version}</version>
-      </dependency>
-
-      <!--解析图片exif 开始-->
-      <!-- 去除图片Exif -->
-      <dependency>
-        <groupId>com.drewnoakes</groupId>
-        <artifactId>metadata-extractor</artifactId>
-        <version>${metadata.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.adobe.xmp</groupId>
-        <artifactId>xmpcore</artifactId>
-        <version>${xmpcore.version}</version>
-      </dependency>
-      <!--解析图片exif 结束-->
-
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>druid-spring-boot-starter</artifactId>
-        <version>${druid.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.baomidou</groupId>
-        <artifactId>mybatis-plus-boot-starter</artifactId>
-        <version>${mybatis-plus.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.baomidou</groupId>
-        <artifactId>mybatis-plus-extension</artifactId>
-        <version>${mybatis-plus.version}</version>
-      </dependency>
-
+      <!-- Spring Data MongoDB，提供与 MongoDB 交互的支持 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-mongodb</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
-      </dependency>
-
+      <!-- Spring Boot 自动配置，简化配置文件的编写 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-autoconfigure</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.springframework</groupId>
-        <artifactId>spring-context</artifactId>
-        <version>${spring.context.version}</version>
-      </dependency>
-
-      <!--minio-->
-      <dependency>
-        <groupId>io.minio</groupId>
-        <artifactId>minio</artifactId>
-        <version>${minio.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.baomidou</groupId>
-        <artifactId>mybatis-plus</artifactId>
-        <version>${mybatis.plus.version}</version>
-      </dependency>
-
-      <!-- mysql -->
-      <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>${mysql.java.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.seata</groupId>
-        <artifactId>seata-spring-boot-starter</artifactId>
-        <version>${seata.version}</version>
-      </dependency>
-
+      <!-- Spring Data Redis，提供与 Redis 交互的支持 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-redis</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.alibaba.nacos</groupId>
-        <artifactId>nacos-client</artifactId>
-        <version>${nacos.client.version}</version>
-      </dependency>
 
+      <!-- 阿里巴巴 Spring 扩展，提供与 Alibaba 相关的集成支持 -->
       <dependency>
         <groupId>com.alibaba.spring</groupId>
         <artifactId>spring-context-support</artifactId>
         <version>${spring.context.support.version}</version>
       </dependency>
 
-      <dependency>
-        <groupId>org.apache.dubbo</groupId>
-        <artifactId>dubbo-spring-boot-starter</artifactId>
-        <version>${dubbo.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.dubbo</groupId>
-        <artifactId>dubbo</artifactId>
-        <version>${dubbo.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-dependencies</artifactId>
-        <version>${spring.cloud.version}</version>
-        <type>pom</type>
-        <scope>runtime</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>com.alibaba.cloud</groupId>
-        <artifactId>spring-cloud-alibaba-dependencies</artifactId>
-        <version>${spring.cloud.alibab.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>commons-codec</groupId>
-        <artifactId>commons-codec</artifactId>
-        <version>${commons.codec.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-lang</groupId>
-        <artifactId>commons-lang</artifactId>
-        <version>${commons.lang.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-collections4</artifactId>
-        <version>${commons.collections4.version}</version>
-      </dependency>
-
+      <!-- Spring Web，提供构建 Web 应用的基本支持 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter</artifactId>
-        <version>${spring.boot.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.boot</groupId><!-- springMvc -->
         <artifactId>spring-boot-starter-web</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
+      <!-- Spring AOP，提供面向切面编程的支持 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-aop</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
+      <!-- Spring Boot 配置处理器，生成配置元数据 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-configuration-processor</artifactId>
@@ -381,91 +151,313 @@
         <version>${spring.boot.version}</version>
       </dependency>
 
-      <!-- userAgent解析用户 -->
+      <!-- Spring 核心上下文，提供核心的 Spring 功能 -->
       <dependency>
-        <groupId>nl.basjes.parse.useragent</groupId>
-        <artifactId>yauaa</artifactId>
-        <version>${yauaa.version}</version>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring.context.version}</version>
       </dependency>
+      <!-- SpringBoot 框架 end-->
 
+      <!-- 数据库相关版本 start-->
+      <!-- 阿里巴巴 Druid 数据库连接池 -->
       <dependency>
         <groupId>com.alibaba</groupId>
-        <artifactId>easyexcel</artifactId>
-        <version>${easy.excel.version}</version>
+        <artifactId>druid</artifactId>
+        <version>${druid.version}</version>
       </dependency>
 
-      <!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-security</artifactId>
-        <version>${spring.boot.version}</version> </dependency> -->
+      <!-- Druid Spring Boot Starter，简化 Druid 的配置和使用 -->
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>druid-spring-boot-starter</artifactId>
+        <version>${druid.version}</version>
+      </dependency>
 
+      <!-- MyBatis-Plus，增强版的 MyBatis，用于简化 CRUD 操作 -->
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-boot-starter</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.baomidou</groupId>
+        <artifactId>mybatis-plus-extension</artifactId>
+        <version>${mybatis-plus.version}</version>
+      </dependency>
+
+      <!-- MySQL 数据库连接器 -->
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>${mysql.java.version}</version>
+      </dependency>
+
+      <!-- HikariCP 数据库连接池 -->
+      <dependency>
+        <groupId>com.zaxxer</groupId>
+        <artifactId>HikariCP</artifactId>
+        <version>${hikaricp.version}</version>
+      </dependency>
+
+      <!-- Spring JDBC，提供访问关系数据库的支持 -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-jdbc</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+      <!-- 数据库相关版本 end-->
+
+      <!-- 消息队列相关 start-->
+      <!-- Spring Integration，提供集成消息传递的支持 -->
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-core</artifactId>
+        <version>${integration.version}</version>
+      </dependency>
+
+      <!-- Eclipse Paho MQTT 客户端，用于与 MQTT 消息代理进行通信 -->
+      <dependency>
+        <groupId>org.eclipse.paho</groupId>
+        <artifactId>org.eclipse.paho.mqttv5.client</artifactId>
+        <version>${mqtt5.version}</version>
+      </dependency>
+
+      <!-- Apache RocketMQ Spring Boot Starter，简化 RocketMQ 的使用 -->
+      <dependency>
+        <groupId>org.apache.rocketmq</groupId>
+        <artifactId>rocketmq-spring-boot-starter</artifactId>
+        <version>${rocketMq.version}</version>
+      </dependency>
+
+      <!-- ActiveMQ Spring Boot Starter，用于与 ActiveMQ 消息代理进行通信 -->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-activemq</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
+      <!-- AMQP Spring Boot Starter，用于与 RabbitMQ 等 AMQP 消息代理进行通信 -->
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-amqp</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
 
+      <!-- Spring Integration MQTT，提供与 MQTT 协议的集成支持 -->
+      <dependency>
+        <groupId>org.springframework.integration</groupId>
+        <artifactId>spring-integration-mqtt</artifactId>
+        <version>${mqtt.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework.integration</groupId>
+            <artifactId>spring-integration-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <!-- 消息队列相关 end-->
+
+      <!-- S3相关 start -->
+      <!-- AWS S3 SDK，用于与 Amazon S3 进行交互 -->
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>s3</artifactId>
+        <version>${aws.s3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>software.amazon.awssdk</groupId>
+        <artifactId>apache-client</artifactId>
+        <version>${aws.s3.version}</version>
+      </dependency>
+
+      <!-- 百度云 BOS SDK，用于与百度云对象存储进行交互 -->
+      <dependency>
+        <groupId>com.baidubce</groupId>
+        <artifactId>bce-java-sdk</artifactId>
+        <version>${bos.version}</version>
+      </dependency>
+
+      <!-- 腾讯云 COS SDK，用于与腾讯云对象存储进行交互 -->
+      <dependency>
+        <groupId>com.qcloud</groupId>
+        <artifactId>cos_api</artifactId>
+        <version>${cos.version}</version>
+      </dependency>
+
+      <!-- 华为云 OBS SDK，用于与华为云对象存储进行交互 -->
+      <dependency>
+        <groupId>com.huaweicloud</groupId>
+        <artifactId>esdk-obs-java-bundle</artifactId>
+        <version>${obs.version}</version>
+      </dependency>
+
+      <!-- 阿里云 OSS SDK，用于与阿里云对象存储进行交互 -->
+      <dependency>
+        <groupId>com.aliyun.oss</groupId>
+        <artifactId>aliyun-sdk-oss</artifactId>
+        <version>${oss.version}</version>
+      </dependency>
+
+      <!-- MinIO SDK，用于与 MinIO S3 存储进行交互 -->
+      <dependency>
+        <groupId>io.minio</groupId>
+        <artifactId>minio</artifactId>
+        <version>${minio.version}</version>
+      </dependency>
+      <!-- S3相关 end -->
+
+      <!-- 解析图片exif 开始-->
+      <!-- Metadata Extractor，用于提取图片的 EXIF 元数据 -->
+      <dependency>
+        <groupId>com.drewnoakes</groupId>
+        <artifactId>metadata-extractor</artifactId>
+        <version>${metadata.version}</version>
+      </dependency>
+
+      <!-- Adobe XMP Core，用于处理 XMP 元数据 -->
+      <dependency>
+        <groupId>com.adobe.xmp</groupId>
+        <artifactId>xmpcore</artifactId>
+        <version>${xmpcore.version}</version>
+      </dependency>
+      <!-- 解析图片exif 结束-->
+
+      <!-- 加密工具 start -->
+      <!-- Bouncy Castle 加密库，提供多种加密算法和协议的实现 -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${bcprov.jdk15on.version}</version>
+      </dependency>
+      <!-- 加密工具 end -->
+
+      <!-- 钉钉微信机器人发送消息 start-->
+      <!-- 阿里巴巴钉钉服务 SDK，用于与钉钉服务进行交互 -->
+      <dependency>
+        <groupId>com.aliyun</groupId>
+        <artifactId>alibaba-dingtalk-service-sdk</artifactId>
+        <version>${dingtalk.version}</version>
+      </dependency>
+      <!-- 钉钉微信机器人发送消息 end-->
+
+      <!-- 工具相关 start -->
+      <!-- Knife4j，用于生成 API 文档 -->
+      <dependency>
+        <groupId>com.github.xiaoymin</groupId>
+        <artifactId>knife4j-spring-boot-starter</artifactId>
+        <version>${knife4j.version}</version>
+      </dependency>
+
+      <!-- SLF4J API，用于日志记录接口 -->
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+
+      <!-- Commons Codec，用于各种编码/解码算法 -->
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons.codec.version}</version>
+      </dependency>
+
+      <!-- Commons Lang，用于增强 Java 的核心类库 -->
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${commons.lang.version}</version>
+      </dependency>
+
+      <!-- Apache Commons Collections，用于增强 Java 集合框架 -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
+        <version>${commons.collections4.version}</version>
+      </dependency>
+
+      <!-- Yauaa，用于解析 User-Agent 字符串 -->
+      <dependency>
+        <groupId>nl.basjes.parse.useragent</groupId>
+        <artifactId>yauaa</artifactId>
+        <version>${yauaa.version}</version>
+      </dependency>
+
+      <!-- EasyExcel，用于简化 Excel 文件的读写操作 -->
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>easyexcel</artifactId>
+        <version>${easy.excel.version}</version>
+      </dependency>
+
+      <!-- Hutool，用于增强 Java 的工具类库 -->
+      <dependency>
+        <groupId>cn.hutool</groupId>
+        <artifactId>hutool-all</artifactId>
+        <version>${hutool.version}</version>
+      </dependency>
+
+      <!-- Thumbnailator，用于处理图片缩略图 -->
+      <dependency>
+        <groupId>net.coobird</groupId>
+        <artifactId>thumbnailator</artifactId>
+        <version>${thumbnailator.version}</version>
+      </dependency>
+      <!-- 工具相关 end -->
+
+      <!-- 微服务相关版本 start -->
+      <!-- Seata，用于分布式事务管理 -->
+      <dependency>
+        <groupId>io.seata</groupId>
+        <artifactId>seata-spring-boot-starter</artifactId>
+        <version>${seata.version}</version>
+      </dependency>
+
+      <!-- Nacos 客户端，用于服务发现和配置管理 -->
+      <dependency>
+        <groupId>com.alibaba.nacos</groupId>
+        <artifactId>nacos-client</artifactId>
+        <version>${nacos.client.version}</version>
+      </dependency>
+
+      <!-- Dubbo Spring Boot Starter，用于简化 Dubbo 的配置和使用 -->
+      <dependency>
+        <groupId>org.apache.dubbo</groupId>
+        <artifactId>dubbo-spring-boot-starter</artifactId>
+        <version>${dubbo.version}</version>
+      </dependency>
+
+      <!-- FastJSON，用于高效 JSON 序列化和反序列化 -->
+      <dependency>
+        <groupId>com.alibaba</groupId>
+        <artifactId>fastjson</artifactId>
+        <version>${fastJson.version}</version>
+      </dependency>
+      <!-- 微服务相关版本 end -->
+
       <!-- 校验注解所有需要jar包 开始 -->
+      <!-- Bean Validation API，提供标准的 Java Bean 校验 -->
       <dependency>
         <groupId>javax.validation</groupId>
         <artifactId>validation-api</artifactId>
         <version>${javax.validation}</version>
       </dependency>
 
+      <!-- Hibernate Validator，实现 Bean Validation API -->
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-validator</artifactId>
         <version>${hibernate.validator.version}</version>
       </dependency>
       <!-- 校验注解所有需要jar包 结束 -->
-
-      <!-- google图片处理 -->
       <dependency>
-        <groupId>net.coobird</groupId>
-        <artifactId>thumbnailator</artifactId>
-        <version>${thumbnailator.version}</version>
-      </dependency>
-
-      <!-- websocket -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-websocket</artifactId>
-        <version>${spring.boot.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-annotations</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>fastjson</artifactId>
-        <version>${fastJson.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-bootstrap</artifactId>
-        <version>${spring.bootstrap.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>cn.hutool</groupId>
-        <artifactId>hutool-all</artifactId>
-        <version>${hutool.version}</version>
+        <groupId>com.alibaba.csp</groupId>
+        <artifactId>sentinel-datasource-nacos</artifactId>
+        <version>1.8.8</version>
       </dependency>
     </dependencies>
-
   </dependencyManagement>
 
   <build>

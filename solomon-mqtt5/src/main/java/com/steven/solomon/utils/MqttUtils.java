@@ -1,5 +1,6 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,7 +21,6 @@ import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.MqttSubscription;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.AnnotationUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -107,13 +107,13 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
-        MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+        MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
         if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
           continue;
         }
         for (String topic : messageListener.topics()) {
           AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-          client.subscribe(topic, messageListener.qos(), consumer);
+          client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{consumer});
         }
       }
     }

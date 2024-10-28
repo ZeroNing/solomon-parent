@@ -9,7 +9,7 @@ services:
       - "9001:9001"
     environment:
       MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: admin
+      MINIO_SECRET_KEY: admin12345678
     volumes:
       - ./data:/data
       - /etc/localtime:/etc/localtime # 容器与宿主机时间同步

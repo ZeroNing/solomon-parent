@@ -1,5 +1,6 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
@@ -25,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
@@ -61,9 +61,8 @@ public class MongoDbUtils {
     mongoDatabase.listCollectionNames().forEach(collectionNameList::add);
 
     for(Object obj : SpringUtil.getBeansWithAnnotation(MongoDBCapped.class).values()){
-      MongoDBCapped                                          mongoDBCapped = AnnotationUtils
-          .getAnnotation(obj.getClass(), MongoDBCapped.class);
-      org.springframework.data.mongodb.core.mapping.Document document      = AnnotationUtils.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
+      MongoDBCapped                                          mongoDBCapped = AnnotationUtil.getAnnotation(obj.getClass(), MongoDBCapped.class);
+      org.springframework.data.mongodb.core.mapping.Document document      = AnnotationUtil.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
 
       String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : "";
       boolean isCreate = collectionNameList.contains(name);

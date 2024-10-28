@@ -1,7 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
@@ -22,9 +22,6 @@ import java.util.Map;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.integration.channel.DirectChannel;
-import org.springframework.integration.dsl.IntegrationFlows;
 
 @Configuration
 public class MqttUtils implements SendService<MqttModel<?>> {
@@ -110,7 +107,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
-        MessageListener messageListener = AnnotationUtils.findAnnotation(abstractConsumer.getClass(), MessageListener.class);
+        MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
         if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
           continue;
         }

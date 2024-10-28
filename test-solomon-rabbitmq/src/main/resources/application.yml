@@ -1,0 +1,26 @@
+i18n:
+  all-locale: zh,en
+  language: zh
+  path: i18n/messages
+server:
+  port: 8001
+knife4j:
+  title: rabbitmq测试用例
+  open: true
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jmx:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    auto-delete-queue: false #是否自动删除队列以及交换机
+
