@@ -33,6 +33,7 @@
     <module>test-solomon-mqtt</module>
     <module>test-solomon-mqtt5</module>
     <module>test-solomon-s3</module>
+    <module>solomon-xxlJob</module>
   </modules>
 
   <properties>
@@ -89,10 +90,18 @@
     <mysql.version>8.0.28</mysql.version>
     <integration.version>5.5.20</integration.version>
     <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
+    <xxl-job.version>2.4.1</xxl-job.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <!-- JOB框架 start -->
+      <dependency>
+        <groupId>com.xuxueli</groupId>
+        <artifactId>xxl-job-core</artifactId>
+        <version>${xxl-job.version}</version>
+      </dependency>
+      <!-- JOB框架 end -->
       <!-- SpringBoot 框架 start-->
       <!-- 用于处理 JSON 数据，默认包含 Jackson 库 -->
       <dependency>
