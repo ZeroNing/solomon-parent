@@ -18,9 +18,6 @@ public class XxlJobInfo {
 	private int jobGroup;		// 执行器主键ID
 	private String jobDesc;
 	
-	private Date addTime;
-	private Date updateTime;
-	
 	private String author;		// 负责人
 	private String alarmEmail;	// 报警邮件
 
@@ -38,13 +35,10 @@ public class XxlJobInfo {
 	private GlueTypeEnum glueType;		// GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
 	private String glueSource;		// GLUE源代码
 	private String glueRemark;		// GLUE备注
-	private Date glueUpdatetime;	// GLUE更新时间
 
 	private String childJobId;		// 子任务ID，多个逗号分隔
 
 	private int triggerStatus;		// 调度状态：0-停止，1-运行
-	private long triggerLastTime;	// 上次调度时间
-	private long triggerNextTime;	// 下次调度时间
 
 	public XxlJobInfo() {
 		super();
@@ -52,6 +46,25 @@ public class XxlJobInfo {
 
 	public XxlJobInfo(JobTask jobTask) {
 		super();
+		this.jobGroup = jobTask.jobGroup();
+		this.jobDesc = jobTask.taskName();
+		this.author = jobTask.author();
+		this.alarmEmail = jobTask.alarmEmail();
+		this.scheduleType = jobTask.scheduleType();
+		this.scheduleConf = jobTask.scheduleConf();
+		this.misfireStrategy = jobTask.misfireStrategy();
+		this.executorRouteStrategy = jobTask.executorRouteStrategy();
+		this.executorHandler = jobTask.executorHandler();
+		this.executorParam = jobTask.executorParam();
+		this.executorBlockStrategy = jobTask.executorBlockStrategy();
+		this.executorTimeout = jobTask.executorTimeout();
+		this.executorFailRetryCount = jobTask.executorFailRetryCount();
+		this.glueType = jobTask.glueType();
+		this.childJobId = jobTask.childJobId();
+		this.triggerStatus = jobTask.start() ? 1 : 0;
+	}
+
+	public void update(JobTask jobTask){
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = jobTask.taskName();
 		this.author = jobTask.author();
@@ -92,22 +105,6 @@ public class XxlJobInfo {
 
 	public void setJobDesc(String jobDesc) {
 		this.jobDesc = jobDesc;
-	}
-
-	public Date getAddTime() {
-		return addTime;
-	}
-
-	public void setAddTime(Date addTime) {
-		this.addTime = addTime;
-	}
-
-	public Date getUpdateTime() {
-		return updateTime;
-	}
-
-	public void setUpdateTime(Date updateTime) {
-		this.updateTime = updateTime;
 	}
 
 	public String getAuthor() {
@@ -222,14 +219,6 @@ public class XxlJobInfo {
 		this.glueRemark = glueRemark;
 	}
 
-	public Date getGlueUpdatetime() {
-		return glueUpdatetime;
-	}
-
-	public void setGlueUpdatetime(Date glueUpdatetime) {
-		this.glueUpdatetime = glueUpdatetime;
-	}
-
 	public String getChildJobId() {
 		return childJobId;
 	}
@@ -244,21 +233,5 @@ public class XxlJobInfo {
 
 	public void setTriggerStatus(int triggerStatus) {
 		this.triggerStatus = triggerStatus;
-	}
-
-	public long getTriggerLastTime() {
-		return triggerLastTime;
-	}
-
-	public void setTriggerLastTime(long triggerLastTime) {
-		this.triggerLastTime = triggerLastTime;
-	}
-
-	public long getTriggerNextTime() {
-		return triggerNextTime;
-	}
-
-	public void setTriggerNextTime(long triggerNextTime) {
-		this.triggerNextTime = triggerNextTime;
 	}
 }
