@@ -10,6 +10,8 @@ import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
+import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
+import com.xxl.job.core.handler.IJobHandler;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -32,29 +34,36 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
+        if(!profile.getEnabled()){
+            logger.error("xxl-Job不启用,不初始化定时任务");
+            return;
+        }
         String cookie = login();
         String adminAddresses = profile.getAdminAddresses();
         if(!adminAddresses.endsWith("/")){
             adminAddresses = adminAddresses + "/";
         }
         String url = adminAddresses + "jobinfo/add";
+        XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         for(Object obj : clazzList){
-            JobTask jobTask = AnnotationUtil.getAnnotation(obj.getClass(), JobTask.class);
-            XxlJob xxlJob = AnnotationUtil.getAnnotation(obj.getClass(), XxlJob.class);
+            Class<?> clazz = obj.getClass();
+            JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
             if(ValidateUtils.isEmpty(jobTask)){
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
-            XxlJobInfo xxlJobInfo = new XxlJobInfo(jobTask,xxlJob);
+            XxlJobInfo xxlJobInfo = new XxlJobInfo(jobTask);
             // 发送 POST 请求
             HttpResponse response = HttpUtil.createPost(url)
                     .form(JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true))
                     .cookie(cookie) // 需要替换为实际的认证信息
                     .execute();
+            XxlJobSpringExecutor.registJobHandler(jobTask.executorHandler(), (IJobHandler) obj);
             if(!response.isOk()){
                 throw new Exception("xxl-job初始化任务失败");
             }
         }
+        xxlJobSpringExecutor.start();
     }
 
     private String login() throws Exception {

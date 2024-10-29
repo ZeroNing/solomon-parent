@@ -50,7 +50,7 @@ public class XxlJobInfo {
 		super();
 	}
 
-	public XxlJobInfo(JobTask jobTask, XxlJob xxlJob) {
+	public XxlJobInfo(JobTask jobTask) {
 		super();
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = jobTask.taskName();
@@ -60,14 +60,14 @@ public class XxlJobInfo {
 		this.scheduleConf = jobTask.scheduleConf();
 		this.misfireStrategy = jobTask.misfireStrategy();
 		this.executorRouteStrategy = jobTask.executorRouteStrategy();
-		this.executorHandler = xxlJob.value();
+		this.executorHandler = jobTask.executorHandler();
 		this.executorParam = jobTask.executorParam();
 		this.executorBlockStrategy = jobTask.executorBlockStrategy();
 		this.executorTimeout = jobTask.executorTimeout();
 		this.executorFailRetryCount = jobTask.executorFailRetryCount();
 		this.glueType = jobTask.glueType();
 		this.childJobId = jobTask.childJobId();
-		this.triggerStatus = 1;
+		this.triggerStatus = jobTask.start() ? 1 : 0;
 	}
 
 	public int getId() {

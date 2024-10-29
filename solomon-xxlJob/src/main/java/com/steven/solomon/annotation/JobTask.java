@@ -55,6 +55,11 @@ public @interface JobTask {
     GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
 
     /**
+     * 执行器，任务Handler名称
+     */
+    String executorHandler();
+
+    /**
      * 执行器 任务参数
      */
     String executorParam() default "";
@@ -88,4 +93,9 @@ public @interface JobTask {
      * 失败重试次数
      */
     int executorFailRetryCount() default 0;
+
+    /**
+     * 是否启动
+     */
+    boolean start() default true;
 }

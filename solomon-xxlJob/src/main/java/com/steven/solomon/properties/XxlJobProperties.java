@@ -35,6 +35,17 @@ public class XxlJobProperties {
     //网页登陆密码
     private String password;
 
+    //是否启用
+    private boolean enabled = true;
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
+    }
+
     public String getUserName() {
         return userName;
     }
