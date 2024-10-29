@@ -27,20 +27,21 @@
 
 ## 项目描述
 
-| 项目名                      | 说明                                                         |
-|:-------------------------| ------------------------------------------------------------ |
-| docker                   | 主要是基础的组件的部署文件(已经是测试过，可以直接用)                  |
-| solomon-base             | 主要是封装了底层的异常捕获以及通用返回实体类                 |
-| solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获 |
+| 项目名                      | 说明                                                                                      |
+|:-------------------------|-----------------------------------------------------------------------------------------|
+| docker                   | 主要是基础的组件的部署文件(已经是测试过，可以直接用)                                                             |
+| solomon-base             | 主要是封装了底层的异常捕获以及通用返回实体类                                                                  |
+| solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获                                                       |
 | solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值，底层数据实体类以及动态切换数据源模板，国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
-| solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
-| solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方 |
-| solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
-| solomon-mqtt5            | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
-| solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
-| solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
-| solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等 |
-| solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
+| solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置                                        |
+| solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方                                                     |
+| solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现                                          |
+| solomon-mqtt5            | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现                                          |
+| solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现                                    |
+| solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY                                                  |
+| solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等                           |
+| solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值                                                     |
+| solomon-xxlJob           | 主要是将原本的XXL-JOB的配置进行自动化,自动创建任务                                                           |
 
 # 自定义配置说明
 ## swagger版本号支持获取git最后一个提交记录版本号
@@ -299,7 +300,32 @@ spring:
     auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
     auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
 ```
-
+## xxl-job配置
+```yaml
+xxl:
+  # 调度中心的地址，通常是XXL-JOB管理控制台的地址
+  admin-addresses: http://localhost:8080/xxl-job-admin
+  # 调度中心和执行器之间的访问令牌，用于确保安全性
+  access-token: default_token
+  # 当前执行器的应用名称，用于唯一标识一个执行器
+  app-name: xxl-job-executor-sample
+  # 执行器地址，用于注册到调度中心。可以指定具体的IP和端口，或者为自动模式（例如：AUTO）
+  address: localhost:8080
+  # 执行器的IP地址。如果为空，系统会自动获取本机IP
+  ip: localhost
+  # 执行器的端口。默认端口为0，表示随机生成一个端口
+  port: 8080
+  # 执行器的日志文件存储路径
+  log-path: 日志路径
+  # 执行器的日志文件的保留天数
+  log-retention-days: 30
+  # 调度中心的登录用户名
+  user-name: admin
+  # 调度中心的登录密码
+  password: 123456
+  # 是否启用该执行器，true表示启用，false表示禁用
+  enabled: true
+```
 # 枚举国际化用例
 
 1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型
@@ -821,6 +847,21 @@ public class Entity implements Serializable {
 }
 ```
 
+## XXL-JOB自动创建任务用法
+```java
+@JobTask(taskName = "任务描述", author = "负责人", executorHandler = "JobHandler",scheduleType = ScheduleTypeEnum.FIX_RATE,scheduleConf = "1")
+public class TestHandler extends AbstractJobConsumer {
+
+    @Override
+    public void handle(String jobParam) {
+    }
+
+    @Override
+    public void saveLog(Throwable throwable) {
+
+    }
+}
+```
 ## Docker Compose安装组件文件
 详细的配置都在docker文件夹内，内涵Emqx的Mqtt组件、Minio对象存储组件、Mongodb组件、Mysql数据库、Portainer管理Docker可视化界面组件、PostgresSql数据库、RabbitMq消息队列组件、Redis缓存组件、RocketMq消息队列组件、sonarqube代码检查组件、Nacos组件
 
