@@ -66,7 +66,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             }
             if(jobTask.start()){
                 String url = adminAddresses + "jobinfo/start";
-                start(cookie,jobTask.executorHandler(),url);
+                enabled(cookie,jobTask.executorHandler(),url);
+            }
+            if(!jobTask.start()){
+                String url = adminAddresses + "jobinfo/stop";
+                enabled(cookie,jobTask.executorHandler(),url);
             }
             XxlJobSpringExecutor.registJobHandler(jobTask.executorHandler(), (IJobHandler) obj);
         }
@@ -108,7 +112,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         return cookies.get(0);
     }
 
-    private void start(String cookie,String executorHandler,String url) throws Exception {
+    private void enabled(String cookie,String executorHandler,String url) throws Exception {
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         if(ValidateUtils.isEmpty(xxlJobInfoList)){
             throw new Exception("xxl-job启动"+executorHandler+"任务失败");
