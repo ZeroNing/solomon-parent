@@ -31,20 +31,19 @@
 |:-------------------------| ------------------------------------------------------------ |
 | docker                   | 主要是基础的组件的部署文件(已经是测试过，可以直接用)                  |
 | solomon-base             | 主要是封装了底层的异常捕获以及通用返回实体类                 |
-| solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
 | solomon-common           | 引入base模块基础上增加了对微服务单体服务以及单体服务的异常捕获 |
 | solomon-constnt          | 主要就是写入了一部分异常编码常量以及缓存时间的值，底层数据实体类以及动态切换数据源模板，国际化配置，支持扫描Jar包内国际化文件并封装了底层通用常见的异常，并且返回国际化错误 |
-| solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等 |
 | solomon-gateway-sentinel | 简单封装了gateway网关以及Sentinel的异常捕获，并支持动态修改nacos中的限流配置 |
 | solomon-mongodb          | 引入了data模块，支持了动态切换缓存数据源，以及封装了部分底层查询方 |
 | solomon-mqtt             | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-mqtt5            | 支持Mqtt以注解形式配置消息质量以及主题，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
 | solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现 |
+| solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY |
+| solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等 |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值 |
 
-## 自定义配置说明
-
-### swagger版本号支持获取git最后一个提交记录版本号
+# 自定义配置说明
+## swagger版本号支持获取git最后一个提交记录版本号
 
 需要在项目的pom.xml配置以下代码,打包成功后即可读取到项目git最后一条记录版本号
 
@@ -103,7 +102,7 @@
 
 
 
-### Swagger配置说明
+## Swagger配置说明
 
 ```yaml
 knife4j:
@@ -114,7 +113,7 @@ knife4j:
 
 
 
-### 国际化配置说明
+## 国际化配置说明
 
 ```yaml
 i18n:
@@ -123,7 +122,7 @@ i18n:
   path:               #国际化文件路径
 ```
 
-### Mqtt配置说明
+## Mqtt配置说明
 
 ```yaml
 mqtt:
@@ -146,7 +145,7 @@ mqtt:
 
 
 
-### 文件配置说明
+## 文件配置说明
 
 ```yaml
 file:
@@ -162,7 +161,7 @@ file:
   connection-timeout: #连接超时 默认60秒 单位毫秒
   socket-timeout:  #socket的超时时间 默认60秒 单位毫秒
 ```
-### 文件命名选择器
+## 文件命名选择器
 ```java
 public enum FileNamingMethodEnum implements BaseEnum<String> {
   ORIGINAL("ORIGINAL","使用文件的文件名"),
@@ -195,7 +194,7 @@ public enum FileNamingMethodEnum implements BaseEnum<String> {
   }
 }
 ```
-### 文件选择器枚举
+## 文件选择器枚举
 ```java
 public enum FileChoiceEnum implements BaseEnum<String> {
   DEFAULT("DEFAULT","无文件存储实现"),
@@ -251,7 +250,7 @@ public enum FileChoiceEnum implements BaseEnum<String> {
 }
 ```
 
-### 缓存配置说明
+## 缓存配置说明
 
 ```yaml
 spring:
@@ -260,9 +259,48 @@ spring:
     type: NONE   #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
 ```
 
+### redis单机版
+```yaml
+spring:
+  cache:
+    mode: NORMAL
+    type: REDIS
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+```
 
+### redis多租户配置
+```yaml
+spring:
+  cache:
+    mode: SWITCH_DB
+    type: REDIS
+  redis:
+    tenant:
+      default: #租户编码
+        host: 127.0.0.1
+        port: 6379
+        database: 0
+      default1: #租户编码
+        host: 127.0.0.1
+        port: 6380
+        database: 0
+```
+## rabbitmq配置
+```yaml
+spring:
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
+    auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
+```
 
-## 枚举国际化用例
+# 枚举国际化用例
 
 1.枚举类需要实现 BaseEnum 其中的<T>是数据库里的值的类型
 
@@ -353,18 +391,6 @@ DelFlagEnum.DELETE=删除
 ```
 
 ## Rabbit队列注册以及消费用例
-### Rabbitmq自定义配置
-```properties
-spring:
-  rabbitmq:
-    username: guest
-    password: guest
-    host: localhost
-    port: 5672
-    auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
-    auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
-```
-
 @MessageListener注解描述：
 
 ```java
@@ -610,42 +636,6 @@ public class Test extends AbstractConsumer<String> {
     }
 }
 ```
-
-## Redis多租户配置方式
-
-1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");type是选择缓存类型目前只支持REDIS
-
-```yaml
-spring:
-    redis:
-      mode: SWITCH_DB
-      type: REDIS
-      host:
-      port: 6379
-      password:
-      database:
-```
-
-2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
-
-```yaml
-spring:
-  redis:
-    mode: SWITCH_DB
-    type: REDIS
-    host:
-    port: 6379
-    password:
-    database: 
-        tenant:
-           租户编码:
-               host:
-               port: 6379
-               password:
-               database: 
-```
-
-3.如果不想选择配置文件配置的话也可以用代码方面调用 RedisInitUtils.init的方法，传入租户编码和redis配置以及注入一个RedisTenantContext对象
 
 ## Redis消息队列用例
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
