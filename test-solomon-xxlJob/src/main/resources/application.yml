@@ -20,7 +20,7 @@ spring:
 xxl:
   access-token: default_token
   app-name: xxl-job-executor-sample
-  admin-addresses: http://192.168.8.96:8080/xxl-job-admin
+  admin-addresses: http://localhost:8080/xxl-job-admin
   user-name: admin
   password: 123456
   log-path: 日志路径
