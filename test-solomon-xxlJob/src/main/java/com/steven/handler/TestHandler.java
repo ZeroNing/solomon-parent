@@ -7,7 +7,7 @@ import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import groovyjarjarpicocli.CommandLine;
 
-@JobTask(taskName = "123456", author = "123456", executorHandler = "testHandler",scheduleType = ScheduleTypeEnum.FIX_RATE,scheduleConf = "60")
+@JobTask(taskName = "123456", author = "123456", executorHandler = "testHandler",scheduleType = ScheduleTypeEnum.FIX_RATE,scheduleConf = "1")
 public class TestHandler extends AbstractJobConsumer {
 
     @Override

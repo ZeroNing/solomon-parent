@@ -51,7 +51,8 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
-            List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,jobTask.executorHandler());
+            String executorHandler = jobTask.executorHandler();;
+            List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
 
             if(ValidateUtils.isEmpty(xxlJobInfoList)){
                 String url = adminAddresses + "jobinfo/add";
@@ -64,15 +65,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 xxlJobInfo.update(jobTask);
                 execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
             }
-            if(jobTask.start()){
-                String url = adminAddresses + "jobinfo/start";
-                enabled(cookie,jobTask.executorHandler(),url);
-            }
-            if(!jobTask.start()){
-                String url = adminAddresses + "jobinfo/stop";
-                enabled(cookie,jobTask.executorHandler(),url);
-            }
-            XxlJobSpringExecutor.registJobHandler(jobTask.executorHandler(), (IJobHandler) obj);
+            String url = adminAddresses + (jobTask.start() ? "jobinfo/start" : "jobinfo/stop");
+            enabled(cookie,executorHandler,url);
+            XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
         }
         xxlJobSpringExecutor.start();
     }
