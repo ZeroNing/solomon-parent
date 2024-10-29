@@ -34,6 +34,7 @@
     <module>test-solomon-mqtt5</module>
     <module>test-solomon-s3</module>
     <module>solomon-xxlJob</module>
+    <module>test-solomon-xxlJob</module>
   </modules>
 
   <properties>
