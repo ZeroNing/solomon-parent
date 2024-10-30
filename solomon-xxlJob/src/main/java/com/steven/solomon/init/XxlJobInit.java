@@ -51,10 +51,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
-            String executorHandler = jobTask.executorHandler();;
+            String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),obj.getClass().getSimpleName());
             List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
             String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoList)? "jobinfo/add" : "jobinfo/update");
             XxlJobInfo xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfoList) ? new XxlJobInfo(jobTask) : xxlJobInfoList.get(0).update(jobTask);
+            xxlJobInfo.setExecutorHandler(executorHandler);
             // 发送 POST 请求
             execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
 
@@ -65,6 +66,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         xxlJobSpringExecutor.start();
     }
 
+    /**
+     * 登陆网页
+     */
     private String login() throws Exception {
         String adminAddresses = profile.getAdminAddresses();
         String userName = profile.getUserName();
@@ -92,6 +96,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         return getCookie(url,paramMap);
     }
 
+    /**
+     * 启动任务
+     */
     private void enabled(String cookie,String executorHandler,String url) throws Exception {
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         if(ValidateUtils.isEmpty(xxlJobInfoList)){
@@ -103,6 +110,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         execute(cookie,url,paramMap);
     }
 
+    /**
+     * 调用xxl-job的任务页面查询
+     */
     private List<XxlJobInfo> findByExecutorHandler(String cookie,String executorHandler) throws Exception {
         String adminAddresses = profile.getAdminAddresses();
         if(!adminAddresses.endsWith("/")){
@@ -116,6 +126,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
     }
 
+    /**
+     * 调用接口
+     */
     private HttpResponse executeResponse(String cookie,String url,Map<String, Object> paramMap) throws Exception {
         HttpRequest request = HttpUtil.createPost(url);
         if(ValidateUtils.isNotEmpty(cookie)){
@@ -140,6 +153,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         return response;
     }
 
+    /**
+     * 获取登陆网页的cookie
+     */
     private String getCookie(String url, Map<String, Object> paramMap) throws Exception {
         try (HttpResponse response = executeResponse(null, url, paramMap)) {
             List<String> cookies = response.headerList("Set-Cookie");
@@ -150,6 +166,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         }
     }
 
+    /**
+     * 获取接口返回的数据
+     */
     private String execute(String cookie, String url, Map<String, Object> paramMap) throws Exception {
         try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
             return response.body();

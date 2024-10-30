@@ -55,9 +55,9 @@ public @interface JobTask {
     GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
 
     /**
-     * 执行器，任务Handler名称
+     * 执行器，任务Handler名称 默认:当前类的类名
      */
-    String executorHandler();
+    String executorHandler() default "";
 
     /**
      * 执行器 任务参数
