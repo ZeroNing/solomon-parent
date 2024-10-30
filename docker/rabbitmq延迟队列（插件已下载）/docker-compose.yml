@@ -11,7 +11,6 @@ services:
       - ./data:/usr/etc/rabbitmq/data
       - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
       - ./plugins/rabbitmq_delayed_message_exchange-3.13.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.13.0.ez
-    environment:
-      - RABBITMQ_DELAYED_MESSAGE_ENABLED=true
-      - RABBITMQ_PLUGINS=--offline rabbitmq_delayed_message_exchange
+      - ./init.sh:/usr/local/bin/init.sh
+    command: ["/bin/bash", "-c", "chmod +x /usr/local/bin/init.sh && /usr/local/bin/init.sh"]
     restart: always
