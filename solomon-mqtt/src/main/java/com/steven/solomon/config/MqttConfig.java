@@ -15,9 +15,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.integration.annotation.IntegrationComponentScan;
@@ -28,6 +30,7 @@ import org.springframework.messaging.MessageChannel;
 @IntegrationComponentScan
 @EnableConfigurationProperties(value={TenantMqttProfile.class,})
 @Import(value = {MqttUtils.class})
+@ConditionalOnProperty(name = "mqtt.enabled", havingValue = "true", matchIfMissing = true)
 public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
 
   private final TenantMqttProfile profile;
@@ -42,12 +45,17 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
 
   @Bean
   @ConditionalOnMissingBean(MessageChannel.class)
+  @Conditional(MqttCondition.class)
   public MessageChannel mqttInputChannel() {
     return new DirectChannel();
   }
 
   @Override
   public void init(List<Object> clazzList) throws Exception {
+    if(!profile.getEnabled()){
+      logger.error("mqtt不启用,不初始化队列以及消费者");
+      return;
+    }
     Map<String,MqttProfile> tenantProfileMap = profile.getTenant();
     if(ValidateUtils.isEmpty(tenantProfileMap)){
       logger.error("AbstractMessageLineRunner:没有MQTT配置");
