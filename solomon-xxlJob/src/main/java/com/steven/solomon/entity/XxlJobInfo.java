@@ -2,6 +2,8 @@ package com.steven.solomon.entity;
 
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.enums.*;
+import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.verification.ValidateUtils;
 import com.xxl.job.core.handler.annotation.XxlJob;
 
 import java.util.Date;
@@ -44,11 +46,17 @@ public class XxlJobInfo {
 		super();
 	}
 
-	public XxlJobInfo(JobTask jobTask) {
+	public XxlJobInfo(JobTask jobTask,String className) {
 		super();
 		this.jobGroup = jobTask.jobGroup();
-		this.jobDesc = jobTask.taskName();
-		this.author = jobTask.author();
+		this.jobDesc = ValidateUtils.getOrDefault(jobTask.taskName(),className);
+		String author = null;
+		if(ValidateUtils.isEmpty(jobTask.author())){
+			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
+		} else {
+			author = jobTask.author();
+		}
+		this.author = author;
 		this.alarmEmail = jobTask.alarmEmail();
 		this.scheduleType = jobTask.scheduleType();
 		this.scheduleConf = jobTask.scheduleConf();
@@ -64,10 +72,16 @@ public class XxlJobInfo {
 		this.triggerStatus = jobTask.start() ? 1 : 0;
 	}
 
-	public XxlJobInfo update(JobTask jobTask){
+	public XxlJobInfo update(JobTask jobTask,String className){
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = jobTask.taskName();
-		this.author = jobTask.author();
+		String author = null;
+		if(ValidateUtils.isEmpty(jobTask.author())){
+			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
+		} else {
+			author = jobTask.author();
+		}
+		this.author = author;
 		this.alarmEmail = jobTask.alarmEmail();
 		this.scheduleType = jobTask.scheduleType();
 		this.scheduleConf = jobTask.scheduleConf();

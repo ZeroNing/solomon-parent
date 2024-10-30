@@ -25,14 +25,14 @@ public @interface JobTask {
      */
     int jobGroup() default 1;
     /**
-     * 任务描述
+     * 任务描述 默认:当前类的类名
      */
-    String taskName();
+    String taskName() default "";
 
     /**
-     * 负责人
+     * 负责人 默认是配置文件的 spring.application.name 如果没有的情况下,继续默认当前类名
      */
-    String author();
+    String author() default "";
 
     /**
      * 报警邮件

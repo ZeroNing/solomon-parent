@@ -51,10 +51,12 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
-            String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),obj.getClass().getSimpleName());
+            String className = obj.getClass().getSimpleName();
+            String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),className);
+
             List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
             String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoList)? "jobinfo/add" : "jobinfo/update");
-            XxlJobInfo xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfoList) ? new XxlJobInfo(jobTask) : xxlJobInfoList.get(0).update(jobTask);
+            XxlJobInfo xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfoList) ? new XxlJobInfo(jobTask,className) : xxlJobInfoList.get(0).update(jobTask,className);
             xxlJobInfo.setExecutorHandler(executorHandler);
             // 发送 POST 请求
             execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));

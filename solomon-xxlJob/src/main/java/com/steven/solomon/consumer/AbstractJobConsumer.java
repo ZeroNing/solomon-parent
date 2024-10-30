@@ -36,7 +36,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
     public abstract void handle(String jobParam);
 
     public String getXxlJobBeanName(){
-        return ValidateUtils.isNotEmpty(jobTask) ? jobTask.executorHandler() : "";
+        return ValidateUtils.isNotEmpty(jobTask) ? ValidateUtils.getOrDefault(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
     }
 
     /**
