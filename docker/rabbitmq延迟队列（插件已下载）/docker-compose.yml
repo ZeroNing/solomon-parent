@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - ./data:/usr/etc/rabbitmq/data
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+      - ./plugins/rabbitmq_delayed_message_exchange-3.13.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.13.0.ez
+    environment:
+      - RABBITMQ_DELAYED_MESSAGE_ENABLED=true
+      - RABBITMQ_PLUGINS=--offline rabbitmq_delayed_message_exchange
+    restart: always
