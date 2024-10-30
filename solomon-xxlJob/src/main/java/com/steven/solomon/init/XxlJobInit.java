@@ -53,19 +53,12 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             }
             String executorHandler = jobTask.executorHandler();;
             List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
+            String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoList)? "jobinfo/add" : "jobinfo/update");
+            XxlJobInfo xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfoList) ? new XxlJobInfo(jobTask) : xxlJobInfoList.get(0).update(jobTask);
+            // 发送 POST 请求
+            execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
 
-            if(ValidateUtils.isEmpty(xxlJobInfoList)){
-                String url = adminAddresses + "jobinfo/add";
-                XxlJobInfo xxlJobInfo = new XxlJobInfo(jobTask);
-                // 发送 POST 请求
-                execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
-            } else {
-                String url = adminAddresses + "jobinfo/update";
-                XxlJobInfo xxlJobInfo = xxlJobInfoList.get(0);
-                xxlJobInfo.update(jobTask);
-                execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
-            }
-            String url = adminAddresses + (jobTask.start() ? "jobinfo/start" : "jobinfo/stop");
+            url = adminAddresses + (jobTask.start() ? "jobinfo/start" : "jobinfo/stop");
             enabled(cookie,executorHandler,url);
             XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
         }
@@ -96,15 +89,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         paramMap.put("password", password);
 
         // 发送 POST 请求
-        HttpResponse response = HttpUtil.createPost(url).form(paramMap).execute();
-        if(!response.isOk()){
-            throw new Exception("xxl-job登陆失败");
-        }
-        List<String> cookies = response.headerList("Set-Cookie");
-        if(ValidateUtils.isEmpty(cookies)){
-            throw new Exception("获取xxl-job的cookie失败");
-        }
-        return cookies.get(0);
+        return getCookie(url,paramMap);
     }
 
     private void enabled(String cookie,String executorHandler,String url) throws Exception {
@@ -131,9 +116,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
     }
 
-    private String execute(String cookie,String url,Map<String, Object> paramMap) throws Exception {
+    private HttpResponse executeResponse(String cookie,String url,Map<String, Object> paramMap) throws Exception {
         HttpRequest request = HttpUtil.createPost(url);
-        request = request.cookie(cookie); // 需要替换为实际的认证信息
+        if(ValidateUtils.isNotEmpty(cookie)){
+            request = request.cookie(cookie); // 需要替换为实际的认证信息
+        }
         if(ValidateUtils.isNotEmpty(paramMap)){
             request = request.form(paramMap);
         }
@@ -141,7 +128,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         String body = response.body();
         String code = null;
         String msg = null;
-        if(JSONUtil.isJson(body)){
+        if(JSONUtil.isTypeJSON(body)){
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             code = ValidateUtils.isEmpty(resultMap.get("code")) ? null : resultMap.get("code").toString();
             msg = ValidateUtils.isEmpty(resultMap.get("msg")) ? null : resultMap.get("msg").toString();
@@ -150,6 +137,22 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         if(!response.isOk() || (ValidateUtils.isNotEmpty(code) && ValidateUtils.notEqualsIgnoreCase(code,"200"))){
             throw new Exception("调用xxl-job接口:["+url+"]失败,请求参数是:["+JSONUtil.toJsonStr(paramMap)+"],原因:"+msg);
         }
-        return body;
+        return response;
+    }
+
+    private String getCookie(String url, Map<String, Object> paramMap) throws Exception {
+        try (HttpResponse response = executeResponse(null, url, paramMap)) {
+            List<String> cookies = response.headerList("Set-Cookie");
+            if(ValidateUtils.isEmpty(cookies)){
+                throw new Exception("获取xxl-job的cookie失败");
+            }
+            return cookies.get(0);
+        }
+    }
+
+    private String execute(String cookie, String url, Map<String, Object> paramMap) throws Exception {
+        try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
+            return response.body();
+        }
     }
 }

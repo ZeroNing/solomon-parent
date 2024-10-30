@@ -64,7 +64,7 @@ public class XxlJobInfo {
 		this.triggerStatus = jobTask.start() ? 1 : 0;
 	}
 
-	public void update(JobTask jobTask){
+	public XxlJobInfo update(JobTask jobTask){
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = jobTask.taskName();
 		this.author = jobTask.author();
@@ -81,6 +81,7 @@ public class XxlJobInfo {
 		this.glueType = jobTask.glueType();
 		this.childJobId = jobTask.childJobId();
 		this.triggerStatus = jobTask.start() ? 1 : 0;
+		return this;
 	}
 
 	public int getId() {
