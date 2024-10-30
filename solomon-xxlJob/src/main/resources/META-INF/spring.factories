@@ -1,0 +1,5 @@
+# Auto Configure
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.spring.SpringUtil,\
+com.steven.solomon.config.XxlJobConfig,\
+com.steven.solomon.init.XxlJobInit
