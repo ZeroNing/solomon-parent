@@ -18,11 +18,15 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
@@ -38,8 +42,9 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 @Configuration
 @EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
-@Import(value = {MongoTenantsContext.class})
+@Import(value = {MongoTenantsContext.class, MongoAutoConfiguration.class})
 @Order(2)
+@ConditionalOnProperty(name = "spring.data.mongodb.enabled", havingValue = "true", matchIfMissing = true)
 public class MongoConfig {
 
   private final Logger logger = LoggerUtils.logger(getClass());
@@ -64,6 +69,10 @@ public class MongoConfig {
 
   @PostConstruct
   public void afterPropertiesSet() {
+    if(!mongoProperties.getEnabled()){
+      logger.error("mongoDb不启用,不初始化队列以及消费者");
+      return;
+    }
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
@@ -81,6 +90,7 @@ public class MongoConfig {
 
   @Bean(name = "mongoTemplate")
   @ConditionalOnMissingBean(MongoTemplate.class)
+  @Conditional(MongoCondition.class)
   public MongoTemplate dynamicMongoTemplate() {
     SimpleMongoClientDatabaseFactory factory          = context.getFactoryMap().values().iterator().next();
     DbRefResolver                    dbRefResolver    = new DefaultDbRefResolver(factory);
@@ -98,6 +108,7 @@ public class MongoConfig {
 
   @Bean(name = "mongoDbFactory")
   @ConditionalOnMissingBean(MongoDatabaseFactory.class)
+  @Conditional(MongoCondition.class)
   public MongoDatabaseFactory tenantMongoDbFactory() {
     return context.getFactoryMap().values().iterator().next();
   }

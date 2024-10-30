@@ -27,8 +27,11 @@ public class MongoAspect {
   @Resource
   private MongoTenantsContext context;
 
-  @Value("${spring.data.mongodb.mode}")
+  @Value("${spring.data.mongodb.mode: NORMAL}")
   private String mode;
+
+  @Value("${spring.data.mongodb.enabled: true}")
+  private boolean enabled;
 
   @Pointcut("execution(* org.springframework.data.mongodb.core.MongoTemplate.*(..)) ||"
       + "execution(* org.springframework.data.mongodb.core.MongoOperations.*(..)) ||"
@@ -39,6 +42,10 @@ public class MongoAspect {
 
   @Around("cutPoint()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
+    if(!enabled){
+      logger.info("MongoDB组件不启用");
+      return point.proceed();
+    }
     boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     try {
       String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;

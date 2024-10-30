@@ -1,0 +1,27 @@
+i18n:
+  all-locale: zh,en
+  language: zh
+  path: i18n/messages
+server:
+  port: 8001
+knife4j:
+  title: rabbitmq测试用例
+  open: true
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jmx:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  data:
+    mongodb:
+      enabled: false
+      username: root
+      password: root
+      database: admin
+      host: localhost
+      port: 27017

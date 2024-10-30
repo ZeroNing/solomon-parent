@@ -33,6 +33,7 @@
     <module>test-solomon-mqtt</module>
     <module>test-solomon-mqtt5</module>
     <module>test-solomon-s3</module>
+      <module>test-solomon-mongo</module>
   </modules>
 
   <properties>
@@ -89,10 +90,17 @@
     <mysql.version>8.0.28</mysql.version>
     <integration.version>5.5.20</integration.version>
     <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
+    <querydsl.version>5.1.0</querydsl.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>com.querydsl</groupId>
+        <artifactId>querydsl-mongodb</artifactId>
+        <version>${querydsl.version}</version>
+      </dependency>
+
       <!-- SpringBoot 框架 start-->
       <!-- 用于处理 JSON 数据，默认包含 Jackson 库 -->
       <dependency>
