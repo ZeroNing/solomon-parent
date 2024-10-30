@@ -9,6 +9,7 @@ import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.enums.ScheduleTypeEnum;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
@@ -56,8 +57,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),className);
 
             List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
-            String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoList)? "jobinfo/add" : "jobinfo/update");
-            XxlJobInfo xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfoList) ? new XxlJobInfo(jobTask,className) : xxlJobInfoList.get(0).update(jobTask,className);
+            Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+            XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
+
+            String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfo)? "jobinfo/add" : "jobinfo/update");
+            xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfo) ? new XxlJobInfo(jobTask,className) : xxlJobInfo.update(jobTask,className);
             xxlJobInfo.setExecutorHandler(executorHandler);
             // 发送 POST 请求
             execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
@@ -109,10 +113,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
      */
     private void enabled(String cookie,String executorHandler,String url) throws Exception {
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
-        if(ValidateUtils.isEmpty(xxlJobInfoList)){
+        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+        XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
+        if(ValidateUtils.isEmpty(xxlJobInfo)){
             throw new Exception("xxl-job启动"+executorHandler+"任务失败");
         }
-        XxlJobInfo xxlJobInfo = xxlJobInfoList.get(0);
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("id", xxlJobInfo.getId());
         execute(cookie,url,paramMap);

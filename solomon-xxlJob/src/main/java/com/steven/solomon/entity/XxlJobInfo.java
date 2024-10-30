@@ -62,7 +62,6 @@ public class XxlJobInfo {
 		this.scheduleConf = jobTask.scheduleConf();
 		this.misfireStrategy = jobTask.misfireStrategy();
 		this.executorRouteStrategy = jobTask.executorRouteStrategy();
-		this.executorHandler = jobTask.executorHandler();
 		this.executorParam = jobTask.executorParam();
 		this.executorBlockStrategy = jobTask.executorBlockStrategy();
 		this.executorTimeout = jobTask.executorTimeout();
@@ -74,7 +73,7 @@ public class XxlJobInfo {
 
 	public XxlJobInfo update(JobTask jobTask,String className){
 		this.jobGroup = jobTask.jobGroup();
-		this.jobDesc = jobTask.taskName();
+		this.jobDesc = ValidateUtils.getOrDefault(jobTask.taskName(),className);
 		String author = null;
 		if(ValidateUtils.isEmpty(jobTask.author())){
 			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
@@ -87,7 +86,6 @@ public class XxlJobInfo {
 		this.scheduleConf = jobTask.scheduleConf();
 		this.misfireStrategy = jobTask.misfireStrategy();
 		this.executorRouteStrategy = jobTask.executorRouteStrategy();
-		this.executorHandler = jobTask.executorHandler();
 		this.executorParam = jobTask.executorParam();
 		this.executorBlockStrategy = jobTask.executorBlockStrategy();
 		this.executorTimeout = jobTask.executorTimeout();
