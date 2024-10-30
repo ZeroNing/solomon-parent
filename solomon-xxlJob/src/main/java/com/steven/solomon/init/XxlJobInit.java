@@ -8,6 +8,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.entity.XxlJobInfo;
+import com.steven.solomon.enums.ScheduleTypeEnum;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
@@ -61,8 +62,13 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             // 发送 POST 请求
             execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
 
-            url = adminAddresses + (jobTask.start() ? "jobinfo/start" : "jobinfo/stop");
-            enabled(cookie,executorHandler,url);
+            //启用或禁止任务，调度类型必须不是不调度才可以
+            if(!ValidateUtils.equalsIgnoreCase(jobTask.scheduleType().name(), ScheduleTypeEnum.NONE.name())){
+                url = adminAddresses + (jobTask.start() ? "jobinfo/start" : "jobinfo/stop");
+                enabled(cookie,executorHandler,url);
+            } else {
+                logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
+            }
             XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
         }
         xxlJobSpringExecutor.start();
