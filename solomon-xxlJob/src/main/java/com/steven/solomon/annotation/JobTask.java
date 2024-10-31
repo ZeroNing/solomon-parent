@@ -95,7 +95,7 @@ public @interface JobTask {
     int executorFailRetryCount() default 0;
 
     /**
-     * 是否启动
+     * 是否启动 默认不启动
      */
-    boolean start() default true;
+    boolean start() default false;
 }
