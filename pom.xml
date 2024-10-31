@@ -36,6 +36,7 @@
     <module>test-solomon-mongo</module>
     <module>solomon-xxlJob</module>
     <module>test-solomon-xxlJob</module>
+    <module>solomon-powerjob</module>
   </modules>
 
   <properties>
@@ -94,6 +95,7 @@
     <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
     <xxl-job.version>2.4.1</xxl-job.version>
     <querydsl.version>5.1.0</querydsl.version>
+    <powerjob.version>5.1.0</powerjob.version>
   </properties>
 
   <dependencyManagement>
@@ -103,6 +105,12 @@
         <groupId>com.xuxueli</groupId>
         <artifactId>xxl-job-core</artifactId>
         <version>${xxl-job.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>tech.powerjob</groupId>
+        <artifactId>powerjob-worker-spring-boot-starter</artifactId>
+        <version>${powerjob.version}</version>
       </dependency>
       <!-- JOB框架 end -->
       <dependency>
