@@ -23,17 +23,17 @@ public abstract class AbstractJobConsumer extends IJobHandler {
             stopWatch.start();
             handle(jobParam);
         }catch(Throwable e){
-            logger.error("AbstractJobConsumer:调度报错 异常为:", e);
+            logger.error("BeanName:{} AbstractJobConsumer:调度报错 异常为:",getXxlJobBeanName(), e);
             saveLog(e);
             throw e;
         } finally {
             stopWatch.stop();
-            Double second      = Double.parseDouble(String.valueOf(stopWatch.getLastTaskTimeMillis())) / 1000;
+            Double second = Double.parseDouble(String.valueOf(stopWatch.getLastTaskTimeMillis())) / 1000;
             logger.info("BeanName:{},结束任务调度,耗时:{}秒",getXxlJobBeanName(),second);
         }
     }
 
-    public abstract void handle(String jobParam);
+    public abstract void handle(String jobParam) throws Exception;
 
     public String getXxlJobBeanName(){
         return ValidateUtils.isNotEmpty(jobTask) ? ValidateUtils.getOrDefault(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
