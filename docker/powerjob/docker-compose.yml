@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  powerjob-server:
+    image: powerjob/powerjob-server:latest
+    container_name: powerjob-server
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - JVMOPTIONS=
+      - PARAMS= >
+        --spring.profiles.active=product
+        --spring.datasource.core.jdbc-url=数据库地址
+        --spring.datasource.core.username=数据库账号
+        --spring.datasource.core.password=数据库密码
+    ports:
+      - "7700:7700"
+      - "10086:10086"
+      - "10010:10010"
+    volumes:
+      - ./logs:/root/powerjob/logs
