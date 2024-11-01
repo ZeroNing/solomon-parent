@@ -37,6 +37,7 @@
     <module>solomon-xxlJob</module>
     <module>test-solomon-xxlJob</module>
     <module>solomon-powerjob</module>
+    <module>test-solomon-powerjob</module>
   </modules>
 
   <properties>

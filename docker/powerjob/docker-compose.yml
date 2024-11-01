@@ -10,9 +10,10 @@ services:
       - JVMOPTIONS=
       - PARAMS= >
         --spring.profiles.active=product
-        --spring.datasource.core.jdbc-url=数据库地址
-        --spring.datasource.core.username=数据库账号
-        --spring.datasource.core.password=数据库密码
+        --spring.datasource.core.jdbc-url=jdbc:mysql://192.168.8.96:3306/powerjob?useUnicode=true&characterEncoding=UTF-8
+        --spring.datasource.core.username=root
+        --spring.datasource.core.password=root
+        --oms.auth.initiliaze.admin.password=admin
     ports:
       - "7700:7700"
       - "10086:10086"

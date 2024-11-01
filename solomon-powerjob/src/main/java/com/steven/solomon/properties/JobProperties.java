@@ -5,14 +5,23 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("powerjob.worker")
 public class JobProperties {
 
-    //是否启用
-    private boolean enabled = true;
+    private String userName;
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
+    private String password;
+
+    public String getUserName() {
+        return userName;
     }
 
-    public boolean getEnabled() {
-        return enabled;
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }
