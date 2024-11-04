@@ -1,0 +1,31 @@
+version: '3.8'  # 指定Docker Compose文件的版本，3.8支持最新的特性和配置选项。
+
+services:
+  powerjob-server:  # 定义一个名为powerjob-server的服务。
+    image: powerjob/powerjob-server:latest  # 使用powerjob的最新版本镜像。
+    container_name: powerjob-server  # 将容器命名为powerjob-server，便于管理。
+    restart: always  # 设置容器重启策略为总是重启，增强容器的高可用性。
+
+    environment:  # 配置传递给容器的环境变量。
+      - TZ=Asia/Shanghai  # 设置时区为上海，使应用的时间显示符合本地时间。
+      - JVMOPTIONS=-Xmx512m -Dpowerjob.network.external.address=[局域网外IP] -Dpowerjob.network.external.port.http=10010 -Dpowerjob.network.external.port.akka=10086  # 可选：用于设置Java虚拟机的启动选项，当前设置为空。
+      - PARAMS=--spring.profiles.active=product \
+        --spring.datasource.core.jdbc-url=[数据库地址] \
+        --spring.datasource.core.username=[数据库账号] \
+        --spring.datasource.core.password=[数据库密码] \
+        --oms.auth.initiliaze.admin.password=admin \
+        --spring.mail.host=smtp.qq.com \
+        --spring.mail.port=25 \
+        --spring.mail.username=[邮箱] \
+        --spring.mail.from=[邮箱] \
+        --spring.mail.password=[QQ邮箱是授权码其余邮箱则是密码] \
+        --spring.mail.properties.mail.smtp.auth=true \
+        --spring.mail.properties.mail.smtp.starttls.enable=true \
+        --spring.mail.properties.mail.smtp.starttls.required=true \
+        --spring.mail.test.connection=true
+    ports:
+      - "7700:7700"  # 将主机的7700端口映射到容器的7700端口，通常用于服务的主接口访问。
+      - "10086:10086"  # 将主机的10086端口映射到容器的10086端口，可能用于日志或其他服务。
+      - "10010:10010"  # 将主机的10010端口映射到容器的10010端口，用于其他可能的应用服务或监控。
+    volumes:
+      - ./logs:/var/log  # 将主机的logs目录挂载到容器内，用于持久化存储应用日志。
