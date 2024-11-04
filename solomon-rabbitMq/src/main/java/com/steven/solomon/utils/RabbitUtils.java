@@ -11,6 +11,7 @@ import com.steven.solomon.entity.MessageQueueDetail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
+import com.steven.solomon.properties.RabbitMqProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;
@@ -30,10 +31,13 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
 @Configuration
+@EnableConfigurationProperties(value = {RabbitProperties.class,RabbitMqProperties.class})
 public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
     private final Logger logger = LoggerUtils.logger(RabbitUtils.class);
