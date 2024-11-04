@@ -29,26 +29,11 @@ public class XxlJobUtils {
         SpringUtil.setContext(applicationContext);
     }
 
-    public void save(XxlJobInfo xxlJobInfo) throws BaseException {
-        String cookie = login();
-
-        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,xxlJobInfo.getExecutorHandler());
-        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
-
-        String adminAddresses = profile.getAdminAddresses();
-        if(!adminAddresses.endsWith("/")){
-            adminAddresses = adminAddresses + "/";
-        }
-        String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoMap.get(xxlJobInfo.getExecutorHandler()))? "jobinfo/add" : "jobinfo/update");
-        // 发送 POST 请求
-        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
-    }
-
     /**
      * 登陆网页
      */
     public String login() throws BaseException {
-        String adminAddresses = profile.getAdminAddresses();
+        String adminAddresses = getUrl();;
         String userName = profile.getUserName();
         String password = profile.getPassword();
         if(ValidateUtils.isEmpty(adminAddresses)){
@@ -61,9 +46,6 @@ public class XxlJobUtils {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_PASSWORD_IS_NULL);
         }
 
-        if(!adminAddresses.endsWith("/")){
-            adminAddresses = adminAddresses + "/";
-        }
         String url = adminAddresses + "login";
         // 构建请求参数
         Map<String, Object> paramMap = new HashMap<>();
@@ -74,14 +56,23 @@ public class XxlJobUtils {
         return getCookie(url,paramMap);
     }
 
+    public void save(XxlJobInfo xxlJobInfo) throws BaseException {
+        String cookie = login();
+
+        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,xxlJobInfo.getExecutorHandler());
+        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+
+        String adminAddresses = getUrl();
+        String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoMap.get(xxlJobInfo.getExecutorHandler()))? "jobinfo/add" : "jobinfo/update");
+        // 发送 POST 请求
+        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
+    }
+
     /**
      * 删除任务
      */
     public void remove(String cookie,String id) throws BaseException {
-        String adminAddresses = profile.getAdminAddresses();
-        if(!adminAddresses.endsWith("/")){
-            adminAddresses = adminAddresses + "/";
-        }
+        String adminAddresses = getUrl();
         String url = adminAddresses + "jobinfo/remove";
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("id", id);
@@ -92,10 +83,7 @@ public class XxlJobUtils {
      * 调用xxl-job的任务页面查询
      */
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws BaseException {
-        String adminAddresses = profile.getAdminAddresses();
-        if(!adminAddresses.endsWith("/")){
-            adminAddresses = adminAddresses + "/";
-        }
+        String adminAddresses = getUrl();
         String url = adminAddresses + "jobinfo/pageList?jobGroup=1&triggerStatus=-1&start="+0+"&length="+1000+"&executorHandler="+executorHandler;
 
         String body = execute(cookie,url,null);
@@ -108,10 +96,7 @@ public class XxlJobUtils {
      * 启动任务
      */
     public void enabled(String cookie,String executorHandler,boolean isStart) throws BaseException {
-        String adminAddresses = profile.getAdminAddresses();
-        if(!adminAddresses.endsWith("/")){
-            adminAddresses = adminAddresses + "/";
-        }
+        String adminAddresses = getUrl();
         String url = adminAddresses + (isStart ? "jobinfo/start" : "jobinfo/stop");
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
@@ -170,4 +155,11 @@ public class XxlJobUtils {
         return response;
     }
 
+    private String getUrl(){
+        String adminAddresses = profile.getAdminAddresses();
+        if(!adminAddresses.endsWith("/")){
+            adminAddresses = adminAddresses + "/";
+        }
+        return adminAddresses;
+    }
 }
