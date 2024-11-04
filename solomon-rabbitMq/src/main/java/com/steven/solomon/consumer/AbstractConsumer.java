@@ -9,6 +9,7 @@ import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
+import com.steven.solomon.config.RabbitCondition;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.pojo.vo.ResultVO;
@@ -22,6 +23,7 @@ import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Conditional;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +32,7 @@ import java.nio.charset.StandardCharsets;
  * RabbitMq消费器
  */
 @ConditionalOnProperty(name = "spring.rabbitmq.enabled", havingValue = "true", matchIfMissing = true)
+@Conditional(RabbitCondition.class)
 public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     protected final Logger logger = LoggerUtils.logger(getClass());

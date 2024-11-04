@@ -32,6 +32,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
@@ -44,8 +45,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public RabbitUtils(RabbitTemplate rabbitTemplate) {
+    private final RabbitMqProperties rabbitMqProperties;
+
+    public RabbitUtils(RabbitTemplate rabbitTemplate, RabbitMqProperties rabbitMqProperties) {
         this.rabbitTemplate = rabbitTemplate;
+        this.rabbitMqProperties = rabbitMqProperties;
     }
 
     /**
@@ -144,7 +148,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //    return allQueueContainerMap;
 //  }
 
-    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) {
+    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
+        if(!rabbitMqProperties.getEnabled()){
+            logger.info("rabbitmq没开启,不发送消息");
+            return false;
+        }
         RabbitMqModel<?> rabbitMQModel = (RabbitMqModel<?>) baseMq;
         if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
             return false;
@@ -199,6 +207,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * @param queueName     队列名
      */
     public void handleQueueMessageManually(boolean transactional, String queueName) throws Exception {
+        if(!rabbitMqProperties.getEnabled()){
+            logger.info("rabbitmq没开启,不发送消息");
+            return;
+        }
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
         GetResponse response = channel.basicGet(queueName, false);
         if (ValidateUtils.isEmpty(response)) {
@@ -225,6 +237,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 请求回复消息发送
      */
     public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
+        if(!rabbitMqProperties.getEnabled()){
+            logger.info("rabbitmq没开启,不发送消息");
+            return null;
+        }
         if(ValidateUtils.isEmpty(model.getReplyTo())){
             throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
         }
@@ -239,6 +255,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 回复消息发送
      */
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
+        if(!rabbitMqProperties.getEnabled()){
+            logger.info("rabbitmq没开启,不发送消息");
+            return;
+        }
         rabbitTemplate.send(routingKey, object);
     }
 }
