@@ -1,0 +1,16 @@
+package com.steven.solomon.code;
+
+public interface XxlJobErrorCode extends BaseExceptionCode {
+
+  String XXL_JOB_ADMIN_URL_IS_NULL = "XXL_JOB_ADMIN_URL_IS_NULL";
+
+  String XXL_JOB_USERNAME_IS_NULL = "XXL_JOB_USERNAME_IS_NULL";
+
+  String XXL_JOB_PASSWORD_IS_NULL = "XXL_JOB_PASSWORD_IS_NULL";
+
+  String XXL_JOB_COOKIE_IS_NULL = "XXL_JOB_COOKIE_IS_NULL";
+
+  String XXL_JOB_EXECUTE_ERROR = "XXL_JOB_EXECUTE_ERROR";
+
+  String XXL_JOB_START_JOB_ERROR = "XXL_JOB_START_JOB_ERROR";
+}
