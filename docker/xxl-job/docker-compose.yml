@@ -1,30 +1,30 @@
-version: '3.8'
+version: '3.8'  # 指定Docker Compose文件的版本。3.8是一个相对较新的版本，支持更多的功能和配置选项。
+
 services:
   ## XXL-Job 管理服务
-  xxl-job-admin:
-    image: xuxueli/xxl-job-admin:2.4.1
-    container_name: xxl-job-admin
+  xxl-job-admin:  # 定义一个服务，名为xxl-job-admin。
+    image: xuxueli/xxl-job-admin:2.4.1  # 使用xuxueli提供的xxl-job-admin镜像，版本为2.4.1。
+    container_name: xxl-job-admin  # 设置容器的名称为xxl-job-admin。
     ports:
-      - "8080:8080"
-    environment:
-      SPRING_DATASOURCE_URL: "jdbc:mysql://host.docker.internal:3306/xxl-job?useUnicode=true&characterEncoding=UTF-8&useSSL=false"
-      SPRING_DATASOURCE_USERNAME: "root"
-      SPRING_DATASOURCE_PASSWORD: "root"
-      XXL_JOB_ACCESS_TOKEN: "default_token"
-      XXL_JOB_LOG_PATH: "/data/applogs/xxl-job"
-
-      # 邮件服务配置
-      SPRING_MAIL_HOST: "smtp.qq.com"
-      SPRING_MAIL_PORT: "587"  # 测试时也可以试用 465 端口
-      SPRING_MAIL_USERNAME: "邮箱"
-      SPRING_MAIL_FROM: "邮箱"
-      SPRING_MAIL_PASSWORD: "你的QQ邮箱授权码"
-
-      # 邮件服务额外配置
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: "true"
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRED: "true"
-      SPRING_MAIL_TEST_CONNECTION: "true"
-
+      - "8080:8080"  # 将主机的8080端口映射到容器的8080端口，便于外部访问XXL-Job的管理界面。
+    environment:  # 设置环境变量。
+      - TZ=Asia/Shanghai  # 设置时区为Asia/Shanghai。
+      - JVMOPTIONS=  # （可选）指定JVM选项，当前为空。
+      - PARAMS= >  # 设置应用程序启动时使用的参数。
+        --spring.datasource.url=[数据库地址]
+        # 指定数据库连接的URL，连接到MySQL数据库的xxl-job库。
+        --spring.datasource.username=[数据库用户名]  # 数据库用户名。
+        --spring.datasource.password=[数据库密码]  # 数据库密码。
+        --xxl.job.accessToken=default_token  # 设置XXL-Job的访问令牌，用于认证。
+        --xxl.job.log.path=/data/applogs/xxl-job  # 设置XXL-Job的日志文件路径。
+        --spring.mail.host=smtp.qq.com  # 设置邮件服务器的主机。
+        --spring.mail.port=25  # 设置邮件服务器的端口。
+        --spring.mail.username=[邮箱]  # 设置邮件服务器的用户名。
+        --spring.mail.from=[邮箱]  # 设置邮件发送者的邮箱。
+        --spring.mail.password=[QQ邮箱则是授权码,其余则是密码]  # （注意安全性）设置邮件服务器的密码。
+        --spring.mail.properties.mail.smtp.auth=true  # 启用SMTP认证。
+        --spring.mail.properties.mail.smtp.starttls.enable=true  # 启用STARTTLS加密。
+        --spring.mail.properties.mail.smtp.starttls.required=true  # 要求STARTTLS加密。
+        --spring.mail.test.connection=true  # 测试邮件服务器连接。
     volumes:
-      - ./logs:/data/applogs/xxl-job
+      - ./logs:/data/applogs/xxl-job  # 将本地主机的logs目录挂载到容器内的/data/applogs/xxl-job路径，用于保存日志文件。
