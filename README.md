@@ -4,7 +4,8 @@
 
 这个项目主要是总结了工作上遇到的问题以及学习一些框架用于整合
 
-
+## 进群二维码
+![img.png](img.png)
 
 ## 技术选型
 
@@ -866,6 +867,3 @@ public class TestHandler extends AbstractJobConsumer {
 详细的配置都在docker文件夹内，内涵Emqx的Mqtt组件、Minio对象存储组件、Mongodb组件、Mysql数据库、Portainer管理Docker可视化界面组件、PostgresSql数据库、RabbitMq消息队列组件、Redis缓存组件、RocketMq消息队列组件、sonarqube代码检查组件、Nacos组件
 
 文件夹内的未命名.txt只是为了让文件夹正常提交才创建的
-
-## 进群二维码
-![img.png](img.png)
