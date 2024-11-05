@@ -43,10 +43,17 @@
 | solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等                           |
 | solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值                                                     |
 | solomon-xxlJob           | 主要是将原本的XXL-JOB的配置进行自动化,自动创建任务                                                           |
+# 切换租户主要设置
 
-# 自定义配置说明
+```java
+RequestHeader.setTenantCode("租户编码");
+```
+
+## 切换时区主要设置
+需要在请求头中添加"Timezone"然后value值就是时区例：UTC+8或者GMT+8，如果不填则默认是系统时区，然后切换时区逻辑为：将传入的参数转换为"Timezone"时区时间后转换为系统默认时区，返回的时候就将返回参数中的时间转换为"Timezone"的时区时间
+
+# Swagger配置
 ## swagger版本号支持获取git最后一个提交记录版本号
-
 需要在项目的pom.xml配置以下代码,打包成功后即可读取到项目git最后一条记录版本号
 
 ```xml
@@ -101,11 +108,7 @@
     </plugins>
 </build>
 ```
-
-
-
 ## Swagger配置说明
-
 ```yaml
 knife4j:
   package:         #需要扫描的包路径
@@ -113,219 +116,13 @@ knife4j:
   open:            #是否开启swagger 线上环境建议为false
 ```
 
-
-
-## 国际化配置说明
-
+# 国际化配置
+## 国际化配置文件说明
 ```yaml
 i18n:
   all-locale:         #目前用到的国际化语言
   language:           #设置默认国际化语言
   path:               #国际化文件路径
-```
-
-## Mqtt配置说明
-
-```yaml
-mqtt:
-  tenant:
-    default:               #租户编码
-      user-name:           #用户名
-      password:            #密码
-      url:                 #连接
-      client-id:           #客户端的标识(不可重复,为空时侯用uuid)
-      completion-timeout:  #连接超时
-      automatic-reconnect: #是否自动重连
-      clean-session:       #客户端掉线后,是否自动清除session
-      keep-alive-interval: #心跳时间
-      will:                #遗嘱消息
-        topic:             #遗嘱主题
-        message:           #遗嘱消息
-        qos:               #遗嘱消息质量
-        retained:          #遗嘱是否保留消息
-```
-
-
-
-## 文件配置说明
-
-```yaml
-file:
-  choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云、KODO:七牛云、ZOS:天翼云、KS3:金山云）
-  file-naming-method: #文件命名选择器(ORIGINAL:原文件名称、DATE:文件名精确到毫秒并且以年月做为文件夹名、UUID:UUID命名、SNOWFLAKE:雪花id命名)
-  endpoint:        # 连接地址
-  accessKey:       # 访问密钥
-  secretKey:       # 密钥
-  bucket-name:     # 桶名 我这是给出了一个默认桶名
-  rootDirectory:   # 根目录
-  region-name:     # 地区名
-  part-size:       #分片大小(默认单位为:MB,默认为5MB)
-  connection-timeout: #连接超时 默认60秒 单位毫秒
-  socket-timeout:  #socket的超时时间 默认60秒 单位毫秒
-```
-## 文件命名选择器
-```java
-public enum FileNamingMethodEnum implements BaseEnum<String> {
-  ORIGINAL("ORIGINAL","使用文件的文件名"),
-  DATE("DATE","根据时间戳生成文件名"),
-  UUID("UUID","根据UUID生成文件名"),
-  SNOWFLAKE("SNOWFLAKE","根据雪花id生成文件名");
-
-  private String label;
-
-  private String desc;
-
-  FileNamingMethodEnum(String label,String desc) {
-    this.label = label;
-    this.desc = desc;
-  }
-
-  @Override
-  public String getDesc() {
-    return desc;
-  }
-
-  @Override
-  public String label() {
-    return this.label;
-  }
-
-  @Override
-  public String key() {
-    return this.name();
-  }
-}
-```
-## 文件选择器枚举
-```java
-public enum FileChoiceEnum implements BaseEnum<String> {
-  DEFAULT("DEFAULT","无文件存储实现"),
-  MINIO("MINIO","minio对象存储"),
-  OSS("OSS","阿里云对象存储"),
-  OBS("OBS","华为云对象存储"),
-  COS("COS","腾讯云对象存储"),
-  BOS("BOS","百度云对象存储"),
-  KODO("KODO","七牛云对象存储"),
-  ZOS("ZOS","天翼云对象存储"),
-  KS3("KS3","金山云对象存储"),
-  EOS("EOS","移动云对象存储"),
-  NOS("NOS","网易数帆对象存储"),
-  B2("B2","B2云存储"),
-  JD("JD","京东云存储"),
-  YANDEX("YANDEX","Yandex对象存储"),
-  AMAZON("AMAZON","亚马逊对象存储"),
-  SHARKTECH("SHARKTECH","鲨鱼对象存储"),
-  DIDI("DIDI","滴滴云对象存储"),
-  BOTO3("BOTO3","交大云对象存储"),
-  TOS("TOS","火山云对象存储"),
-  R2("R2","R2对象存储"),
-  GOOGLE_CLOUD_STORAGE("GOOGLE_CLOUD_STORAGE","谷歌云对象存储"),
-  UOS("UOS","紫光云对象存储"),
-  AZURE("AZURE","微软对象存储"),
-  INSPUR("INSPUR","浪潮云对象存储"),
-  S3("S3","S3协议对象存储")
-  ;
-
-  private String label;
-
-  private String desc;
-
-  FileChoiceEnum(String label,String desc) {
-    this.label = label;
-    this.desc = desc;
-  }
-
-  @Override
-  public String getDesc() {
-    return desc;
-  }
-
-  @Override
-  public String label() {
-    return this.label;
-  }
-
-  @Override
-  public String key() {
-    return this.name();
-  }
-}
-```
-
-## 缓存配置说明
-
-```yaml
-spring:
-  cache:
-    mode: NORMAL #NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");
-    type: NONE   #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
-```
-
-### redis单机版
-```yaml
-spring:
-  cache:
-    mode: NORMAL
-    type: REDIS
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    database: 0
-```
-
-### redis多租户配置
-```yaml
-spring:
-  cache:
-    mode: SWITCH_DB
-    type: REDIS
-  redis:
-    tenant:
-      default: #租户编码
-        host: 127.0.0.1
-        port: 6379
-        database: 0
-      default1: #租户编码
-        host: 127.0.0.1
-        port: 6380
-        database: 0
-```
-## rabbitmq配置
-```yaml
-spring:
-  rabbitmq:
-    username: guest
-    password: guest
-    host: localhost
-    port: 5672
-    auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
-    auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
-```
-## xxl-job配置
-```yaml
-xxl:
-  # 调度中心的地址，通常是XXL-JOB管理控制台的地址
-  admin-addresses: http://localhost:8080/xxl-job-admin
-  # 调度中心和执行器之间的访问令牌，用于确保安全性
-  access-token: default_token
-  # 当前执行器的应用名称，用于唯一标识一个执行器
-  app-name: xxl-job-executor-sample
-  # 执行器地址，用于注册到调度中心。可以指定具体的IP和端口，或者为自动模式（例如：AUTO）
-  address: localhost:8080
-  # 执行器的IP地址。如果为空，系统会自动获取本机IP
-  ip: localhost
-  # 执行器的端口。默认端口为0，表示随机生成一个端口
-  port: 8080
-  # 执行器的日志文件存储路径
-  log-path: 日志路径
-  # 执行器的日志文件的保留天数
-  log-retention-days: 30
-  # 调度中心的登录用户名
-  user-name: admin
-  # 调度中心的登录密码
-  password: 123456
-  # 是否启用该执行器，true表示启用，false表示禁用
-  enabled: true
 ```
 ## 枚举国际化用例
 
@@ -417,7 +214,235 @@ DelFlagEnum.NOT_DELETE=未删除
 DelFlagEnum.DELETE=删除
 ```
 
-## Rabbit队列注册以及消费用例
+# Mqtt配置说明
+## Mqtt配置文件说明
+```yaml
+mqtt:
+  tenant:
+    default:               #租户编码
+      user-name:           #用户名
+      password:            #密码
+      url:                 #连接
+      client-id:           #客户端的标识(不可重复,为空时侯用uuid)
+      completion-timeout:  #连接超时
+      automatic-reconnect: #是否自动重连
+      clean-session:       #客户端掉线后,是否自动清除session
+      keep-alive-interval: #心跳时间
+      will:                #遗嘱消息
+        topic:             #遗嘱主题
+        message:           #遗嘱消息
+        qos:               #遗嘱消息质量
+        retained:          #遗嘱是否保留消息
+```
+## MQTT消费用例
+
+1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
+
+2.加上@MessageListener，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题
+
+```java
+@MessageListener(topics = "topic",qos = 2)
+public class Test extends AbstractConsumer<String> {
+
+    private Logger logger = LoggerUtils.logger(Test.class);
+
+
+    @Override
+    public void handleMessage(String body) throws Exception {
+        logger.info("消息为:{}",body);
+    }
+
+    @Override
+    public void saveFailMessage(String topic, MqttMessage message, Exception e) {
+
+    }
+}
+```
+
+# S3配置说明
+## S3配置文件说明
+
+```yaml
+file:
+  choice:             #文件选择器（MINIO:minio对象存储、DEFAULT:无文件存储实现、OSS:阿里云、OBS:华为云、COS:腾讯云、BOS:百度云、KODO:七牛云、ZOS:天翼云、KS3:金山云）
+  file-naming-method: #文件命名选择器(ORIGINAL:原文件名称、DATE:文件名精确到毫秒并且以年月做为文件夹名、UUID:UUID命名、SNOWFLAKE:雪花id命名)
+  endpoint:        # 连接地址
+  accessKey:       # 访问密钥
+  secretKey:       # 密钥
+  bucket-name:     # 桶名 我这是给出了一个默认桶名
+  rootDirectory:   # 根目录
+  region-name:     # 地区名
+  part-size:       #分片大小(默认单位为:MB,默认为5MB)
+  connection-timeout: #连接超时 默认60秒 单位毫秒
+  socket-timeout:  #socket的超时时间 默认60秒 单位毫秒
+```
+## S3使用用例
+### 文件命名选择器
+```java
+public enum FileNamingMethodEnum implements BaseEnum<String> {
+  ORIGINAL("ORIGINAL","使用文件的文件名"),
+  DATE("DATE","根据时间戳生成文件名"),
+  UUID("UUID","根据UUID生成文件名"),
+  SNOWFLAKE("SNOWFLAKE","根据雪花id生成文件名");
+
+  private String label;
+
+  private String desc;
+
+  FileNamingMethodEnum(String label,String desc) {
+    this.label = label;
+    this.desc = desc;
+  }
+
+  @Override
+  public String getDesc() {
+    return desc;
+  }
+
+  @Override
+  public String label() {
+    return this.label;
+  }
+
+  @Override
+  public String key() {
+    return this.name();
+  }
+}
+```
+### 文件选择器枚举
+```java
+public enum FileChoiceEnum implements BaseEnum<String> {
+  DEFAULT("DEFAULT","无文件存储实现"),
+  MINIO("MINIO","minio对象存储"),
+  OSS("OSS","阿里云对象存储"),
+  OBS("OBS","华为云对象存储"),
+  COS("COS","腾讯云对象存储"),
+  BOS("BOS","百度云对象存储"),
+  KODO("KODO","七牛云对象存储"),
+  ZOS("ZOS","天翼云对象存储"),
+  KS3("KS3","金山云对象存储"),
+  EOS("EOS","移动云对象存储"),
+  NOS("NOS","网易数帆对象存储"),
+  B2("B2","B2云存储"),
+  JD("JD","京东云存储"),
+  YANDEX("YANDEX","Yandex对象存储"),
+  AMAZON("AMAZON","亚马逊对象存储"),
+  SHARKTECH("SHARKTECH","鲨鱼对象存储"),
+  DIDI("DIDI","滴滴云对象存储"),
+  BOTO3("BOTO3","交大云对象存储"),
+  TOS("TOS","火山云对象存储"),
+  R2("R2","R2对象存储"),
+  GOOGLE_CLOUD_STORAGE("GOOGLE_CLOUD_STORAGE","谷歌云对象存储"),
+  UOS("UOS","紫光云对象存储"),
+  AZURE("AZURE","微软对象存储"),
+  INSPUR("INSPUR","浪潮云对象存储"),
+  S3("S3","S3协议对象存储")
+  ;
+
+  private String label;
+
+  private String desc;
+
+  FileChoiceEnum(String label,String desc) {
+    this.label = label;
+    this.desc = desc;
+  }
+
+  @Override
+  public String getDesc() {
+    return desc;
+  }
+
+  @Override
+  public String label() {
+    return this.label;
+  }
+
+  @Override
+  public String key() {
+    return this.name();
+  }
+}
+```
+## 文件上传下载分享使用用例
+
+1.引文件jar包
+
+```xml
+<dependencies>
+	<dependency>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-s3</artifactId>
+      <version>1.0</version>
+    </dependency>
+</dependencies>
+```
+
+2.注入FileServiceInterface
+
+```java
+@RestController
+@RequestMapping("/api/file")
+@Api(tags = "文件接口")
+public class FileController {
+
+    private final FileServiceInterface fileServiceInterface;
+
+    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+}
+```
+
+3.方法使用
+
+```java
+@RestController
+@RequestMapping("/api/file")
+@Api(tags = "文件接口")
+public class FileController {
+
+    private final FileServiceInterface fileServiceInterface;
+
+    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+
+    @PostMapping("/{bucket}/upload")
+    @ApiOperation(value = "文件上传")
+    public ResultVO<FileUpload> upload(@RequestPart("file") MultipartFile file,
+                                       @ApiParam("minio桶") @PathVariable("bucket") String bucket) throws Exception {
+        //上传文件
+        FileUpload fileUpload = fileServiceInterface.upload(file,"桶名");
+        //分享文件
+        String shareUrl = fileServiceInterface.share("文件名","桶名",分享文件超时时间,TimeUnit.SECONDS);
+        //分片上传
+        FileUpload fileUpload = fileServiceInterface.multipartUpload(file,"桶名");
+        //删除文件
+        fileServiceInterface.deleteFile("文件名","桶名");
+        //拷贝文件
+        boolean     flag        = fileServiceInterface.copyObject("原桶名","目标桶名","原文件名","目标文件名");
+        //下载文件流
+        InputStream inputStream = fileServiceInterface.download("文件名","桶名");
+
+        return ResultVO.success(fileServiceInterface.upload(file,bucket));
+    }
+
+}
+```
+
+# rabbitmq配置
+## rabbitmq配置文件说明
+```yaml
+spring:
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    auto-delete-queue: true  #是否自动删除队列以 true：自动删除 false：不删除
+    auto-delete-exchange: true  #是否自动删除交换机 true：自动删除 false：不删除
+    enabled: true #是否启用该组件
+```
+
+## rabbitmq使用说明
 @MessageListener注解描述：
 
 ```java
@@ -581,7 +606,7 @@ public class TestMq extends AbstractConsumer<String,String> {
 ```
 
 ```java
-@Component
+@DlxMessageListener
 public class TestDlxMq extends AbstractConsumer<String,String> {
 
     public TestDlxMq(RabbitUtils rabbitUtils) {
@@ -638,33 +663,71 @@ public class Handler extends AbstractConsumer<String,String> {
 }
 ```
 
+# 缓存配置说明
+## 缓存配置文件说明
+```yaml
+spring:
+  cache:
+    mode: NORMAL #NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");
+    type: NONE   #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
+```
 
-## MQTT消费用例
+## redis单机版配置文件说明
+```yaml
+spring:
+  cache:
+    mode: NORMAL #NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");
+    type: REDIS #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 0
+```
 
-1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
-
-2.加上@MessageListener，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题
+## redis多租户配置文件说明
+```yaml
+spring:
+  cache:
+    mode: SWITCH_DB #NORMAL("单库"), SWITCH_DB("切换数据源"), TENANT_PREFIX("增加租户前缀");
+    type: REDIS #NONE 不使用缓存 REDIS 使用redis缓存目前只支持这两个
+  redis:
+    tenant:
+      default: #租户编码
+        host: 127.0.0.1
+        port: 6379
+        database: 0
+      default1: #租户编码
+        host: 127.0.0.1
+        port: 6380
+        database: 0
+```
+## Redis消息队列用例
+### MessageListener注解说明
 
 ```java
-@MessageListener(topics = "topic",qos = 2)
-public class Test extends AbstractConsumer<String> {
+/**
+ * Redis消息队列
+ */
+@Target(value = {ElementType.FIELD, ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface MessageListener {
 
-    private Logger logger = LoggerUtils.logger(Test.class);
+    @AliasFor(annotation = Component.class)
+    String value() default "";
 
+    /**
+     * 主题名
+     */
+    String topic();
 
-    @Override
-    public void handleMessage(String body) throws Exception {
-        logger.info("消息为:{}",body);
-    }
-
-    @Override
-    public void saveFailMessage(String topic, MqttMessage message, Exception e) {
-
-    }
+    /**
+     * 主题模式
+     */
+    TopicMode mode() default TopicMode.CHANNEL;
 }
 ```
 
-## Redis消息队列用例
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
 2.加上@MessageListener注解，并填写主题名,并设置主题模式
@@ -685,11 +748,154 @@ public class Test extends AbstractConsumer<String,String> {
 }
 ```
 
-## MongoDB多租户配置方式
 
+# xxl-job配置说明
+## xxl-job配置文件说明
+```yaml
+xxl:
+  # 调度中心的地址，通常是XXL-JOB管理控制台的地址
+  admin-addresses: http://localhost:8080/xxl-job-admin
+  # 调度中心和执行器之间的访问令牌，用于确保安全性
+  access-token: default_token
+  # 当前执行器的应用名称，用于唯一标识一个执行器
+  app-name: xxl-job-executor-sample
+  # 执行器地址，用于注册到调度中心。可以指定具体的IP和端口，或者为自动模式（例如：AUTO）
+  address: localhost:8080
+  # 执行器的IP地址。如果为空，系统会自动获取本机IP
+  ip: localhost
+  # 执行器的端口。默认端口为0，表示随机生成一个端口
+  port: 8080
+  # 执行器的日志文件存储路径
+  log-path: 日志路径
+  # 执行器的日志文件的保留天数
+  log-retention-days: 30
+  # 调度中心的登录用户名
+  user-name: admin
+  # 调度中心的登录密码
+  password: 123456
+  # 是否启用该执行器，true表示启用，false表示禁用
+  enabled: true
+```
+
+## xxl-job使用说明
+### jobTask注解说明
+```java
+/**
+ * xxl-job注解
+ */
+@Target(value = { ElementType.FIELD, ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface JobTask {
+
+    @AliasFor(annotation = Component.class)
+    String value() default "";
+
+    /**
+     * 执行器主键ID
+     */
+    int jobGroup() default 1;
+    /**
+     * 任务描述 默认:当前类的类名
+     */
+    String taskName() default "";
+
+    /**
+     * 负责人 默认是配置文件的 spring.application.name 如果没有的情况下,继续默认当前类名
+     */
+    String author() default "";
+
+    /**
+     * 报警邮件
+     */
+    String alarmEmail() default "";
+
+    /**
+     * 调度类型 默认不调度
+     */
+    ScheduleTypeEnum scheduleType() default ScheduleTypeEnum.NONE;
+
+    /**
+     * 调度配置 CRON(* * * * * ?) FIX_RATE(30秒)
+     */
+    String scheduleConf() default "";
+
+    /**
+     * 运行模式
+     */
+    GlueTypeEnum glueType() default GlueTypeEnum.BEAN;
+
+    /**
+     * 执行器，任务Handler名称 默认:当前类的类名
+     */
+    String executorHandler() default "";
+
+    /**
+     * 执行器 任务参数
+     */
+    String executorParam() default "";
+
+    /**
+     * 路由策略
+     */
+    ExecutorRouteStrategyEnum executorRouteStrategy() default ExecutorRouteStrategyEnum.FIRST;
+
+    /**
+     * 子任务ID，多个逗号分隔
+     */
+    String childJobId() default "";
+
+    /**
+     * 调度过期策略
+     */
+    MisfireStrategyEnum misfireStrategy() default MisfireStrategyEnum.DO_NOTHING;
+
+    /**
+     * 阻塞处理策略
+     */
+    ExecutorBlockStrategyEnum executorBlockStrategy() default ExecutorBlockStrategyEnum.SERIAL_EXECUTION;
+
+    /**
+     * 任务执行超时时间，单位秒
+     */
+    int executorTimeout() default 0;
+
+    /**
+     * 失败重试次数
+     */
+    int executorFailRetryCount() default 0;
+
+    /**
+     * 是否启动 默认不启动
+     */
+    boolean start() default false;
+}
+
+```
+
+## XXL-JOB自动创建任务用法
+```java
+@JobTask(taskName = "任务描述", author = "负责人", executorHandler = "JobHandler",scheduleType = ScheduleTypeEnum.FIX_RATE,scheduleConf = "1")
+public class TestHandler extends AbstractJobConsumer {
+
+    @Override
+    public void handle(String jobParam) {
+    }
+
+    @Override
+    public void saveLog(Throwable throwable) {
+
+    }
+}
+```
+
+# MongoDB配置说明
+## MongoDB多租户配置方式
 1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源");
 
 2.如果选择的是切换数据源的话可以选择配置tenant配置,租户编码则是不同客户的租户编码，到时候切换也是根据租户编码切换的
+
+3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
 
 ```yaml
 spring:
@@ -711,81 +917,21 @@ spring:
             database:
             uri: 
 ```
-
-3.如果不想选择配置文件配置的话也可以用代码方面调用 MongoInitUtils.init的方法，传入租户编码和mongodb配置以及注入一个MongoTenantsContext对象
-
-## 切换租户主要设置
-
+## MongoDB配置固定集合
+以下代码配置的是集合固定大小为2048字节,限制行数为五十万
 ```java
-HeardHolder.setTenantCode("租户编码");
-```
-
-## 切换时区主要设置
-
-需要在请求头中添加"Timezone"然后value值就是时区例：UTC+8或者GMT+8，如果不填则默认是系统时区，然后切换时区逻辑为：将传入的参数转换为"Timezone"时区时间后转换为系统默认时区，返回的时候就将返回参数中的时间转换为"Timezone"的时区时间
-
-## 文件上传下载分享使用用例
-
-1.引文件jar包
-
-```xml
-<dependencies>
-	<dependency>
-      <groupId>com.steven</groupId>
-      <artifactId>solomon-file</artifactId>
-      <version>1.0</version>
-    </dependency>
-</dependencies>
-```
-
-2.注入FileServiceInterface
-
-```java
-@RestController
-@RequestMapping("/api/file")
-@Api(tags = "文件接口")
-public class FileController {
-
-    private final FileServiceInterface fileServiceInterface;
-
-    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
+@MongoDBCapped(size = 2048,maxDocuments = 500000)
+@Document
+public class Entity implements Serializable {
+    
+    private String id;
+    
+    private Date created;
+    
+    private Date updated;
 }
 ```
 
-3.方法使用
-
-```java
-@RestController
-@RequestMapping("/api/file")
-@Api(tags = "文件接口")
-public class FileController {
-
-    private final FileServiceInterface fileServiceInterface;
-
-    public FileController(FileServiceInterface fileServiceInterface) {this.fileServiceInterface = fileServiceInterface;}
-
-    @PostMapping("/{bucket}/upload")
-    @ApiOperation(value = "文件上传")
-    public ResultVO<FileUpload> upload(@RequestPart("file") MultipartFile file,
-                                       @ApiParam("minio桶") @PathVariable("bucket") String bucket) throws Exception {
-        //上传文件
-        FileUpload fileUpload = fileServiceInterface.upload(file,"桶名");
-        //分享文件
-        String shareUrl = fileServiceInterface.share("文件名","桶名",分享文件超时时间,TimeUnit.SECONDS);
-        //分片上传
-        FileUpload fileUpload = fileServiceInterface.multipartUpload(file,"桶名");
-        //删除文件
-        fileServiceInterface.deleteFile("文件名","桶名");
-        //拷贝文件
-        boolean     flag        = fileServiceInterface.copyObject("原桶名","目标桶名","原文件名","目标文件名");
-        //下载文件流
-        InputStream inputStream = fileServiceInterface.download("文件名","桶名");
-
-        return ResultVO.success(fileServiceInterface.upload(file,bucket));
-    }
-
-}
-```
 ## 集合排序使用
 
 ```java
@@ -833,36 +979,23 @@ static class Person {
     }
 }
 ```
-## MongoDB配置固定集合
-以下代码配置的是集合固定大小为2048字节,限制行数为五十万
-```java
-@MongoDBCapped(size = 2048,maxDocuments = 500000)
-@Document
-public class Entity implements Serializable {
-    
-    private String id;
-    
-    private Date created;
-    
-    private Date updated;
-}
+
+# powerJob配置说明
+## powerJob配置文件说明
+```yaml
+powerjob:
+  worker:
+    enabled: true  # 启用或禁用PowerJob Worker。如果设置为false，将不会启动worker。
+    port: 27777  # Worker监听的端口，用于接收任务执行命令。
+    app-name: 应用名称  # 应用名称，需要与PowerJob服务端注册的应用名称保持一致。
+    server-address: localhost:7700  # PowerJob服务端的地址和端口，Worker会通过此地址与服务端通信。
+    protocol: http  # 与PowerJob服务端通信使用的协议，通常为http或https。
+    max-result-length: 4096  # 任务执行结果的最大长度，单位为字符。超出此长度的结果将被截断。
+    max-lightweight-task-num: 1024  # 最大轻量级任务数量，即同时允许执行的轻量级任务的数量。
+    user-name: 认证的用户名  # 用于认证的用户名，与服务端配置的用户名匹配。
+    password: 认证的密码  # 用于认证的密码，与服务端配置的密码匹配。
 ```
 
-## XXL-JOB自动创建任务用法
-```java
-@JobTask(taskName = "任务描述", author = "负责人", executorHandler = "JobHandler",scheduleType = ScheduleTypeEnum.FIX_RATE,scheduleConf = "1")
-public class TestHandler extends AbstractJobConsumer {
-
-    @Override
-    public void handle(String jobParam) {
-    }
-
-    @Override
-    public void saveLog(Throwable throwable) {
-
-    }
-}
-```
 ## Docker Compose安装组件文件
 详细的配置都在docker文件夹内，内涵Emqx的Mqtt组件、Minio对象存储组件、Mongodb组件、Mysql数据库、Portainer管理Docker可视化界面组件、PostgresSql数据库、RabbitMq消息队列组件、Redis缓存组件、RocketMq消息队列组件、sonarqube代码检查组件、Nacos组件
 
