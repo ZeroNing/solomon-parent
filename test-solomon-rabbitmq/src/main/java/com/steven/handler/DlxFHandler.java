@@ -1,12 +1,13 @@
 package com.steven.handler;
 
+import com.steven.solomon.annotation.DlxMessageListener;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.utils.RabbitUtils;
 import org.springframework.stereotype.Component;
 
-@Component
+@DlxMessageListener
 public class DlxFHandler extends AbstractConsumer<String,String> {
 
     protected DlxFHandler(RabbitUtils rabbitUtils) {

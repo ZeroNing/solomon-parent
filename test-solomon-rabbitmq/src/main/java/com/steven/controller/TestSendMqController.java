@@ -1,6 +1,8 @@
 package com.steven.controller;
 
+import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.RabbitMqModel;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.RabbitUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class TestSendMqController {
@@ -21,6 +24,7 @@ public class TestSendMqController {
 
     @GetMapping("/test")
     public Object test() throws Exception {
+        Map<String,AbstractConsumer> b = SpringUtil.getBeansOfType(AbstractConsumer.class);
         //发送消息到A交换器 直连模式
         utils.send(new RabbitMqModel<String>("A","A"));
         //发送消息到B交换器 广播模式

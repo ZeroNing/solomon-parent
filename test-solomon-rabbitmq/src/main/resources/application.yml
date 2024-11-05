@@ -23,4 +23,4 @@ spring:
     host: localhost
     port: 5672
     auto-delete-queue: false #是否自动删除队列以及交换机
-
+    enabled: false
