@@ -31,8 +31,6 @@ import java.nio.charset.StandardCharsets;
 /**
  * RabbitMq消费器
  */
-@ConditionalOnProperty(name = "spring.rabbitmq.enabled", havingValue = "true", matchIfMissing = true)
-@Conditional(RabbitCondition.class)
 public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
