@@ -1,6 +1,8 @@
 package com.steven.solomon.annotation;
 
+import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.enums.*;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +17,7 @@ import java.lang.annotation.Target;
 @Target(value = { ElementType.FIELD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Component
+@Conditional(XxlJobCondition.class)
 public @interface JobTask {
 
     @AliasFor(annotation = Component.class)

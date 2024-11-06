@@ -19,6 +19,7 @@ import com.steven.solomon.properties.JobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.PowerJobUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -60,13 +61,13 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
         //获取全部任务
         Map<String,SaveJobInfoRequest> taskMap = powerJobUtils.getAllTask(cookie,appId);
         for(Object obj : clazzList){
-            Class<?> clazz = obj.getClass();
+            Class<?> clazz = AopUtils.getTargetClass(obj);
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
             if(ValidateUtils.isEmpty(jobTask)){
-                logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
+                logger.error("{}没有JobTask注解,不进行初始化",clazz.getSimpleName());
                 continue;
             }
-            String className = obj.getClass().getName();
+            String className = clazz.getName();
             SaveJobInfoRequest saveRequest = taskMap.get(className);
             if(ValidateUtils.isEmpty(saveRequest)){
                 saveRequest = new SaveJobInfoRequest(jobTask,appId,className);

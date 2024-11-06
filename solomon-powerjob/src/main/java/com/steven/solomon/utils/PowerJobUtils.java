@@ -8,6 +8,7 @@ import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.steven.solomon.config.PowerJobCondition;
 import com.steven.solomon.entity.JobAppVO;
 import com.steven.solomon.entity.JobLoginVO;
 import com.steven.solomon.entity.JobNamespace;
@@ -17,6 +18,7 @@ import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.properties.JobProperties;
 import com.steven.solomon.verification.ValidateUtils;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Component;
 import tech.powerjob.worker.autoconfigure.PowerJobProperties;
@@ -28,7 +30,8 @@ import java.util.Map;
 import static com.steven.solomon.code.PowerJobErrorCode.*;
 
 @Component
-@Import(value = {JobProperties.class,PowerJobProperties.class})
+@Import(value = {JobProperties.class})
+@Conditional(PowerJobCondition.class)
 public class PowerJobUtils {
 
     private final JobProperties jobProperties;
@@ -110,7 +113,8 @@ public class PowerJobUtils {
         paramMap.put("pageSize",1000);
 
         String body = execute(cookie,webUrl+"namespace/list",paramMap);
-        List<JobNamespace> namespaceList = JSONUtil.toList(body,JobNamespace.class);
+        Map<String,Object> bodyMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
+        List<JobNamespace> namespaceList = JSONUtil.toList((JSONArray)bodyMap.get("data"),JobNamespace.class);
         return Lambda.toMap(namespaceList,JobNamespace::getCode);
     }
     /**
@@ -131,7 +135,7 @@ public class PowerJobUtils {
         componentUserRoleInfoMap.put("developer",new String[]{});
         componentUserRoleInfoMap.put("admin",new String[]{});
         params.put("componentUserRoleInfo",componentUserRoleInfoMap);
-        String body = execute(cookie,webUrl + "/namespace/save",params);
+        String body = execute(cookie,webUrl + "namespace/save",params);
         Map<String,Object> bodyMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         return ValidateUtils.isEmpty(bodyMap) ? 0 : Integer.parseInt(bodyMap.get("id").toString());
     }

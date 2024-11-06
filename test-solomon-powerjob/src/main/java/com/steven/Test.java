@@ -7,9 +7,10 @@ import tech.powerjob.worker.core.processor.sdk.BasicProcessor;
 
 @JobTask(taskName = "5555")
 public class Test implements BasicProcessor {
+
     @Override
     public ProcessResult process(TaskContext taskContext) throws Exception {
 
-        return null;
+        return new ProcessResult(true,"成功");
     }
 }
