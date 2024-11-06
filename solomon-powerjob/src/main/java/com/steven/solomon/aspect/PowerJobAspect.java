@@ -37,7 +37,9 @@ public class PowerJobAspect {
         TaskContext taskContext = null;
         if(ValidateUtils.isNotEmpty(args)){
             for(Object arg : args){
-                taskContext = (TaskContext) arg;
+                if(arg instanceof TaskContext){
+                    taskContext = (TaskContext) arg;
+                }
             }
         }
         if(ValidateUtils.isNotEmpty(taskContext)){
