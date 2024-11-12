@@ -12,7 +12,11 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @Aspect
 @Configuration
@@ -22,6 +26,15 @@ public class PowerJobAspect {
 
     @Value("${powerjob.worker.enabled: true}")
     private boolean enabled;
+
+    //任务ID
+    private String jobId = null;
+    //任务实例ID
+    private String instanceId = null;
+    //子任务实例ID
+    private String subInstanceId = null;
+    //任务参数
+    private String jobParams = null;
 
     @Pointcut("execution(* tech.powerjob.worker.core.processor.sdk.BasicProcessor.process(..))")
     void cutPoint() {}
@@ -42,9 +55,24 @@ public class PowerJobAspect {
                 }
             }
         }
+
         if(ValidateUtils.isNotEmpty(taskContext)){
-            logger.info("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{}",taskContext.getJobId(),taskContext.getInstanceId(),taskContext.getSubInstanceId(),taskContext.getJobParams());
+            jobId = String.valueOf(taskContext.getJobId());
+            instanceId = String.valueOf(taskContext.getInstanceId());
+            subInstanceId = String.valueOf(taskContext.getSubInstanceId());
+            jobParams = taskContext.getJobParams();
+            logger.info("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{}",jobId,instanceId,subInstanceId,jobParams);
         }
-        return point.proceed();
+        Object result = null;
+        try{
+            result = point.proceed();
+        } catch (Throwable e){
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            logger.info("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{},出现了异常:",jobId,instanceId,subInstanceId,jobParams,e);
+            return new ProcessResult(false,"出现异常:"+sw.toString());
+        }
+        return result;
     }
 }
