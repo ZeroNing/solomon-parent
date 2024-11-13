@@ -160,7 +160,7 @@ public class PowerJobUtils {
         // 构建请求参数
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("loginType","PWJB");
-        JSONObject originParams = new JSONObject();
+        Map<String, Object> originParams = new HashMap<>();
         originParams.put("username", userName);
         originParams.put("password", password);
         originParams.put("encryption", "none");
