@@ -2,9 +2,7 @@ package com.steven.solomon.utils;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
+import cn.hutool.http.*;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -14,6 +12,7 @@ import com.steven.solomon.entity.JobLoginVO;
 import com.steven.solomon.entity.JobNamespace;
 import com.steven.solomon.entity.SaveJobInfoRequest;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.http.HttpUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.properties.JobProperties;
@@ -50,7 +49,7 @@ public class PowerJobUtils {
         if(ValidateUtils.isEmpty(jobId)){
             throw new BaseException(POWER_JOB_JOB_ID_IS_NULL);
         }
-        executeGet(cookie,webUrl+"job/delete?jobId="+jobId);
+        execute(cookie,webUrl+"job/delete?jobId="+jobId,Method.GET,null,null);
     }
 
     /**
@@ -93,13 +92,8 @@ public class PowerJobUtils {
         paramMap.put("title",appName);
         paramMap.put("namespaceId",namespacesId);
         paramMap.put("password",jobProperties.getPassword());
-        Map<String,Object> componentUserRoleInfoMap = new HashMap<>();
-        componentUserRoleInfoMap.put("observer",new String[]{});
-        componentUserRoleInfoMap.put("qa",new String[]{});
-        componentUserRoleInfoMap.put("developer",new String[]{});
-        componentUserRoleInfoMap.put("admin",new String[]{});
-        paramMap.put("componentUserRoleInfo",componentUserRoleInfoMap);
-        String body = execute(cookie,webUrl+"appInfo/save",paramMap);
+        paramMap.put("componentUserRoleInfo",initUserRole());
+        String body = execute(cookie,webUrl+"appInfo/save",Method.POST,ContentType.JSON,paramMap);
         JobAppVO jobApp = JSONUtil.toBean(body,JobAppVO.class);
         return jobApp.getId();
     }
@@ -112,7 +106,7 @@ public class PowerJobUtils {
         paramMap.put("index",0);
         paramMap.put("pageSize",1000);
 
-        String body = execute(cookie,webUrl+"namespace/list",paramMap);
+        String body = execute(cookie,webUrl+"namespace/list",Method.POST,ContentType.JSON,paramMap);
         Map<String,Object> bodyMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         List<JobNamespace> namespaceList = JSONUtil.toList((JSONArray)bodyMap.get("data"),JobNamespace.class);
         return Lambda.toMap(namespaceList,JobNamespace::getCode);
@@ -129,13 +123,8 @@ public class PowerJobUtils {
         Map<String,Object> params = new HashMap<>();
         params.put("code", code);
         params.put("name", code);
-        Map<String,Object> componentUserRoleInfoMap = new HashMap<>();
-        componentUserRoleInfoMap.put("observer",new String[]{});
-        componentUserRoleInfoMap.put("qa",new String[]{});
-        componentUserRoleInfoMap.put("developer",new String[]{});
-        componentUserRoleInfoMap.put("admin",new String[]{});
-        params.put("componentUserRoleInfo",componentUserRoleInfoMap);
-        String body = execute(cookie,webUrl + "namespace/save",params);
+        params.put("componentUserRoleInfo",initUserRole());
+        String body = execute(cookie,webUrl + "namespace/save",Method.POST,ContentType.JSON,params);
         Map<String,Object> bodyMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         return ValidateUtils.isEmpty(bodyMap) ? 0 : Integer.parseInt(bodyMap.get("id").toString());
     }
@@ -160,13 +149,13 @@ public class PowerJobUtils {
         // 构建请求参数
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("loginType","PWJB");
-        Map<String, Object> originParams = new HashMap<>();
+        JSONObject originParams = new JSONObject();
         originParams.put("username", userName);
         originParams.put("password", password);
         originParams.put("encryption", "none");
         paramMap.put("originParams", originParams.toString());
         // 发送 POST 请求
-        String body = execute(null,url,paramMap);
+        String body = execute(null,url,Method.POST,ContentType.JSON,paramMap);
         JobLoginVO loginVO = JSONUtil.toBean(body, JobLoginVO.class);
         return loginVO.getJwtToken();
     }
@@ -181,7 +170,7 @@ public class PowerJobUtils {
         paramMap.put("index",0);
         paramMap.put("pageSize",1000);
 
-        String body = execute(cookie,url,paramMap);
+        String body = execute(cookie,url,Method.POST,ContentType.JSON,paramMap);
         Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         JSONArray jsonArray = (JSONArray) resultMap.get("data");
         if(ValidateUtils.isEmpty(jsonArray)){
@@ -196,7 +185,7 @@ public class PowerJobUtils {
      */
     public void save(String cookie, SaveJobInfoRequest saveRequest) throws BaseException {
         String url = webUrl + "job/save";
-        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(saveRequest), new TypeReference<Map<String, Object>>() {},true));
+        execute(cookie,url,Method.POST,ContentType.JSON,JSONUtil.toBean(JSONUtil.toJsonStr(saveRequest), new TypeReference<Map<String, Object>>() {},true));
     }
 
     /**
@@ -208,7 +197,7 @@ public class PowerJobUtils {
         paramMap.put("appId",appId);
         paramMap.put("index",0);
         paramMap.put("pageSize",100000);
-        String body = execute(cookie,url,paramMap);
+        String body = execute(cookie,url,Method.POST,ContentType.JSON,paramMap);
         ResultVO<String> data = JSONUtil.toBean(body, new TypeReference<ResultVO<String>>() {}, true);
         if(ValidateUtils.isEmpty(data) || ValidateUtils.isEmpty(data.getData())){
             return new HashMap<>();
@@ -220,8 +209,8 @@ public class PowerJobUtils {
     /**
      * 调用接口
      */
-    private HttpResponse executePostResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
-        HttpRequest request = HttpUtil.createPost(url).contentType("application/json");
+    private HttpResponse executeResponse(String cookie, String url, Method requestMethod,ContentType contentType, Map<String, Object> paramMap) throws BaseException {
+        HttpRequest request = HttpUtils.initRequest(requestMethod, url,contentType);
         if(ValidateUtils.isNotEmpty(cookie)){
             request = request.header("PowerJwt",cookie); // 需要替换为实际的认证信息
         }
@@ -245,45 +234,10 @@ public class PowerJobUtils {
     }
 
     /**
-     * 调用接口
-     */
-    private HttpResponse executeGetResponse(String cookie, String url) throws BaseException {
-        HttpRequest request = HttpUtil.createGet(url).contentType("application/json");
-        if(ValidateUtils.isNotEmpty(cookie)){
-            request = request.header("PowerJwt",cookie); // 需要替换为实际的认证信息
-        }
-        HttpResponse response = request.execute();
-        String body = response.body();
-        Boolean success = null;
-        String message = null;
-        if(JSONUtil.isTypeJSON(body)){
-            Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-            success = BooleanUtil.toBoolean(ValidateUtils.isEmpty(resultMap.get("success")) ? "false" : resultMap.get("success").toString());
-            message = ValidateUtils.isEmpty(resultMap.get("message")) ? null : resultMap.get("message").toString();
-        }
-
-        if(!response.isOk() || Boolean.FALSE.equals(success)){
-            throw new BaseException(POWER_JOB_EXECUTE_GET_ERROR,url,message);
-        }
-        return response;
-    }
-
-    /**
      * 获取接口返回的数据
      */
-    private String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
-        try (HttpResponse response = executePostResponse(cookie, url, paramMap)) {
-            String body = response.body();
-            Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-            return ValidateUtils.isEmpty(resultMap.get("data")) ? null : resultMap.get("data").toString();
-        }
-    }
-
-    /**
-     * 获取接口返回的数据
-     */
-    private String executeGet(String cookie, String url) throws BaseException {
-        try (HttpResponse response = executeGetResponse(cookie, url)) {
+    private String execute(String cookie, String url,Method requestMethod,ContentType contentType, Map<String, Object> paramMap) throws BaseException {
+        try (HttpResponse response = executeResponse(cookie, url,requestMethod,contentType, paramMap)) {
             String body = response.body();
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             return ValidateUtils.isEmpty(resultMap.get("data")) ? null : resultMap.get("data").toString();
@@ -296,5 +250,14 @@ public class PowerJobUtils {
             adminAddresses = adminAddresses + "/";
         }
         return adminAddresses;
+    }
+
+    private Map<String,Object> initUserRole(){
+        Map<String,Object> componentUserRoleInfoMap = new HashMap<>();
+        componentUserRoleInfoMap.put("observer",new String[]{});
+        componentUserRoleInfoMap.put("qa",new String[]{});
+        componentUserRoleInfoMap.put("developer",new String[]{});
+        componentUserRoleInfoMap.put("admin",new String[]{});
+        return componentUserRoleInfoMap;
     }
 }
