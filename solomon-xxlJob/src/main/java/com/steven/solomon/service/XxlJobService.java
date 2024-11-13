@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+package com.steven.solomon.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.http.HttpRequest;
@@ -13,27 +13,28 @@ import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Component
-public class XxlJobUtils {
+@Service
+public class XxlJobService implements JobService<XxlJobInfo>{
 
     private final XxlJobProperties profile;
 
-    public XxlJobUtils(ApplicationContext applicationContext, XxlJobProperties profile) {
+    private final String adminAddresses;
+
+
+    public XxlJobService(ApplicationContext applicationContext, XxlJobProperties profile) {
         this.profile = profile;
+        this.adminAddresses = getUrl();
         SpringUtil.setContext(applicationContext);
     }
 
-    /**
-     * 登陆网页
-     */
-    public String login() throws BaseException {
-        String adminAddresses = getUrl();;
+    @Override
+    public String login() throws Exception {
         String userName = profile.getUserName();
         String password = profile.getPassword();
         if(ValidateUtils.isEmpty(adminAddresses)){
@@ -56,48 +57,59 @@ public class XxlJobUtils {
         return getCookie(url,paramMap);
     }
 
-    public void save(XxlJobInfo xxlJobInfo) throws BaseException {
-        String cookie = login();
+    @Override
+    public void saveJob(String cookie,XxlJobInfo job) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
 
-        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,xxlJobInfo.getExecutorHandler());
+        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
-
-        String adminAddresses = getUrl();
-        String url = adminAddresses + (ValidateUtils.isEmpty(xxlJobInfoMap.get(xxlJobInfo.getExecutorHandler()))? "jobinfo/add" : "jobinfo/update");
+        if(xxlJobInfoMap.containsKey(job.getExecutorHandler())){
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NOT_NULL);
+        }
+        String url = adminAddresses + "jobinfo/add";
         // 发送 POST 请求
-        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(xxlJobInfo), new TypeReference<Map<String,Object>>() {},true));
+        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(job), new TypeReference<Map<String,Object>>() {},true));
     }
 
-    /**
-     * 删除任务
-     */
-    public void remove(String cookie,String id) throws BaseException {
-        String adminAddresses = getUrl();
+    @Override
+    public void updateJob(String cookie,XxlJobInfo job) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
+
+        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
+        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+        XxlJobInfo exitJob = xxlJobInfoMap.get(job.getExecutorHandler());
+        if(ValidateUtils.isEmpty(exitJob)){
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL);
+        }
+        job.setId(exitJob.getId());
+        String url = adminAddresses + "jobinfo/update";
+        // 发送 POST 请求
+        execute(cookie,url,JSONUtil.toBean(JSONUtil.toJsonStr(job), new TypeReference<Map<String,Object>>() {},true));
+    }
+
+    @Override
+    public void deleteJob(String cookie,String executorHandler) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
+
         String url = adminAddresses + "jobinfo/remove";
+        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
+        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+        XxlJobInfo exitJob = xxlJobInfoMap.get(executorHandler);
+        if(ValidateUtils.isEmpty(exitJob)){
+            throw new BaseException("");
+        }
+
         Map<String, Object> paramMap = new HashMap<>();
-        paramMap.put("id", id);
+        paramMap.put("id", exitJob.getId());
         execute(cookie,url,paramMap);
     }
 
-    /**
-     * 调用xxl-job的任务页面查询
-     */
-    public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws BaseException {
-        String adminAddresses = getUrl();
-        String url = adminAddresses + "jobinfo/pageList?jobGroup=1&triggerStatus=-1&start="+0+"&length="+1000+"&executorHandler="+executorHandler;
+    @Override
+    public void startJob(String cookie,String executorHandler) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
 
-        String body = execute(cookie,url,null);
-        Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-        Object obj = resultMap.get("data");
-        return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
-    }
+        String url = adminAddresses + "jobinfo/start";
 
-    /**
-     * 启动任务
-     */
-    public void enabled(String cookie,String executorHandler,boolean isStart) throws BaseException {
-        String adminAddresses = getUrl();
-        String url = adminAddresses + (isStart ? "jobinfo/start" : "jobinfo/stop");
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
@@ -107,6 +119,33 @@ public class XxlJobUtils {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("id", xxlJobInfo.getId());
         execute(cookie,url,paramMap);
+    }
+
+    @Override
+    public void stopJob(String cookie,String executorHandler) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
+
+        String url = adminAddresses + "jobinfo/stop";
+
+        List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
+        Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
+        XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
+        if(ValidateUtils.isEmpty(xxlJobInfo)){
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_STOP_JOB_ERROR,executorHandler);
+        }
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", xxlJobInfo.getId());
+        execute(cookie,url,paramMap);
+    }
+
+    public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws Exception {
+        cookie = ValidateUtils.getOrDefault(cookie, login());
+        String url = adminAddresses + "jobinfo/pageList?jobGroup=1&triggerStatus=-1&start="+0+"&length="+1000+"&executorHandler="+executorHandler;
+
+        String body = execute(cookie,url,null);
+        Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
+        Object obj = resultMap.get("data");
+        return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
     }
 
     /**
