@@ -6,6 +6,7 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.XxlJobErrorCode;
+import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
@@ -13,6 +14,7 @@ import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
+@Conditional(XxlJobCondition.class)
 public class XxlJobService implements JobService<XxlJobInfo>{
 
     private final XxlJobProperties profile;
