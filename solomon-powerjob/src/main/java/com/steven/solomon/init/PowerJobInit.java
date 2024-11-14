@@ -16,8 +16,8 @@ import com.steven.solomon.entity.SaveJobInfoRequest;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.properties.JobProperties;
+import com.steven.solomon.service.PowerJobService;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.utils.PowerJobUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,11 +38,11 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
 
     private final PowerJobProperties powerJobProperties;
 
-    private final PowerJobUtils powerJobUtils;
+    private final PowerJobService service;
 
-    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobUtils powerJobUtils) {
+    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service) {
         this.powerJobProperties = powerJobProperties;
-        this.powerJobUtils = powerJobUtils;
+        this.service = service;
         SpringUtil.setContext(applicationContext);
     }
 
@@ -53,13 +53,13 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
             return;
         }
         //登陆获取cookie
-        String cookie = powerJobUtils.login();
+        String cookie = service.login();
         //创建命名空间
-        Integer namespaceId = powerJobUtils.createNamespace(powerJobProperties.getWorker().getAppName(),cookie);
+        Integer namespaceId = service.createNamespace(powerJobProperties.getWorker().getAppName(),cookie);
         //根据appName创建namespace并返回namespaceId
-        Integer appId = powerJobUtils.createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
+        Integer appId = service.createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
         //获取全部任务
-        Map<String,SaveJobInfoRequest> taskMap = powerJobUtils.getAllTask(cookie,appId);
+        Map<String,SaveJobInfoRequest> taskMap = service.findByExecutorHandler(cookie,appId);
         for(Object obj : clazzList){
             Class<?> clazz = AopUtils.getTargetClass(obj);
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
@@ -71,10 +71,11 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
             SaveJobInfoRequest saveRequest = taskMap.get(className);
             if(ValidateUtils.isEmpty(saveRequest)){
                 saveRequest = new SaveJobInfoRequest(jobTask,appId,className);
+                service.saveJob(cookie,saveRequest);
             } else {
                 saveRequest = saveRequest.update(jobTask,className);
+                service.updateJob(cookie,saveRequest);
             }
-            powerJobUtils.save(cookie,saveRequest);
         }
     }
 

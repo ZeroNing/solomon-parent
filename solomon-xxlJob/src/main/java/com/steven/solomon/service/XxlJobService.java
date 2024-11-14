@@ -29,7 +29,6 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     private final String adminAddresses;
 
-
     public XxlJobService(ApplicationContext applicationContext, XxlJobProperties profile) {
         this.profile = profile;
         this.adminAddresses = getUrl();
