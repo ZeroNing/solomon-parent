@@ -73,9 +73,9 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("loginType","PWJB");
         JSONObject originParams = new JSONObject();
-        originParams.put("username", userName);
-        originParams.put("password", password);
-        originParams.put("encryption", "none");
+        originParams.set("username", userName);
+        originParams.set("password", password);
+        originParams.set("encryption", "none");
         paramMap.put("originParams", originParams.toString());
         // 发送 POST 请求
         String body = execute(null,url,Method.POST,ContentType.JSON,paramMap);
