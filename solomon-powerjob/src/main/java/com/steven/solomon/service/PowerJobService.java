@@ -45,15 +45,12 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     private final Integer appId;
 
-    private final Integer namespaceId;
-
     public PowerJobService(JobProperties jobProperties, PowerJobProperties powerJobProperties) throws Exception {
         this.jobProperties = jobProperties;
         this.powerJobProperties = powerJobProperties;
         this.adminAddresses = getUrl();
         String cookie = login();
-        this.namespaceId = createNamespace(powerJobProperties.getWorker().getAppName(),cookie);
-        this.appId = createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
+        this.appId = createAppId(cookie,powerJobProperties.getWorker().getAppName(), createNamespace(powerJobProperties.getWorker().getAppName(), cookie));
     }
 
     @Override
