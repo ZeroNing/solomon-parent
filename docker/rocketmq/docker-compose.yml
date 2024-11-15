@@ -8,8 +8,7 @@ services:
     restart: always
     privileged: true
     volumes:
-      - ./nameserver/logs:/home/rocketmq/logs
-      - ./nameserver/bin/runserver.sh:/home/rocketmq/rocketmq-5.1.0/bin/runserver.sh
+      - ./logs/nameserver:/home/rocketmq/logs
       - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     environment:
       - MAX_HEAP_SIZE=256M
@@ -24,10 +23,9 @@ services:
     restart: always
     privileged: true
     volumes:
-      - ./broker/logs:/root/logs
-      - ./broker/store:/root/store
-      - ./broker/conf/broker.conf:/home/rocketmq/broker.conf
-      - ./broker/bin/runbroker.sh:/home/rocketmq/rocketmq-5.1.0/bin/runbroker.sh
+      - ./logs/broker:/root/logs
+      - ./data:/root/store
+      - ./conf/broker.conf:/home/rocketmq/broker.conf
       - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
     depends_on:
       - 'rmqnamesrv'
@@ -40,7 +38,7 @@ services:
     image: apacherocketmq/rocketmq-dashboard:latest
     container_name: rocketmq-dashboard
     ports:
-      - 8082:8080
+      - 8080:8080
     restart: always
     privileged: true
     depends_on:
