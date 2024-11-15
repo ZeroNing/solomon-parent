@@ -1,7 +1,6 @@
 package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.steven.solomon.condition.JsonCondition;
 import com.steven.solomon.json.config.JsonConfig;
 
 import java.nio.charset.StandardCharsets;
