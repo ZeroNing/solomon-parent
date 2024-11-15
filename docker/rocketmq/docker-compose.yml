@@ -1,47 +1,51 @@
-version: '3'
+version: '3'  # Docker Compose 文件格式版本
+
 services:
   rmqnamesrv:
-    image: apache/rocketmq:latest
-    container_name: rmqnamesrv
+    image: apache/rocketmq:latest  # 使用 RocketMQ 最新版本的镜像
+    container_name: rmqnamesrv     # 指定容器的名称为 rmqnamesrv
     ports:
-      - 9876:9876
-    restart: always
-    privileged: true
+      - 9876:9876  # 将主机的 9876 端口映射到容器内的 9876 端口，供外部访问 NameServer
+    restart: always  # 如果容器崩溃或重新启动 Docker 服务，则自动重启容器
+    privileged: true  # 以特权模式运行容器，通常用于需要访问宿主机设备的场景
     volumes:
-      - ./logs/nameserver:/home/rocketmq/logs
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+      - ./logs/nameserver:/home/rocketmq/logs  # 将主机上的日志目录挂载到容器内
+      - /etc/localtime:/etc/localtime  # 将宿主机的时间设置挂载到容器，以同步时间
     environment:
-      - MAX_HEAP_SIZE=256M
-      - HEAP_NEWSIZE=128M
-    command: ["sh","mqnamesrv"]
+      - MAX_HEAP_SIZE=256M  # 设置 Java 虚拟机最大堆内存为 256MB
+      - HEAP_NEWSIZE=128M   # 设置 Java 的新生代内存大小为 128MB
+    command: ["sh","mqnamesrv"]  # 启动容器时执行的命令，用于启动 NameServer
+
   broker:
-    image: apache/rocketmq:latest
-    container_name: rmqbroker
+    image: apache/rocketmq:latest  # 使用 RocketMQ 最新版本的镜像
+    container_name: rmqbroker      # 指定容器的名称为 rmqbroker
     ports:
-      - 10909:10909
-      - 10911:10911
-    restart: always
-    privileged: true
+      - 10909:10909  # 将主机的 10909 端口映射到容器内的 10909 端口，供外部访问
+      - 10911:10911  # 将主机的 10911 端口映射到容器内的 10911 端口，供外部访问
+    restart: always  # 如果容器崩溃或重新启动 Docker 服务，则自动重启容器
+    privileged: true  # 以特权模式运行容器
     volumes:
-      - ./logs/broker:/root/logs
-      - ./data:/root/store
-      - ./conf/broker.conf:/home/rocketmq/broker.conf
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+      - ./logs/broker:/root/logs  # 将主机上的日志目录挂载到容器内
+      - ./data:/root/store  # 将主机上的数据目录挂载到容器内
+      - ./conf/broker.conf:/home/rocketmq/broker.conf  # 挂载自定义的 Broker 配置文件
+      - /etc/localtime:/etc/localtime  # 将宿主机的时间设置挂载到容器，以同步时间
     depends_on:
-      - 'rmqnamesrv'
+      - 'rmqnamesrv'  # 确保在启动 broker 之前，NameServer 已经启动
     environment:
-      - NAMESRV_ADDR=rmqnamesrv:9876
-      - MAX_HEAP_SIZE=512M
-      - HEAP_NEWSIZE=256M
-    command: ["sh","mqbroker","-c","/home/rocketmq/broker.conf"]
+      - NAMESRV_ADDR=rmqnamesrv:9876  # 设置 NameServer 的地址，以便 Broker 能够连接到 NameServer
+      - MAX_HEAP_SIZE=512M  # 设置 Java 虚拟机最大堆内存为 512MB
+      - HEAP_NEWSIZE=256M   # 设置 Java 的新生代内存大小为 256MB
+    command: ["sh","mqbroker","-c","/home/rocketmq/broker.conf"]  # 启动 Broker 时使用自定义配置文件
+
   rmqdashboard:
-    image: apacherocketmq/rocketmq-dashboard:latest
-    container_name: rocketmq-dashboard
+    image: apacherocketmq/rocketmq-dashboard:latest  # 使用 RocketMQ Dashboard 最新版本的镜像
+    container_name: rocketmq-dashboard  # 指定容器的名称为 rocketmq-dashboard
     ports:
-      - 8080:8080
-    restart: always
-    privileged: true
+      - 8080:8080  # 将主机的 8080 端口映射到容器内的 8080 端口，供外部访问 Dashboard
+    restart: always  # 如果容器崩溃或重新启动 Docker 服务，则自动重启容器
+    privileged: true  # 以特权模式运行容器
     depends_on:
-      - 'rmqnamesrv'
+      - 'rmqnamesrv'  # 确保在启动 Dashboard 之前，NameServer 已经启动
     environment:
       - JAVA_OPTS= -Xmx256M -Xms256M -Xmn128M -Drocketmq.namesrv.addr=rmqnamesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false
+      # 设置 Java 虚拟机参数，指定 NameServer 地址，并禁用 VIP 通道
