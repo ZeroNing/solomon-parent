@@ -2,6 +2,7 @@ package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
@@ -56,13 +57,10 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   @Override
   public void send(MqttModel<?> data) throws Exception {
     // 获取客户端实例
-    ObjectMapper mapper = new ObjectMapper();
     try {
       // 转换消息为json字符串
-      String json = mapper.writeValueAsString(data);
+      String json = JSONUtil.toJsonStr(data);
       getClientMap().get(data.getTenantCode()).getTopic(data.getTopic()).publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
-    } catch (JsonProcessingException e) {
-      logger.error(String.format("MQTT: 主题[%s]发送消息转换json失败", data.getTopic()));
     } catch (MqttException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息失败", data.getTopic()));
     }
