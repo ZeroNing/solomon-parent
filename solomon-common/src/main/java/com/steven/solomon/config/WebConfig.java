@@ -1,10 +1,14 @@
 package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.steven.solomon.condition.JsonCondition;
 import com.steven.solomon.json.config.JsonConfig;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -16,6 +20,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @Import(value = {JsonConfig.class})
+@ConditionalOnMissingBean(WebMvcConfigurer.class)
 public class WebConfig implements WebMvcConfigurer {
 
   private final ObjectMapper mapper;
