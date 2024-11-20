@@ -1,6 +1,7 @@
 package com.steven.solomon.config;
 
 import cn.hutool.core.util.BooleanUtil;
+import com.steven.solomon.config.i18n.AutoConfigurationExclusionListener;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
@@ -12,19 +13,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class RabbitAutoConfigurationExclusionListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
+public class RabbitAutoConfigurationExclusionListener extends AutoConfigurationExclusionListener {
 
     @Override
-    public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
-        boolean enabled = BooleanUtil.toBoolean(ValidateUtils.getOrDefault(event.getEnvironment().getProperty("spring.rabbitmq.enabled"),"true"));
-        if(enabled){
-            return;
-        }
-        ConfigurableEnvironment environment = event.getEnvironment();
+    public String getEnabledKey() {
+        return "spring.rabbitmq.enabled";
+    }
+
+    @Override
+    public String getComponentName() {
+        return "RabbitMq";
+    }
+
+    @Override
+    public Map<String, Object> getExclude() {
         Map<String, Object> map = new HashMap<>();
-        // 设置spring.autoconfigure.exclude属性以排除RabbitAutoConfiguration
         map.put("spring.autoconfigure.exclude", "org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration");
-        MapPropertySource propertySource = new MapPropertySource("customProperties", map);
-        environment.getPropertySources().addLast(propertySource);
+        return map;
     }
 }
