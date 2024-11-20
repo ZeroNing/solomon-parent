@@ -2,4 +2,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.config.RabbitConfig,\
 com.steven.solomon.init.RabbitMQInitConfig,\
-com.steven.solomon.utils.RabbitUtils
+com.steven.solomon.utils.RabbitUtils,\
+com.steven.solomon.config.RabbitAutoConfigurationExclusionListener
