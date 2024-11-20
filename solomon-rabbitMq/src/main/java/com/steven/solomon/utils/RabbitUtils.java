@@ -47,8 +47,12 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
     private final RabbitMqProperties rabbitMqProperties;
 
-    public RabbitUtils(RabbitTemplate rabbitTemplate, RabbitMqProperties rabbitMqProperties) {
-        this.rabbitTemplate = rabbitTemplate;
+    public RabbitUtils(RabbitMqProperties rabbitMqProperties) {
+        if(!rabbitMqProperties.getEnabled()){
+            this.rabbitTemplate = null;
+        } else {
+            this.rabbitTemplate = SpringUtil.getBean(RabbitTemplate.class);
+        }
         this.rabbitMqProperties = rabbitMqProperties;
     }
 
@@ -57,6 +61,9 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void send(RabbitMqModel<?> mq) throws Exception {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         if (!convertAndSend(mq, 0, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -67,6 +74,9 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         if (!convertAndSend(mq, delay, true)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -77,6 +87,9 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         if (!convertAndSend(mq, expiration, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -85,7 +98,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 重置队列并发使用者
      */
-    public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) {
+    public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) throws BaseException {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         Assert.state(concurrentConsumers > 0, "参数 'concurrentConsumers' 必须大于0.");
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
         if (ValidateUtils.isNotEmpty(container) && container.isActive() && container.isRunning()) {
@@ -98,7 +114,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 重启消息监听者
      */
-    public boolean restartMessageListener(String queueName) {
+    public boolean restartMessageListener(String queueName) throws BaseException {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("restartMessageListener 重启队列失败,传入队列名为空!");
             return false;
@@ -116,7 +135,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 停止消息监听者
      */
-    public boolean stopMessageListener(String queueName) {
+    public boolean stopMessageListener(String queueName) throws BaseException {
+        if(!rabbitMqProperties.getEnabled()){
+            throw new BaseException(RabbitMqErrorCode.ENABLED);
+        }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("stopMessageListener 停止队列失败,传入队列名为空!");
             return false;
