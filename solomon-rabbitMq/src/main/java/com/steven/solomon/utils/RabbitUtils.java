@@ -62,7 +62,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     @Override
     public void send(RabbitMqModel<?> mq) throws Exception {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
         }
         if (!convertAndSend(mq, 0, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
@@ -75,7 +76,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     @Override
     public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
         }
         if (!convertAndSend(mq, delay, true)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
@@ -88,7 +90,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     @Override
     public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
         }
         if (!convertAndSend(mq, expiration, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
@@ -100,7 +103,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) throws BaseException {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
         }
         Assert.state(concurrentConsumers > 0, "参数 'concurrentConsumers' 必须大于0.");
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
@@ -116,7 +120,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     public boolean restartMessageListener(String queueName) throws BaseException {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
         }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("restartMessageListener 重启队列失败,传入队列名为空!");
@@ -137,7 +142,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     public boolean stopMessageListener(String queueName) throws BaseException {
         if(!rabbitMqProperties.getEnabled()){
-            throw new BaseException(RabbitMqErrorCode.ENABLED);
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
         }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("stopMessageListener 停止队列失败,传入队列名为空!");
