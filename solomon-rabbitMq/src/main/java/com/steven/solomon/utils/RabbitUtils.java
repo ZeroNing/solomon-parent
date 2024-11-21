@@ -42,20 +42,16 @@ import org.springframework.util.Assert;
 @EnableConfigurationProperties(value = {RabbitProperties.class,RabbitMqProperties.class})
 public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
-    private final Logger logger = LoggerUtils.logger(RabbitUtils.class);
+    private final Logger logger = LoggerUtils.logger(getClass());
 
     private final RabbitTemplate rabbitTemplate;
 
-    private final RabbitMqProperties rabbitMqProperties;
+    private final boolean enabled;
 
     public RabbitUtils(RabbitMqProperties rabbitMqProperties, ApplicationContext context) {
         SpringUtil.setContext(context);
-        if(!rabbitMqProperties.getEnabled()){
-            this.rabbitTemplate = null;
-        } else {
-            this.rabbitTemplate = SpringUtil.getBean(RabbitTemplate.class);
-        }
-        this.rabbitMqProperties = rabbitMqProperties;
+        this.enabled = rabbitMqProperties.getEnabled();
+        this.rabbitTemplate = !enabled ? null : SpringUtil.getBean(RabbitTemplate.class);
     }
 
     /**
@@ -63,7 +59,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void send(RabbitMqModel<?> mq) throws Exception {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -77,7 +73,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -91,7 +87,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -104,7 +100,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 重置队列并发使用者
      */
     public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) throws BaseException {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -121,7 +117,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 重启消息监听者
      */
     public boolean restartMessageListener(String queueName) throws BaseException {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -143,7 +139,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 停止消息监听者
      */
     public boolean stopMessageListener(String queueName) throws BaseException {
-        if(!rabbitMqProperties.getEnabled()){
+        if(!enabled){
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -179,8 +175,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //  }
 
     private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
-        if(!rabbitMqProperties.getEnabled()){
-            logger.info("rabbitmq没开启,不发送消息");
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
             return false;
         }
         RabbitMqModel<?> rabbitMQModel = (RabbitMqModel<?>) baseMq;
@@ -237,8 +233,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * @param queueName     队列名
      */
     public void handleQueueMessageManually(boolean transactional, String queueName) throws Exception {
-        if(!rabbitMqProperties.getEnabled()){
-            logger.info("rabbitmq没开启,不发送消息");
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
             return;
         }
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
@@ -267,8 +263,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 请求回复消息发送
      */
     public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
-        if(!rabbitMqProperties.getEnabled()){
-            logger.info("rabbitmq没开启,不发送消息");
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
             return null;
         }
         if(ValidateUtils.isEmpty(model.getReplyTo())){
@@ -285,8 +281,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 回复消息发送
      */
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
-        if(!rabbitMqProperties.getEnabled()){
-            logger.info("rabbitmq没开启,不发送消息");
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
             return;
         }
         rabbitTemplate.send(routingKey, object);
