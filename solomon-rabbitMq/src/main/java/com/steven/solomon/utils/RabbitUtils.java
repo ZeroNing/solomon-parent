@@ -34,6 +34,7 @@ import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
@@ -47,7 +48,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
     private final RabbitMqProperties rabbitMqProperties;
 
-    public RabbitUtils(RabbitMqProperties rabbitMqProperties) {
+    public RabbitUtils(RabbitMqProperties rabbitMqProperties, ApplicationContext context) {
+        SpringUtil.setContext(context);
         if(!rabbitMqProperties.getEnabled()){
             this.rabbitTemplate = null;
         } else {
