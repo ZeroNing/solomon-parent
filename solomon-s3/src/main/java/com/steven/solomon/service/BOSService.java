@@ -7,6 +7,7 @@ import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.*;
 import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
@@ -38,8 +39,8 @@ public class BOSService extends AbstractFileService {
     return new BosClient(configuration);
   }
 
-  public BOSService(FileChoiceProperties properties) {
-    super(properties);
+  public BOSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
     this.client = client();
   }
 

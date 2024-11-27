@@ -26,20 +26,25 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected static Logger logger = LoggerUtils.logger(AbstractFileService.class);
 
-  @Autowired
   protected FileNamingRulesGenerationService fileNamingRulesGenerationService;
 
   protected FileChoiceProperties properties;
 
   protected Long partSize;
 
-  public AbstractFileService(FileChoiceProperties properties){
+  public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService){
+    this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
     this.properties = properties;
     this.partSize = (long) (this.properties.getPartSize() * 1024 * 1024);
   }
 
+  public AbstractFileService(FileNamingRulesGenerationService fileNamingRulesGenerationService){
+      this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
+      this.partSize = (long) (5 * 1024 * 1024);
+  }
+
   public AbstractFileService(){
-    this.partSize = (long) (5 * 1024 * 1024);
+    super();
   }
 
   @Override
