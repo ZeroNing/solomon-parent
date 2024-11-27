@@ -47,7 +47,7 @@
 # 切换租户主要设置
 
 ```java
-RequestHeader.setTenantCode("租户编码");
+RequestHeaderHolder.setTenantCode("租户编码");
 ```
 
 ## 切换时区主要设置
