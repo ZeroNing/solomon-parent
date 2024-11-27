@@ -1,6 +1,6 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.config.i18n.AutoConfigurationExclusionListener;
+import com.steven.solomon.config.component.AutoConfigurationExclusionListener;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;

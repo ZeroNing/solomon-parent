@@ -1,12 +1,6 @@
 package com.steven.solomon.config;
 
-import cn.hutool.core.util.BooleanUtil;
-import com.steven.solomon.config.i18n.AutoConfigurationExclusionListener;
-import com.steven.solomon.verification.ValidateUtils;
-import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
+import com.steven.solomon.config.component.AutoConfigurationExclusionListener;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
