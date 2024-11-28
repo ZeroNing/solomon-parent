@@ -30,3 +30,4 @@ powerjob:
     max-lightweight-task-num: 1024
     user-name: ADMIN
     password: admin
+    namespace: solomon

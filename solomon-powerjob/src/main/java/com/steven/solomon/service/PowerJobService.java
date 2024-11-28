@@ -50,7 +50,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         this.powerJobProperties = powerJobProperties;
         this.adminAddresses = getUrl();
         String cookie = login();
-        this.appId = createAppId(cookie,powerJobProperties.getWorker().getAppName(), createNamespace(powerJobProperties.getWorker().getAppName(), cookie));
+        this.appId = createAppId(cookie,powerJobProperties.getWorker().getAppName(), createNamespace(jobProperties.getNamespace(), cookie));
     }
 
     @Override

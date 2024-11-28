@@ -39,11 +39,13 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
     private final PowerJobProperties powerJobProperties;
 
     private final PowerJobService service;
+    private final JobProperties jobProperties;
 
-    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service) {
+    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service, JobProperties jobProperties) {
         this.powerJobProperties = powerJobProperties;
         this.service = service;
         SpringUtil.setContext(applicationContext);
+        this.jobProperties = jobProperties;
     }
 
     @Override
@@ -55,7 +57,7 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
         //登陆获取cookie
         String cookie = service.login();
         //创建命名空间
-        Integer namespaceId = service.createNamespace(powerJobProperties.getWorker().getAppName(),cookie);
+        Integer namespaceId = service.createNamespace(jobProperties.getNamespace(),cookie);
         //根据appName创建namespace并返回namespaceId
         Integer appId = service.createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
         //获取全部任务
