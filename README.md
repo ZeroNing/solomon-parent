@@ -239,7 +239,7 @@ mqtt:
 
 1.继承AbstractConsumer抽象类并重写handleMessage(业务逻辑处理),saveFailMessage(失败消息保存)
 
-2.加上@MessageListener，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题,tenantRange是允许哪些租户订阅
+2.加上@MessageListener，并填写主题以及消息质量，这样子在项目启动时侯，就会自动订阅该主题,tenantRange是允许哪些租户订阅，默认是允许所有租户订阅
 
 ```java
 @MessageListener(topics = "topic",qos = 2,tenantRange = "test12")
