@@ -33,7 +33,7 @@ public class DefaultMqttInitService implements MqttInitService {
         mqttClient.connect(options);
         utils.putOptionsMap(tenantCode,options);
         // 订阅主题
-        utils.subscribe(mqttClient,clazzList);
+        utils.subscribe(mqttClient,clazzList,tenantCode);
 
         //配置callback
         mqttClient.setCallback(new MqttCallbackExtended() {

@@ -113,6 +113,8 @@ public class MqttUtils implements SendService<MqttModel<?>> {
             AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
             client.subscribe(topic, messageListener.qos(), consumer);
           }
+        } else {
+          logger.info("{}租户,{}只支持{}范围",tenantCode,abstractConsumer.getClass().getSimpleName(),rangeList.toArray());
         }
       }
     }

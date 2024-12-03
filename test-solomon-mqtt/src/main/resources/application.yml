@@ -20,6 +20,6 @@ spring:
 mqtt:
   tenant:
     test:
-      user-name: root
-      password: root
+      user-name: admin
+      password: admin
       url: tcp://127.0.0.1:1883

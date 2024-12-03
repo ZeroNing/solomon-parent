@@ -5,7 +5,7 @@ import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-@MessageListener(topics = "top/+/123")
+@MessageListener(topics = "top/+/123",tenantRange = "test12")
 public class TestHandler extends AbstractConsumer<String,String> {
     @Override
     public String handleMessage(String topic, String tenantCode, String body) throws Exception {

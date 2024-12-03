@@ -95,7 +95,8 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    */
   public void subscribe(MqttClient client,String tenantCode) throws MqttException {
     List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values());
-    this.subscribe(client,clazzList,tenantCode);  }
+    this.subscribe(client,clazzList,tenantCode);
+  }
 
   /**
    * 订阅消息
@@ -114,6 +115,8 @@ public class MqttUtils implements SendService<MqttModel<?>> {
             AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
             client.subscribe(topic, messageListener.qos(), consumer);
           }
+        } else {
+          logger.info("{}租户,{}只支持{}范围",tenantCode,abstractConsumer.getClass().getSimpleName(),rangeList.toArray());
         }
       }
     }
