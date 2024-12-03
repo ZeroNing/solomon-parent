@@ -2,6 +2,7 @@ package com.steven.solomon.service;
 
 import com.aliyun.oss.ClientConfiguration;
 import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
@@ -34,12 +35,12 @@ public class S3Service extends AbstractFileService {
 
   private S3Presigner presigner;
 
-  public S3Service(){
-    super();
+  public S3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService){
+    super(fileNamingRulesGenerationService);
   }
 
-  public S3Service(FileChoiceProperties properties) {
-    super(properties);
+  public S3Service(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
     AwsBasicCredentials credentials = AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey());
     client = S3Client.builder()
             .endpointOverride(URI.create(properties.getEndpoint()))

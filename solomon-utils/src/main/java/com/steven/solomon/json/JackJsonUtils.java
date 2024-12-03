@@ -19,7 +19,7 @@ public class JackJsonUtils {
 
     private static final Logger logger = LoggerUtils.logger(JackJsonUtils.class);
 
-    private static final ObjectMapper mapper = SpringUtil.getBean(ObjectMapper.class);
+    private static final ObjectMapper mapper = ValidateUtils.getOrDefault(SpringUtil.getBean(ObjectMapper.class),new ObjectMapper());
 
     public static <T> T convertValue(Object obj, Class<T> clazz) {
         return convertValue(obj, clazz, false);

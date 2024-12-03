@@ -9,8 +9,10 @@ import com.steven.solomon.service.impl.DefaultMqttInitService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -20,6 +22,7 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(value={TenantMqttProfile.class,})
 @Import(value = {MqttUtils.class})
+@ConditionalOnProperty(name = "mqtt.enabled", havingValue = "true", matchIfMissing = true)
 public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
 
     private final TenantMqttProfile profile;
@@ -33,7 +36,12 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
     }
 
     @Override
+    @Conditional(MqttCondition.class)
     public void init(List<Object> clazzList) throws Exception {
+        if(!profile.getEnabled()){
+            logger.error("mqtt不启用,不初始化队列以及消费者");
+            return;
+        }
         Map<String,MqttProfile> tenantProfileMap = profile.getTenant();
         if(ValidateUtils.isEmpty(tenantProfileMap)){
             logger.error("AbstractMessageLineRunner:没有MQTT配置");

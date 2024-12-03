@@ -4,6 +4,7 @@ import com.obs.services.ObsClient;
 import com.obs.services.ObsConfiguration;
 import com.obs.services.model.*;
 import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
@@ -19,8 +20,8 @@ public class OBSService extends AbstractFileService {
 
   private final ObsClient client;
 
-  public OBSService(FileChoiceProperties properties) {
-    super(properties);
+  public OBSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
     this.client = client();
   }
 

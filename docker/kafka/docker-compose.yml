@@ -1,0 +1,26 @@
+version: '3.8'
+services:
+  kafka:
+    image: apache/kafka:latest  # 使用支持 Kraft 模式的 Kafka 版本
+    container_name: kafka
+    ports:
+      - "9092:9092"  # 将 Kafka 的默认端口映射到主机
+    environment:
+      KAFKA_KRAFT_MODE: "true"  # 启用 Kraft 模式以取代 Zookeeper
+      KAFKA_PROCESS_ROLES: "broker,controller"  # 定义 Kafka 的角色为 broker 和 controller
+      KAFKA_NODE_ID: 1  # Kafka 节点的唯一 ID
+      KAFKA_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:29092"  # 配置 Kafka 的监听接口
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"  # 定义监听器的协议映射
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"  # 用于 broker 之间通信的监听器名称
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"  # 定义控制器使用的监听器名称
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:29092"  # 配置控制器投票者
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"  # 数据文件存储目录
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # 设置偏移量主题的复制因子
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1  # 定义事务状态日志的复制因子
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1  # 事务日志的最小同步副本
+      KAFKA_MIN_INSYNC_REPLICAS: 1  # 最小同步副本数
+      KAFKA_BROKER_ID: 1  # Broker 的唯一 ID
+      KAFKA_LOG4J_LOGGERS: "kafka.controller=INFO,state.change.logger=INFO"  # 定义特定日志类别的日志级别
+    volumes:
+      - ./data/kafka:/var/lib/kafka/data  # 持久化 Kafka 数据到本地目录
+      - ./logs/kafka:/var/log/kafka  # 将 Kafka 容器的日志输出到本地主机目录

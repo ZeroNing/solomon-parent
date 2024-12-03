@@ -3,3 +3,7 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.aspect.MongoAspect,\
 com.steven.solomon.config.MongoConfig,\
 com.steven.solomon.config.MongoTenantsContext
+
+# Application Listener
+org.springframework.context.ApplicationListener=\
+com.steven.solomon.config.MongoDbConfigurationExclusionListener

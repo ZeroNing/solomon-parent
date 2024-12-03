@@ -4,7 +4,7 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.enums.TopicMode;
 import com.steven.solomon.init.AbstractMessageLineRunner;
-import com.steven.solomon.json.config.JacksonConfig;
+import com.steven.solomon.json.config.JsonConfig;
 import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.spring.SpringUtil;
@@ -28,7 +28,7 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class, TenantRedisProperties.class, CacheProfile.class, CacheProperties.class})
-@Import(value = {RedisTenantContext.class, JacksonConfig.class})
+@Import(value = {RedisTenantContext.class, JsonConfig.class})
 public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener> {
 
     private final Logger logger = LoggerUtils.logger(getClass());

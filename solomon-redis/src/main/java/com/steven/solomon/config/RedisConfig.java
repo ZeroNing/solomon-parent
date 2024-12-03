@@ -3,7 +3,7 @@ package com.steven.solomon.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.init.RedisInitUtils;
-import com.steven.solomon.json.config.JacksonConfig;
+import com.steven.solomon.json.config.JsonConfig;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
@@ -38,7 +38,7 @@ import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class,TenantRedisProperties.class, CacheProfile.class,CacheProperties.class})
-@Import(value = {RedisTenantContext.class,JacksonConfig.class})
+@Import(value = {RedisTenantContext.class, JsonConfig.class})
 public class RedisConfig extends CachingConfigurerSupport {
 
   private final Logger logger = LoggerUtils.logger(getClass());

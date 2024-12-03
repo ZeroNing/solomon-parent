@@ -1,0 +1,33 @@
+i18n:
+  all-locale: zh,en
+  language: zh
+  path: i18n/messages
+server:
+  port: 8001
+knife4j:
+  title: powerJob测试用例
+  open: true
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jmx:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  application:
+    name: 123456
+powerjob:
+  worker:
+    enabled: true
+    port: 27777
+    app-name: solomon # 应用名称，需与PowerJob服务 注册的应用保持一致
+    server-address: localhost:7700
+    protocol: http
+    max-result-length: 4096
+    max-lightweight-task-num: 1024
+    user-name: ADMIN
+    password: admin
+    namespace: solomon

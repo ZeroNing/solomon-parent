@@ -1,5 +1,6 @@
 package com.steven.solomon.service;
 
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 
 /**
@@ -7,9 +8,8 @@ import com.steven.solomon.properties.FileChoiceProperties;
  */
 public class TosService extends S3Service {
 
-
-  public TosService(FileChoiceProperties properties) {
-    super(properties);
+  public TosService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
   }
 
 

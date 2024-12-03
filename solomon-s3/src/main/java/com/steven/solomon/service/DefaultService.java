@@ -3,6 +3,7 @@ package com.steven.solomon.service;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import java.io.InputStream;
 import java.util.List;
@@ -14,8 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class DefaultService extends AbstractFileService {
 
 
-  public DefaultService(FileChoiceProperties properties) {
-    super(properties);
+  public DefaultService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
   }
 
   @Override

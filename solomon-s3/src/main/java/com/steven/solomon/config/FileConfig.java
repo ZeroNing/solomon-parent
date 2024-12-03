@@ -41,59 +41,59 @@ public class FileConfig {
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   @ConditionalOnClass(OkHttpClient.Builder.class)
-  public FileServiceInterface fileService(FileChoiceProperties fileProperties){
+  public FileServiceInterface fileService(FileChoiceProperties fileProperties,FileNamingRulesGenerationService fileNamingRulesGenerationService){
     logger.info("选择 {} 文件服务", fileProperties.getChoice().getDesc());
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinioService(fileProperties);
+        return new MinioService(fileProperties,fileNamingRulesGenerationService);
       case OSS:
-        return new OSSService(fileProperties);
+        return new OSSService(fileProperties,fileNamingRulesGenerationService);
       case OBS:
-        return new OBSService(fileProperties);
+        return new OBSService(fileProperties,fileNamingRulesGenerationService);
       case COS:
-        return new COSService(fileProperties);
+        return new COSService(fileProperties,fileNamingRulesGenerationService);
       case BOS:
-        return new BOSService(fileProperties);
+        return new BOSService(fileProperties,fileNamingRulesGenerationService);
       case KODO:
-        return new KODOService(fileProperties);
+        return new KODOService(fileProperties,fileNamingRulesGenerationService);
       case ZOS:
-        return new ZOSService(fileProperties);
+        return new ZOSService(fileProperties,fileNamingRulesGenerationService);
       case KS3:
-        return new KS3Service(fileProperties);
+        return new KS3Service(fileProperties,fileNamingRulesGenerationService);
       case EOS:
-        return new EOSService(fileProperties);
+        return new EOSService(fileProperties,fileNamingRulesGenerationService);
       case NOS:
-        return new NOSService(fileProperties);
+        return new NOSService(fileProperties,fileNamingRulesGenerationService);
       case B2:
-        return new B2Service(fileProperties);
+        return new B2Service(fileProperties,fileNamingRulesGenerationService);
       case JD:
-        return new JDService(fileProperties);
+        return new JDService(fileProperties,fileNamingRulesGenerationService);
       case YANDEX:
-        return new YandexService(fileProperties);
+        return new YandexService(fileProperties,fileNamingRulesGenerationService);
       case AMAZON:
-        return new AmazonService(fileProperties);
+        return new AmazonService(fileProperties,fileNamingRulesGenerationService);
       case SHARKTECH:
-        return new SharktechService(fileProperties);
+        return new SharktechService(fileProperties,fileNamingRulesGenerationService);
       case DIDI:
-        return new DiDiService(fileProperties);
+        return new DiDiService(fileProperties,fileNamingRulesGenerationService);
       case BOTO3:
-        return new Boto3Service(fileProperties);
+        return new Boto3Service(fileProperties,fileNamingRulesGenerationService);
       case TOS:
-        return new TosService(fileProperties);
+        return new TosService(fileProperties,fileNamingRulesGenerationService);
       case R2:
-        return new R2Service(fileProperties);
+        return new R2Service(fileProperties,fileNamingRulesGenerationService);
       case GOOGLE_CLOUD_STORAGE:
-        return new GoogleCloudStorageService(fileProperties);
+        return new GoogleCloudStorageService(fileProperties,fileNamingRulesGenerationService);
       case UOS:
-        return new UosService(fileProperties);
+        return new UosService(fileProperties,fileNamingRulesGenerationService);
       case AZURE:
-        return new AzureService(fileProperties);
+        return new AzureService(fileProperties,fileNamingRulesGenerationService);
       case INSPUR:
-        return new InspurService(fileProperties);
+        return new InspurService(fileProperties,fileNamingRulesGenerationService);
       case S3:
-        return new S3Service(fileProperties);
+        return new S3Service(fileProperties,fileNamingRulesGenerationService);
       default:
-        return new DefaultService(fileProperties);
+        return new DefaultService(fileProperties,fileNamingRulesGenerationService);
     }
   }
 }

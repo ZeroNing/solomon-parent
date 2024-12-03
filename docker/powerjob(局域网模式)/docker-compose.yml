@@ -1,0 +1,31 @@
+version: '3.8'  # 指定Docker Compose文件的版本，3.8版本支持最新的特性和配置选项。
+
+services:
+  powerjob-server:  # 定义一个名为powerjob-server的服务。
+    image: powerjob/powerjob-server:latest  # 使用名为powerjob/powerjob-server的Docker镜像，并使用最新的标签。
+    container_name: powerjob-server  # 将容器命名为powerjob-server，便于识别和管理。
+    restart: always  # 设置容器的重启策略为始终重启，以增强容器的高可用性和稳定性。
+
+    environment:  # 配置传递给容器的环境变量。
+      - TZ=Asia/Shanghai  # 设置时区为上海，使应用的时间戳符合该时区。
+      - JVMOPTIONS= # 可选：用于设置Java虚拟机的启动选项，当前无特定设置。
+      - PARAMS=--spring.profiles.active=product \  # 多行环境变量，激活Spring Boot的生产环境配置。
+        --spring.datasource.core.jdbc-url=[数据库地址] \  # 设置数据库连接的JDBC URL。
+        --spring.datasource.core.username=[数据库账号] \  # 设置数据库连接的用户名。
+        --spring.datasource.core.password=[数据库密码] \  # 设置数据库连接的密码。
+        --oms.auth.initiliaze.admin.password=admin \  # 设置OMS系统初始化管理员密码为admin。
+        --spring.mail.host=smtp.qq.com \  # 设置邮件服务器主机为QQ邮箱的SMTP服务器。
+        --spring.mail.port=25 \  # 设置邮件服务器端口为25。
+        --spring.mail.username=[邮箱] \  # 设置用于发送邮件的邮箱用户名。
+        --spring.mail.from=[邮箱] \  # 设置邮件发送者的邮箱地址。
+        --spring.mail.password=[QQ邮箱则是授权码,其他邮箱则是密码] \  # 设置邮箱密码或QQ邮箱授权码。
+        --spring.mail.properties.mail.smtp.auth=true \  # 开启SMTP认证。
+        --spring.mail.properties.mail.smtp.starttls.enable=true \  # 启用TLS支持。
+        --spring.mail.properties.mail.smtp.starttls.required=true \  # 要求使用TLS。
+        --spring.mail.test.connection=true  # 在启动时测试邮件服务器连接。
+    ports:
+      - "7700:7700"  # 将主机的7700端口映射到容器的7700端口，通常用于应用的主要接口。
+      - "10086:10086"  # 将主机的10086端口映射到容器的10086端口，可能用于日志访问或其他服务通信。
+      - "10010:10010"  # 将主机的10010端口映射到容器的10010端口，可能用于其他应用服务或监控。
+    volumes:
+      - ./logs:/var/log  # 将主机上的logs目录挂载到容器的/var/log目录，实现日志数据的持久化存储。

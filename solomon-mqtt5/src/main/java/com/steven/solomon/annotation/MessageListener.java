@@ -1,5 +1,7 @@
 package com.steven.solomon.annotation;
 
+import com.steven.solomon.config.MqttCondition;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
 
 import java.lang.annotation.ElementType;
@@ -13,6 +15,7 @@ import java.lang.annotation.Target;
 @Target(value = { ElementType.FIELD, ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Component
+@Conditional(MqttCondition.class)
 public @interface MessageListener {
 
   /**

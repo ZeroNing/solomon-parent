@@ -17,6 +17,17 @@ public class RabbitMqProperties  {
      */
     private boolean autoDeleteExchange = false;
 
+    //是否启用
+    private boolean enabled = true;
+
+    public boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public boolean getAutoDeleteExchange() {
         return autoDeleteExchange;
     }

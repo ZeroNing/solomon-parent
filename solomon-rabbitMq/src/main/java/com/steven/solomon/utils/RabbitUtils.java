@@ -11,6 +11,7 @@ import com.steven.solomon.entity.MessageQueueDetail;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.init.RabbitMQInitConfig;
+import com.steven.solomon.properties.RabbitMqProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;
@@ -30,18 +31,27 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Assert;
 
 @Configuration
+@EnableConfigurationProperties(value = {RabbitProperties.class,RabbitMqProperties.class})
 public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 
-    private final Logger logger = LoggerUtils.logger(RabbitUtils.class);
+    private final Logger logger = LoggerUtils.logger(getClass());
 
     private final RabbitTemplate rabbitTemplate;
 
-    public RabbitUtils(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    private final boolean enabled;
+
+    public RabbitUtils(RabbitMqProperties rabbitMqProperties, ApplicationContext context) {
+        SpringUtil.setContext(context);
+        this.enabled = rabbitMqProperties.getEnabled();
+        this.rabbitTemplate = !enabled ? null : SpringUtil.getBean(RabbitTemplate.class);
     }
 
     /**
@@ -49,6 +59,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void send(RabbitMqModel<?> mq) throws Exception {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
+        }
         if (!convertAndSend(mq, 0, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -59,6 +73,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
+        }
         if (!convertAndSend(mq, delay, true)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -69,6 +87,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return;
+        }
         if (!convertAndSend(mq, expiration, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
@@ -77,7 +99,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 重置队列并发使用者
      */
-    public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) {
+    public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) throws BaseException {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
+        }
         Assert.state(concurrentConsumers > 0, "参数 'concurrentConsumers' 必须大于0.");
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
         if (ValidateUtils.isNotEmpty(container) && container.isActive() && container.isRunning()) {
@@ -90,7 +116,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 重启消息监听者
      */
-    public boolean restartMessageListener(String queueName) {
+    public boolean restartMessageListener(String queueName) throws BaseException {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
+        }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("restartMessageListener 重启队列失败,传入队列名为空!");
             return false;
@@ -108,7 +138,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     /**
      * 停止消息监听者
      */
-    public boolean stopMessageListener(String queueName) {
+    public boolean stopMessageListener(String queueName) throws BaseException {
+        if(!enabled){
+            logger.error("Rabbitmq不开启,禁止使用该功能");
+            return false;
+        }
         if (ValidateUtils.isEmpty(queueName)) {
             logger.error("stopMessageListener 停止队列失败,传入队列名为空!");
             return false;
@@ -140,7 +174,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //    return allQueueContainerMap;
 //  }
 
-    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) {
+    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
+            return false;
+        }
         RabbitMqModel<?> rabbitMQModel = (RabbitMqModel<?>) baseMq;
         if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
             return false;
@@ -195,6 +233,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * @param queueName     队列名
      */
     public void handleQueueMessageManually(boolean transactional, String queueName) throws Exception {
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
+            return;
+        }
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
         GetResponse response = channel.basicGet(queueName, false);
         if (ValidateUtils.isEmpty(response)) {
@@ -221,6 +263,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 请求回复消息发送
      */
     public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
+            return null;
+        }
         if(ValidateUtils.isEmpty(model.getReplyTo())){
             throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
         }
@@ -235,6 +281,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 回复消息发送
      */
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
+        if(!enabled){
+            logger.error("rabbitmq没开启,不发送消息");
+            return;
+        }
         rabbitTemplate.send(routingKey, object);
     }
 }

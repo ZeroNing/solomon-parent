@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf/default.conf:/etc/nginx/conf.d/default.conf
+      - ./logs:/var/log/nginx
+    restart:  always

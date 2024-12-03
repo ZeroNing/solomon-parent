@@ -3,6 +3,7 @@ package com.steven.solomon.service;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.graphics2D.entity.FileUpload;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -38,8 +39,8 @@ public class MinioService extends AbstractFileService {
 
   public MinioClient client;
 
-  public MinioService(FileChoiceProperties properties) {
-    super(properties);
+  public MinioService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
 
     OkHttpClient okHttpClient = new OkHttpClient.Builder()
             .connectTimeout(properties.getConnectionTimeout(), TimeUnit.MILLISECONDS)  // 设置连接超时时间为10秒

@@ -9,6 +9,7 @@ import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
 import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
@@ -26,8 +27,8 @@ public class COSService extends AbstractFileService {
 
   private final COSClient client;
 
-  public COSService(FileChoiceProperties properties) {
-    super(properties);
+  public COSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+    super(properties,fileNamingRulesGenerationService);
     this.client = initClient(properties);
   }
 

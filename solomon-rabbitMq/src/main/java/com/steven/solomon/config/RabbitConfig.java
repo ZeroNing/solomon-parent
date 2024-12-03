@@ -11,20 +11,21 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(value = {RabbitProperties.class})
-@Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
+@Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class, RabbitAutoConfiguration.class})
+@ConditionalOnProperty(name = "spring.rabbitmq.enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitConfig {
     private final Logger logger = LoggerUtils.logger(RabbitConfig.class);
 
@@ -37,12 +38,14 @@ public class RabbitConfig {
      */
     @Bean("messageConverter")
     @ConditionalOnMissingBean(MessageConverter.class)
+    @Conditional(RabbitCondition.class)
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
 
     @Bean("rabbitTemplate")
     @ConditionalOnMissingBean(RabbitTemplate.class)
+    @Conditional(RabbitCondition.class)
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory, MessageConverter messageConverter,
                                          RabbitProperties properties) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
@@ -67,6 +70,8 @@ public class RabbitConfig {
 
     @Bean("rabbitAdmin")
     @ConditionalOnMissingBean(RabbitAdmin.class)
+    @Conditional(RabbitCondition.class)
+    @Primary
     public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
         RabbitAdmin rabbitAdmin = new RabbitAdmin(connectionFactory);
         logger.info("RabbitAdmin启动了。。。");

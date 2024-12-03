@@ -27,6 +27,7 @@ import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.rabbit.retry.RepublishMessageRecoverer;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -40,6 +41,7 @@ import org.springframework.retry.support.RetryTemplate;
 @Configuration
 @EnableConfigurationProperties(value = {RabbitProperties.class,RabbitMqProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class, FanoutMQService.class, TopicMQService.class, HeadersMQService.class})
+@ConditionalOnProperty(name = "spring.rabbitmq.enabled", havingValue = "true", matchIfMissing = true)
 public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListener> {
 
     private final Logger logger = LoggerUtils.logger(getClass());
@@ -72,6 +74,10 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
+        if(!properties.getEnabled()){
+            logger.error("rabbitMq不启用,不初始化队列以及消费者");
+            return;
+        }
         // 遍历消费者队列进行初始化绑定以及监听
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
