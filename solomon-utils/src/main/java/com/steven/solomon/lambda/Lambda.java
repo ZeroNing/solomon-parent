@@ -41,6 +41,17 @@ public class Lambda {
     /**
      * 转list
      *
+     * @param list      数据集合
+     * @param predicate 条件筛选数据
+     * @param func      需要的字段
+     */
+    public static <T, S> List<T> toList(Collection<S> list, Predicate<S> predicate, Function<S, T> func) {
+        return toList(list, predicate, func, false);
+    }
+
+    /**
+     * 转list
+     *
      * @param list 数据集合
      * @param func 需要的字段
      */

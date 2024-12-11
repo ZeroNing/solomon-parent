@@ -27,4 +27,9 @@ public @interface MessageListener {
    * 消息质量
    */
   int qos() default 0;
+
+  /**
+   * 允许订阅的租户范围
+   */
+  String[] tenantRange() default "";
 }

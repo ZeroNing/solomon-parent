@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
+import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.spring.SpringUtil;
@@ -15,10 +16,7 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
@@ -93,25 +91,30 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    * 订阅消息
    * @param client mqtt连接
    */
-  public void subscribe(MqttClient client) throws MqttException {
+  public void subscribe(MqttClient client,String tenantCode) throws MqttException {
     List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values());
-    this.subscribe(client,clazzList);
+    this.subscribe(client,clazzList,tenantCode);
   }
 
   /**
    * 订阅消息
    * @param client mqtt连接
    */
-  public void subscribe(MqttClient client,List<Object> clazzList) throws MqttException {
+  public void subscribe(MqttClient client,List<Object> clazzList,String tenantCode) throws MqttException {
     if (ValidateUtils.isNotEmpty(clazzList)) {
       for (Object abstractConsumer : clazzList) {
         MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
         if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
           continue;
         }
-        for (String topic : messageListener.topics()) {
-          AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-          client.subscribe(topic, messageListener.qos(), consumer);
+        List<String> rangeList = Lambda.toList(Arrays.asList(messageListener.tenantRange()), ValidateUtils::isNotEmpty, key->key);
+        if(ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)){
+          for (String topic : messageListener.topics()) {
+            AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
+            client.subscribe(topic, messageListener.qos(), consumer);
+          }
+        } else {
+          logger.info("{}租户,{}只支持{}范围",tenantCode,abstractConsumer.getClass().getSimpleName(),rangeList.toArray());
         }
       }
     }
@@ -142,7 +145,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     MqttClient client = getClientMap().get(tenantCode);
     if(!client.isConnected()){
       client.connect(getOptionsMap().get(tenantCode));
-      subscribe(client);
+      subscribe(client,tenantCode);
     }
   }
 

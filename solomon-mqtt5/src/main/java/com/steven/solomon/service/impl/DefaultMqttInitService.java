@@ -89,7 +89,7 @@ public class DefaultMqttInitService implements MqttInitService {
             }
         });
         // 订阅主题
-        utils.subscribe(client,clazzList);
+        utils.subscribe(client,clazzList,tenantCode);
         //保存client
         utils.putClient(tenantCode,client);
     }
