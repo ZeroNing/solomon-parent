@@ -9,9 +9,9 @@ import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
-import com.steven.solomon.config.RabbitCondition;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.mq.CommonMqttMessageListener;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -22,8 +22,6 @@ import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Conditional;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * RabbitMq消费器
  */
-public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
+public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter implements CommonMqttMessageListener<T,R> {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
@@ -128,12 +126,6 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter {
         MessageListener messageListener = getClass().getAnnotation(MessageListener.class);
         return ValidateUtils.isNotEmpty(messageListener) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), messageListener.mode().toString());
     }
-
-    /**
-     * 消费方法
-     * @param body 请求数据
-     */
-    public abstract R handleMessage(T body) throws Exception;
 
     /**
      * 判断是否重复消费

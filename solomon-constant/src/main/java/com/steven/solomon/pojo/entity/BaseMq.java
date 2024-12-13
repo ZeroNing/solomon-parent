@@ -14,6 +14,19 @@ public class BaseMq<T> implements Serializable {
      */
     private String tenantCode;
 
+    /**
+     * 消息ID
+     */
+    private String msgId;
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
+    }
+
     public BaseMq(){
 
     }
