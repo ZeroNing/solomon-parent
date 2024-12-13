@@ -7,7 +7,7 @@ public class BaseMq<T> implements Serializable {
     /**
      * 消费者数据
      */
-    private              T body;
+    private T body;
 
     /**
      * 租户

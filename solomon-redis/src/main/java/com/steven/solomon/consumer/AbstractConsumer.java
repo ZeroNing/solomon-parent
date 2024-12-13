@@ -6,7 +6,9 @@ import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entiy.RedisQueueModel;
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.mq.CommonMqttMessageListener;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -20,7 +22,7 @@ import java.lang.reflect.Type;
 /**
  * Redis消费器
  */
-public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter implements CommonMqttMessageListener<T,R> {
+public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter implements CommonMqttMessageListener<T,R,RedisQueueModel<T>> {
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
@@ -37,6 +39,10 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
         try {
           model = conversion(body);
           RequestHeaderHolder.setTenantCode(model.getTenantCode());
+          // 判断是否重复消费
+          if(checkMessageKey(model)){
+              throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+          }
           logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
           result = this.handleMessage(model.getBody());
         } catch (Throwable e){
@@ -45,26 +51,8 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
           throwable = e;
         } finally {
           // 保存消费成功/失败的消息
-          saveLog(result, model,throwable);
+          deleteCheckMessageKey(model);
+          saveLog(result,throwable,model);
         }
-    }
-
-    /**
-     * 保存消费成功消息
-     */
-    public abstract void saveLog(R result, RedisQueueModel<T> model, Throwable e);
-
-    private RedisQueueModel<T> conversion(String json) {
-        RedisQueueModel<T> model = JSONUtil.toBean(json, new TypeReference<RedisQueueModel<T>>() {},true);
-        T body = model.getBody();
-        boolean isJsonObject = body instanceof JSONObject;
-        boolean isJsonArray = body instanceof JSONArray;
-        if(!isJsonObject && !isJsonArray){
-            return model;
-        }
-        Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
-        body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
-        model.setBody(body);
-        return model;
     }
 }
