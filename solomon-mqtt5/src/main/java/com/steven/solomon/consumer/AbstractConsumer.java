@@ -23,8 +23,15 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
 
   protected final Logger logger = LoggerUtils.logger(getClass());
 
+  protected String topic;
+
+  protected MqttMessage mqttMessage;
+
   @Override
   public void messageArrived(String topic, MqttMessage message) throws Exception {
+    this.topic = topic;
+    this.mqttMessage = message;
+
     String json          = new String(message.getPayload(), StandardCharsets.UTF_8);
     Throwable throwable = null;
     R result = null;
@@ -32,8 +39,9 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
     try {
       mqttModel = conversion(json);
       RequestHeaderHolder.setTenantCode(mqttModel.getTenantCode());
-      logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),message.getId(),topic, json);      // 判断是否重复消费
-      if(checkMessageKey(topic,message,mqttModel)){
+      logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),mqttModel.getTenantCode(),message.getId(),topic, json);
+      // 判断是否重复消费
+      if(checkMessageKey(mqttModel)){
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
       // 消费消息
@@ -44,7 +52,7 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
     } finally {
       deleteCheckMessageKey(topic,message);
       // 保存消费成功/失败消息
-      saveLog(result,message,mqttModel,throwable);
+      saveLog(result,mqttModel,throwable);
     }
   }
 
@@ -58,17 +66,16 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener {
    * 判断是否重复消费
    * @return true 重复消费 false 不重复消费
    */
-  public boolean checkMessageKey(String topic, MqttMessage message,MqttModel<T> mqttModel){
+  public boolean checkMessageKey(MqttModel<T> mqttModel){
     return false;
   }
 
   /**
    * 保存消费成功/失败的消息
    * @param result 消费成功后返回的结果
-   * @param message mqtt消息题
    * @param model 收到的消息体
    */
-  public abstract void saveLog(R result,MqttMessage message,MqttModel<T> model, Throwable e);
+  public abstract void saveLog(R result,MqttModel<T> model, Throwable e);
 
   /**
    * 删除判断重复消费Key
