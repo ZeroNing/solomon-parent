@@ -65,7 +65,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
             }
             // 消费消息
             result = this.handleMessage(model.getBody());
-            if (isAutoAck) {
+            if (!isAutoAck) {
                 // 手动确认消息
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
             }
