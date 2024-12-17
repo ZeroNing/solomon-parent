@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -181,7 +182,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         return backOffPolicy;
     }
 
-    public SimpleRetryPolicy retryPolicyByProperties(MessageListenerRetry messageListenerRetry) {
+    public RetryPolicy retryPolicyByProperties(MessageListenerRetry messageListenerRetry) {
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
         retryPolicy.setMaxAttempts(messageListenerRetry.retryNumber());
         return retryPolicy;
