@@ -7,14 +7,15 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 @MessageListener(topics = "top/+/123",tenantRange = "test12")
 public class TestHandler extends AbstractConsumer<String,String> {
+
     @Override
-    public String handleMessage(String topic, String tenantCode, String body) throws Exception {
+    public String handleMessage(String body) throws Exception {
         logger.info("接受的主题是:{},内容是:{}",topic,body);
         return "";
     }
 
     @Override
-    public void saveLog(String result, MqttMessage message, MqttModel<String> model, Throwable e) {
+    public void saveLog(String result, Throwable throwable, MqttModel<String> model) {
 
     }
 }
