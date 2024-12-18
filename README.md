@@ -42,7 +42,7 @@
 | solomon-rabbitmq         | 支持rabbitmq以注解形式配置重试次数以及注册队列，并将通用的业务抽出来，让用户只关注业务逻辑的实现                                    |
 | solomon-redis            | 引入了data模块，支持了动态切换缓存数据源以及增加租户编码前缀的缓存KEY                                                  |
 | solomon-s3               | 主要封装了有关于S3协议下文分布式对象存储接口，如:阿里云、腾讯云、minio、百度云、华为云、七牛云、天翼云、金山云等等                           |
-| solomon-utils            | 主要封装了一些通用的工具并支持用@JsonEnum注解国际化数据库的值                                                     |
+| solomon-utils            | 主要封装了一些通用的工具并支持用@JEnumSerialize注解国际化数据库的值                                                     |
 | solomon-xxlJob           | 主要是将原本的XXL-JOB的配置进行自动化,自动创建任务                                                           |
 # 切换租户主要设置
 
@@ -197,12 +197,12 @@ public enum DelFlagEnum implements BaseEnum<String> {
 }
 ```
 
-2.在实体类中需要国际化的字段上加上@JsonEnum注解 ，并且可以支持自定义返回值的名称用fieldName指定，不指定的时候就在该字段后面增加Desc
+2.在实体类中需要国际化的字段上加上@JEnumSerialize注解 ，并且可以支持自定义返回值的名称用fieldName指定，不指定的时候就在该字段后面增加Desc
 
 例：
 
 ```java
-  @JsonEnum(enumClass = DelFlagEnum.class)
+  @EnumSerialize(enumClass = DelFlagEnum.class)
 private              String        delFlag;
 ```
 
