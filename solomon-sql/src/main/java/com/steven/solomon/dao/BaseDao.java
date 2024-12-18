@@ -3,7 +3,6 @@ package com.steven.solomon.dao;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.execute.ClazzExecuteSql;
-import com.steven.solomon.json.FastJsonUtils;
 import com.steven.solomon.temple.SqlTemple;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -33,6 +32,6 @@ public class BaseDao<T> {
         config.setMaxLifetime(1800000);
 
         ClazzExecuteSql a = new ClazzExecuteSql(new SqlTemple(new HikariDataSource(config)));
-        System.out.println(FastJsonUtils.formatJsonByFilter(a.executeQuery("select * from admin order by name desc",null,Admin.class,true)));
+//        System.out.println(FastJsonUtils.formatJsonByFilter(a.executeQuery("select * from admin order by name desc",null,Admin.class,true)));
     }
 }
