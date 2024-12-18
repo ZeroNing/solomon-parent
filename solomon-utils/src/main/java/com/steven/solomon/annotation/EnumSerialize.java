@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Documented
 @JacksonAnnotationsInside
 @JsonSerialize(using = JacksonSerializer.class)
-public @interface JsonEnum {
+public @interface EnumSerialize {
 
     Class<? extends Enum<?>> enumClass();
 
