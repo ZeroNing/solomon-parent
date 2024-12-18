@@ -1,6 +1,7 @@
 package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.StrUtil;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
@@ -64,7 +65,7 @@ public class MongoDbUtils {
       MongoDBCapped                                          mongoDBCapped = AnnotationUtil.getAnnotation(obj.getClass(), MongoDBCapped.class);
       org.springframework.data.mongodb.core.mapping.Document document      = AnnotationUtil.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
 
-      String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : "";
+      String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : StrUtil.EMPTY;
       boolean isCreate = collectionNameList.contains(name);
       if(!isCreate){
         if(ValidateUtils.isNotEmpty(mongoDBCapped)){

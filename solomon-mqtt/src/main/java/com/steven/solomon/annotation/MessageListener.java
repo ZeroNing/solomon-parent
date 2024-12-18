@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.MqttCondition;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Component;
@@ -31,5 +32,5 @@ public @interface MessageListener {
   /**
    * 允许订阅的租户范围
    */
-  String[] tenantRange() default "";
+  String[] tenantRange() default StrUtil.EMPTY;
 }

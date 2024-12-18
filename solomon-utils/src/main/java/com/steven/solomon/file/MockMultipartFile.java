@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cn.hutool.core.util.StrUtil;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
@@ -56,7 +57,7 @@ public class MockMultipartFile implements MultipartFile {
 
         Assert.hasLength(name, "Name must not be empty");
         this.name = name;
-        this.originalFilename = (originalFilename != null ? originalFilename : "");
+        this.originalFilename = (originalFilename != null ? originalFilename : StrUtil.EMPTY);
         this.contentType = contentType;
         this.content = (content != null ? content : new byte[0]);
     }

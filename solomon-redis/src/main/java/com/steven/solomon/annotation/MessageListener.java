@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.enums.TopicMode;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,7 @@ import java.lang.annotation.Target;
 public @interface MessageListener {
 
     @AliasFor(annotation = Component.class)
-    String value() default "";
+    String value() default StrUtil.EMPTY;
 
     /**
      * 主题名

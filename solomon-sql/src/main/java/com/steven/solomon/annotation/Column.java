@@ -1,5 +1,7 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -12,7 +14,7 @@ public @interface Column {
     /**
      * 数据库字段名
      */
-    String name() default "";
+    String name() default StrUtil.EMPTY;
 
     /**
      * 数据库字段分割符 默认"_"

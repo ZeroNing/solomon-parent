@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.RabbitCondition;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -24,5 +25,5 @@ import java.lang.annotation.Target;
 public @interface DlxMessageListener {
 
     @AliasFor(annotation = Component.class)
-    String value() default "";
+    String value() default StrUtil.EMPTY;
 }

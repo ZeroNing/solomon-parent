@@ -1,5 +1,6 @@
 package com.steven.solomon.utils.ip;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -197,7 +198,7 @@ public class IPAddressUtils {
 	 * @return 整数形式的ip地址
 	 */
 	public static BigInteger stringToBigInt(String ipInString) {
-		ipInString = ipInString.replace(" ", "");
+		ipInString = ipInString.replace(" ", StrUtil.EMPTY);
 		byte[] bytes;
 		if (ipInString.contains(":")) {
 			bytes = ipv6ToBytes(ipInString);
@@ -252,7 +253,7 @@ public class IPAddressUtils {
 				ret[ib--] = temp[2];
 				ret[ib--] = temp[1];
 				comFlag = true;
-			} else if ("".equals(groups[ig])) {
+			} else if (StrUtil.EMPTY.equals(groups[ig])) {
 				// 出现零长度压缩,计算缺少的组数
 				int zlg = 9 - (groups.length + (comFlag ? 1 : 0));
 				// 将这些组置0

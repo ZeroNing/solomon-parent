@@ -1,5 +1,6 @@
 package com.steven.solomon.rmb;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.verification.ValidateUtils;
 /**
  * @Title: ConvertUpMoney
@@ -42,7 +43,7 @@ public class ConvertUpMoney {
             str = str.replaceAll("-", "");
         }
 
-        str = str.replaceAll(",", "");//去掉","
+        str = str.replaceAll(",", StrUtil.EMPTY);//去掉","
         String integerStr;//整数部分数字
         String decimalStr;//小数部分数字
 
@@ -52,11 +53,11 @@ public class ConvertUpMoney {
             integerStr = str.substring(0, str.indexOf("."));
             decimalStr = str.substring(str.indexOf(".") + 1);
         } else if (str.indexOf(".") == 0) {
-            integerStr = "";
+            integerStr = StrUtil.EMPTY;
             decimalStr = str.substring(1);
         } else {
             integerStr = str;
-            decimalStr = "";
+            decimalStr = StrUtil.EMPTY;
         }
 
         //beyond超出计算能力，直接返回
@@ -95,13 +96,13 @@ public class ConvertUpMoney {
 
     //将整数部分转为大写的金额
     public static String getChineseInteger(int[] integers, boolean isWan) {
-        StringBuffer chineseInteger = new StringBuffer("");
+        StringBuffer chineseInteger = new StringBuffer(StrUtil.EMPTY);
         int length = integers.length;
         if (length == 1 && integers[0] == 0) {
-            return "";
+            return StrUtil.EMPTY;
         }
         for (int i = 0; i < length; i++) {
-            String key = "";
+            String key = StrUtil.EMPTY;
             if (integers[i] == 0) {
                 if ((length - i) == 13) {//万（亿）
                     key = IUNIT[4];
@@ -123,12 +124,12 @@ public class ConvertUpMoney {
 
     //将小数部分转为大写的金额
     private static String getChineseDecimal(int[] decimals) {
-        StringBuffer chineseDecimal = new StringBuffer("");
+        StringBuffer chineseDecimal = new StringBuffer(StrUtil.EMPTY);
         for (int i = 0; i < decimals.length; i++) {
             if (i == 3) {
                 break;
             }
-            chineseDecimal.append(decimals[i] == 0 ? "" : (NUMBERS[decimals[i]] + DUNIT[i]));
+            chineseDecimal.append(decimals[i] == 0 ? StrUtil.EMPTY : (NUMBERS[decimals[i]] + DUNIT[i]));
         }
         return chineseDecimal.toString();
     }
@@ -137,7 +138,7 @@ public class ConvertUpMoney {
     private static boolean isWan5(String integerStr) {
         int length = integerStr.length();
         if (length > 4) {
-            String subInteger = "";
+            String subInteger = StrUtil.EMPTY;
             if (length > 8) {
                 subInteger = integerStr.substring(length - 8, length - 4);
             } else {

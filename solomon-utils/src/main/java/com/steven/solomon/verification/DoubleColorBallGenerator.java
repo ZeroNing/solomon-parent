@@ -1,5 +1,7 @@
 package com.steven.solomon.verification;
 
+import cn.hutool.core.util.StrUtil;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,7 +38,7 @@ public class DoubleColorBallGenerator {
 
     public static void main(String[] args) throws InterruptedException {
         for (int i = 1; i <= 5; i++) {
-            System.out.print("第" + i + "组号码: " + "");
+            System.out.print("第" + i + "组号码: " + StrUtil.EMPTY);
             List<Integer> redBalls = generateRedBalls(8);
             List<Integer> blueBall = generateBlueBall(4);
             System.out.print("红球：");
