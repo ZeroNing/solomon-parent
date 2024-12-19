@@ -40,7 +40,7 @@ public class ConvertUpMoney {
         boolean flag = false;
         if (str.startsWith("-")) {
             flag = true;
-            str = str.replaceAll("-", "");
+            str = str.replaceAll("-", StrUtil.EMPTY);
         }
 
         str = str.replaceAll(",", StrUtil.EMPTY);//去掉","
