@@ -1,20 +1,16 @@
 package com.steven.solomon.utils.excel;
 
 import cn.hutool.core.date.StopWatch;
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.ExcelWriter;
-import com.alibaba.excel.annotation.ExcelProperty;
-import com.alibaba.excel.metadata.Head;
-import com.alibaba.excel.metadata.data.WriteCellData;
-import com.alibaba.excel.write.builder.ExcelWriterBuilder;
-import com.alibaba.excel.write.builder.ExcelWriterSheetBuilder;
-import com.alibaba.excel.write.handler.WriteHandler;
-import com.alibaba.excel.write.metadata.WriteSheet;
-import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
-import com.alibaba.excel.write.metadata.style.WriteCellStyle;
-import com.alibaba.excel.write.metadata.style.WriteFont;
-import com.alibaba.excel.write.style.HorizontalCellStyleStrategy;
-import com.alibaba.excel.write.style.column.AbstractColumnWidthStyleStrategy;
+import cn.idev.excel.ExcelWriter;
+import cn.idev.excel.FastExcel;
+import cn.idev.excel.annotation.ExcelProperty;
+import cn.idev.excel.write.builder.ExcelWriterBuilder;
+import cn.idev.excel.write.builder.ExcelWriterSheetBuilder;
+import cn.idev.excel.write.metadata.WriteSheet;
+import cn.idev.excel.write.metadata.style.WriteCellStyle;
+import cn.idev.excel.write.metadata.style.WriteFont;
+import cn.idev.excel.write.style.HorizontalCellStyleStrategy;
+import cn.idev.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import com.steven.solomon.clazz.ClassUtils;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.file.MockMultipartFile;
@@ -23,9 +19,7 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -34,10 +28,8 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.VerticalAlignment;
 import org.slf4j.Logger;
 import org.springframework.http.MediaType;
@@ -57,7 +49,7 @@ public class ExcelUtils {
 	 * @param clazz     需要导出excel的类,其中ExcelProperty注解国际化是类名+.+字段名组成
 	 * @param data      数据
 	 */
-	public static void export(HttpServletResponse response, String excelName, String sheetName,Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
+	public static void export(HttpServletResponse response, String excelName, String sheetName, Class<?> clazz, List<?> data, HorizontalCellStyleStrategy cellStyleStrategy, AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		setHead(response, excelName);
 		//更新Class注解值
 		StopWatch stopWatch = new StopWatch();
@@ -70,7 +62,7 @@ public class ExcelUtils {
 		stopWatch = new StopWatch();
 		stopWatch.start();
 		logger.info("开始导出Excel");
-		EasyExcel.write(response.getOutputStream(), clazz)
+		FastExcel.write(response.getOutputStream(), clazz)
 				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
 				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
 				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
@@ -112,10 +104,10 @@ public class ExcelUtils {
 			stopWatch = new StopWatch();
 			stopWatch.start();
 			logger.info("开始导出Excel");
-			ExcelWriterBuilder excelWriterBuilder = EasyExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
+			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
-			WriteSheet              writeSheet;
+			WriteSheet writeSheet;
 			excelWriterSheetBuilder = new ExcelWriterSheetBuilder(excelWriter);
 			excelWriterSheetBuilder.sheetNo(0).sheetName(sheetName);
 			writeSheet = excelWriterSheetBuilder.build();
@@ -149,7 +141,7 @@ public class ExcelUtils {
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
 			annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
-			ClassUtils.updateClassField(field,ExcelProperty.class,annotationNameAndValueMap);
+			ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
 		}
 	}
 

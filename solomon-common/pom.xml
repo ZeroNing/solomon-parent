@@ -31,8 +31,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.alibaba</groupId>
-      <artifactId>easyexcel</artifactId>
+      <groupId>cn.idev.excel</groupId>
+      <artifactId>fastexcel</artifactId>
     </dependency>
 
   </dependencies>

@@ -1,9 +1,10 @@
 package com.steven.solomon.utils.excel;
 
-import com.alibaba.excel.metadata.Head;
-import com.alibaba.excel.metadata.data.WriteCellData;
-import com.alibaba.excel.write.metadata.holder.WriteSheetHolder;
-import com.alibaba.excel.write.style.column.AbstractColumnWidthStyleStrategy;
+
+import cn.idev.excel.metadata.Head;
+import cn.idev.excel.metadata.data.WriteCellData;
+import cn.idev.excel.write.metadata.holder.WriteSheetHolder;
+import cn.idev.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Sheet;
 
