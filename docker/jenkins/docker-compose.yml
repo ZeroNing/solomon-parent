@@ -9,4 +9,8 @@ services:
       - "50000:50000"  # Jenkins agent
     volumes:
       - ./home:/var/jenkins_home
+    environment:
+      - LANG=zh_CN.UTF-8
+      - LANGUAGE=zh_CN.UTF-8
+      - LC_ALL=zh_CN.UTF-8
     restart: always
