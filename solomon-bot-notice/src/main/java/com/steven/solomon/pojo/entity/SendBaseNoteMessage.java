@@ -118,11 +118,11 @@ public class SendBaseNoteMessage implements Serializable {
             this.atUserIds = atUserIds;
         }
 
-        public boolean getAtAll() {
+        public boolean getIsAtAll() {
             return isAtAll;
         }
 
-        public void setAtAll(boolean atAll) {
+        public void setIsAtAll(boolean atAll) {
             isAtAll = atAll;
         }
     }

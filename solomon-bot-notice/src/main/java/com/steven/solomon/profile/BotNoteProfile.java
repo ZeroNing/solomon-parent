@@ -15,7 +15,7 @@ import java.time.Instant;
 @ConfigurationProperties("bot.note")
 public class BotNoteProfile {
 
-    private WeComNotProfile weCom;
+    private WeComNotProfile wechat;
 
     private DingTalkNotProfile dingTalk;
 
@@ -62,7 +62,7 @@ public class BotNoteProfile {
         }
 
         public String getWebUrl() throws Exception {
-            if(ValidateUtils.isEmpty(url)){
+            if(ValidateUtils.isNotEmpty(url)){
                 long timestamp = Instant.now().toEpochMilli();
                 String stringToSign = timestamp + "\n" + secret;
                 Mac mac = Mac.getInstance("HmacSHA256");
@@ -77,12 +77,12 @@ public class BotNoteProfile {
         }
     }
 
-    public WeComNotProfile getWeCom() {
-        return weCom;
+    public WeComNotProfile getWechat() {
+        return wechat;
     }
 
-    public void setWeCom(WeComNotProfile weCom) {
-        this.weCom = weCom;
+    public void setWechat(WeComNotProfile wechat) {
+        this.wechat = wechat;
     }
 
     public DingTalkNotProfile getDingTalk() {

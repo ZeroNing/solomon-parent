@@ -29,7 +29,7 @@ public class BotNoteUtils {
     private final BotNoteProfile.DingTalkNotProfile dingTalkProfile;
 
     public BotNoteUtils(BotNoteProfile profile) {
-        this.weComProfile = profile.getWeCom();
+        this.weComProfile = profile.getWechat();
         this.dingTalkProfile = profile.getDingTalk();
     }
 
@@ -74,7 +74,7 @@ public class BotNoteUtils {
             if(ValidateUtils.isNotEmpty(sendAtMessage)){
                 List<String> metionedList = ValidateUtils.getOrDefault(sendAtMessage.getAtUserIds(),new ArrayList<>());
                 List<String> metionedMobileList = ValidateUtils.getOrDefault(sendAtMessage.getAtMobiles(),new ArrayList<>());
-                if(sendAtMessage.getAtAll()){
+                if(sendAtMessage.getIsAtAll()){
                     metionedList.add("@all");
                 }
                 if(ValidateUtils.isNotEmpty(metionedList)){
@@ -126,7 +126,7 @@ public class BotNoteUtils {
         //设置需要@的人处理
         if(ValidateUtils.isNotEmpty(sendAtMessage)){
             OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
-            at.setIsAtAll(sendAtMessage.getAtAll());
+            at.setIsAtAll(sendAtMessage.getIsAtAll());
             at.setAtMobiles(sendAtMessage.getAtMobiles());
             at.setAtUserIds(sendAtMessage.getAtUserIds());
             request.setAt(at);

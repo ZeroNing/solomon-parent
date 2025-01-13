@@ -39,6 +39,7 @@
     <module>solomon-powerjob</module>
     <module>test-solomon-powerjob</module>
     <module>solomon-bot-notice</module>
+    <module>test-solomon-bot-notice</module>
   </modules>
 
   <properties>
