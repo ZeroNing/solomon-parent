@@ -12,6 +12,7 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.mq.CommonMqttMessageListener;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -28,6 +29,8 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
 
     private String topic;
 
+    protected String tenantCode;
+
     @Override
     public void onMessage(Message message, @Nullable byte[] pattern) {
         String body = new String(message.getBody());
@@ -38,11 +41,14 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
         R result = null;
         try {
           model = conversion(body);
-          RequestHeaderHolder.setTenantCode(model.getTenantCode());
+          tenantCode = model.getTenantCode();
           // 判断是否重复消费
           if(checkMessageKey(model)){
               throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
           }
+          if(ValidateUtils.isNotEmpty(tenantCode)){
+              RequestHeaderHolder.setTenantCode(tenantCode);
+         }
           logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
           result = this.handleMessage(model.getBody());
         } catch (Throwable e){

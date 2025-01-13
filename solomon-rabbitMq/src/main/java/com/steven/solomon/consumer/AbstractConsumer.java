@@ -7,6 +7,7 @@ import com.steven.solomon.annotation.MessageListenerRetry;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
+import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.mq.CommonMqttMessageListener;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.utils.RabbitUtils;
@@ -40,6 +41,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
 
     protected final boolean isAutoAck;
 
+    protected String tenantCode;
+
     protected AbstractConsumer(RabbitUtils rabbitUtils) {
         this.rabbitUtils = rabbitUtils;
         MessageListenerRetry messageListenerRetry = getClass().getAnnotation(MessageListenerRetry.class);
@@ -59,9 +62,13 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
         try {
             logger.info("线程名:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), json);
             model = conversion(json);
+            tenantCode = model.getTenantCode();
             // 判断是否重复消费
             if (checkMessageKey(model)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+            }
+            if(ValidateUtils.isNotEmpty(tenantCode)){
+                RequestHeaderHolder.setTenantCode(tenantCode);
             }
             // 消费消息
             result = this.handleMessage(model.getBody());

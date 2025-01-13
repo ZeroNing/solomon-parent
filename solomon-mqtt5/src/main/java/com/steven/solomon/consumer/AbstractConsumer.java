@@ -43,13 +43,13 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener, Com
     try {
       model = conversion(json);
       tenantCode = model.getTenantCode();
-      if(ValidateUtils.isNotEmpty(tenantCode)){
-        RequestHeaderHolder.setTenantCode(tenantCode);
-      }
       logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),tenantCode,message.getId(),topic, json);
       // 判断是否重复消费
       if(checkMessageKey(model)){
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
+      }
+      if(ValidateUtils.isNotEmpty(tenantCode)){
+        RequestHeaderHolder.setTenantCode(tenantCode);
       }
       // 消费消息
       result = this.handleMessage(model.getBody());
