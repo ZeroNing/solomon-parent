@@ -1,16 +1,20 @@
-version: '3.9'  # 使用更新的版本
+version: '3.9'  # 使用 Docker Compose 文件的版本。'3.9' 是一个较新的版本，支持更多功能，适用于现代 Docker 环境。
 
 services:
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
+  jenkins:  # 定义一个名为 "jenkins" 的服务（用于运行 Jenkins）
+    image: jenkins/jenkins:lts  # 使用 Jenkins 的长期支持（LTS）版本镜像，确保稳定性和长期更新。
+    container_name: jenkins  # 指定容器名称为 "jenkins"，方便管理和识别（否则会自动生成随机名称）。
     ports:
-      - "8080:8080"  # Jenkins Web UI
-      - "50000:50000"  # Jenkins agent
+      - "8080:8080"  # 将主机的 8080 端口映射到容器的 8080 端口，用于访问 Jenkins Web UI。
+      - "50000:50000"  # 将主机的 50000 端口映射到容器的 50000 端口，用于和 Jenkins agent（从属节点）通信。
     volumes:
-      - ./home:/var/jenkins_home
+      - ./home:/var/jenkins_home  # 将主机目录 "./home" 挂载到容器的 "/var/jenkins_home"。
+        # Jenkins 的数据（包括配置、插件、构建记录等）默认保存在 "/var/jenkins_home" 目录中。
+      # 使用挂载可以持久化数据，重启或重新创建容器时不会丢失数据。
     environment:
-      - LANG=zh_CN.UTF-8
-      - LANGUAGE=zh_CN.UTF-8
-      - LC_ALL=zh_CN.UTF-8
-    restart: always
+      - LANG=zh_CN.UTF-8  # 设置容器的语言环境为简体中文（zh_CN）。
+      - LANGUAGE=zh_CN.UTF-8  # 设置语言为中文（将影响 Jenkins 的界面语言）。
+      - LC_ALL=zh_CN.UTF-8  # 设置区域和语言编码为 UTF-8，确保中文字符正常显示。
+    restart: always  # 配置容器自动重启策略。
+      # "always" 表示无论容器是因为何种原因退出（包括手动停止），容器都会自动重启。
+    # 适用于需要长时间运行的服务，如 Jenkins。
