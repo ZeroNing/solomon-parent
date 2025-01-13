@@ -1,4 +1,4 @@
-package com.steven.solomon.note.entity;
+package com.steven.solomon.pojo.entity;
 
 import java.io.Serializable;
 import java.util.List;
