@@ -1,0 +1,15 @@
+version: '3.8'  # Docker Compose 文件版本，可以根据需要调整
+services:
+  instock:
+    image: mayanghua/instock:latest  # 使用的镜像
+    container_name: InStock         # 容器名称
+    ports:
+      - "9988:9988"                 # 端口映射：宿主机:容器
+    environment:
+      db_host: 192.168.8.96            # 数据库主机
+      db_user: root                 # 数据库用户名
+      db_password: root             # 数据库密码
+      db_database: instockdb        # 数据库名称
+      db_port: "3306"               # 数据库端口
+    stdin_open: true                # 等价于 `-i`，保持标准输入打开
+    tty: true                       # 等价于 `-t`，分配终端
