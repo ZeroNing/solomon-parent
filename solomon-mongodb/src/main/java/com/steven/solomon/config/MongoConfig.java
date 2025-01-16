@@ -81,9 +81,7 @@ public class MongoConfig {
       }
       MongoDbUtils.init(mongoProperties.getTenant(), context);
     } else {
-      SimpleMongoClientDatabaseFactory factory = MongoDbUtils.initFactory(properties);
-      MongoDbUtils.initDocument(factory);
-      context.setFactory(BaseCode.DEFAULT,factory);
+      MongoDbUtils.init(BaseCode.DEFAULT, properties,context);
     }
   }
 
