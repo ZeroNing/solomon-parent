@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
@@ -42,7 +41,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 @Configuration
 @EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
-@Import(value = {MongoTenantsContext.class, MongoAutoConfiguration.class})
+@Import(value = {MongoTenantContext.class, MongoAutoConfiguration.class})
 @Order(2)
 @ConditionalOnProperty(name = "spring.data.mongodb.enabled", havingValue = "true", matchIfMissing = true)
 public class MongoConfig {
@@ -51,14 +50,14 @@ public class MongoConfig {
 
   private final TenantMongoProperties mongoProperties;
 
-  private final MongoTenantsContext context;
+  private final MongoTenantContext context;
 
   private final MongoProperties properties;
 
   private boolean isSwitchDb = false;
 
 
-  public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantsContext context,
+  public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantContext context,
       MongoProperties properties, ApplicationContext applicationContext) {
     this.mongoProperties = mongoProperties;
     this.context         = context;

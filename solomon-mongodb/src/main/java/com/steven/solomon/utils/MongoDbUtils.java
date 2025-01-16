@@ -13,7 +13,7 @@ import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.connection.ClusterConnectionMode;
 import com.mongodb.connection.ClusterType;
 import com.steven.solomon.annotation.MongoDBCapped;
-import com.steven.solomon.config.MongoTenantsContext;
+import com.steven.solomon.config.MongoTenantContext;
 import com.steven.solomon.enums.MongoDbRoleEnum;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -34,13 +34,13 @@ public class MongoDbUtils {
 
   private static final Logger logger = LoggerUtils.logger(MongoDbUtils.class);
 
-  public static void init(Map<String, MongoProperties> propertiesMap, MongoTenantsContext context){
+  public static void init(Map<String, MongoProperties> propertiesMap, MongoTenantContext context){
     for(Entry<String,MongoProperties> entry : propertiesMap.entrySet()){
       init(entry.getKey(),entry.getValue(),context);
     }
   }
 
-  public static void init(String tenantCode,MongoProperties properties,MongoTenantsContext context){
+  public static void init(String tenantCode, MongoProperties properties, MongoTenantContext context){
     SimpleMongoClientDatabaseFactory factory = initFactory(properties);
     context.setFactory(tenantCode,factory);
     initDocument(factory);
