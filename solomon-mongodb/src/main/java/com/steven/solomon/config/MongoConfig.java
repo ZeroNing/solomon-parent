@@ -7,9 +7,10 @@ import com.steven.solomon.converter.LocalDateTimeToDateConverter;
 import com.steven.solomon.converter.LocalDateToDateConverter;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.properties.TenantMongoProperties;
+import com.steven.solomon.service.AbstractTenantInitService;
+import com.steven.solomon.service.DefaultMongoTenantInitService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicMongoTemplate;
-import com.steven.solomon.utils.MongoDbUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 @Configuration
 @EnableConfigurationProperties(value={MongoProperties.class,TenantMongoProperties.class})
-@Import(value = {MongoTenantContext.class, MongoAutoConfiguration.class})
+@Import(value = {MongoTenantContext.class, MongoAutoConfiguration.class,DefaultMongoTenantInitService.class})
 @Order(2)
 @ConditionalOnProperty(name = "spring.data.mongodb.enabled", havingValue = "true", matchIfMissing = true)
 public class MongoConfig {
@@ -56,13 +57,15 @@ public class MongoConfig {
 
   private boolean isSwitchDb = false;
 
+  private final DefaultMongoTenantInitService defaultMongoTenantInitService;
 
   public MongoConfig(TenantMongoProperties mongoProperties, MongoTenantContext context,
-      MongoProperties properties, ApplicationContext applicationContext) {
+                     MongoProperties properties, ApplicationContext applicationContext, DefaultMongoTenantInitService defaultMongoTenantInitService) {
     this.mongoProperties = mongoProperties;
     this.context         = context;
     this.properties      = properties;
     this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
+    this.defaultMongoTenantInitService = defaultMongoTenantInitService;
     SpringUtil.setContext(applicationContext);
   }
 
@@ -72,6 +75,8 @@ public class MongoConfig {
       logger.error("mongoDb不启用,不初始化队列以及消费者");
       return;
     }
+    Map<String, AbstractTenantInitService> abstractMQMap = SpringUtil.getBeansOfType(AbstractTenantInitService.class);
+    AbstractTenantInitService<MongoProperties,MongoTenantContext,?> tenantInitService = ValidateUtils.isNotEmpty(abstractMQMap) ? abstractMQMap.values().stream().findFirst().get() : defaultMongoTenantInitService;
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
@@ -79,11 +84,9 @@ public class MongoConfig {
         tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);
       }
-      MongoDbUtils.init(mongoProperties.getTenant(), context);
+      tenantInitService.init(mongoProperties.getTenant(), context);
     } else {
-      SimpleMongoClientDatabaseFactory factory = MongoDbUtils.initFactory(properties);
-      MongoDbUtils.initDocument(factory);
-      context.setFactory(BaseCode.DEFAULT,factory);
+      tenantInitService.init(BaseCode.DEFAULT, properties,context);
     }
   }
 
