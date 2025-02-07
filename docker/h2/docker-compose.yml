@@ -5,10 +5,10 @@ services:
     image: oscarfonts/h2
     container_name: h2_database
     ports:
-      - "9092:9092"  # 显式绑定 Web 控制台端口
+      - "81:81"  # 显式绑定 Web 控制台端口
       - "1521:1521"  # TCP 端口
     environment:
-      - H2_OPTIONS=-tcp -tcpAllowOthers -web -webAllowOthers -webPort 9092 -ifNotExists
+      - H2_OPTIONS=-tcp -tcpAllowOthers -web -webAllowOthers -ifNotExists
     volumes:
       - ./data:/opt/h2-data
     restart: always
