@@ -167,4 +167,9 @@ public class MinioService extends AbstractFileService {
     }
     return bucketNameList;
   }
+
+  @Override
+  public boolean isMultipartUpload(){
+    return false;
+  }
 }
