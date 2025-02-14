@@ -39,7 +39,6 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             return;
         }
         String cookie = service.login();
-        XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         for(Object obj : clazzList){
             Class<?> clazz = obj.getClass();
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
@@ -54,24 +53,29 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
             XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
 
-            xxlJobInfo = ValidateUtils.isEmpty(xxlJobInfo) ? new XxlJobInfo(jobTask,className) : xxlJobInfo.update(jobTask,className);
+            boolean isCreate = ValidateUtils.isEmpty(xxlJobInfo);
+            xxlJobInfo = isCreate ? new XxlJobInfo(jobTask,className) : xxlJobInfo.update(jobTask,className);
             xxlJobInfo.setExecutorHandler(executorHandler);
             // 发送 POST 请求
-            service.saveJob(cookie,xxlJobInfo);
-
+            if (isCreate) {
+                service.saveJob(cookie, xxlJobInfo);
+            } else {
+                service.updateJob(cookie, xxlJobInfo);
+            }
             //启用或禁止任务，调度类型必须不是不调度才可以
-            if(!ValidateUtils.equalsIgnoreCase(jobTask.scheduleType().name(), ScheduleTypeEnum.NONE.name())){
-                if(jobTask.start()){
-                    service.startJob(cookie, jobTask.executorHandler());
-                } else {
-                    service.stopJob(cookie, jobTask.executorHandler());
+            if(!ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())){
+                if(isCreate){
+                    if(jobTask.start()){
+                        service.startJob(cookie, xxlJobInfo.getExecutorHandler());
+                    } else {
+                        service.stopJob(cookie, xxlJobInfo.getExecutorHandler());
+                    }
                 }
             } else {
                 logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
             }
             XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
         }
-        xxlJobSpringExecutor.start();
     }
 
 }
