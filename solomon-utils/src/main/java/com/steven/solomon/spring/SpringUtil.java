@@ -1,7 +1,9 @@
 package com.steven.solomon.spring;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 
@@ -75,6 +77,11 @@ public class SpringUtil implements ApplicationContextAware {
 
     public static <T> Map<String, T> getBeansOfType(Class<T> type) {
         return context.getBeansOfType(type);
+    }
+
+    public static <T> T getBeansOfType(Class<T> type,T defaultVal) {
+        List<T> list =  new ArrayList<T>(context.getBeansOfType(type).values());
+        return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
     }
 
     /**
