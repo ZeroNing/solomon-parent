@@ -68,7 +68,7 @@ public class MongoConfig {
   }
 
   @PostConstruct
-  public void afterPropertiesSet() {
+  public void afterPropertiesSet() throws Throwable {
     if(!mongoProperties.getEnabled()){
       logger.error("mongoDb不启用,不初始化队列以及消费者");
       return;

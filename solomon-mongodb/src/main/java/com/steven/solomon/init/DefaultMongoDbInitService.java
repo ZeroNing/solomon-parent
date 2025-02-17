@@ -29,14 +29,14 @@ import java.util.List;
 public class DefaultMongoDbInitService extends AbstractDataSourceInitService<MongoProperties, MongoTenantContext, SimpleMongoClientDatabaseFactory>{
 
     @Override
-    public void init(String tenantCode, MongoProperties properties, MongoTenantContext context) {
+    public void init(String tenantCode, MongoProperties properties, MongoTenantContext context) throws Throwable {
         SimpleMongoClientDatabaseFactory factory = initFactory(properties);
         context.setFactory(tenantCode,factory);
         initDocument(factory);
     }
 
     @Override
-    public SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties) {
+    public SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties) throws Throwable {
         MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
         MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
             builder.hosts(List.of(new ServerAddress(properties.getHost(), properties.getPort()))).mode(
