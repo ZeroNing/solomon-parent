@@ -2,7 +2,8 @@ package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.init.RedisInitUtils;
+import com.steven.solomon.init.AbstractDataSourceInitService;
+import com.steven.solomon.init.DefaultRedisInitService;
 import com.steven.solomon.json.config.JsonConfig;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
 import com.steven.solomon.manager.SpringRedisAutoManager;
@@ -19,6 +20,7 @@ import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
+import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
@@ -26,8 +28,10 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ResolvableType;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -75,7 +79,8 @@ public class RedisConfig extends CachingConfigurerSupport {
       tenantMap.put(BaseCode.DEFAULT, redisProperties);
       properties.setTenant(tenantMap);
     }
-    RedisInitUtils.init(properties.getTenant(), context);
+    AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> service = getService();
+    service.init(properties.getTenant(),context);
   }
 
   @Bean(name = "redisTemplate")
@@ -112,7 +117,7 @@ public class RedisConfig extends CachingConfigurerSupport {
     if (isSwitchDb) {
       factory = context.getFactoryMap().values().iterator().next();
     } else {
-      factory = RedisInitUtils.initConnectionFactory(redisProperties);
+      factory = new DefaultRedisInitService().initFactory(redisProperties);
       context.setFactory(BaseCode.DEFAULT, factory);
     }
     return factory;
@@ -131,6 +136,15 @@ public class RedisConfig extends CachingConfigurerSupport {
   @ConditionalOnMissingBean(ICacheService.class)
   public ICacheService cacheService(RedisTemplate<String,Object> redisTemplate){
     return new RedisService(redisTemplate);
+  }
+
+  private AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> getService(){
+    return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
+            AbstractDataSourceInitService.class,
+            ResolvableType.forClass(RedisProperties.class),  // 替换P为实际类型
+            ResolvableType.forClass(RedisTenantContext.class),  // 替换C为实际类型
+            ResolvableType.forClass(LettuceConnectionFactory.class)   // 替换F为实际类型
+    ),new DefaultRedisInitService());
   }
 }
 

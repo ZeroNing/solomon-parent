@@ -1,16 +1,15 @@
 package com.steven.solomon.spring;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import javax.annotation.PostConstruct;
 
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
@@ -83,6 +82,20 @@ public class SpringUtil implements ApplicationContextAware {
         List<T> list =  new ArrayList<T>(context.getBeansOfType(type).values());
         return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
     }
+
+    public static <T> T getBeansOfType(ResolvableType type,T defaultVal) {
+        DefaultListableBeanFactory beanFactory =
+                (DefaultListableBeanFactory) ((ConfigurableApplicationContext) context).getBeanFactory();
+
+        String[] beanNames = beanFactory.getBeanNamesForType(type);
+        Map<String, T> beans = new LinkedHashMap<>();
+        for (String beanName : beanNames) {
+            beans.put(beanName, (T) beanFactory.getBean(beanName));
+        }
+        List<T> list =  new ArrayList<T>(beans.values());
+        return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
+    }
+
 
     /**
      * 读取#{}和${}值
