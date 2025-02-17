@@ -26,9 +26,12 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
     private final XxlJobService service;
 
-    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobService service) {
+    private final XxlJobSpringExecutor xxlJobSpringExecutor;
+
+    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobService service, XxlJobSpringExecutor xxlJobSpringExecutor) {
         this.profile = profile;
         this.service = service;
+        this.xxlJobSpringExecutor = xxlJobSpringExecutor;
         SpringUtil.setContext(applicationContext);
     }
 
@@ -74,7 +77,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             } else {
                 logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
             }
-            XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
+            xxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
         }
     }
 
