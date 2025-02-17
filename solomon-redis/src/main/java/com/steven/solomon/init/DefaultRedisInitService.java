@@ -15,12 +15,12 @@ import java.time.Duration;
 
 public class DefaultRedisInitService extends AbstractDataSourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory>{
     @Override
-    public void init(String tenantCode, RedisProperties properties, RedisTenantContext context) {
+    public void init(String tenantCode, RedisProperties properties, RedisTenantContext context) throws Throwable {
         context.setFactory(tenantCode, initFactory(properties));
     }
 
     @Override
-    public LettuceConnectionFactory initFactory(RedisProperties properties) {
+    public LettuceConnectionFactory initFactory(RedisProperties properties) throws Throwable {
         GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
         RedisProperties.Pool pool                    = properties.getLettuce().getPool();
         if (ValidateUtils.isNotEmpty(pool)) {

@@ -72,7 +72,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   }
 
   @PostConstruct
-  public void afterPropertiesSet() {
+  public void afterPropertiesSet()throws Throwable {
     logger.info("Redis当前模式为:{}", cacheProfile.getMode().getDesc());
     Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
     if(!tenantMap.containsKey(BaseCode.DEFAULT)){
@@ -112,7 +112,7 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   @Bean(name = "redisFactory")
   @ConditionalOnMissingBean(RedisConnectionFactory.class)
-  public RedisConnectionFactory tenantRedisFactory(RedisProperties redisProperties) {
+  public RedisConnectionFactory tenantRedisFactory(RedisProperties redisProperties)throws Throwable {
     RedisConnectionFactory factory = null;
     if (isSwitchDb) {
       factory = context.getFactoryMap().values().iterator().next();
