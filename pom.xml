@@ -40,6 +40,8 @@
     <module>test-solomon-powerjob</module>
     <module>solomon-bot-notice</module>
     <module>test-solomon-bot-notice</module>
+    <module>solomon-datasource</module>
+    <module>test-solomon-datasource</module>
   </modules>
 
   <properties>
@@ -228,13 +230,6 @@
         <groupId>com.zaxxer</groupId>
         <artifactId>HikariCP</artifactId>
         <version>${hikaricp.version}</version>
-      </dependency>
-
-      <!-- Spring JDBC，提供访问关系数据库的支持 -->
-      <dependency>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-jdbc</artifactId>
-        <version>${spring.boot.version}</version>
       </dependency>
       <!-- 数据库相关版本 end-->
 

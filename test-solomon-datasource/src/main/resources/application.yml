@@ -1,0 +1,27 @@
+i18n:
+  all-locale: zh,en
+  language: zh
+  path: i18n/messages
+server:
+  port: 8001
+knife4j:
+  title: datasource测试用例
+  open: true
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jmx:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+datasource:
+  mode: normal
+  tenant:
+    default:
+      url: jdbc:mysql://127.0.0.1:3306/xxl-job
+      username: root
+      password: root
+      driver-class-name: com.mysql.cj.jdbc.Driver
