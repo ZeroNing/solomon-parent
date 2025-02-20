@@ -153,6 +153,17 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     }
   }
 
+  /**
+   * 重新连接
+   */
+  public void reconnect(String tenantCode,MqttProfile profile) throws MqttException, BaseException {
+    MqttClient client = getClient(tenantCode);
+    if(!client.isConnected()){
+      client.connect(initMqttConnectOptions(profile));
+      subscribe(client,tenantCode);
+    }
+  }
+
   private MqttClient getClient(String tenantCode) throws BaseException {
     MqttClient client = getClientMap().get(tenantCode);
     if(ValidateUtils.isEmpty(client)){
