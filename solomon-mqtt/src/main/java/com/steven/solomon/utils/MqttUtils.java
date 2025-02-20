@@ -161,7 +161,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   private MqttClient getClient(String tenantCode) throws BaseException {
     MqttClient client = getClientMap().get(tenantCode);
     if(ValidateUtils.isEmpty(client)){
-      throw new BaseException(MqttErrorCode.CLIENT_IS_NULL);
+      throw new BaseException(MqttErrorCode.CLIENT_IS_NULL,tenantCode);
     }
     return client;
   }
