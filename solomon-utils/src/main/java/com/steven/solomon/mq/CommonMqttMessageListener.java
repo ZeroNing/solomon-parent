@@ -6,6 +6,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.pojo.entity.BaseMq;
+import com.steven.solomon.verification.ValidateUtils;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -39,24 +40,35 @@ public interface CommonMqttMessageListener<T,R,M extends BaseMq<T>> {
      * 转换消息
      */
     default M conversion(String json){
+        Type parameterizedType = getParameterizedType("M");
+        M model = JSONUtil.toBean(json, parameterizedType,true);
+        T body = model.getBody();
+        if(ValidateUtils.isNotEmpty(body)){
+            boolean isJsonObject = body instanceof JSONObject;
+            boolean isJsonArray = body instanceof JSONArray;
+            if(!isJsonObject && !isJsonArray){
+                return model;
+            }
+            Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
+            body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
+        } else {
+            parameterizedType = getParameterizedType("T");
+            body = JSONUtil.toBean(json,parameterizedType,true);
+        }
+        model.setBody(body);
+        return model;
+
+    }
+
+    default Type getParameterizedType(String typeName){
         Map<Type, Type> typeMap = TypeUtil.getTypeMap(getClass());
-        ParameterizedType parameterizedType = null;
+        Type parameterizedType = null;
         for(Map.Entry<Type,Type> entry: typeMap.entrySet()){
-            if(StrUtil.equalsAnyIgnoreCase("M",entry.getKey().getTypeName())){
-                parameterizedType = (ParameterizedType) entry.getValue();
+            if(StrUtil.equalsAnyIgnoreCase(typeName,entry.getKey().getTypeName())){
+                parameterizedType = entry.getValue();
                 break;
             }
         }
-        M model = JSONUtil.toBean(json, parameterizedType,true);
-        T body = model.getBody();
-        boolean isJsonObject = body instanceof JSONObject;
-        boolean isJsonArray = body instanceof JSONArray;
-        if(!isJsonObject && !isJsonArray){
-            return model;
-        }
-        Type typeArgument = TypeUtil.getTypeArgument(getClass(),0);
-        body = JSONUtil.toBean(JSONUtil.toJsonStr(body),typeArgument,true);
-        model.setBody(body);
-        return model;
+        return parameterizedType;
     }
 }

@@ -115,7 +115,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         if(ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)){
           for (String topic : messageListener.topics()) {
             AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-            client.subscribe(topic, messageListener.qos(), consumer);
+            client.subscribe(new MqttSubscription[]{new MqttSubscription(topic,messageListener.qos())},new IMqttMessageListener[]{consumer});
           }
         } else {
           logger.info("{}租户,{}只支持{}范围",tenantCode,abstractConsumer.getClass().getSimpleName(),rangeList.toArray());
