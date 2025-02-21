@@ -8,7 +8,8 @@ services:
         -  "8083:8083"  #  HTTP  API  端口
         -  "18083:18083"  #  Dashboard  端口
       environment:
-        -  EMQX_LOADED_PLUGINS="emqx_dashboard,emqx_retainer,emqx_webhook"
+        - EMQX_LOADED_PLUGINS="emqx_dashboard,emqx_retainer,emqx_webhook,emqx_rule_engine"
+        - EMQX_PLUGINS__LOADED_FILE=/opt/emqx/data/loaded_plugins
       volumes:
         - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
         - ./data:/opt/emqx/data  #  挂载数据卷
