@@ -15,6 +15,7 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Service
 @Conditional(XxlJobCondition.class)
+@Import(XxlJobProperties.class)
 public class XxlJobService implements JobService<XxlJobInfo>{
 
     private final XxlJobProperties profile;
