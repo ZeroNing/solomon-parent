@@ -1,6 +1,8 @@
 package com.steven.solomon.namingRules;
 
 import java.util.UUID;
+
+import cn.hutool.core.util.StrUtil;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -11,6 +13,6 @@ public class UUIDNamingRulesGenerationService implements FileNamingRulesGenerati
   @Override
   public String getFileName(MultipartFile file) {
     String contentType = getExtensionName(file.getOriginalFilename());
-    return UUID.randomUUID().toString().replace("-","") + "."+contentType;
+    return UUID.randomUUID().toString().replace("-", StrUtil.EMPTY) + "."+contentType;
   }
 }

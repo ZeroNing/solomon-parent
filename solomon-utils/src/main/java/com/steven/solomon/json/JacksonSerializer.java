@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.ContextualSerializer;
-import com.steven.solomon.annotation.JsonEnum;
+import com.steven.solomon.annotation.EnumSerialize;
 import com.steven.solomon.enums.EnumUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -73,7 +73,7 @@ public class JacksonSerializer extends JsonSerializer<String> implements Context
             return serializerProvider.findValueSerializer(beanProperty.getType(), beanProperty);
         }
 
-        JsonEnum enumLabel = beanProperty.getAnnotation(JsonEnum.class);
+        EnumSerialize enumLabel = beanProperty.getAnnotation(EnumSerialize.class);
         if (ValidateUtils.isEmpty(enumLabel) || !enumLabel.ignore()) {
             return serializerProvider.findValueSerializer(beanProperty.getType(), beanProperty);
         }

@@ -187,6 +187,8 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         rabbitTemplate.convertAndSend(rabbitMQModel.getExchange(), rabbitMQModel.getRoutingKey(), rabbitMQModel, msg -> {
             //设置消息持久化
             msg.getMessageProperties().setDeliveryMode(rabbitMQModel.getMessagePersistent() ? MessageDeliveryMode.PERSISTENT : MessageDeliveryMode.NON_PERSISTENT);
+            //设置消息优先级
+            msg.getMessageProperties().setPriority(rabbitMQModel.getPriority());
             if (ValidateUtils.equals(0L, expiration)) {
                 return msg;
             }

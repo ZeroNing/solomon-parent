@@ -11,7 +11,7 @@ public class RequestHeaderHolder {
 
   public static String getTimeZone(){
     String serverTimeZone = threadLocal.get().getTimezone();
-    if(serverTimeZone == null || "".equalsIgnoreCase(serverTimeZone)){
+    if(serverTimeZone.isEmpty()){
       serverTimeZone = ZoneId.systemDefault().getId();
     }
     try {

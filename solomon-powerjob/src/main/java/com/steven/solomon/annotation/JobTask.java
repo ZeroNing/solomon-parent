@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.PowerJobCondition;
 import com.steven.solomon.enums.*;
 import org.springframework.context.annotation.Conditional;
@@ -21,7 +22,7 @@ import java.lang.annotation.Target;
 public @interface JobTask {
 
     @AliasFor(annotation = Component.class)
-    String value() default "";
+    String value() default StrUtil.EMPTY;
 
     /**
      * 任务名称
@@ -31,12 +32,12 @@ public @interface JobTask {
     /**
      * 任务描述
      */
-    String taskDesc() default "";
+    String taskDesc() default StrUtil.EMPTY;
 
     /**
      * 任务参数
      */
-    String taskParams() default "";
+    String taskParams() default StrUtil.EMPTY;
 
     /**
      * 时间表达式类型 默认:固定频率
@@ -61,7 +62,7 @@ public @interface JobTask {
     /**
      * 处理器信息。 默认只有是内置的情况下才拿当前class名字
      */
-    String processorInfo() default "";
+    String processorInfo() default StrUtil.EMPTY;
 
     /**
      * 最大实例数设置
@@ -116,17 +117,17 @@ public @interface JobTask {
     /**
      * 某种派发策略背后的具体配置，值取决于 dispatchStrategy。
      */
-    String dispatchStrategyConfig() default "";
+    String dispatchStrategyConfig() default StrUtil.EMPTY;
 
     /**
      * 生命周期开始时间 格式"yyyy-MM-dd HH:mm:ss"
      */
-    String lifeCycleStart() default "";
+    String lifeCycleStart() default StrUtil.EMPTY;
 
     /**
      * 生命周期结束时间 格式"yyyy-MM-dd HH:mm:ss"
      */
-    String lifeCycleEnd() default "";
+    String lifeCycleEnd() default StrUtil.EMPTY;
 
     /**
      * 获取告警阈值。

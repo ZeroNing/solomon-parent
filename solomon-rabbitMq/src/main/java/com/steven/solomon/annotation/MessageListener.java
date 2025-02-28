@@ -1,5 +1,6 @@
 package com.steven.solomon.annotation;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.RabbitCondition;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.ExchangeTypes;
@@ -25,7 +26,7 @@ import java.lang.annotation.Target;
 public @interface MessageListener {
 
     @AliasFor(annotation = Component.class)
-    String value() default "";
+    String value() default StrUtil.EMPTY;
 
     /**
      * 队列
@@ -35,12 +36,12 @@ public @interface MessageListener {
     /**
      * 交换器
      */
-    String exchange() default "";
+    String exchange() default StrUtil.EMPTY;
 
     /**
      * 路由规则
      */
-    String routingKey() default "";
+    String routingKey() default StrUtil.EMPTY;
 
     /**
      * 是否持久化

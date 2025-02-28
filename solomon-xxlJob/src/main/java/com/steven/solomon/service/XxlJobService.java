@@ -15,6 +15,7 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 @Service
 @Conditional(XxlJobCondition.class)
+@Import(XxlJobProperties.class)
 public class XxlJobService implements JobService<XxlJobInfo>{
 
     private final XxlJobProperties profile;
@@ -66,7 +68,7 @@ public class XxlJobService implements JobService<XxlJobInfo>{
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         if(xxlJobInfoMap.containsKey(job.getExecutorHandler())){
-            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NOT_NULL);
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NOT_NULL,job.getExecutorHandler());
         }
         String url = adminAddresses + "jobinfo/add";
         // 发送 POST 请求
@@ -81,7 +83,7 @@ public class XxlJobService implements JobService<XxlJobInfo>{
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(job.getExecutorHandler());
         if(ValidateUtils.isEmpty(exitJob)){
-            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL);
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,job.getExecutorHandler());
         }
         job.setId(exitJob.getId());
         String url = adminAddresses + "jobinfo/update";
@@ -98,7 +100,7 @@ public class XxlJobService implements JobService<XxlJobInfo>{
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(executorHandler);
         if(ValidateUtils.isEmpty(exitJob)){
-            throw new BaseException("");
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,executorHandler);
         }
 
         Map<String, Object> paramMap = new HashMap<>();

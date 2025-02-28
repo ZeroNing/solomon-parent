@@ -10,7 +10,7 @@ services:
     environment:  # 设置传递给容器的环境变量。
       - TZ=Asia/Shanghai  # 设置时区为Asia/Shanghai，确保应用时间符合本地时区。
       - JVMOPTIONS=  # （可选）指定Java虚拟机的启动选项，目前为空。
-      - PARAMS= |  # 设置应用启动参数，这里使用管道符号 `|` 允许多行字符串。
+      - PARAMS= |
         --spring.datasource.url=[数据库URL]  # 配置数据库的连接URL。
         --spring.datasource.username=[数据库账号]  # 配置数据库连接所需的用户名。
         --spring.datasource.password=[数据库密码]  # 配置数据库连接所需的密码。

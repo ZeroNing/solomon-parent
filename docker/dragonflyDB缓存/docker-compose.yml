@@ -1,0 +1,14 @@
+version: '3.8'  # Docker Compose 文件的版本。3.8 是一个常用的稳定版本，兼容大多数 Docker 和 Docker Compose 的功能。
+
+services:  # 定义了服务部分，多个服务可以在这里列出。
+  dragonfly:  # 定义服务名称，这里为 `dragonfly`，你可以通过此名称访问和管理服务。
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'  # 使用 DragonflyDB 的官方镜像，这里指定的是来自官方 Docker registry 的镜像地址。
+    ulimits:  # 设置容器的资源限制。`memlock` 限制表示锁定内存的大小。`-1` 表示没有限制，允许容器使用所有内存，这有助于提高性能。
+      memlock: -1  # 允许 DragonflyDB 使用更多的内存资源（通常用于高性能数据库）。
+    ports:  # 配置端口映射，将宿主机的 `6379` 端口映射到容器的 `6379` 端口。DragonflyDB 默认监听这个端口，通常用于 Redis 协议。
+      - "6379:6379"  # 第一个 `6379` 是宿主机的端口，第二个 `6379` 是容器中的端口。
+    # 以下是关于网络模式的说明，可以提高性能。注释掉的部分提供了使用 `host` 模式的建议。
+    # network_mode: "host"  # 使用 `host` 模式将容器网络设置为直接与宿主机网络共享，这样可以避免 Docker 的网络地址转换（NAT），提高性能，但在 Swarm 模式下不支持。
+    # 该行被注释掉了，表明如果你在普通 Docker 环境中，可能会想启用 `host` 网络模式，但在 Swarm 中不能使用此设置。
+    volumes:  # 配置数据卷，用于持久化容器的数据。将宿主机的 `./data` 目录挂载到容器内的 `/data` 目录。
+      - ./data:/data  # 这个卷可以确保 DragonflyDB 的数据不会因容器停止或删除而丢失。

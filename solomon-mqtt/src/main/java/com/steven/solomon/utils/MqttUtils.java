@@ -3,11 +3,11 @@ package com.steven.solomon.utils;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.code.MqttErrorCode;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.entity.MqttModel;
+import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
@@ -57,7 +57,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     try {
       // 转换消息为json字符串
       String json = JSONUtil.toJsonStr(data);
-      getClientMap().get(data.getTenantCode()).getTopic(data.getTopic()).publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
+      getClient(data.getTenantCode()).getTopic(data.getTopic()).publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
     } catch (MqttException e) {
       logger.error(String.format("MQTT: 主题[%s]发送消息失败", data.getTopic()));
     }
@@ -80,11 +80,11 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    * @param qos 消息质量
    * @param consumer 消费者
    */
-  public void subscribe(String tenantCode,String topic,int qos, IMqttMessageListener consumer) throws MqttException {
+  public void subscribe(String tenantCode,String topic,int qos, IMqttMessageListener consumer) throws MqttException, BaseException {
     if(ValidateUtils.isEmpty(topic)){
       return;
     }
-    getClientMap().get(tenantCode).subscribe(topic, qos,consumer);
+    getClient(tenantCode).subscribe(topic, qos,consumer);
   }
 
   /**
@@ -124,29 +124,46 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    * 取消订阅
    * @param topic 主题
    */
-  public void unsubscribe(String tenantCode,String[] topic) throws MqttException {
+  public void unsubscribe(String tenantCode,String[] topic) throws MqttException, BaseException {
     if(ValidateUtils.isEmpty(topic)){
       return;
     }
-    getClientMap().get(tenantCode).unsubscribe(topic);
+    getClient(tenantCode).unsubscribe(topic);
   }
 
   /**
    * 关闭连接
    */
-  public void disconnect(String tenantCode) throws MqttException {
-    getClientMap().get(tenantCode).disconnect();
+  public void disconnect(String tenantCode) throws MqttException, BaseException {
+    getClient(tenantCode).disconnect();
   }
 
   /**
    * 重新连接
    */
-  public void reconnect(String tenantCode) throws MqttException {
-    MqttClient client = getClientMap().get(tenantCode);
+  public void reconnect(String tenantCode) throws MqttException, BaseException {
+
+    MqttClient client = getClient(tenantCode);
     if(!client.isConnected()){
       client.connect(getOptionsMap().get(tenantCode));
       subscribe(client,tenantCode);
     }
+  }
+
+  public void reconnect(String tenantCode,MqttProfile mqttProfile) throws MqttException, BaseException {
+    MqttClient client = getClient(tenantCode);
+    if(!client.isConnected()){
+      client.connect(initMqttConnectOptions(mqttProfile));
+      subscribe(client,tenantCode);
+    }
+  }
+  
+  private MqttClient getClient(String tenantCode) throws BaseException {
+    MqttClient client = getClientMap().get(tenantCode);
+    if(ValidateUtils.isEmpty(client)){
+      throw new BaseException(MqttErrorCode.CLIENT_IS_NULL,tenantCode);
+    }
+    return client;
   }
 
   public MqttConnectOptions initMqttConnectOptions(MqttProfile mqttProfile) {

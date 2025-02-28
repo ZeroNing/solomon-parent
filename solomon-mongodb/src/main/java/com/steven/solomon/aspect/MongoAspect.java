@@ -1,7 +1,7 @@
 package com.steven.solomon.aspect;
 
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.config.MongoTenantsContext;
+import com.steven.solomon.config.MongoTenantContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
@@ -25,7 +25,7 @@ public class MongoAspect {
   private final Logger logger = LoggerUtils.logger(getClass());
 
   @Resource
-  private MongoTenantsContext context;
+  private MongoTenantContext context;
 
   @Value("${spring.data.mongodb.mode: NORMAL}")
   private String mode;

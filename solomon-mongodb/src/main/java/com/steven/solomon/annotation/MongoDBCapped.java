@@ -6,6 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.MongoCondition;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.annotation.AliasFor;
@@ -21,7 +22,7 @@ import org.springframework.stereotype.Component;
 public @interface MongoDBCapped {
 
   @AliasFor(annotation = Component.class)
-  String value() default "";
+  String value() default StrUtil.EMPTY;
 
   /**
    * 限制记录大小使用的是(字节)

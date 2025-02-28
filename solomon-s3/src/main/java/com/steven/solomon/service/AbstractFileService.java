@@ -1,6 +1,7 @@
 package com.steven.solomon.service;
 
 import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.file.MockMultipartFile;
@@ -68,12 +69,17 @@ public abstract class AbstractFileService implements FileServiceInterface{
     makeBucket(bucketName);
     String       filePath = getFilePath(!isUseOriginalName ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);
     long fileSize = file.getSize();
-    if(fileSize >= partSize){
-      return multipartUpload(file,bucketName,isUseOriginalName);
+    if(isMultipartUpload()){
+      if(fileSize >= partSize){
+        return multipartUpload(file,bucketName,isUseOriginalName);
+      } else {
+        this.upload(file,bucketName,filePath);
+        return new FileUpload(bucketName,filePath,file.getInputStream());
+      }
     } else {
-      this.upload(file,bucketName,filePath);
-      return new FileUpload(bucketName,filePath,file.getInputStream());
+      return upload(file.getInputStream(),bucketName,filePath);
     }
+
   }
 
   @Override
@@ -148,7 +154,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
     makeBucket(bucketName);
     String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
     objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
-    String thumbnailName = new StringBuilder(ValidateUtils.isEmpty(filePath) ? ValidateUtils.isEmpty(properties.getRootDirectory()) ? "" : properties.getRootDirectory() :filePath).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
+    String thumbnailName = new StringBuilder(ValidateUtils.getOrDefault(filePath,ValidateUtils.getOrDefault(properties.getRootDirectory(), StrUtil.EMPTY))).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
     if(!objectExist(bucketName,thumbnailName)){
       MockMultipartFile file = null;
       try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
@@ -266,4 +272,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * @param objectName 文件名
    */
   protected abstract String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
+
+  public boolean isMultipartUpload(){
+    return true;
+  }
 }

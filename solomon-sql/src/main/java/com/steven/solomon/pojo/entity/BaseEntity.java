@@ -2,7 +2,7 @@ package com.steven.solomon.pojo.entity;
 
 
 import com.steven.solomon.annotation.Column;
-import com.steven.solomon.annotation.JsonEnum;
+import com.steven.solomon.annotation.EnumSerialize;
 import com.steven.solomon.pojo.enums.DelFlagEnum;
 import com.steven.solomon.utils.date.DateTimeUtils;
 
@@ -55,7 +55,7 @@ public class BaseEntity<I> implements Serializable {
   /**
    * 删除标记
    */
-  @JsonEnum(enumClass = DelFlagEnum.class)
+  @EnumSerialize(enumClass = DelFlagEnum.class)
   @Column
   private              String        delFlag;
 

@@ -33,6 +33,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.retry.RetryPolicy;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
 import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.retry.policy.SimpleRetryPolicy;
@@ -89,11 +90,11 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
             String[] queues = messageListener.queues();
             for (String queueName : queues) {
                 // 初始化队列绑定
-                Queue queue = initBinding(abstractMQMap, queueName, true, false);
+                Queue queue = initBinding(queueName, true, false);
                 // 启动监听器并保存已启动的MQ
                 allQueueContainerMap.put(queue.getName(), this.startContainer(abstractConsumer, queue));
                 // 初始化死信队列
-                this.initDlx(queue, abstractMQMap);
+                this.initDlx(queue);
             }
         }
     }
@@ -101,7 +102,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
     /**
      * 初始化死信队列MQ
      */
-    private void initDlx(Queue queue, Map<String, AbstractMQService<?>> abstractMQMap) {
+    private void initDlx(Queue queue) {
         // 判断消费队列是否需要死信队列 只要死信队列或者延时队列为true即可判断为开启死信队列
         Class<?> clazz = messageListener.dlxClazz();
 
@@ -119,7 +120,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         // 获取死信队列类
         Object abstractConsumer = SpringUtil.getBean(clazz);
         // 初始化队列绑定
-        Queue queues = initBinding(abstractMQMap, queueName, false, true);
+        Queue queues = initBinding(queueName, false, true);
         // 启动监听器
         allQueueContainerMap.put(queues.getName(), this.startContainer(abstractConsumer, queues));
         logger.info("MessageListenerConfig队列:{}绑定{}死信队列", queue.getName(), queues.getName());
@@ -181,13 +182,13 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         return backOffPolicy;
     }
 
-    public SimpleRetryPolicy retryPolicyByProperties(MessageListenerRetry messageListenerRetry) {
+    public RetryPolicy retryPolicyByProperties(MessageListenerRetry messageListenerRetry) {
         SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
         retryPolicy.setMaxAttempts(messageListenerRetry.retryNumber());
         return retryPolicy;
     }
 
-    private Queue initBinding(Map<String, AbstractMQService<?>> abstractMQMap, String queue, boolean isInitDlxMap,
+    private Queue initBinding(String queue, boolean isInitDlxMap,
                               boolean isAddDlxPrefix) {
         AbstractMQService<?> abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
                 ? abstractMQMap.get("delayedMQService") : abstractMQMap

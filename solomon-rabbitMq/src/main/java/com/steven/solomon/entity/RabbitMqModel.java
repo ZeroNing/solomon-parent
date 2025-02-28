@@ -35,6 +35,19 @@ public class RabbitMqModel<T> extends BaseMq<T> {
      */
     private String replyTo;
 
+    /**
+     * 消息优先级
+     */
+    private Integer priority;
+
+    public Integer getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Integer priority) {
+        this.priority = priority;
+    }
+
     public String getReplyTo() {
         return replyTo;
     }

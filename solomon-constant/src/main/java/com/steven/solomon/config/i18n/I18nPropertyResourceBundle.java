@@ -36,7 +36,7 @@ public class I18nPropertyResourceBundle extends ResourceBundle {
 
   @Override
   public Object handleGetObject(String key) {
-    if (key.isEmpty() || "".equals(key)) {
+    if (key.isEmpty()) {
       throw new NullPointerException();
     }
     return lookup.get(key);

@@ -7,12 +7,25 @@ public class BaseMq<T> implements Serializable {
     /**
      * 消费者数据
      */
-    private              T body;
+    private T body;
 
     /**
      * 租户
      */
     private String tenantCode;
+
+    /**
+     * 消息ID
+     */
+    private String msgId;
+
+    public String getMsgId() {
+        return msgId;
+    }
+
+    public void setMsgId(String msgId) {
+        this.msgId = msgId;
+    }
 
     public BaseMq(){
 
