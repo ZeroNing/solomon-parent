@@ -3,8 +3,6 @@ package com.steven.solomon.annotation;
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.enums.*;
-import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.core.glue.GlueTypeEnum;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.stereotype.Component;
