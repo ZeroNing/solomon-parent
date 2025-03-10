@@ -15,7 +15,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
 
     private final JobTask jobTask = getClass().getAnnotation(JobTask.class);
 
-    private final String xxlJobBeanName = ValidateUtils.isNotEmpty(jobTask) ? ValidateUtils.getOrDefault(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
+    protected final String xxlJobBeanName = ValidateUtils.isNotEmpty(jobTask) ? ValidateUtils.getOrDefault(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
 
     public void execute() throws Exception{
         String jobParam = XxlJobHelper.getJobParam();
@@ -26,7 +26,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
             handle(jobParam);
         }catch(Throwable e){
             logger.error("BeanName:{} AbstractJobConsumer:调度报错 异常为:",xxlJobBeanName, e);
-            saveLog(e);
+            saveLog(jobParam,e);
             throw e;
         } finally {
             stopWatch.stop();
@@ -40,5 +40,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
     /**
      * 保存消费失败的消息
      */
-    public abstract void saveLog(Throwable throwable);
+    public void saveLog(String jobParam,Throwable throwable){
+        logger.error("BeanName:{},任务参数:{}.出现了异常,异常为:",xxlJobBeanName,jobParam,throwable);
+    }
 }
