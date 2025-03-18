@@ -41,9 +41,8 @@ public class SwaggerConfig {
     List<RequestParameter> requestParameters = new ArrayList<>();
     if(ObjectUtil.isNotEmpty(profile.getGlobalRequestParameters())){
       // 创建必要参数对象
-      RequestParameterBuilder requestParameterBuilder = new RequestParameterBuilder();
       for(SwaggerProfile.DocRequestParameter requestParameter: profile.getGlobalRequestParameters()){
-        requestParameters.add(requestParameterBuilder.name(requestParameter.getName())
+        requestParameters.add(new RequestParameterBuilder().name(requestParameter.getName())
                 .in(requestParameter.getIn())
                 .description(requestParameter.getDescription())
                 .required(requestParameter.getRequired())
