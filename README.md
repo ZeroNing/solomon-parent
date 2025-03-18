@@ -112,10 +112,16 @@ RequestHeaderHolder.setTenantCode("租户编码");
 ```
 ## Swagger配置说明
 ```yaml
-knife4j:
-  package:         #需要扫描的包路径
-  title:           #swagger文档名字
-  open:            #是否开启swagger 线上环境建议为false
+doc:
+  title:                        #swagger文档名字
+  enabled:                      #swagger是否开启
+  globalRequestParameters:      #Swagger全局请求参数配置
+    - name:                     #参数名
+      in:                       #参数位置类型 QUERY HEADER PATH COOKIE FORM FORMDATA BODY
+      description:              #参数描述说明
+      required:                 #是否已弃用参数
+      deprecated:               #是否已弃用参数
+      hidden:                   #是否隐藏参数
 ```
 
 # 国际化配置
