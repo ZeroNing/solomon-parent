@@ -119,7 +119,7 @@ doc:
     - name:                     #参数名
       in:                       #参数位置类型 QUERY HEADER PATH COOKIE FORM FORMDATA BODY
       description:              #参数描述说明
-      required:                 #是否已弃用参数
+      required:                 #是否必填参数
       deprecated:               #是否已弃用参数
       hidden:                   #是否隐藏参数
 ```

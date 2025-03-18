@@ -35,7 +35,7 @@ public class SwaggerProfile {
          */
         private String description;
         /**
-         * 是否已弃用参数
+         * 是否必填参数
          */
         private Boolean required;
         /**
