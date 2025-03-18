@@ -4,9 +4,16 @@ i18n:
   path: i18n/messages
 server:
   port: 8001
-knife4j:
-  title: rabbitmq测试用例
-  open: true
+doc:
+  title: S3文件上传下载测试用例
+  enabled: true
+  globalRequestParameters:
+    - name: token
+      in: HEADER
+      description: 用户认证令牌
+      required: true
+      deprecated: false
+      hidden: false
 spring:
   mvc:
     pathmatch:
