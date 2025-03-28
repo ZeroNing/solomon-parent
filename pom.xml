@@ -43,7 +43,7 @@
     <module>solomon-datasource</module>
     <module>test-solomon-datasource</module>
     <module>solomon-saas-xxlJob</module>
-      <module>test-solomon-saas-xxl-job</module>
+      <module>test-solomon-saas-xxlJob</module>
   </modules>
 
   <properties>
