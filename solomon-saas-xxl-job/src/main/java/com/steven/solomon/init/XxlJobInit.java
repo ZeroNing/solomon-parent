@@ -2,6 +2,7 @@ package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.consumer.AbstractJobConsumer;
 import com.steven.solomon.entity.XxlJobInfo;
@@ -61,6 +62,10 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
                 if(ValidateUtils.isEmpty(jobTask)){
                     logger.error("租户:{},{}没有JobTask注解,不进行初始化",tenantCode,obj.getClass().getSimpleName());
+                    continue;
+                }
+                if(StrUtil.isNotBlank(jobTask.tenantCode()) && !StrUtil.equalsIgnoreCase(jobTask.tenantCode(),tenantCode)){
+                    logger.error("租户:{},不允许创建当前任务:{},因为非这个{}租户的任务",tenantCode,obj.getClass().getSimpleName(),jobTask.tenantCode());
                     continue;
                 }
                 String className = obj.getClass().getSimpleName();

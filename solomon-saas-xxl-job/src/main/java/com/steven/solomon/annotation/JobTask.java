@@ -104,7 +104,7 @@ public @interface JobTask {
     boolean start() default false;
 
     /**
-     * 租户id（代表任务只属于这个租户,其他租户无法创建这个任务）
+     * 租户Code（代表任务只属于这个租户,其他租户无法创建这个任务）
      */
-    String tenantId() default StrUtil.EMPTY;
+    String tenantCode() default StrUtil.EMPTY;
 }
