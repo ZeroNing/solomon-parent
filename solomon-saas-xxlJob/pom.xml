@@ -6,7 +6,7 @@
         <version>1.0</version>
     </parent>
 
-    <artifactId>solomon-saas-xxl-job</artifactId>
+    <artifactId>solomon-saas-xxlJob</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

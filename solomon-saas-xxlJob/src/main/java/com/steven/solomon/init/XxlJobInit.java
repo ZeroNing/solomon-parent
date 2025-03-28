@@ -115,6 +115,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             xxlJobSpringExecutor.setLogPath(profile.getLogPath());
         }
         xxlJobSpringExecutor.setLogRetentionDays(profile.getLogRetentionDays());
+        xxlJobSpringExecutor.start();
         return xxlJobSpringExecutor;
     }
 }
