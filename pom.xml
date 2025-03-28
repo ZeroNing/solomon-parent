@@ -42,8 +42,6 @@
     <module>test-solomon-bot-notice</module>
     <module>solomon-datasource</module>
     <module>test-solomon-datasource</module>
-    <module>solomon-saas-xxlJob</module>
-      <module>test-solomon-saas-xxlJob</module>
   </modules>
 
   <properties>
