@@ -1,13 +1,9 @@
 package com.steven.solomon.entity;
 
 import com.steven.solomon.annotation.JobTask;
-import com.steven.solomon.enums.ExecutorRouteStrategyEnum;
-import com.steven.solomon.enums.MisfireStrategyEnum;
-import com.steven.solomon.enums.ScheduleTypeEnum;
+import com.steven.solomon.enums.*;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
-import com.xxl.job.core.enums.ExecutorBlockStrategyEnum;
-import com.xxl.job.core.glue.GlueTypeEnum;
 
 /**
  * xxl-job info

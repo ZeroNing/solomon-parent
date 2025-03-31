@@ -70,7 +70,7 @@
     <nacos.client.version>2.2.2</nacos.client.version>
     <seata.version>2.0.0</seata.version>
     <mybatis.plus.version>3.5.1</mybatis.plus.version>
-    <hutool.version>5.8.27</hutool.version>
+    <hutool.version>5.8.36</hutool.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>8.0.28</mysql.java.version>

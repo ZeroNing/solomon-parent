@@ -11,8 +11,4 @@ public class TestHandler1 extends AbstractJobConsumer {
     public void handle(String jobParam) {
     }
 
-    @Override
-    public void saveLog(Throwable throwable) {
-
-    }
 }
