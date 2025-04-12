@@ -38,6 +38,17 @@ public class XxlJobProperties {
     //是否启用
     private boolean enabled = true;
 
+    //超时时间
+    private Integer timeout;
+
+    public Integer getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(Integer timeout) {
+        this.timeout = timeout;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
