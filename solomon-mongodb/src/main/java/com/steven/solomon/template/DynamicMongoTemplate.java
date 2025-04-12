@@ -27,12 +27,6 @@ public class DynamicMongoTemplate extends MongoTemplate {
   }
 
   @Override
-  public MongoDatabaseFactory getMongoDbFactory() {
-    MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantContext.class).getFactory();
-    return mongoDbFactory == null ? super.getMongoDbFactory() : mongoDbFactory;
-  }
-
-  @Override
   public MongoDatabaseFactory getMongoDatabaseFactory() {
     MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantContext.class).getFactory();
     return mongoDbFactory == null ? super.getMongoDatabaseFactory() : mongoDbFactory;

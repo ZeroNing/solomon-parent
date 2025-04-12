@@ -6,7 +6,7 @@ import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.verification.ValidateUtils;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;

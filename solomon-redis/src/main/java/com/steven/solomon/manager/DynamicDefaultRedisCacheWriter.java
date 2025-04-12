@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -100,6 +101,11 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
     statistics.incPuts(name);
   }
 
+  @Override
+  public CompletableFuture<Void> store(String name, byte[] key, byte[] value, Duration ttl) {
+    return null;
+  }
+
   /*
    * (non-Javadoc)
    * @see org.springframework.data.redis.cache.RedisCacheWriter#get(java.lang.String, byte[])
@@ -121,6 +127,11 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
     }
 
     return result;
+  }
+
+  @Override
+  public CompletableFuture<byte[]> retrieve(String name, byte[] key, Duration ttl) {
+    return null;
   }
 
   /*

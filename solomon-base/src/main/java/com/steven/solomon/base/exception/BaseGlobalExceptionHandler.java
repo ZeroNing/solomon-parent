@@ -8,7 +8,8 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import javax.servlet.http.HttpServletResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 
 public class BaseGlobalExceptionHandler {

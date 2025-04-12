@@ -5,9 +5,8 @@ import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
-
-import javax.annotation.Resource;
 
 public abstract class AbsICacheService implements  ICacheService {
 
