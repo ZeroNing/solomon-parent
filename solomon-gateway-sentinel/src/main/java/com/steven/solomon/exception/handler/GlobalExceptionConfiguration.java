@@ -40,11 +40,11 @@ public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandle
   @Value("${spring.application.id:default}")
   private String serverId;
 
-  public GlobalExceptionConfiguration(ErrorAttributes errorAttributes, WebProperties.Resources resources,
+  public GlobalExceptionConfiguration(ErrorAttributes errorAttributes, WebProperties webProperties,
       ServerProperties serverProperties, ApplicationContext applicationContext,
       ObjectProvider<ViewResolver> viewResolvers,
       ServerCodecConfigurer serverCodecConfigurer) {
-    super(errorAttributes, resources, serverProperties.getError(), applicationContext);
+    super(errorAttributes, webProperties.getResources(), serverProperties.getError(), applicationContext);
     this.viewResolvers         = viewResolvers;
     this.serverCodecConfigurer = serverCodecConfigurer;
     setViewResolvers(viewResolvers.orderedStream().collect(Collectors.toList()));

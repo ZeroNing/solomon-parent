@@ -1,11 +1,11 @@
 package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.steven.solomon.json.config.JsonConfig;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import com.steven.solomon.json.config.JsonConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;

@@ -15,7 +15,7 @@ public class NotFoundExceptionHandler extends AbstractExceptionHandler {
     if(ex instanceof NotFoundException){
       String reason = ((NotFoundException) ex).getReason();
       reason = reason.substring(reason.lastIndexOf("for ")+4);
-      baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.SERVICE_CALL_ERROR,((NotFoundException) ex).getStatus().value());
+      baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.SERVICE_CALL_ERROR,((NotFoundException) ex).getStatusCode().value());
       baseExceptionVO.setArg(reason);
     }
     return baseExceptionVO;

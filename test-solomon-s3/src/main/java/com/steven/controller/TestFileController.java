@@ -1,7 +1,5 @@
-package steven.controller;
+package com.steven.controller;
 
-import com.steven.solomon.config.FileConfig;
-import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.service.FileServiceInterface;
@@ -9,8 +7,6 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.concurrent.TimeUnit;
 
 @RestController
 public class TestFileController {

@@ -4,16 +4,22 @@ i18n:
   path: i18n/messages
 server:
   port: 8001
-doc:
-  title: S3文件上传下载测试用例
-  enabled: true
-  globalRequestParameters:
-    - name: token
-      in: HEADER
-      description: 用户认证令牌
-      required: true
-      deprecated: false
-      hidden: false
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+    api-docs:
+      path: /v3/api-docs
+    group-configs:
+      - group: 'default'
+        paths-to-match: '/**'
+        packages-to-scan: com.steven
+  # knife4j的增强配置，不需要增强可以不配
+  knife4j:
+    enable: true
+    setting:
+      language: zh_cn
 spring:
   mvc:
     pathmatch:
@@ -26,7 +32,7 @@ spring:
       max-request-size: 20MB
 file:
   bucket-name: default
-  choice: s3
+  choice: DEFAULT
   endpoint: http://127.0.0.1:9000
   access-key: admin
   secret-key: admin12345678
