@@ -1,140 +1,122 @@
 package com.steven.solomon.config.i18n;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
-import java.security.AccessController;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class I18nControl extends ResourceBundle.Control{
-  private static final String ALL_CLASSPATH_URL_PERFIX = "classpath*:";
+  private static final String ALL_CLASSPATH_URL_PREFIX = "classpath*:";
+  private static final Map<URL, Long> LAST_MODIFIED_CACHE = new ConcurrentHashMap<>();
 
   @Override
   public ResourceBundle newBundle(String baseName, Locale locale, String format,
       ClassLoader classLoader, boolean reload)
-      throws IllegalAccessException, InstantiationException, IOException {
-    // 例如将classpath*:i18n/messages_zh.properties全放到一个集合中
-    String bundleName = super.toBundleName(baseName, locale);
-    final String               resourceName = bundleName + ".properties";
-    I18nPropertyResourceBundle bundle       = null;
-    if ("java.class".equals(format)) {
-      // 不支持
-      bundle = null;
-    } else if ("java.properties".equals(format)) {
-      if (bundleName.startsWith(ALL_CLASSPATH_URL_PERFIX)) {
-        bundle = this.getBundleFromAllClasspath(resourceName, classLoader, reload);
+      throws IOException {
+    String bundleName = toBundleName(baseName, locale);
+    String resourceName = bundleName + ".properties";
+
+    if ("java.properties".equals(format)) {
+      if (bundleName.startsWith(ALL_CLASSPATH_URL_PREFIX)) {
+        return getBundleFromAllClasspath(resourceName, classLoader, reload);
       } else {
-        bundle = this.getBundleFromClasspath(resourceName, classLoader, reload);
+        return getBundleFromClasspath(resourceName, classLoader, reload);
       }
     }
-    return bundle;
+    return null;
   }
 
   private I18nPropertyResourceBundle getBundleFromAllClasspath(String resourceName,
       ClassLoader classLoader,
       boolean reload) throws IOException {
-    resourceName = resourceName.substring(ALL_CLASSPATH_URL_PERFIX.length(), resourceName.length());
-    Enumeration<URL> enumeration = classLoader.getResources(resourceName);
-    Map<String, URL> urlMap      = new HashMap<>(16);
-    URL              tempURL;
-    while (enumeration.hasMoreElements()) {
-      tempURL = enumeration.nextElement();
-      urlMap.put(tempURL.toString(), tempURL);
-    }
+    String actualName = resourceName.substring(ALL_CLASSPATH_URL_PREFIX.length());
+    Enumeration<URL> urls = classLoader.getResources(actualName);
 
-    if (urlMap.isEmpty()) {
-      return null;
+    I18nPropertyResourceBundle combinedBundle = new I18nPropertyResourceBundle();
+    while (urls.hasMoreElements()) {
+      URL url = urls.nextElement();
+      try (InputStream stream = openStreamWithReload(url, reload)) {
+        if (stream != null) {
+          combinedBundle.combine(new I18nPropertyResourceBundle(
+              new InputStreamReader(stream, StandardCharsets.UTF_8)));
+        }
+      }
     }
-
-    I18nPropertyResourceBundle bundle = new I18nPropertyResourceBundle();
-    for (URL url : urlMap.values()) {
-      bundle.combine(this.propertyFromURL(url, reload));
-    }
-
-    return bundle;
+    return combinedBundle.isEmpty() ? null : combinedBundle;
   }
 
   private I18nPropertyResourceBundle getBundleFromClasspath(String resourceName,
       ClassLoader classLoader,
-      final boolean reload) throws IOException {
-    I18nPropertyResourceBundle bundle = null;
-    InputStream                stream = null;
-    try {
-      stream = AccessController.doPrivileged(
-          new PrivilegedExceptionAction<InputStream>() {
-            @Override
-            public InputStream run() throws IOException {
-              InputStream is = null;
-              if (reload) {
-                URL url = classLoader.getResource(resourceName);
-                if (url != null) {
-                  URLConnection connection = url.openConnection();
-                  if (connection != null) {
-                    // Disable caches to get fresh data for
-                    // reloading.
-                    connection.setUseCaches(false);
-                    is = connection.getInputStream();
-                  }
-                }
-              } else {
-                is = classLoader.getResourceAsStream(resourceName);
-              }
-              return is;
-            }
-          });
-    } catch (PrivilegedActionException e) {
-      throw (IOException) e.getException();
+      boolean reload) throws IOException {
+    URL url = classLoader.getResource(resourceName);
+    if (url == null) return null;
+
+    try (InputStream stream = openStreamWithReload(url, reload)) {
+      return stream != null
+             ? new I18nPropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8))
+             : null;
     }
-    if (stream != null) {
-      try {
-        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
-      } finally {
-        stream.close();
-      }
-    }
-    return bundle;
   }
 
-  private I18nPropertyResourceBundle propertyFromURL(final URL url, final boolean reload) throws IOException {
-    I18nPropertyResourceBundle bundle = null;
-    InputStream                stream = null;
-    try {
-      stream = AccessController.doPrivileged(
-          new PrivilegedExceptionAction<InputStream>() {
-            @Override
-            public InputStream run() throws IOException {
-              InputStream is = null;
-              if (reload) {
-                URLConnection connection = url.openConnection();
-                if (connection != null) {
-                  // Disable caches to get fresh data for
-                  // reloading.
-                  connection.setUseCaches(false);
-                  is = connection.getInputStream();
-                }
-              } else {
-                is = url.openStream();
-              }
-              return is;
-            }
-          });
-    } catch (PrivilegedActionException e) {
-      throw (IOException) e.getException();
+  /**
+   * 带缓存控制的流打开方法
+   */
+  private InputStream openStreamWithReload(URL url, boolean reload) throws IOException {
+    if (!reload) return url.openStream();
+
+    URLConnection connection = url.openConnection();
+    if (connection instanceof HttpURLConnection httpConn) {
+      httpConn.setRequestProperty("Cache-Control", "no-cache");
     }
-    if (stream != null) {
-      try {
-        bundle = new I18nPropertyResourceBundle(new InputStreamReader(stream, StandardCharsets.UTF_8));
-      } finally {
-        stream.close();
+
+    // 基于最后修改时间的缓存验证
+    long lastModified = connection.getLastModified();
+    if (LAST_MODIFIED_CACHE.containsKey(url) &&
+        LAST_MODIFIED_CACHE.get(url) == lastModified) {
+      return null; // 未修改时跳过加载
+    }
+
+    LAST_MODIFIED_CACHE.put(url, lastModified);
+    connection.setUseCaches(false);
+    return connection.getInputStream();
+  }
+
+  // 假设 I18nPropertyResourceBundle 实现以下方法
+  private static class I18nPropertyResourceBundle extends ResourceBundle {
+    private final Properties properties = new Properties();
+
+    public I18nPropertyResourceBundle() {}
+
+    public I18nPropertyResourceBundle(Reader reader) throws IOException {
+      try (BufferedReader br = new BufferedReader(reader)) {
+        properties.load(br);
       }
     }
 
-    return bundle;
+    public void combine(I18nPropertyResourceBundle other) {
+      other.properties.forEach((k, v) -> properties.putIfAbsent(k, v));
+    }
+
+    public boolean isEmpty() {
+      return properties.isEmpty();
+    }
+
+    @Override
+    protected Object handleGetObject(String key) {
+      return properties.get(key);
+    }
+
+    @Override
+    public Enumeration<String> getKeys() {
+      return Collections.enumeration(properties.stringPropertyNames());
+    }
   }
 
 }

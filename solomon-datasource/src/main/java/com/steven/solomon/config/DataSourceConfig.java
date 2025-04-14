@@ -8,6 +8,7 @@ import com.steven.solomon.properties.TenantDataSourceProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -18,7 +19,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.Order;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;

@@ -1,26 +1,13 @@
 package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
-import cn.hutool.core.lang.TypeReference;
-import cn.hutool.core.util.BooleanUtil;
-import cn.hutool.http.HttpRequest;
-import cn.hutool.http.HttpResponse;
-import cn.hutool.http.HttpUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.JobTask;
-import com.steven.solomon.entity.JobAppVO;
-import com.steven.solomon.entity.JobLoginVO;
 import com.steven.solomon.entity.SaveJobInfoRequest;
-import com.steven.solomon.lambda.Lambda;
-import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.properties.JobProperties;
 import com.steven.solomon.service.PowerJobService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.aop.support.AopUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;

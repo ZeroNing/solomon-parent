@@ -51,10 +51,10 @@
     <maven.compiler.target>21</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
     <yauaa.version>7.28.1</yauaa.version>
-    <fast.excel.version>1.0.0</fast.excel.version>
+    <fast.excel.version>1.1.0</fast.excel.version>
     <spring.boot.version>3.4.4</spring.boot.version>
-    <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
-    <javax.validation>2.0.1.Final</javax.validation>
+    <hibernate.validator.version>8.0.2.Final</hibernate.validator.version>
+    <javax.validation>3.1.1</javax.validation>
     <thumbnailator.version>0.4.20</thumbnailator.version>
     <commons.collections4.version>4.4</commons.collections4.version>
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
@@ -73,12 +73,12 @@
     <hutool.version>5.8.36</hutool.version>
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
-    <mysql.java.version>8.0.28</mysql.java.version>
+    <mysql.java.version>9.2.0</mysql.java.version>
     <minio.version>8.2.1</minio.version>
     <spring.context.version>5.3.7</spring.context.version>
     <slf4j.version>1.7.30</slf4j.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
-    <druid.version>1.2.23</druid.version>
+    <druid.version>1.2.24</druid.version>
     <xmpcore.version>6.1.11</xmpcore.version>
     <metadata.version>2.19.0</metadata.version>
     <knife4j.version>3.0.3</knife4j.version>
@@ -94,7 +94,7 @@
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
     <dingtalk.version>2.0.0</dingtalk.version>
-    <hikaricp.version>5.1.0</hikaricp.version>
+    <hikaricp.version>6.3.0</hikaricp.version>
     <mysql.version>8.0.28</mysql.version>
     <integration.version>5.5.20</integration.version>
     <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
@@ -220,8 +220,8 @@
 
       <!-- MySQL 数据库连接器 -->
       <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
         <version>${mysql.java.version}</version>
       </dependency>
 
@@ -464,14 +464,14 @@
       <!-- 校验注解所有需要jar包 开始 -->
       <!-- Bean Validation API，提供标准的 Java Bean 校验 -->
       <dependency>
-        <groupId>javax.validation</groupId>
-        <artifactId>validation-api</artifactId>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
         <version>${javax.validation}</version>
       </dependency>
 
       <!-- Hibernate Validator，实现 Bean Validation API -->
       <dependency>
-        <groupId>org.hibernate</groupId>
+        <groupId>org.hibernate.validator</groupId>
         <artifactId>hibernate-validator</artifactId>
         <version>${hibernate.validator.version}</version>
       </dependency>
