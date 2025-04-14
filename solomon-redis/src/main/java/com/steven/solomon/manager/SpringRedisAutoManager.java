@@ -6,6 +6,7 @@ import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.cache.RedisCache;
@@ -14,7 +15,6 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Resource;
 import java.time.Duration;
 
 public class SpringRedisAutoManager extends RedisCacheManager {

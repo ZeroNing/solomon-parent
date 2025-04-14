@@ -45,14 +45,14 @@
   </modules>
 
   <properties>
-    <java.version>11</java.version>
+    <java.version>21</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
     <yauaa.version>7.28.1</yauaa.version>
     <fast.excel.version>1.0.0</fast.excel.version>
-    <spring.boot.version>2.7.18</spring.boot.version>
+    <spring.boot.version>3.4.4</spring.boot.version>
     <hibernate.validator.version>6.0.13.Final</hibernate.validator.version>
     <javax.validation>2.0.1.Final</javax.validation>
     <thumbnailator.version>0.4.20</thumbnailator.version>
@@ -98,9 +98,9 @@
     <mysql.version>8.0.28</mysql.version>
     <integration.version>5.5.20</integration.version>
     <sentinel.nacos.version>1.8.8</sentinel.nacos.version>
-    <xxl-job.version>2.4.1</xxl-job.version>
+    <xxl-job.version>3.0.0</xxl-job.version>
     <querydsl.version>5.1.0</querydsl.version>
-    <powerjob.version>5.1.0</powerjob.version>
+    <powerjob.version>5.1.1</powerjob.version>
   </properties>
 
   <dependencyManagement>
