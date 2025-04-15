@@ -72,6 +72,7 @@ public class DefaultMqttInitService implements MqttInitService {
                         if (ValidateUtils.isNotEmpty(messageListener)) {
                             try {
                                 for(String topic : messageListener.topics()){
+                                    topic = SpringUtil.getElValue(topic);
                                     logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
                                     client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});
                                 }

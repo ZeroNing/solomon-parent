@@ -102,10 +102,31 @@
     <querydsl.version>5.1.0</querydsl.version>
     <powerjob.version>5.1.1</powerjob.version>
     <knife4j-springdoc-openapi-jakarta.version>2.8.6</knife4j-springdoc-openapi-jakarta.version>
+    <spring.cloud.alibaba.sentinel.version>2023.0.3.2</spring.cloud.alibaba.sentinel.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-gateway</artifactId>
+        <version>${Spring.cloud.gateway.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        <version>${spring.cloud.loadbalancer.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.csp</groupId>
+        <artifactId>sentinel-spring-cloud-gateway-adapter</artifactId>
+        <version>${sentinel.nacos.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.alibaba.cloud</groupId>
+        <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        <version>${spring.cloud.alibaba.sentinel.version}</version>
+      </dependency>
       <!-- JOB框架 start -->
       <dependency>
         <groupId>com.xuxueli</groupId>

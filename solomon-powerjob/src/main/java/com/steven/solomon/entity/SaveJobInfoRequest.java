@@ -3,6 +3,7 @@ package com.steven.solomon.entity;
 import cn.hutool.core.date.DateUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.enums.*;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.date.DateTimeUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import tech.powerjob.common.model.AlarmConfig;
@@ -189,7 +190,7 @@ public class SaveJobInfoRequest {
     }
 
     public SaveJobInfoRequest update(JobTask jobTask,String className){
-        this.jobName = jobTask.taskName();
+        this.jobName = SpringUtil.getElValue(jobTask.taskName());
         this.jobDescription = jobTask.taskDesc();
         this.appId = Long.valueOf(appId);
         this.jobParams = jobTask.taskParams();
@@ -244,7 +245,7 @@ public class SaveJobInfoRequest {
 
     public SaveJobInfoRequest(JobTask jobTask,Integer appId,String className) {
         super();
-        this.jobName = jobTask.taskName();
+        this.jobName = SpringUtil.getElValue(jobTask.taskName());
         this.jobDescription = jobTask.taskDesc();
         this.appId = Long.valueOf(appId);
         this.jobParams = jobTask.taskParams();

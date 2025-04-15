@@ -76,7 +76,7 @@ public class InitRabbitBinding implements Serializable {
         if (ValidateUtils.isEmpty(name)) {
             return name;
         }
-        name = SpringUtil.getElValue(name,ValidateUtils.getElDefaultValue(name));
+        name = SpringUtil.getElValue(name);
         return isAddDlxPrefix ? BaseRabbitMqCode.DLX_PREFIX + name : name;
     }
 

@@ -114,6 +114,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         List<String> rangeList = Lambda.toList(Arrays.asList(messageListener.tenantRange()), ValidateUtils::isNotEmpty, key->key);
         if(ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)){
           for (String topic : messageListener.topics()) {
+            topic = SpringUtil.getElValue(topic);
             AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
             client.subscribe(new MqttSubscription[]{new MqttSubscription(topic,messageListener.qos())},new IMqttMessageListener[]{consumer});
           }

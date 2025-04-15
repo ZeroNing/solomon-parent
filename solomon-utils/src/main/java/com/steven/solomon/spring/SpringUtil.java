@@ -103,10 +103,7 @@ public class SpringUtil implements ApplicationContextAware {
      */
     public static String getElValue(String elKey){
         if(ValidateUtils.isNotEmpty(elKey) && ValidateUtils.isELExpression(elKey)){
-            elKey = ValidateUtils.extractPropertyName(elKey);
-            if(ValidateUtils.isNotEmpty(elKey)){
-                return context.getEnvironment().getProperty(elKey);
-            }
+            return context.getEnvironment().resolveRequiredPlaceholders(elKey);
         }
         return elKey;
     }

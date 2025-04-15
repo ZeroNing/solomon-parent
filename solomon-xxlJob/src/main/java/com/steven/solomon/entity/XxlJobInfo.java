@@ -54,7 +54,7 @@ public class XxlJobInfo {
 			author = jobTask.author();
 		}
 		this.author = author;
-		this.alarmEmail = jobTask.alarmEmail();
+		this.alarmEmail = SpringUtil.getElValue(jobTask.alarmEmail());
 		this.scheduleType = jobTask.scheduleType();
 		this.scheduleConf = jobTask.scheduleConf();
 		this.misfireStrategy = jobTask.misfireStrategy();
@@ -78,7 +78,7 @@ public class XxlJobInfo {
 			author = jobTask.author();
 		}
 		this.author = author;
-		this.alarmEmail = jobTask.alarmEmail();
+		this.alarmEmail = SpringUtil.getElValue(jobTask.alarmEmail());
 		this.scheduleType = jobTask.scheduleType();
 		this.scheduleConf = jobTask.scheduleConf();
 		this.misfireStrategy = jobTask.misfireStrategy();

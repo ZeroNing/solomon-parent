@@ -50,7 +50,7 @@ public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener>
                 if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topic())) {
                     continue;
                 }
-                String topicName = SpringUtil.getElValue(messageListener.topic(), ValidateUtils.getElDefaultValue(messageListener.topic()));
+                String topicName = SpringUtil.getElValue(messageListener.topic());
                 Topic topic = ValidateUtils.equalsIgnoreCase(messageListener.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
                 RedisMessageListenerContainer container = new RedisMessageListenerContainer();
                 container.setConnectionFactory(factory);
