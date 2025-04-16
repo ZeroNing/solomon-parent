@@ -74,7 +74,7 @@
     <maven.compiler.plugin.version>3.5.1</maven.compiler.plugin.version>
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>9.2.0</mysql.java.version>
-    <minio.version>8.2.1</minio.version>
+    <minio.version>8.5.17</minio.version>
     <spring.context.version>5.3.7</spring.context.version>
     <slf4j.version>1.7.30</slf4j.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
@@ -83,14 +83,14 @@
     <metadata.version>2.19.0</metadata.version>
     <knife4j.version>4.5.0</knife4j.version>
     <jwt.version>0.9.1</jwt.version>
-    <oss.version>3.15.1</oss.version>
-    <obs.version>3.22.3</obs.version>
-    <cos.version>5.6.97</cos.version>
-    <bos.version>0.10.240</bos.version>
+    <oss.version>3.18.1</oss.version>
+    <obs.version>3.24.12</obs.version>
+    <cos.version>5.6.245</cos.version>
+    <bos.version>0.10.371</bos.version>
     <rocketMq.version>2.2.3</rocketMq.version>
     <mqtt.version>6.2.2</mqtt.version>
     <druid.version>1.2.18</druid.version>
-    <aws.s3.version>2.28.29</aws.s3.version>
+    <aws.s3.version>2.31.21</aws.s3.version>
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
     <dingtalk.version>2.0.0</dingtalk.version>
