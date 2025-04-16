@@ -50,7 +50,7 @@
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
-    <yauaa.version>7.28.1</yauaa.version>
+    <yauaa.version>7.30.0</yauaa.version>
     <fast.excel.version>1.1.0</fast.excel.version>
     <spring.boot.version>3.4.4</spring.boot.version>
     <hibernate.validator.version>8.0.2.Final</hibernate.validator.version>
