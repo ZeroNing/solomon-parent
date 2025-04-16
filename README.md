@@ -912,7 +912,7 @@ powerjob:
     password: admin      # powerjob密码
     namespace: solomon   # 命名空间
 ```
-## xxl-job使用说明
+## powerJob使用说明
 ### jobTask注解说明
 ```java
 /**
