@@ -896,7 +896,191 @@ public class TestHandler extends AbstractJobConsumer {
     }
 }
 ```
+# powerJob配置说明
+## powerJob配置文件说明
+```yaml
+powerjob:
+  worker:
+    enabled: true        # 是否启用 Worker 节点（true/false），需确保服务符合中国网络安全法要求
+    port: 27777          # Worker 服务监听端口（范围 1024-65535），注意避免与系统服务端口冲突
+    app-name: solomon    # 应用名称（需与PowerJob控制台注册的应用名完全一致），建议遵循企业命名规范
+    server-address: localhost:7700 # powerJob地址
+    protocol: http       # 通信协议（http/https），敏感场景建议使用HTTPS加密传输
+    max-result-length: 4096 # 任务结果最大长度（单位：字节），需符合业务实际需求
+    max-lightweight-task-num: 1024 # 最大轻量级任务并行数，需根据服务器资源合理配置
+    user-name: ADMIN     # powerjob账号
+    password: admin      # powerjob密码
+    namespace: solomon   # 命名空间
+```
+## xxl-job使用说明
+### jobTask注解说明
+```java
+/**
+ * powerjob注解
+ */
+@Target(value = { ElementType.FIELD, ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+@Conditional(PowerJobCondition.class)
+public @interface JobTask {
 
+    @AliasFor(annotation = Component.class)
+    String value() default StrUtil.EMPTY;
+
+    /**
+     * 任务名称
+     */
+    String taskName();
+
+    /**
+     * 任务描述
+     */
+    String taskDesc() default StrUtil.EMPTY;
+
+    /**
+     * 任务参数
+     */
+    String taskParams() default StrUtil.EMPTY;
+
+    /**
+     * 时间表达式类型 默认:固定频率
+     */
+    TimeExpressionType timeExpressionType() default TimeExpressionType.FIXED_RATE;
+
+    /**
+     * 时间表达式值 根据类型来配置
+     */
+    String timeExpression() default "30000";
+
+    /**
+     * 执行类型 默认:单机执行
+     */
+    ExecuteType executeType() default ExecuteType.STANDALONE;
+
+    /**
+     * 处理器类型 默认:内置
+     */
+    ProcessorType processorType() default ProcessorType.BUILT_IN;
+
+    /**
+     * 处理器信息。 默认只有是内置的情况下才拿当前class名字
+     */
+    String processorInfo() default StrUtil.EMPTY;
+
+    /**
+     * 最大实例数设置
+     */
+    int maxInstanceNum() default 0;
+
+    /**
+     * 并发设置
+     */
+    int concurrency() default 0;
+
+    /**
+     * 实例运行时间限制。{@code 0L}表示没有限制。
+     */
+    long instanceTimeLimit() default 0L;
+
+    /**
+     * 实例重试次数设置。
+     */
+    int instanceRetryNum() default 0;
+
+    /**
+     * 任务重试次数设置
+     */
+    int taskRetryNum() default 0;
+
+    /**
+     * 最小 CPU 要求。{@code 0}表示没有限制
+     */
+    double minCpuCores()default 0;
+
+    /**
+     * 最小内存要求，以 GB 为单位。
+     */
+    double minMemorySpace() default 0;
+
+    /**
+     * 最小磁盘空间，以 GB 为单位。{@code 0}表示没有限制。
+     */
+    double minDiskSpace() default 0;
+
+    /**
+     * 是否启用作业。
+     */
+    boolean enable() default true;
+
+    /**
+     * 派发策略。
+     */
+    DispatchStrategy dispatchStrategy() default DispatchStrategy.HEALTH_FIRST;
+
+    /**
+     * 某种派发策略背后的具体配置，值取决于 dispatchStrategy。
+     */
+    String dispatchStrategyConfig() default StrUtil.EMPTY;
+
+    /**
+     * 生命周期开始时间 格式"yyyy-MM-dd HH:mm:ss"
+     */
+    String lifeCycleStart() default StrUtil.EMPTY;
+
+    /**
+     * 生命周期结束时间 格式"yyyy-MM-dd HH:mm:ss"
+     */
+    String lifeCycleEnd() default StrUtil.EMPTY;
+
+    /**
+     * 获取告警阈值。
+     *
+     * @return 告警阈值的整数表示。默认值为 0，表示未设置具体阈值。
+     */
+    int alertThreshold() default 0;
+
+    /**
+     * 获取统计窗口长度。
+     *
+     * @return 统计窗口的长度，以整数形式表示。默认值为 0，表示未设置具体长度。
+     */
+    int statisticWindowLen() default 0;
+
+    /**
+     * 获取静默窗口长度。
+     *
+     * @return 静默窗口的长度，以整数形式表示。默认值为 0，表示未设置具体长度。
+     */
+    int silenceWindowLen() default 0;
+
+    /**
+     * 日志配置 默认不配置日志
+     */
+    LogType type() default LogType.NULL;
+
+    /**
+     * 日志等级 默认:INFO
+     */
+    LogLevel level() default LogLevel.INFO;
+
+    /**
+     * 高级配置
+     */
+    TaskTrackerBehavior taskTrackerBehavior() default TaskTrackerBehavior.NORMAL;
+}
+```
+## powerJob自动创建任务用法
+```java
+@JobTask(taskName = "5555")
+public class Test implements BasicProcessor {
+
+    @Override
+    public ProcessResult process(TaskContext taskContext) throws Exception {
+
+        return new ProcessResult(true,"成功");
+    }
+}
+```
 # MongoDB配置说明
 ## MongoDB多租户配置方式
 1.需要在配置文件增加配置mode: NORMAL("单库"), SWITCH_DB("切换数据源");
