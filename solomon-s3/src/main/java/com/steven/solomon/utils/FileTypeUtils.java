@@ -8,15 +8,30 @@ import java.io.InputStream;
 public class FileTypeUtils {
 
   public static String getFileType(InputStream inputStream) {
-    return ValidateUtils.getOrDefault(FileTypeUtil.getType(inputStream), "application/octet-stream");
+    String fileType = ValidateUtils.getOrDefault(FileTypeUtil.getType(inputStream), "application/octet-stream");
+    if(!fileType.contains("application")){
+      return "application/octet-stream";
+    } else {
+      return fileType;
+    }
   }
 
   public static String getFileType(InputStream inputStream, String fileName) {
-    return ValidateUtils.getOrDefault(FileTypeUtil.getType(inputStream, fileName), "application/octet-stream");
+    String fileType = ValidateUtils.getOrDefault(FileTypeUtil.getType(inputStream, fileName), "application/octet-stream");
+    if(!fileType.contains("application")){
+      return "application/octet-stream";
+    } else {
+      return fileType;
+    }
   }
 
   public static String getFileType(File file) {
-    return ValidateUtils.getOrDefault(FileTypeUtil.getType(file), "application/octet-stream");
+    String fileType = ValidateUtils.getOrDefault(FileTypeUtil.getType(file), "application/octet-stream");
+    if(!fileType.contains("application")){
+      return "application/octet-stream";
+    } else {
+      return fileType;
+    }
   }
 
 

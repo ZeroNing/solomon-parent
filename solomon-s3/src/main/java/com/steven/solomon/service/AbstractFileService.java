@@ -77,7 +77,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
         return new FileUpload(bucketName,filePath,file.getInputStream());
       }
     } else {
-      return upload(file.getInputStream(),bucketName,filePath);
+      this.upload(file,bucketName,filePath);
+      return new FileUpload(bucketName,filePath,file.getInputStream());
     }
 
   }

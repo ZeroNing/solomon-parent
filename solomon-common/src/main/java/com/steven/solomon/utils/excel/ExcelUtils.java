@@ -14,6 +14,7 @@ import cn.idev.excel.write.style.column.AbstractColumnWidthStyleStrategy;
 import com.steven.solomon.clazz.ClassUtils;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.file.MockMultipartFile;
+import com.steven.solomon.utils.excel.converter.ImageExcelConverter;
 import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -104,7 +105,7 @@ public class ExcelUtils {
 			stopWatch = new StopWatch();
 			stopWatch.start();
 			logger.info("开始导出Excel");
-			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
+			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerConverter(new ImageExcelConverter()).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
 			WriteSheet writeSheet;
@@ -140,8 +141,11 @@ public class ExcelUtils {
 		for(Field field : clazz.getDeclaredFields()){
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
-			annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
-			ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
+			String value = I18nUtils.getMessage(i18nKey,(String)null);
+			if(ValidateUtils.isNotEmpty(value)){
+				annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
+				ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
+			}
 		}
 	}
 
