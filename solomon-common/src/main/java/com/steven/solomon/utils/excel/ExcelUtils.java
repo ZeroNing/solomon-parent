@@ -15,6 +15,8 @@ import com.steven.solomon.clazz.ClassUtils;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.utils.excel.converter.ImageExcelConverter;
+import com.steven.solomon.utils.excel.converter.ListExcelConverter;
+import com.steven.solomon.utils.excel.handler.ImageCellWriteHandler;
 import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -64,6 +66,7 @@ public class ExcelUtils {
 		stopWatch.start();
 		logger.info("开始导出Excel");
 		FastExcel.write(response.getOutputStream(), clazz)
+				.registerConverter(new ListExcelConverter()).registerWriteHandler(new ImageCellWriteHandler())
 				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
 				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
 				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
@@ -105,7 +108,7 @@ public class ExcelUtils {
 			stopWatch = new StopWatch();
 			stopWatch.start();
 			logger.info("开始导出Excel");
-			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerConverter(new ImageExcelConverter()).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
+			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerConverter(new ListExcelConverter()).registerWriteHandler(new ImageCellWriteHandler()).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 			ExcelWriter excelWriter = excelWriterBuilder.build();
 			ExcelWriterSheetBuilder excelWriterSheetBuilder;
 			WriteSheet writeSheet;
