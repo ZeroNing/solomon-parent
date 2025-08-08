@@ -10,7 +10,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ImageExcelConverter implements Converter<InputStream> {
+public class InputStreamExcelConverter implements Converter<InputStream> {
 
     @Override
     public Class<?> supportJavaTypeKey() {

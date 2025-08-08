@@ -25,7 +25,7 @@ public class TestFileController {
         String bucketName = "default";
         //判断桶是否存在
         boolean bucketExists = fileService.bucketExists(bucketName);
-        logger.info("桶:{}{}",bucketExists,bucketExists ? "已存在" : "不存在");
+        logger.info("桶:{}{}",bucketName,bucketExists ? "已存在" : "不存在");
         //上传文件
         FileUpload fileUpload = fileService.upload(file,bucketName);
         //分享URL
