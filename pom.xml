@@ -105,10 +105,18 @@
     <spring.cloud.alibaba.sentinel.version>2023.0.3.2</spring.cloud.alibaba.sentinel.version>
     <poi.version>5.4.0</poi.version>
     <common-io.version>2.18.0</common-io.version>
+    <clamav.version>2.1.2</clamav.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>xyz.capybara</groupId>
+        <artifactId>clamav-client</artifactId>
+        <version>${clamav.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.poi</groupId>
         <artifactId>poi</artifactId>
