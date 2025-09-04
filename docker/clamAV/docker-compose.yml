@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  clamav:
+    image: clamav/clamav:latest
+    container_name: clamav
+    volumes:
+      - ./data:/var/lib/clamav  # 病毒库持久化
+      - ./scan:/scandir         # 待扫描目录
+    ports:
+      - "3310:3310"
+#    environment:
+#      - CLAMAV_NO_FRESHCLAMD=false        # 开启自动更新
+    restart: unless-stopped
