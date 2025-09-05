@@ -1,5 +1,6 @@
 package com.steven.solomon.clamav.utils;
 
+import com.steven.solomon.clamav.properties.ClamAvProperties;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
@@ -12,15 +13,17 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
 
-@Component
 public class ClamAvUtils {
 
     private final Logger logger = LoggerUtils.logger(ClamAvUtils.class);
 
     private final ClamavClient client;
 
-    public ClamAvUtils(ClamavClient client) {
+    private final ClamAvProperties properties;
+
+    public ClamAvUtils(ClamavClient client, ClamAvProperties properties) {
         this.client = client;
+        this.properties = properties;
     }
 
     /**
@@ -30,6 +33,9 @@ public class ClamAvUtils {
      * @throws BaseException
      */
     public boolean scanFile(InputStream inputStream) throws BaseException {
+        if(!properties.getEnabled()){
+            return false;
+        }
         if(ValidateUtils.isEmpty(inputStream)){
             throw new IllegalArgumentException("Input stream is empty");
         }
