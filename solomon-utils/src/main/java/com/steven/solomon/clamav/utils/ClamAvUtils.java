@@ -51,6 +51,12 @@ public class ClamAvUtils {
         throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
     }
 
+    /**
+     * 扫描文件是否有病毒
+     * @param inputStream 文件流
+     * @param errorCode 有病毒异常编码
+     * @throws BaseException
+     */
     public void scanFile(InputStream inputStream,String errorCode) throws BaseException {
         if(!scanFile(inputStream)){
             throw new BaseException(errorCode);
