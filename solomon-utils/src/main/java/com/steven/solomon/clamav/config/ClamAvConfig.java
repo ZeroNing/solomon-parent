@@ -1,53 +1,32 @@
-package com.steven.solomon.clamav.utils;
+package com.steven.solomon.clamav.config;
 
 import com.steven.solomon.clamav.properties.ClamAvProperties;
-import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
-import org.slf4j.Logger;
-import org.springframework.stereotype.Component;
+import com.steven.solomon.clamav.utils.ClamAvUtils;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
 import xyz.capybara.clamav.ClamavClient;
-import xyz.capybara.clamav.commands.scan.result.ScanResult;
+import xyz.capybara.clamav.Platform;
 
-import java.io.InputStream;
-import java.util.Collection;
-import java.util.Map;
+@Configuration
+@EnableConfigurationProperties(value = {ClamAvProperties.class})
+public class ClamAvConfig {
 
-public class ClamAvUtils {
+    private final ClamAvProperties clamAVProperties;
 
-    private final Logger logger = LoggerUtils.logger(ClamAvUtils.class);
-
-    private final ClamavClient client;
-
-    private final ClamAvProperties properties;
-
-    public ClamAvUtils(ClamavClient client, ClamAvProperties properties) {
-        this.client = client;
-        this.properties = properties;
+    public ClamAvConfig(ClamAvProperties clamAVProperties) {
+        this.clamAVProperties = clamAVProperties;
     }
 
-    /**
-     * 扫描文件是否有病毒
-     * @param inputStream 文件流
-     * @return true 有病毒 false 没有病毒
-     * @throws BaseException
-     */
-    public boolean scanFile(InputStream inputStream) throws BaseException {
-        if(!properties.getEnabled()){
-            return false;
+    @Bean
+    public ClamAvUtils clamAvUtils() {
+        ClamavClient client = null;
+        if(clamAVProperties.getEnabled()){
+            client = new ClamavClient(clamAVProperties.getHost(), clamAVProperties.getPort(), clamAVProperties.getPlatform());
         }
-        if(ValidateUtils.isEmpty(inputStream)){
-            throw new IllegalArgumentException("Input stream is empty");
-        }
-        ScanResult scanResult = client.scan(inputStream);
-        if(scanResult instanceof ScanResult.OK) {
-           return false;
-        }
-        if(scanResult instanceof ScanResult.VirusFound) {
-            Map<String, Collection<String>> foundViruses = ((ScanResult.VirusFound) scanResult).getFoundViruses();
-            logger.info(foundViruses.toString());
-            return true;
-        }
-        throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
+        return new ClamAvUtils(client,clamAVProperties);
     }
 }
