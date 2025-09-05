@@ -50,4 +50,10 @@ public class ClamAvUtils {
         }
         throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
     }
+
+    public void scanFile(InputStream inputStream,String errorCode) throws BaseException {
+        if(!scanFile(inputStream)){
+            throw new BaseException(errorCode);
+        }
+    }
 }
