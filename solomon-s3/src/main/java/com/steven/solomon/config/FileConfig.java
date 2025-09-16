@@ -1,5 +1,6 @@
 package com.steven.solomon.config;
 
+import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.namingRules.OriginalNamingRulesGenerationService;
@@ -41,59 +42,59 @@ public class FileConfig {
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   @ConditionalOnClass(OkHttpClient.Builder.class)
-  public FileServiceInterface fileService(FileChoiceProperties fileProperties,FileNamingRulesGenerationService fileNamingRulesGenerationService){
+  public FileServiceInterface fileService(FileChoiceProperties fileProperties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils){
     logger.info("选择 {} 文件服务", fileProperties.getChoice().getDesc());
     switch (fileProperties.getChoice()) {
       case MINIO:
-        return new MinioService(fileProperties,fileNamingRulesGenerationService);
+        return new MinioService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case OSS:
-        return new OSSService(fileProperties,fileNamingRulesGenerationService);
+        return new OSSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case OBS:
-        return new OBSService(fileProperties,fileNamingRulesGenerationService);
+        return new OBSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case COS:
-        return new COSService(fileProperties,fileNamingRulesGenerationService);
+        return new COSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case BOS:
-        return new BOSService(fileProperties,fileNamingRulesGenerationService);
+        return new BOSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case KODO:
-        return new KODOService(fileProperties,fileNamingRulesGenerationService);
+        return new KODOService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case ZOS:
-        return new ZOSService(fileProperties,fileNamingRulesGenerationService);
+        return new ZOSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case KS3:
-        return new KS3Service(fileProperties,fileNamingRulesGenerationService);
+        return new KS3Service(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case EOS:
-        return new EOSService(fileProperties,fileNamingRulesGenerationService);
+        return new EOSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case NOS:
-        return new NOSService(fileProperties,fileNamingRulesGenerationService);
+        return new NOSService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case B2:
-        return new B2Service(fileProperties,fileNamingRulesGenerationService);
+        return new B2Service(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case JD:
-        return new JDService(fileProperties,fileNamingRulesGenerationService);
+        return new JDService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case YANDEX:
-        return new YandexService(fileProperties,fileNamingRulesGenerationService);
+        return new YandexService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case AMAZON:
-        return new AmazonService(fileProperties,fileNamingRulesGenerationService);
+        return new AmazonService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case SHARKTECH:
-        return new SharktechService(fileProperties,fileNamingRulesGenerationService);
+        return new SharktechService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case DIDI:
-        return new DiDiService(fileProperties,fileNamingRulesGenerationService);
+        return new DiDiService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case BOTO3:
-        return new Boto3Service(fileProperties,fileNamingRulesGenerationService);
+        return new Boto3Service(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case TOS:
-        return new TosService(fileProperties,fileNamingRulesGenerationService);
+        return new TosService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case R2:
-        return new R2Service(fileProperties,fileNamingRulesGenerationService);
+        return new R2Service(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case GOOGLE_CLOUD_STORAGE:
-        return new GoogleCloudStorageService(fileProperties,fileNamingRulesGenerationService);
+        return new GoogleCloudStorageService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case UOS:
-        return new UosService(fileProperties,fileNamingRulesGenerationService);
+        return new UosService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case AZURE:
-        return new AzureService(fileProperties,fileNamingRulesGenerationService);
+        return new AzureService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case INSPUR:
-        return new InspurService(fileProperties,fileNamingRulesGenerationService);
+        return new InspurService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       case S3:
-        return new S3Service(fileProperties,fileNamingRulesGenerationService);
+        return new S3Service(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
       default:
-        return new DefaultService(fileProperties,fileNamingRulesGenerationService);
+        return new DefaultService(fileProperties,fileNamingRulesGenerationService,clamAvUtils);
     }
   }
 }

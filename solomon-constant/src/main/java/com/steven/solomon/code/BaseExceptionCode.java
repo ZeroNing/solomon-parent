@@ -87,4 +87,6 @@ public interface BaseExceptionCode {
    * 上传文件大小超过最大限制
    */
   String FILE_UPLOAD_MAX_SIZE = "FILE_UPLOAD_MAX_SIZE";
+
+  String FILE_HIGH_RISK = "FILE_HIGH_RISK";
 }

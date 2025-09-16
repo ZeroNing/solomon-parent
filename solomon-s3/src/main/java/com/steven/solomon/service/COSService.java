@@ -8,6 +8,7 @@ import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.http.HttpProtocol;
 import com.qcloud.cos.model.*;
 import com.qcloud.cos.region.Region;
+import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -27,8 +28,8 @@ public class COSService extends AbstractFileService {
 
   private final COSClient client;
 
-  public COSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
-    super(properties,fileNamingRulesGenerationService);
+  public COSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
+    super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client = initClient(properties);
   }
 
