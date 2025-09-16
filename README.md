@@ -1242,7 +1242,7 @@ public class ClamAvUtils {
      * @throws BaseException
      */
     public void scanFile(InputStream inputStream,String errorCode) throws BaseException {
-        if(!scanFile(inputStream)){
+        if(scanFile(inputStream)){
             throw new BaseException(errorCode);
         }
     }
