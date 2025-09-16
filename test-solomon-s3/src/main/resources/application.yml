@@ -37,3 +37,8 @@ file:
   access-key: admin
   secret-key: admin12345678
   file-naming-method: date
+clamav:
+  enabled: true
+  host: 127.0.0.1
+  port: 3310
+  platform: unix
