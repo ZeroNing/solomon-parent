@@ -45,7 +45,7 @@ public class ClamAvUtils {
         }
         if(scanResult instanceof ScanResult.VirusFound) {
             Map<String, Collection<String>> foundViruses = ((ScanResult.VirusFound) scanResult).getFoundViruses();
-            logger.info(foundViruses.toString());
+            logger.info("扫描文件出现高风险病毒:{}",foundViruses.toString());
             return true;
         }
         throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
