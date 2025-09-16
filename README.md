@@ -1196,6 +1196,7 @@ clamav:
   port: 3310 #ClamAV端口
   platform: unix #ClamAV的platform 
 ```
+## ClamAV工具
 ```java
 public class ClamAvUtils {
 
@@ -1245,6 +1246,31 @@ public class ClamAvUtils {
         if(scanFile(inputStream)){
             throw new BaseException(errorCode);
         }
+    }
+}
+```
+## ClamAV使用案例
+```java
+@RestController
+public class TestFileController {
+
+    private final FileServiceInterface fileService;
+
+    private final ClamAvUtils clamAvUtils;
+
+
+    private final Logger logger = LoggerUtils.logger(TestFileController.class);
+
+    public TestFileController(FileServiceInterface fileService, ClamAvUtils clamAvUtils) {
+        this.fileService = fileService;
+        this.clamAvUtils = clamAvUtils;
+    }
+
+
+    @PostMapping("/test")
+    public ResultVO<String> test(@RequestPart(name = "file") MultipartFile file) throws Exception {
+        clamAvUtils.scanFile(file.getInputStream(), BaseExceptionCode.FILE_HIGH_RISK);
+        return new ResultVO<String>("");
     }
 }
 ```
