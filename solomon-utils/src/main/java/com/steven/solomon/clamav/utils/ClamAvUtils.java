@@ -1,5 +1,6 @@
 package com.steven.solomon.clamav.utils;
 
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.clamav.properties.ClamAvProperties;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -45,7 +46,7 @@ public class ClamAvUtils {
         }
         if(scanResult instanceof ScanResult.VirusFound) {
             Map<String, Collection<String>> foundViruses = ((ScanResult.VirusFound) scanResult).getFoundViruses();
-            logger.info("扫描文件出现高风险病毒:{}",foundViruses.toString());
+            logger.info("扫描文件出现高风险病毒:{}", JSONUtil.toJsonStr(foundViruses.toString()));
             return true;
         }
         throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
