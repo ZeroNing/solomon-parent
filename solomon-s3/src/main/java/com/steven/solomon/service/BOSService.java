@@ -6,6 +6,7 @@ import com.baidubce.auth.DefaultBceCredentials;
 import com.baidubce.services.bos.BosClient;
 import com.baidubce.services.bos.BosClientConfiguration;
 import com.baidubce.services.bos.model.*;
+import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -39,8 +40,8 @@ public class BOSService extends AbstractFileService {
     return new BosClient(configuration);
   }
 
-  public BOSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
-    super(properties,fileNamingRulesGenerationService);
+  public BOSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
+    super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client = client();
   }
 

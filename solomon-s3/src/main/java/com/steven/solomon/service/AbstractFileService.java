@@ -2,12 +2,15 @@ package com.steven.solomon.service;
 
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.StrUtil;
+import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.Color;
@@ -33,10 +36,13 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected Long partSize;
 
-  public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService){
+  protected ClamAvUtils clamAvUtils;
+
+  public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService,ClamAvUtils clamAvUtils){
     this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
     this.properties = properties;
     this.partSize = (long) (this.properties.getPartSize() * 1024 * 1024);
+    this.clamAvUtils = clamAvUtils;
   }
 
   public AbstractFileService(FileNamingRulesGenerationService fileNamingRulesGenerationService){
@@ -65,6 +71,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception{
+    clamAvUtils.scanFile(file.getInputStream(), BaseExceptionCode.FILE_HIGH_RISK);
     //创建桶
     makeBucket(bucketName);
     String       filePath = getFilePath(!isUseOriginalName ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);

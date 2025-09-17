@@ -5,6 +5,7 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.comm.Protocol;
 import com.aliyun.oss.model.*;
+import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.namingRules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
@@ -22,8 +23,8 @@ public class OSSService extends AbstractFileService {
 
   private final OSS client;
 
-  public OSSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService) {
-    super(properties,fileNamingRulesGenerationService);
+  public OSSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
+    super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client     = client();
   }
 

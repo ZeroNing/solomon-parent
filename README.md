@@ -1187,7 +1187,93 @@ powerjob:
     user-name: 认证的用户名  # 用于认证的用户名，与服务端配置的用户名匹配。
     password: 认证的密码  # 用于认证的密码，与服务端配置的密码匹配。
 ```
+# ClamAV配置说明
+## ClamAV配置文件说明
+```yaml
+clamav:
+  enabled: true #是否开启ClamAV扫描病毒
+  host: 127.0.0.1 #ClamAV地址
+  port: 3310 #ClamAV端口
+  platform: unix #ClamAV的platform 
+```
+## ClamAV工具
+```java
+public class ClamAvUtils {
 
+    private final Logger logger = LoggerUtils.logger(ClamAvUtils.class);
+
+    private final ClamavClient client;
+
+    private final ClamAvProperties properties;
+
+    public ClamAvUtils(ClamavClient client, ClamAvProperties properties) {
+        this.client = client;
+        this.properties = properties;
+    }
+
+    /**
+     * 扫描文件是否有病毒
+     * @param inputStream 文件流
+     * @return true 有病毒 false 没有病毒
+     * @throws BaseException
+     */
+    public boolean scanFile(InputStream inputStream) throws BaseException {
+        if(!properties.getEnabled()){
+            return false;
+        }
+        if(ValidateUtils.isEmpty(inputStream)){
+            throw new IllegalArgumentException("Input stream is empty");
+        }
+        ScanResult scanResult = client.scan(inputStream);
+        if(scanResult instanceof ScanResult.OK) {
+           return false;
+        }
+        if(scanResult instanceof ScanResult.VirusFound) {
+            Map<String, Collection<String>> foundViruses = ((ScanResult.VirusFound) scanResult).getFoundViruses();
+            logger.info("扫描文件出现高风险病毒:{}", JSONUtil.toJsonStr(foundViruses.toString()));
+            return true;
+        }
+        throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
+    }
+
+    /**
+     * 扫描文件是否有病毒
+     * @param inputStream 文件流
+     * @param errorCode 有病毒异常编码
+     * @throws BaseException
+     */
+    public void scanFile(InputStream inputStream,String errorCode) throws BaseException {
+        if(scanFile(inputStream)){
+            throw new BaseException(errorCode);
+        }
+    }
+}
+```
+## ClamAV使用案例
+```java
+@RestController
+public class TestFileController {
+
+    private final FileServiceInterface fileService;
+
+    private final ClamAvUtils clamAvUtils;
+
+
+    private final Logger logger = LoggerUtils.logger(TestFileController.class);
+
+    public TestFileController(FileServiceInterface fileService, ClamAvUtils clamAvUtils) {
+        this.fileService = fileService;
+        this.clamAvUtils = clamAvUtils;
+    }
+
+
+    @PostMapping("/test")
+    public ResultVO<String> test(@RequestPart(name = "file") MultipartFile file) throws Exception {
+        clamAvUtils.scanFile(file.getInputStream(), BaseExceptionCode.FILE_HIGH_RISK);
+        return new ResultVO<String>("");
+    }
+}
+```
 # Docker Compose安装组件文件
 详细的配置都在docker文件夹内，内涵Emqx的Mqtt组件、Minio对象存储组件、Mongodb组件、Mysql数据库、Portainer管理Docker可视化界面组件、PostgresSql数据库、RabbitMq消息队列组件、Redis缓存组件、RocketMq消息队列组件、sonarqube代码检查组件、Nacos组件
 
