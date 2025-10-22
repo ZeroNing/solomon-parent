@@ -49,7 +49,7 @@ public class ClamAvUtils {
             logger.info("扫描文件出现高风险病毒:{}", JSONUtil.toJsonStr(foundViruses.toString()));
             return true;
         }
-        throw new BaseException("ERROR_CODE_SCAN_FILE_ERROR");
+        throw new BaseException("SCAN_FILE_ERROR");
     }
 
     /**
