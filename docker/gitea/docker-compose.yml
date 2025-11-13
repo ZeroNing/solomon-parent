@@ -1,0 +1,46 @@
+# 指定 Docker Compose 文件版本
+version: "3"
+
+# 定义服务
+services:
+  # Gitea 服务
+  gitea:
+    # 使用 Gitea 的 nightly 版本（开发版，可能不稳定）
+    image: gitea/gitea:1.25-nightly
+    # 容器名称
+    container_name: gitea
+    # 环境变量配置
+    environment:
+      # 设置容器内运行 Gitea 的用户 UID
+      - USER_UID=1000
+      # 设置容器内运行 Gitea 的用户 GID
+      - USER_GID=1000
+      # 数据库类型：MySQL
+      - GITEA__database__DB_TYPE=mysql
+      # ⚠️ 问题所在：数据库连接地址应为数据库服务名，不是 127.0.0.1
+      # 应该改为：GITEA__database__HOST=db:3306
+      - GITEA__database__HOST=127.0.0.1:3306
+      # 数据库名称
+      - GITEA__database__NAME=gitea
+      # 数据库用户名
+      - GITEA__database__USER=root
+      # 数据库密码
+      - GITEA__database__PASSWD=root
+    # 重启策略：总是重启
+    restart: always
+    # 数据卷映射
+    volumes:
+      # 将主机上的 ./data 目录映射到容器的 /data 目录（Gitea 数据存储）
+      - ./data:/data
+      # 将主机上的 ./config 目录映射到容器的 /etc/gitea 目录（配置文件）
+      - ./config:/etc/gitea
+      # 同步主机时区信息到容器
+      - /etc/timezone:/etc/timezone:ro
+      # 同步主机本地时间到容器
+      - /etc/localtime:/etc/localtime:ro
+    # 端口映射
+    ports:
+      # 将主机的 3000 端口映射到容器的 3000 端口（Web 界面）
+      - "3000:3000"
+      # 将主机的 222 端口映射到容器的 22 端口（SSH 访问）
+      - "222:22"
