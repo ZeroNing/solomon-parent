@@ -40,8 +40,6 @@ public class XxlJobProperties {
 
     //超时时间
     private Integer timeout;
-    //xxl-job版本
-    private String version;
 
     //是否自动注册
     private boolean autoRegister = false;
@@ -52,14 +50,6 @@ public class XxlJobProperties {
 
     public void setAutoRegister(boolean autoRegister) {
         this.autoRegister = autoRegister;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    public void setVersion(String version) {
-        this.version = version;
     }
 
     public Integer getTimeout() {

@@ -11,7 +11,10 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.HashMap;
@@ -24,13 +27,13 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     protected final String adminAddresses;
 
+    private Logger logger = LoggerUtils.logger(CommonXxlJobService.class);
+
     protected CommonXxlJobService(XxlJobProperties profile, ApplicationContext applicationContext) {
         this.profile = profile;
         this.adminAddresses = getUrl();
         SpringUtil.setContext(applicationContext);
     }
-
-    protected abstract String getLoginUrl();
 
     @Override
     public String login() throws Exception {
@@ -46,14 +49,21 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
             throw new BaseException(XxlJobErrorCode.XXL_JOB_PASSWORD_IS_NULL);
         }
 
-        String url = getLoginUrl();
         // 构建请求参数
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userName", userName);
         paramMap.put("password", password);
+        String url = null;
+        try {
+            url = adminAddresses + "login";
+            // 发送 POST 请求
+            return getCookie(url,paramMap);
+        } catch (Throwable e) {
+            logger.warn("请求URL:{}失败,改为请求:{},异常:",url,adminAddresses + "auth/doLogin",e);
+            url = adminAddresses + "auth/doLogin";
+            return getCookie(url,paramMap);
+        }
 
-        // 发送 POST 请求
-        return getCookie(url,paramMap);
     }
 
     @Override
