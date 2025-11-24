@@ -3,4 +3,8 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.spring.SpringUtil,\
 com.steven.solomon.config.XxlJobConfig,\
 com.steven.solomon.init.XxlJobInit,\
-com.steven.solomon.service.XxlJobService
+com.steven.solomon.service.XxlJob320Service,\
+com.steven.solomon.service.XxlJob311Service,\
+com.steven.solomon.service.XxlJob320Service,\
+com.steven.solomon.service.XxlJob300Service,\
+com.steven.solomon.service.XxlJob242Service

@@ -33,4 +33,5 @@ xxl:
   user-name: admin
   password: 123456
   log-path: 日志路径
+  auto-register: false
 

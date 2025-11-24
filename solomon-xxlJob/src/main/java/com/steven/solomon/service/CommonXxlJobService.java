@@ -6,7 +6,6 @@ import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.XxlJobErrorCode;
-import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
@@ -14,28 +13,24 @@ import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service
-@Conditional(XxlJobCondition.class)
-@Import(XxlJobProperties.class)
-public class XxlJobService implements JobService<XxlJobInfo>{
+public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
-    private final XxlJobProperties profile;
+    protected final XxlJobProperties profile;
 
-    private final String adminAddresses;
+    protected final String adminAddresses;
 
-    public XxlJobService(ApplicationContext applicationContext, XxlJobProperties profile) {
+    protected CommonXxlJobService(XxlJobProperties profile, ApplicationContext applicationContext) {
         this.profile = profile;
         this.adminAddresses = getUrl();
         SpringUtil.setContext(applicationContext);
     }
+
+    protected abstract String getLoginUrl();
 
     @Override
     public String login() throws Exception {
@@ -51,7 +46,7 @@ public class XxlJobService implements JobService<XxlJobInfo>{
             throw new BaseException(XxlJobErrorCode.XXL_JOB_PASSWORD_IS_NULL);
         }
 
-        String url = adminAddresses + "login";
+        String url = getLoginUrl();
         // 构建请求参数
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("userName", userName);
@@ -63,7 +58,9 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void saveJob(String cookie,XxlJobInfo job) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
@@ -77,7 +74,9 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void updateJob(String cookie,XxlJobInfo job) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
@@ -93,7 +92,9 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void deleteJob(String cookie,String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
 
         String url = adminAddresses + "jobinfo/remove";
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
@@ -110,7 +111,9 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void startJob(String cookie,String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
 
         String url = adminAddresses + "jobinfo/start";
 
@@ -127,7 +130,9 @@ public class XxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void stopJob(String cookie,String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
 
         String url = adminAddresses + "jobinfo/stop";
 
@@ -143,10 +148,19 @@ public class XxlJobService implements JobService<XxlJobInfo>{
     }
 
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
-        String url = adminAddresses + "jobinfo/pageList?jobGroup=1&triggerStatus=-1&start="+0+"&length="+1000+"&executorHandler="+executorHandler;
-
-        String body = execute(cookie,url,null);
+        if(ValidateUtils.isEmpty(cookie)){
+            cookie = login();
+        }
+        String url = adminAddresses + "jobinfo/pageList";
+        Map<String,Object> paramMap = new  HashMap<>();
+        paramMap.put("jobGroup", "1");
+        paramMap.put("triggerStatus", "-1");
+        paramMap.put("start", "0");
+        paramMap.put("length", "10000");
+        paramMap.put("executorHandler", executorHandler);
+        paramMap.put("author", "");
+        paramMap.put("jobDesc", "");
+        String body = execute(cookie,url,paramMap);
         Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         Object obj = resultMap.get("data");
         return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
@@ -155,29 +169,33 @@ public class XxlJobService implements JobService<XxlJobInfo>{
     /**
      * 获取登陆网页的cookie
      */
-    private String getCookie(String url, Map<String, Object> paramMap) throws BaseException {
+    protected String getCookie(String url, Map<String, Object> paramMap) throws BaseException {
         try (HttpResponse response = executeResponse(null, url, paramMap)) {
             List<String> cookies = response.headerList("Set-Cookie");
             if(ValidateUtils.isEmpty(cookies)){
                 throw new BaseException(XxlJobErrorCode.XXL_JOB_COOKIE_IS_NULL);
             }
-            return cookies.get(0);
+            String cookie = cookies.getFirst();
+            // 按分号分割，取第一个部分
+            String[] parts = cookie.split(";");
+            if (parts.length > 0) {
+                String tokenPart = parts[0].trim(); // 获取分号前的部分
+                return tokenPart;
+            }
+            return cookies.getFirst();
         }
     }
 
-    private String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
+    protected String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
             return response.body();
         }
     }
 
-    /**
-     * 调用接口
-     */
-    private HttpResponse executeResponse(String cookie,String url,Map<String, Object> paramMap) throws BaseException {
+    protected HttpResponse executeResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         HttpRequest request = HttpUtil.createPost(url);
         if(ValidateUtils.isNotEmpty(cookie)){
-            request = request.cookie(cookie); // 需要替换为实际的认证信息
+            request = request.header("Cookie", cookie);
         }
         if(ValidateUtils.isNotEmpty(paramMap)){
             request = request.form(paramMap);
@@ -198,7 +216,7 @@ public class XxlJobService implements JobService<XxlJobInfo>{
         return response;
     }
 
-    private String getUrl(){
+    protected String getUrl(){
         String adminAddresses = profile.getAdminAddresses();
         if(!adminAddresses.endsWith("/")){
             adminAddresses = adminAddresses + "/";
