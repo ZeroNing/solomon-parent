@@ -7,6 +7,7 @@ import com.steven.solomon.enums.ScheduleTypeEnum;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.service.CommonXxlJobService;
+import com.steven.solomon.service.XxlJobService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
@@ -25,38 +26,12 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
     private final XxlJobProperties profile;
 
-    private final CommonXxlJobService service;
+    private final XxlJobService service;
 
-    private final XxlJobSpringExecutor xxlJobSpringExecutor;
-
-    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobSpringExecutor xxlJobSpringExecutor) {
+    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobService service) {
         SpringUtil.setContext(applicationContext);
+        this.service = service;
         this.profile = profile;
-        Map<String,CommonXxlJobService> xxlJobServiceMap = SpringUtil.getBeansOfType(CommonXxlJobService.class);
-        if(ValidateUtils.isEmpty(profile.getVersion())){
-            service = xxlJobServiceMap.get(xxlJobServiceMap.keySet().stream()
-                    .filter(s -> s.matches("^\\d+(\\.\\d+)*$")) // 匹配版本格式
-                    .max((s1, s2) -> {
-                        String[] parts1 = s1.split("\\.");
-                        String[] parts2 = s2.split("\\.");
-
-                        int maxLength = Math.max(parts1.length, parts2.length);
-
-                        for (int i = 0; i < maxLength; i++) {
-                            int num1 = (i < parts1.length) ? Integer.parseInt(parts1[i]) : 0;
-                            int num2 = (i < parts2.length) ? Integer.parseInt(parts2[i]) : 0;
-
-                            if (num1 != num2) {
-                                return Integer.compare(num1, num2);
-                            }
-                        }
-                        return 0;
-                    })
-                    .orElse(null));
-        } else {
-            this.service = xxlJobServiceMap.get(profile.getVersion());
-        }
-        this.xxlJobSpringExecutor = xxlJobSpringExecutor;
 
     }
 
