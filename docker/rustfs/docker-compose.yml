@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      RUSTFS_ACCESS_KEY: admin
+      RUSTFS_SECRET_KEY: admin12345678
+    volumes:
+      - ./data:/data
+      - ./logs:/app/logs
+      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+    restart:  always
