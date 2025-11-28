@@ -41,6 +41,10 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
             logger.error("powerJob不启用,不初始化定时任务");
             return;
         }
+        if(!jobProperties.getAutoRegister()){
+            logger.error("powerJob启用,配置了不自动注册任务");
+            return;
+        }
         //登陆获取cookie
         String cookie = service.login();
         //创建命名空间
