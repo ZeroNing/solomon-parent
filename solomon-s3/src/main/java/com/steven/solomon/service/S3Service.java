@@ -63,10 +63,14 @@ public class S3Service extends AbstractFileService {
 
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
-    client.putObject(PutObjectRequest.builder()
+    byte[] fileBytes = file.getBytes();
+
+    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(filePath)
-            .build(), RequestBody.fromInputStream(file.getInputStream(),file.getSize()));
+            .contentLength((long) fileBytes.length)
+            .build();
+    client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
   }
 
   @Override
