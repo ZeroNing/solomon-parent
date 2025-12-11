@@ -212,6 +212,24 @@ public class MqttUtils implements SendService<MqttModel<?>> {
       message.setRetained(will.getRetained());
       mqttConnectOptions.setWill(will.getTopic(), message);
     }
+    if(mqttProfile.getVerifyCertificate()){
+      try {
+        // 创建信任所有证书的 SSLContext
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+          public X509Certificate[] getAcceptedIssuers() { return null; }
+          public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+          public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+        }}, new java.security.SecureRandom());
+
+        mqttConnectOptions.setSocketFactory(sslContext.getSocketFactory());
+        // 可选：设置主机名验证为忽略 (Paho 1.2.0+支持)
+        // options.setSSLHostnameVerifier((hostname, session) -> true);
+
+      } catch (NoSuchAlgorithmException | KeyManagementException e) {
+        throw new RuntimeException("Error setting up SSL for MQTT", e);
+      }
+    }
     return mqttConnectOptions;
   }
 }
