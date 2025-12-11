@@ -16,11 +16,18 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 @Configuration
 public class MqttUtils implements SendService<MqttModel<?>> {
@@ -194,6 +201,25 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     if (ValidateUtils.isNotEmpty(will)) {
       mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
     }
+    if(mqttProfile.getVerifyCertificate()){
+      try {
+        // 创建信任所有证书的 SSLContext
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, new TrustManager[]{new X509TrustManager() {
+          public X509Certificate[] getAcceptedIssuers() { return null; }
+          public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+          public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+        }}, new java.security.SecureRandom());
+
+        mqttConnectOptions.setSocketFactory(sslContext.getSocketFactory());
+        // 可选：设置主机名验证为忽略 (Paho 1.2.0+支持)
+        // options.setSSLHostnameVerifier((hostname, session) -> true);
+
+      } catch (NoSuchAlgorithmException | KeyManagementException e) {
+        throw new RuntimeException("Error setting up SSL for MQTT", e);
+      }
+    }
+
     return mqttConnectOptions;
   }
 }
