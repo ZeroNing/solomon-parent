@@ -102,6 +102,11 @@ public class MqttProfile {
    */
   private Long sessionExpiryInterval = null;
 
+  /**
+   * ssl连接是否验证证书
+   */
+  private boolean verifyCertificate = false;
+
   public static class MqttWill implements Serializable {
 
     /**
@@ -313,5 +318,13 @@ public class MqttProfile {
 
   public void setSessionExpiryInterval(Long sessionExpiryInterval) {
     this.sessionExpiryInterval = sessionExpiryInterval;
+  }
+
+  public boolean getVerifyCertificate() {
+    return verifyCertificate;
+  }
+
+  public void setVerifyCertificate(boolean verifyCertificate) {
+    this.verifyCertificate = verifyCertificate;
   }
 }
