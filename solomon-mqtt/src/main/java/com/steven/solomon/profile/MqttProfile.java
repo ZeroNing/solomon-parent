@@ -68,6 +68,11 @@ public class MqttProfile {
    */
   private int executorServiceTimeout = 1;
 
+  /**
+   * ssl连接是否验证证书
+   */
+  private boolean verifyCertificate = false;
+
   public static class MqttWill implements Serializable {
 
     /**
@@ -223,5 +228,13 @@ public class MqttProfile {
 
   public void setExecutorServiceTimeout(int executorServiceTimeout) {
     this.executorServiceTimeout = executorServiceTimeout;
+  }
+
+  public boolean getVerifyCertificate() {
+    return verifyCertificate;
+  }
+
+  public void setVerifyCertificate(boolean verifyCertificate) {
+    this.verifyCertificate = verifyCertificate;
   }
 }
