@@ -201,7 +201,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     if (ValidateUtils.isNotEmpty(will)) {
       mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
     }
-    if(mqttProfile.getVerifyCertificate()){
+    if(!mqttProfile.getVerifyCertificate()){
       try {
         // 创建信任所有证书的 SSLContext
         SSLContext sslContext = SSLContext.getInstance("TLS");
