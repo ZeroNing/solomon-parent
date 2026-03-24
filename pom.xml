@@ -42,6 +42,7 @@
     <module>test-solomon-bot-notice</module>
     <module>solomon-datasource</module>
     <module>test-solomon-datasource</module>
+    <module>solom-vertx-mqtt</module>
   </modules>
 
   <properties>
@@ -106,10 +107,24 @@
     <poi.version>5.4.0</poi.version>
     <common-io.version>2.18.0</common-io.version>
     <clamav.version>2.1.2</clamav.version>
+    <vertx.mqtt>5.0.8</vertx.mqtt>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-mqtt</artifactId>
+        <version>${vertx.mqtt}</version>
+        <scope>compile</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-core</artifactId>
+        <version>${vertx.mqtt}</version>
+      </dependency>
 
       <dependency>
         <groupId>xyz.capybara</groupId>
