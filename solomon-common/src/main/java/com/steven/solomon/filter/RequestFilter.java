@@ -19,10 +19,14 @@ public class RequestFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-    //设置时区值
-    ExceptionUtil.requestId.set(UUID.randomUUID().toString());
-    RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
-    //往下执行
-    chain.doFilter(new ContentCachingRequestWrapper(request), response);
+    try {
+      ExceptionUtil.requestId.set(UUID.randomUUID().toString());
+      RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
+      chain.doFilter(new ContentCachingRequestWrapper(request), response);
+    } finally {
+      // 必须清理 ThreadLocal
+      ExceptionUtil.requestId.remove();
+      // RequestHeaderHolder 也需要添加 remove 方法
+    }
   }
 }

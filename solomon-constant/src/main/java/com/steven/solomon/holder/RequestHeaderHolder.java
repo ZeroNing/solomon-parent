@@ -46,7 +46,7 @@ public class RequestHeaderHolder {
   public static String getTenantName(){
     RequestHeader heard = threadLocal.get();
     if(heard != null && !heard.getTenantName().isEmpty()){
-      return heard.getTenantCode();
+      return heard.getTenantName();
     } else {
       return "";
     }
