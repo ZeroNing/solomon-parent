@@ -102,12 +102,30 @@ public class S3Service extends AbstractFileService {
     client.createBucket(CreateBucketRequest.builder().bucket(bucketName).build());
   }
 
+  /**
+   * 检查S3对象是否存在
+   *
+   * <p>通过发送HEAD请求检查对象是否存在。</p>
+   * <p>⚠️ 异常处理策略：</p>
+   * <ul>
+   *   <li>{@link NoSuchKeyException} - 对象不存在，返回false</li>
+   *   <li>{@link S3Exception} - 其他S3错误，记录警告日志并返回false</li>
+   *   <li>其他异常 - 向上抛出，由调用方处理</li>
+   * </ul>
+   *
+   * @param bucketName 桶名称
+   * @param objectName 对象键名
+   * @return {@code true}: 对象存在<br>{@code false}: 对象不存在或发生错误
+   */
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     try{
       client.headObject(HeadObjectRequest.builder().bucket(bucketName).key(objectName).build());
       return true;
-    } catch (Throwable e){
+    } catch (NoSuchKeyException e){
+      return false;  // 对象不存在
+    } catch (S3Exception e) {
+      logger.warn("检查S3对象是否存在时发生异常: bucket={}, key={}, error={}", bucketName, objectName, e.getMessage());
       return false;
     }
   }
@@ -122,12 +140,29 @@ public class S3Service extends AbstractFileService {
             .build());
   }
 
+  /**
+   * 检查S3桶是否存在
+   *
+   * <p>通过发送HEAD请求检查桶是否存在。</p>
+   * <p>⚠️ 异常处理策略：</p>
+   * <ul>
+   *   <li>{@link NoSuchBucketException} - 桶不存在，返回false</li>
+   *   <li>{@link S3Exception} - 其他S3错误，记录警告日志并返回false</li>
+   *   <li>其他异常 - 向上抛出，由调用方处理</li>
+   * </ul>
+   *
+   * @param bucketName 桶名称
+   * @return {@code true}: 桶存在<br>{@code false}: 桶不存在或发生错误
+   */
   @Override
   public boolean bucketExists(String bucketName) throws Exception {
     try{
       client.headBucket(HeadBucketRequest.builder().bucket(bucketName).build());
       return true;
-    } catch (Throwable e){
+    } catch (NoSuchBucketException e){
+      return false;  // 桶不存在
+    } catch (S3Exception e) {
+      logger.warn("检查S3桶是否存在时发生异常: bucket={}, error={}", bucketName, e.getMessage());
       return false;
     }
   }
@@ -162,39 +197,93 @@ public class S3Service extends AbstractFileService {
     client.abortMultipartUpload(AbortMultipartUploadRequest.builder().bucket(bucketName).key(filePath).uploadId(uploadId).build());
   }
 
+  /**
+   * 分片上传大文件
+   *
+   * <p>将大文件分割成多个分片进行上传，适用于上传大文件（通常>5MB）。</p>
+   *
+   * <h3>⚠️ InputStream处理的关键点：</h3>
+   * <ol>
+   *   <li><b>循环skip</b>：{@link InputStream#skip(long)}不保证一次性跳过所有字节，
+   *       必须循环调用直到跳过足够的字节数</li>
+   *   <li><b>循环read</b>：{@link InputStream#read(byte[], int, int)}不保证读满buffer，
+   *       必须循环调用直到读取足够的数据</li>
+   *   <li><b>资源清理</b>：使用try-with-resources确保每个分片的InputStream被正确关闭</li>
+   * </ol>
+   *
+   * <h3>内存使用说明：</h3>
+   * <p>每个分片会分配一个大小为partSize的buffer，请根据可用内存合理设置分片大小。</p>
+   *
+   * @param file 上传的文件
+   * @param bucketName 桶名称
+   * @param fileSize 文件总大小（字节）
+   * @param uploadId 分片上传任务ID
+   * @param filePath 对象键名
+   * @param partCount 分片总数
+   * @throws IllegalStateException 当skip或read操作无法完成时抛出
+   * @throws Exception 当S3上传失败时抛出
+   */
   @Override
   protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
     List<CompletedPart> partETags = new ArrayList<>();
     for (int i = 0; i < partCount; i++) {
-      InputStream inputStream = file.getInputStream();
-      // 跳到每个分块的开头
-      long skipBytes = partSize * i;
-      inputStream.skip(skipBytes);
+      // 使用try-with-resources确保InputStream被正确关闭，避免资源泄漏
+      try (InputStream inputStream = file.getInputStream()) {
+        // ========== 跳过前序分片的字节 ==========
+        // ⚠️ 关键：skip()方法不保证一次性跳过所有字节，必须循环调用
+        // 例如：某些InputStream实现可能每次只跳过1字节
+        long skipBytes = (long) partSize * i;
+        long skipped = 0;
+        while (skipped < skipBytes) {
+          long n = inputStream.skip(skipBytes - skipped);
+          if (n <= 0) {
+            // skip返回0或负数表示无法继续跳过，可能是文件已结束
+            throw new IllegalStateException("无法跳过足够的字节，期望: " + skipBytes + ", 实际: " + skipped);
+          }
+          skipped += n;
+        }
 
-      // 计算每个分块的大小
-      long size = partSize < fileSize - skipBytes ?
-                  partSize : fileSize - skipBytes;
-      byte[] buffer = new byte[(int) size];
-      inputStream.read(buffer);
+        // ========== 计算当前分片大小 ==========
+        // 最后一个分片可能小于partSize
+        long size = partSize < fileSize - skipBytes ? partSize : fileSize - skipBytes;
+        byte[] buffer = new byte[(int) size];
+        
+        // ========== 读取分片数据 ==========
+        // ⚠️ 关键：read()方法不保证读满buffer，必须循环调用
+        // 例如：网络InputStream可能分多次返回数据
+        int bytesRead = 0;
+        while (bytesRead < size) {
+          int n = inputStream.read(buffer, bytesRead, (int) size - bytesRead);
+          if (n < 0) {
+            // read返回-1表示文件已结束，但此时数据还未读满
+            throw new IllegalStateException("意外的文件结束，期望: " + size + ", 实际: " + bytesRead);
+          }
+          bytesRead += n;
+        }
 
-      UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
-              .bucket(bucketName)
-              .key(filePath)
-              .uploadId(uploadId)
-              .partNumber(i + 1)
-              .contentLength(size)
-              .build();
-      // 上传分片并添加到列表
-      UploadPartResponse uploadPartResponse = client.uploadPart(uploadPartRequest, RequestBody.fromBytes(buffer));
-      partETags.add(CompletedPart.builder()
-              .partNumber(i + 1)
-              .eTag(uploadPartResponse.eTag())
-              .build());
+        // ========== 上传分片到S3 ==========
+        UploadPartRequest uploadPartRequest = UploadPartRequest.builder()
+                .bucket(bucketName)
+                .key(filePath)
+                .uploadId(uploadId)
+                .partNumber(i + 1)  // S3分片号从1开始
+                .contentLength(size)
+                .build();
+        
+        // 上传分片并记录ETag（用于完成分片上传时校验）
+        UploadPartResponse uploadPartResponse = client.uploadPart(uploadPartRequest, RequestBody.fromBytes(buffer));
+        partETags.add(CompletedPart.builder()
+                .partNumber(i + 1)
+                .eTag(uploadPartResponse.eTag())
+                .build());
+      }
+      // try-with-resources确保inputStream在此处自动关闭
     }
 
-    // 完成分片上传
+    // ========== 完成分片上传 ==========
+    // 将所有分片合并成完整对象
     CompleteMultipartUploadRequest compRequest =CompleteMultipartUploadRequest.builder()
             .bucket(bucketName)
             .key(filePath)

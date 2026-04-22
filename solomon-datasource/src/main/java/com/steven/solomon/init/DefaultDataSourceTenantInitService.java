@@ -17,7 +17,7 @@ public class DefaultDataSourceTenantInitService extends AbstractDataSourceInitSe
     @Override
     public void init(String tenantCode, DataSourceProperties properties, DataSourceTenantContext context) throws Throwable {
         DataSource dataSource = initFactory(properties);
-        context.setFactory(tenantCode, dataSource);
+        context.registerFactory(tenantCode, dataSource);
     }
 
     @Override
@@ -27,14 +27,21 @@ public class DefaultDataSourceTenantInitService extends AbstractDataSourceInitSe
             log.info("连接池类型为空,自动默认为:Druid");
             connectionPool = ConnectionPoolTypeEnum.DRUID;
         }
+        
         DataSource dataSource = null;
+        
+        // ⚠️ 修复：每个case后必须加break，否则会穿透到下一个case
+        // 原bug：缺少break导致DRUID和HIKARICP都会穿透到default抛出异常
         switch (connectionPool) {
             case DRUID:
                 dataSource = new DruidDataSourceService().getDataSource(properties);
+                break;  // ⚠️ 必须有break，否则会穿透
             case HIKARICP:
                 dataSource = new HikariCPDataSourceService().getDataSource(properties);
+                break;  // ⚠️ 必须有break，否则会穿透
             default:
                 throw new BaseException(I18nUtils.getErrorMessage(SqlErrorCode.CONNECTION_POOL_TYPE_NO_MATCH,connectionPool.getName()));
         }
+        return dataSource;
     }
 }

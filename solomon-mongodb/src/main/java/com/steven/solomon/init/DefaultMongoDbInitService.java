@@ -31,7 +31,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
     @Override
     public void init(String tenantCode, MongoProperties properties, MongoTenantContext context) throws Throwable {
         SimpleMongoClientDatabaseFactory factory = initFactory(properties);
-        context.setFactory(tenantCode,factory);
+        context.registerFactory(tenantCode,factory);
         initDocument(factory);
     }
 

@@ -360,14 +360,40 @@ public class ValidateUtils {
     }
 
     /**
-     * 检查枚举是否不符合
+     * 检查枚举值是否无效（不存在于枚举类中）
      *
-     * @param value 枚举名称
+     * <p>该方法通过捕获{@link IllegalArgumentException}来判断枚举值是否存在。</p>
+     * <p>⚠️ 注意：枚举名称是大小写敏感的。</p>
+     *
+     * <h3>使用示例：</h3>
+     * <pre>{@code
+     * enum Status { ACTIVE, INACTIVE }
+     *
+     * // 有效枚举值
+     * checkEnumValueIsEmpty("ACTIVE", Status.class);  // 返回 false
+     *
+     * // 无效枚举值
+     * checkEnumValueIsEmpty("UNKNOWN", Status.class); // 返回 true
+     * checkEnumValueIsEmpty("active", Status.class);  // 返回 true（大小写敏感）
+     * checkEnumValueIsEmpty(null, Status.class);      // 返回 true
+     * }</pre>
+     *
+     * @param value 枚举名称（大小写敏感）
      * @param clazz 枚举class
+     * @return {@code true}: 枚举值无效（不存在）<br>{@code false}: 枚举值有效（存在）
+     * @see Enum#valueOf(Class, String)
      */
-    public static boolean checkEnumValueIsEmpty(String value, Class clazz) {
-        Enum<?> enums = Enum.valueOf(clazz, value);
-        return isEmpty(enums);
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static boolean checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz) {
+        if (isEmpty(value) || isEmpty(clazz)) {
+            return true;
+        }
+        try {
+            Enum.valueOf(clazz, value);
+            return false;  // 找到了，说明有效
+        } catch (IllegalArgumentException e) {
+            return true;   // 找不到，说明无效
+        }
     }
 
     /**

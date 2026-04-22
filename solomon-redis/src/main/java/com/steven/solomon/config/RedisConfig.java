@@ -118,7 +118,7 @@ public class RedisConfig extends CachingConfigurerSupport {
       factory = context.getFactoryMap().values().iterator().next();
     } else {
       factory = new DefaultRedisInitService().initFactory(redisProperties);
-      context.setFactory(BaseCode.DEFAULT, factory);
+      context.registerFactory(BaseCode.DEFAULT, factory);
     }
     return factory;
   }

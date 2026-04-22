@@ -146,6 +146,12 @@
     <sentinel.version>1.8.8</sentinel.version>
     <spring-context-support.version>1.0.11</spring-context-support.version>
 
+    <!-- Redis连接池 -->
+    <commons-pool2.version>2.12.0</commons-pool2.version>
+
+    <!-- Servlet API -->
+    <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
+
     <!-- 其他 -->
     <poi.version>5.4.0</poi.version>
     <clamav.version>2.1.2</clamav.version>
@@ -344,6 +350,21 @@
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
         <version>${commons-io.version}</version>
+      </dependency>
+      
+      <!-- Redis连接池 -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-pool2</artifactId>
+        <version>${commons-pool2.version}</version>
+      </dependency>
+      
+      <!-- Servlet API -->
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${jakarta.servlet-api.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>nl.basjes.parse.useragent</groupId>

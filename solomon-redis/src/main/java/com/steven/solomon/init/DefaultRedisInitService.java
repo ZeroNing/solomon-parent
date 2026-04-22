@@ -16,7 +16,7 @@ import java.time.Duration;
 public class DefaultRedisInitService extends AbstractDataSourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory>{
     @Override
     public void init(String tenantCode, RedisProperties properties, RedisTenantContext context) throws Throwable {
-        context.setFactory(tenantCode, initFactory(properties));
+        context.registerFactory(tenantCode, initFactory(properties));
     }
 
     @Override
