@@ -10,7 +10,6 @@ import java.util.Enumeration;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 
 public class IPAddressUtils {
@@ -58,7 +57,7 @@ public class IPAddressUtils {
 	public static boolean isIpv6Address(final String ip) {
 		int num = 0;
 		String inputStr = null;
-		if (StringUtils.contains(ip, "%")) {
+		if (StrUtil.contains(ip, "%")) {
 			inputStr = ip.substring(0, ip.indexOf("%"));
 		} else {
 			inputStr = ip;
@@ -121,7 +120,7 @@ public class IPAddressUtils {
 			ip = request.getRemoteAddr();
 		}
 		// 返回多个ip 处理
-		if (StringUtils.contains(ip, ",")) {
+		if (StrUtil.contains(ip, ",")) {
 			logger.info("返回IP多条 ip ={}", ip);
 			String[] addres = ip.split(",");
 			for (int i = 0; i < addres.length; i++) {

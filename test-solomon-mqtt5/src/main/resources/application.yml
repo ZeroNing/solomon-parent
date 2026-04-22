@@ -29,4 +29,4 @@ mqtt:
     test:
       user-name: admin
       password: admin
-      url: tcp://127.0.0.1:1883
+      url: tcp://192.168.8.95:1883

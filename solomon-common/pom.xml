@@ -6,6 +6,7 @@
     <artifactId>solomon-parent</artifactId>
     <groupId>com.steven</groupId>
     <version>1.0</version>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -16,7 +17,6 @@
     <dependency>
       <groupId>com.steven</groupId>
       <artifactId>solomon-base</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>
