@@ -26,56 +26,188 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 默认MongoDB租户初始化服务
+ * 
+ * <h2>功能说明</h2>
+ * <p>负责为多租户环境创建和管理MongoDB连接工厂，支持固定集合（Capped Collection）</p>
+ * 
+ * <h2>核心功能</h2>
+ * <ul>
+ *   <li>创建MongoDB连接工厂</li>
+ *   <li>自动创建数据库和集合</li>
+ *   <li>支持固定集合（Capped Collection）配置</li>
+ *   <li>支持用户权限管理</li>
+ * </ul>
+ * 
+ * <h2>固定集合说明</h2>
+ * <p>固定集合是大小固定的循环集合，当集合填满时，新文档会覆盖最旧的文档。</p>
+ * <p>适用场景：日志存储、事件记录、缓存数据等</p>
+ * 
+ * @author steven
+ * @since 1.0.0
+ * @see MongoDBCapped
+ * @see MongoTenantContext
+ */
 public class DefaultMongoDbInitService extends AbstractDataSourceInitService<MongoProperties, MongoTenantContext, SimpleMongoClientDatabaseFactory>{
 
+    /**
+     * 初始化租户MongoDB连接
+     * 
+     * <p>流程：</p>
+     * <ol>
+     *   <li>创建MongoDB连接工厂</li>
+     *   <li>注册到租户上下文</li>
+     *   <li>初始化文档集合（自动创建固定集合）</li>
+     * </ol>
+     * 
+     * @param tenantCode 租户编码
+     * @param properties MongoDB配置
+     * @param context MongoDB租户上下文
+     * @throws Throwable 创建失败时抛出
+     */
     @Override
     public void init(String tenantCode, MongoProperties properties, MongoTenantContext context) throws Throwable {
-        SimpleMongoClientDatabaseFactory factory = initFactory(properties);
-        context.registerFactory(tenantCode,factory);
-        initDocument(factory);
+        log.info("[MongoDB] 开始初始化租户MongoDB连接: tenantCode={}, host={}:{}, database={}", 
+            tenantCode, properties.getHost(), properties.getPort(), properties.getDatabase());
+        
+        long startTime = System.currentTimeMillis();
+        try {
+            // Step 1: 创建连接工厂
+            SimpleMongoClientDatabaseFactory factory = initFactory(properties);
+            
+            // Step 2: 注册到租户上下文
+            context.registerFactory(tenantCode, factory);
+            
+            // Step 3: 初始化文档集合
+            initDocument(factory);
+            
+            long cost = System.currentTimeMillis() - startTime;
+            log.info("[MongoDB] 租户MongoDB连接初始化成功: tenantCode={}, host={}:{}, database={}, cost={}ms", 
+                tenantCode, properties.getHost(), properties.getPort(), properties.getDatabase(), cost);
+        } catch (Exception e) {
+            long cost = System.currentTimeMillis() - startTime;
+            log.error("[MongoDB] 租户MongoDB连接初始化失败: tenantCode={}, host={}:{}, cost={}ms, error={}", 
+                tenantCode, properties.getHost(), properties.getPort(), cost, e.getMessage(), e);
+            throw e;
+        }
     }
 
+    /**
+     * 创建MongoDB连接工厂
+     * 
+     * <h3>配置说明</h3>
+     * <ul>
+     *   <li>使用用户名/密码认证</li>
+     *   <li>配置为单机模式（STANDALONE）</li>
+     *   <li>支持多节点连接（MULTIPLE模式）</li>
+     * </ul>
+     * 
+     * @param properties MongoDB配置
+     * @return MongoDB数据库工厂
+     * @throws Throwable 配置错误时抛出
+     */
     @Override
     public SimpleMongoClientDatabaseFactory initFactory(MongoProperties properties) throws Throwable {
-        MongoCredential mongoCredential = MongoCredential.createCredential(properties.getUsername(),properties.getDatabase(),properties.getPassword());
-        MongoClientSettings settings = MongoClientSettings.builder().credential(mongoCredential).applyToClusterSettings(builder -> {
-            builder.hosts(List.of(new ServerAddress(properties.getHost(), properties.getPort()))).mode(
-                    ClusterConnectionMode.MULTIPLE).requiredClusterType(ClusterType.STANDALONE);
-        }).build();
-        return new SimpleMongoClientDatabaseFactory(MongoClients.create(settings),properties.getDatabase());
+        log.debug("[MongoDB] 开始创建连接工厂: host={}:{}, database={}, username={}", 
+            properties.getHost(), properties.getPort(), properties.getDatabase(), properties.getUsername());
+        
+        // ========== Step 1: 创建认证信息 ==========
+        MongoCredential mongoCredential = MongoCredential.createCredential(
+            properties.getUsername(), 
+            properties.getDatabase(), 
+            properties.getPassword());
+        
+        log.debug("[MongoDB] 认证信息: username={}, authDatabase={}", 
+            properties.getUsername(), properties.getDatabase());
+        
+        // ========== Step 2: 创建客户端设置 ==========
+        MongoClientSettings settings = MongoClientSettings.builder()
+            .credential(mongoCredential)
+            .applyToClusterSettings(builder -> {
+                builder.hosts(List.of(new ServerAddress(properties.getHost(), properties.getPort())))
+                    .mode(ClusterConnectionMode.MULTIPLE)  // 多节点连接模式
+                    .requiredClusterType(ClusterType.STANDALONE);  // 单机类型
+            })
+            .build();
+        
+        // ========== Step 3: 创建连接工厂 ==========
+        SimpleMongoClientDatabaseFactory factory = new SimpleMongoClientDatabaseFactory(
+            MongoClients.create(settings), 
+            properties.getDatabase());
+        
+        log.info("[MongoDB] 连接工厂创建成功: host={}:{}, database={}", 
+            properties.getHost(), properties.getPort(), properties.getDatabase());
+        
+        return factory;
     }
 
+    /**
+     * 初始化文档集合
+     * 
+     * <p>扫描所有带有{@link MongoDBCapped}注解的实体类，自动创建固定集合（Capped Collection）</p>
+     * 
+     * <h3>处理逻辑</h3>
+     * <ul>
+     *   <li>如果集合不存在：创建固定集合（如果配置了MongoDBCapped）或普通集合</li>
+     *   <li>如果集合已存在：记录警告日志，不修改（防止数据丢失）</li>
+     * </ul>
+     * 
+     * @param factory MongoDB数据库工厂
+     */
     public void initDocument(MongoDatabaseFactory factory){
-
-        List<String>  collectionNameList = new ArrayList<>();
-        MongoDatabase mongoDatabase      = factory.getMongoDatabase();
+        log.debug("[MongoDB] 开始初始化文档集合");
+        
+        // ========== Step 1: 获取已存在的集合列表 ==========
+        List<String> collectionNameList = new ArrayList<>();
+        MongoDatabase mongoDatabase = factory.getMongoDatabase();
         mongoDatabase.listCollectionNames().forEach(collectionNameList::add);
-
+        
+        log.debug("[MongoDB] 已存在集合: {}", collectionNameList);
+        
+        // ========== Step 2: 扫描带有MongoDBCapped注解的实体 ==========
+        int createCount = 0;
+        int skipCount = 0;
+        
         for(Object obj : SpringUtil.getBeansWithAnnotation(MongoDBCapped.class).values()){
-            MongoDBCapped                                          mongoDBCapped = AnnotationUtil.getAnnotation(obj.getClass(), MongoDBCapped.class);
-            org.springframework.data.mongodb.core.mapping.Document document      = AnnotationUtil.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
-
-            String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : ValidateUtils.isNotEmpty(document.value()) ? document.value() : StrUtil.EMPTY;
+            // 获取注解信息
+            MongoDBCapped mongoDBCapped = AnnotationUtil.getAnnotation(obj.getClass(), MongoDBCapped.class);
+            org.springframework.data.mongodb.core.mapping.Document document = 
+                AnnotationUtil.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
+            
+            // 确定集合名称
+            String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : 
+                ValidateUtils.isNotEmpty(document.value()) ? document.value() : StrUtil.EMPTY;
+            
             boolean isCreate = collectionNameList.contains(name);
+            
+            // ========== Step 3: 创建集合 ==========
             if(!isCreate){
+                // 集合不存在，创建新集合
                 if(ValidateUtils.isNotEmpty(mongoDBCapped)){
-                    mongoDatabase.createCollection(name,new CreateCollectionOptions().capped(true).maxDocuments(mongoDBCapped.maxDocuments()).sizeInBytes(mongoDBCapped.size()));
+                    // 创建固定集合（Capped Collection）
+                    mongoDatabase.createCollection(name, 
+                        new CreateCollectionOptions()
+                            .capped(true)
+                            .maxDocuments(mongoDBCapped.maxDocuments())
+                            .sizeInBytes(mongoDBCapped.size()));
+                    
+                    log.info("[MongoDB] 创建固定集合: name={}, maxDocuments={}, size={}bytes", 
+                        name, mongoDBCapped.maxDocuments(), mongoDBCapped.size());
                 } else {
+                    // 创建普通集合
                     mongoDatabase.createCollection(name);
+                    log.info("[MongoDB] 创建普通集合: name={}", name);
                 }
+                createCount++;
             } else {
-                log.error("集合{}已存在,不允许修改为固定集合,防止数据丢失,请先备份数据后,手动创建固定集合",name);
-//        if(ValidateUtils.isNotEmpty(mongoDBCapped)){
-//          org.bson.Document command  = new org.bson.Document("collStats", name);
-//          Boolean  isCapped = mongoDatabase.runCommand(command).getBoolean("capped");
-//          if(!isCapped){
-//            logger.info("修改集合{}为固定集合,限制字节为:{},记录数:{}",name,mongoDBCapped.size(),mongoDBCapped.maxDocuments());
-//            command = new org.bson.Document("convertToCapped", name).append("capped",true).append("size", mongoDBCapped.size()).append("max",mongoDBCapped.maxDocuments());
-//            mongoDatabase.runCommand(command);
-//          }
-//        }
+                // 集合已存在，跳过创建
+                log.warn("[MongoDB] 集合已存在，跳过创建: name={}（注意：修改为固定集合会导致数据丢失，请手动处理）", name);
+                skipCount++;
             }
         }
+        
+        log.info("[MongoDB] 文档集合初始化完成: 创建={}, 跳过={}", createCount, skipCount);
     }
 
     /**

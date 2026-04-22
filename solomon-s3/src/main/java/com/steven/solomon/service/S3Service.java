@@ -185,15 +185,24 @@ public class S3Service extends AbstractFileService {
 
   @Override
   public String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception {
+    logger.info("[S3] 开始分片上传任务: bucket={}, key={}", bucketName, objectName);
+    
+    long startTime = System.currentTimeMillis();
     CreateMultipartUploadRequest initRequest = CreateMultipartUploadRequest.builder()
             .bucket(bucketName)
             .key(objectName)
             .build();
-    return client.createMultipartUpload(initRequest).uploadId();
+    
+    String uploadId = client.createMultipartUpload(initRequest).uploadId();
+    
+    logger.info("[S3] 分片上传任务创建成功: bucket={}, key={}, uploadId={}, cost={}ms", 
+        bucketName, objectName, uploadId, System.currentTimeMillis() - startTime);
+    return uploadId;
   }
 
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
+    logger.warn("[S3] 中止分片上传任务: bucket={}, key={}, uploadId={}", bucketName, filePath, uploadId);
     client.abortMultipartUpload(AbortMultipartUploadRequest.builder().bucket(bucketName).key(filePath).uploadId(uploadId).build());
   }
 
@@ -227,8 +236,15 @@ public class S3Service extends AbstractFileService {
   protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     // 分割文件并上传分片
+    logger.info("[S3] 开始分片上传: bucket={}, key={}, fileSize={}, partCount={}, partSize={}", 
+        bucketName, filePath, fileSize, partCount, partSize);
+    
     List<CompletedPart> partETags = new ArrayList<>();
+    long uploadStartTime = System.currentTimeMillis();
+    
     for (int i = 0; i < partCount; i++) {
+      long partStartTime = System.currentTimeMillis();
+      
       // 使用try-with-resources确保InputStream被正确关闭，避免资源泄漏
       try (InputStream inputStream = file.getInputStream()) {
         // ========== 跳过前序分片的字节 ==========
@@ -240,6 +256,8 @@ public class S3Service extends AbstractFileService {
           long n = inputStream.skip(skipBytes - skipped);
           if (n <= 0) {
             // skip返回0或负数表示无法继续跳过，可能是文件已结束
+            logger.error("[S3] 分片跳过失败: part={}/{}, expected={}, actual={}", 
+                i + 1, partCount, skipBytes, skipped);
             throw new IllegalStateException("无法跳过足够的字节，期望: " + skipBytes + ", 实际: " + skipped);
           }
           skipped += n;
@@ -258,6 +276,8 @@ public class S3Service extends AbstractFileService {
           int n = inputStream.read(buffer, bytesRead, (int) size - bytesRead);
           if (n < 0) {
             // read返回-1表示文件已结束，但此时数据还未读满
+            logger.error("[S3] 分片读取失败: part={}/{}, expected={}, actual={}", 
+                i + 1, partCount, size, bytesRead);
             throw new IllegalStateException("意外的文件结束，期望: " + size + ", 实际: " + bytesRead);
           }
           bytesRead += n;
@@ -278,38 +298,65 @@ public class S3Service extends AbstractFileService {
                 .partNumber(i + 1)
                 .eTag(uploadPartResponse.eTag())
                 .build());
+        
+        long partCost = System.currentTimeMillis() - partStartTime;
+        logger.debug("[S3] 分片上传完成: part={}/{}, size={}bytes, cost={}ms, eTag={}", 
+            i + 1, partCount, size, partCost, uploadPartResponse.eTag());
       }
       // try-with-resources确保inputStream在此处自动关闭
     }
 
     // ========== 完成分片上传 ==========
     // 将所有分片合并成完整对象
+    logger.info("[S3] 开始完成分片上传: bucket={}, key={}, uploadId={}, parts={}", 
+        bucketName, filePath, uploadId, partETags.size());
+    
     CompleteMultipartUploadRequest compRequest =CompleteMultipartUploadRequest.builder()
             .bucket(bucketName)
             .key(filePath)
             .uploadId(uploadId)
             .multipartUpload(CompletedMultipartUpload.builder().parts(partETags).build()).build();
     client.completeMultipartUpload(compRequest);
+    
+    long totalCost = System.currentTimeMillis() - uploadStartTime;
+    logger.info("[S3] 分片上传完成: bucket={}, key={}, totalParts={}, totalCost={}ms", 
+        bucketName, filePath, partCount, totalCost);
   }
 
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
     if(ValidateUtils.isEmpty(bucketName)){
-      logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
+      logger.error("[S3] 删除桶失败，参数为空: bucketName=null");
+      return;
     }
-    client.deleteBucket(DeleteBucketRequest.builder().bucket(bucketName).build());
+    
+    logger.info("[S3] 开始删除桶: bucket={}", bucketName);
+    long startTime = System.currentTimeMillis();
+    
+    try {
+      client.deleteBucket(DeleteBucketRequest.builder().bucket(bucketName).build());
+      logger.info("[S3] 桶删除成功: bucket={}, cost={}ms", bucketName, System.currentTimeMillis() - startTime);
+    } catch (Exception e) {
+      logger.error("[S3] 桶删除失败: bucket={}, error={}", bucketName, e.getMessage(), e);
+      throw e;
+    }
   }
 
   @Override
   public List<String> getBucketList() throws Exception {
+    logger.debug("[S3] 开始获取桶列表");
+    
     List<Bucket> bucketList = client.listBuckets().buckets();
     List<String> bucketNameList = new ArrayList<>();
+    
     if(ValidateUtils.isNotEmpty(bucketList)){
       for(Bucket bucket : bucketList){
         bucketNameList.add(bucket.name());
       }
     }
+    
+    logger.info("[S3] 获取桶列表成功: count={}", bucketNameList.size());
     return bucketNameList;
   }
 }
