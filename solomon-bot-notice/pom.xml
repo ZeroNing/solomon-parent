@@ -5,6 +5,7 @@
         <groupId>com.steven</groupId>
         <artifactId>solomon-parent</artifactId>
         <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>solomon-bot-notice</artifactId>
@@ -13,7 +14,6 @@
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-utils</artifactId>
-            <version>1.0</version>
         </dependency>
 
         <dependency>
