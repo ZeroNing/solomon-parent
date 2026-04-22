@@ -19,16 +19,9 @@ public abstract class AbstractConsumer<T, R> implements CommonMqttMessageListene
 
     protected final Logger logger = LoggerUtils.logger(getClass());
 
-    protected String topic;
-
-    protected MqttPublishMessage mqttMessage;
-
     protected String tenantCode;
 
     public void messageArrived(String topic, MqttPublishMessage message) throws Exception {
-        this.topic = topic;
-        this.mqttMessage = message;
-
         String json = message.payload().toString(StandardCharsets.UTF_8);
         Throwable throwable = null;
         R result = null;

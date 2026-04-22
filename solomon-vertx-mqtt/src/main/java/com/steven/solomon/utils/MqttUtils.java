@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import io.netty.handler.codec.mqtt.MqttQoS;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
@@ -159,12 +160,10 @@ public class MqttUtils implements SendService<MqttModel<?>> {
                         // 设置消息处理器
                         String finalTopic = topic;
                         client.publishHandler(message -> {
-                            if (StrUtil.equalsIgnoreCase(message.topicName(), finalTopic)) {
-                                try {
-                                    consumer.messageArrived(finalTopic, message);
-                                } catch (Exception e) {
-                                    logger.error("消费消息异常,topic:{}", finalTopic, e);
-                                }
+                            try {
+                                consumer.messageArrived(finalTopic, message);
+                            } catch (Exception e) {
+                                logger.error("消费消息异常,topic:{}", finalTopic, e);
                             }
                         });
                     }
