@@ -1,6 +1,7 @@
 package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import cn.hutool.core.util.StrUtil;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.GetResponse;
 import com.steven.solomon.annotation.MessageListener;
@@ -21,7 +22,6 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.util.*;
 import java.util.Map.Entry;
 
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
@@ -224,7 +224,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     }
 
     public AbstractMessageListenerContainer findContainerByQueueName(String queueName) {
-        String key = StringUtils.trim(queueName);
+        String key = StrUtil.trim(queueName);
         return RabbitMQInitConfig.allQueueContainerMap.get(key);
     }
 
