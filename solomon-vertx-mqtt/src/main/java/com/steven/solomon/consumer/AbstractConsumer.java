@@ -27,9 +27,9 @@ public abstract class AbstractConsumer<T, R> implements CommonMqttMessageListene
         R result = null;
         MqttModel<T> model = null;
         try {
+            logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), tenantCode, message.messageId(), topic, json);
             model = conversion(json);
             tenantCode = model.getTenantCode();
-            logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}", Thread.currentThread().getName(), tenantCode, message.messageId(), topic, json);
             // 判断是否重复消费
             if (checkMessageKey(model)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
