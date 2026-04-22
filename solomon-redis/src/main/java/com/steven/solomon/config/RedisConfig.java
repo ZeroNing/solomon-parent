@@ -116,8 +116,8 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   @Bean(name = "redisFactory")
   @ConditionalOnMissingBean(RedisConnectionFactory.class)
-  public RedisConnectionFactory tenantRedisFactory(RedisProperties redisProperties)throws Throwable {
-    RedisConnectionFactory factory = null;
+  public RedisConnectionFactory tenantRedisFactory(RedisProperties redisProperties) throws Throwable {
+    RedisConnectionFactory factory;
     if (isSwitchDb) {
       factory = context.getFactoryMap().values().iterator().next();
     } else {

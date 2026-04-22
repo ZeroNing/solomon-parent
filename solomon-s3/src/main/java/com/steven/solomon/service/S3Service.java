@@ -168,8 +168,8 @@ public class S3Service extends AbstractFileService {
   }
 
   @Override
-  public List<String> listObjects(String bucketName,String key) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+  public List<String> listObjects(String bucketName, String key) throws Exception {
+    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
     ListObjectsV2Request.Builder requestBuilder = ListObjectsV2Request.builder()
@@ -179,23 +179,22 @@ public class S3Service extends AbstractFileService {
     }
     ListObjectsV2Request request = requestBuilder.build();
     ListObjectsV2Response response = client.listObjectsV2(request);
-    return Lambda.toList(response.contents(),S3Object::key);
+    return Lambda.toList(response.contents(), S3Object::key);
   }
 
-
   @Override
-  public String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception {
+  public String initiateMultipartUploadTask(String bucketName, String objectName) throws Exception {
     logger.info("[S3] 开始分片上传任务: bucket={}, key={}", bucketName, objectName);
-    
+
     long startTime = System.currentTimeMillis();
     CreateMultipartUploadRequest initRequest = CreateMultipartUploadRequest.builder()
             .bucket(bucketName)
             .key(objectName)
             .build();
-    
+
     String uploadId = client.createMultipartUpload(initRequest).uploadId();
-    
-    logger.info("[S3] 分片上传任务创建成功: bucket={}, key={}, uploadId={}, cost={}ms", 
+
+    logger.info("[S3] 分片上传任务创建成功: bucket={}, key={}, uploadId={}, cost={}ms",
         bucketName, objectName, uploadId, System.currentTimeMillis() - startTime);
     return uploadId;
   }
@@ -311,29 +310,28 @@ public class S3Service extends AbstractFileService {
     logger.info("[S3] 开始完成分片上传: bucket={}, key={}, uploadId={}, parts={}", 
         bucketName, filePath, uploadId, partETags.size());
     
-    CompleteMultipartUploadRequest compRequest =CompleteMultipartUploadRequest.builder()
+    CompleteMultipartUploadRequest compRequest = CompleteMultipartUploadRequest.builder()
             .bucket(bucketName)
             .key(filePath)
             .uploadId(uploadId)
             .multipartUpload(CompletedMultipartUpload.builder().parts(partETags).build()).build();
     client.completeMultipartUpload(compRequest);
-    
+
     long totalCost = System.currentTimeMillis() - uploadStartTime;
-    logger.info("[S3] 分片上传完成: bucket={}, key={}, totalParts={}, totalCost={}ms", 
+    logger.info("[S3] 分片上传完成: bucket={}, key={}, totalParts={}, totalCost={}ms",
         bucketName, filePath, partCount, totalCost);
   }
 
-
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName)) {
       logger.error("[S3] 删除桶失败，参数为空: bucketName=null");
       return;
     }
-    
+
     logger.info("[S3] 开始删除桶: bucket={}", bucketName);
     long startTime = System.currentTimeMillis();
-    
+
     try {
       client.deleteBucket(DeleteBucketRequest.builder().bucket(bucketName).build());
       logger.info("[S3] 桶删除成功: bucket={}, cost={}ms", bucketName, System.currentTimeMillis() - startTime);
@@ -346,16 +344,16 @@ public class S3Service extends AbstractFileService {
   @Override
   public List<String> getBucketList() throws Exception {
     logger.debug("[S3] 开始获取桶列表");
-    
+
     List<Bucket> bucketList = client.listBuckets().buckets();
     List<String> bucketNameList = new ArrayList<>();
-    
-    if(ValidateUtils.isNotEmpty(bucketList)){
-      for(Bucket bucket : bucketList){
+
+    if (ValidateUtils.isNotEmpty(bucketList)) {
+      for (Bucket bucket : bucketList) {
         bucketNameList.add(bucket.name());
       }
     }
-    
+
     logger.info("[S3] 获取桶列表成功: count={}", bucketNameList.size());
     return bucketNameList;
   }
