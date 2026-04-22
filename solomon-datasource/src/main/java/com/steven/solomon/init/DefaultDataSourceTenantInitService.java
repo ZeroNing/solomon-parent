@@ -81,20 +81,16 @@ public class DefaultDataSourceTenantInitService extends AbstractDataSourceInitSe
 
     /**
      * 创建数据源连接池
-     * 
+     *
      * <h3>连接池选择逻辑</h3>
      * <ul>
      *   <li>如果连接池类型为空，默认使用DRUID</li>
      *   <li>根据类型创建对应的数据源服务</li>
      * </ul>
-     * 
-     * <h3>⚠️ Switch穿透Bug修复</h3>
-     * <p>原Bug：每个case缺少break语句，导致：</p>
-     * <ul>
-     *   <li>DRUID case会穿透到HIKARICP，覆盖dataSource</li>
-     *   <li>最终穿透到default，抛出异常</li>
-     * </ul>
-     * 
+     *
+     * <h3>⚠️ Switch Expression 优化</h3>
+     * <p>使用Java 14+ switch expression语法，避免dataSource变量声明后未初始化的问题</p>
+     *
      * @param properties 数据源配置
      * @return 配置好的数据源实例
      * @throws BaseException 当连接池类型不匹配时抛出
@@ -103,37 +99,33 @@ public class DefaultDataSourceTenantInitService extends AbstractDataSourceInitSe
     public DataSource initFactory(DataSourceProperties properties) throws Throwable {
         // Step 1: 获取连接池类型，默认DRUID
         ConnectionPoolTypeEnum connectionPool = properties.getConnectionPoolType();
-        if(ValidateUtils.isEmpty(connectionPool)){
+        if (ValidateUtils.isEmpty(connectionPool)) {
             log.info("[DataSource] 连接池类型为空，自动默认为Druid");
             connectionPool = ConnectionPoolTypeEnum.DRUID;
         }
-        
-        log.debug("[DataSource] 开始创建连接池: poolType={}, url={}", 
+
+        log.debug("[DataSource] 开始创建连接池: poolType={}, url={}",
             connectionPool, properties.getUrl());
-        
-        DataSource dataSource = null;
+
         long startTime = System.currentTimeMillis();
-        
-        // Step 2: 根据类型创建数据源
-        // ⚠️ 修复：每个case后必须加break，否则会穿透到下一个case
-        // 原bug：缺少break导致DRUID和HIKARICP都会穿透到default抛出异常
-        switch (connectionPool) {
-            case DRUID:
+
+        // Step 2: 使用switch expression创建数据源
+        // ✅ 优化：使用switch expression直接返回值，避免变量声明后未初始化
+        DataSource dataSource = switch (connectionPool) {
+            case DRUID -> {
                 log.debug("[DataSource] 创建Druid连接池");
-                dataSource = new DruidDataSourceService().getDataSource(properties);
-                break;  // ⚠️ 必须有break，否则会穿透
-            case HIKARICP:
+                yield new DruidDataSourceService().getDataSource(properties);
+            }
+            case HIKARICP -> {
                 log.debug("[DataSource] 创建HikariCP连接池");
-                dataSource = new HikariCPDataSourceService().getDataSource(properties);
-                break;  // ⚠️ 必须有break，否则会穿透
-            default:
-                log.error("[DataSource] 不支持的连接池类型: poolType={}", connectionPool);
-                throw new BaseException(I18nUtils.getErrorMessage(SqlErrorCode.CONNECTION_POOL_TYPE_NO_MATCH,connectionPool.getName()));
-        }
-        
+                yield new HikariCPDataSourceService().getDataSource(properties);
+            }
+            default -> throw new BaseException(
+                I18nUtils.getErrorMessage(SqlErrorCode.CONNECTION_POOL_TYPE_NO_MATCH, connectionPool.getName()));
+        };
+
         long cost = System.currentTimeMillis() - startTime;
         log.info("[DataSource] 连接池创建成功: poolType={}, cost={}ms", connectionPool, cost);
-        
         return dataSource;
     }
 }

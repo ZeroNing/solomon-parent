@@ -60,27 +60,31 @@ public class RedisConfig extends CachingConfigurerSupport {
   private final ObjectMapper objectMapper;
 
 
-  public RedisConfig(TenantRedisProperties properties, RedisTenantContext context, RedisProperties redisProperties,
-                     ApplicationContext applicationContext, CacheProfile cacheProfile, ObjectMapper objectMapper) {
-    this.properties         = properties;
-    this.context            = context;
-    this.isSwitchDb         = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), cacheProfile.getMode().toString());
-    this.redisProperties    = redisProperties;
-    this.cacheProfile       = cacheProfile;
-    this.objectMapper = objectMapper;
+  public RedisConfig(TenantRedisProperties tenantRedisProperties, RedisTenantContext redisTenantContext,
+                     RedisProperties redisPropertiesConfig, ApplicationContext applicationContext,
+                     CacheProfile cacheProfileConfig, ObjectMapper objectMapperConfig) {
+    this.properties = tenantRedisProperties;
+    this.context = redisTenantContext;
+    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(
+        SwitchModeEnum.SWITCH_DB.toString(), cacheProfileConfig.getMode().toString());
+    this.redisProperties = redisPropertiesConfig;
+    this.cacheProfile = cacheProfileConfig;
+    this.objectMapper = objectMapperConfig;
     SpringUtil.setContext(applicationContext);
   }
 
   @PostConstruct
-  public void afterPropertiesSet()throws Throwable {
+  public void afterPropertiesSet() throws Throwable {
     logger.info("Redis当前模式为:{}", cacheProfile.getMode().getDesc());
-    Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
-    if(!tenantMap.containsKey(BaseCode.DEFAULT)){
+    Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) 
+        ? new HashMap<>() 
+        : properties.getTenant();
+    if (!tenantMap.containsKey(BaseCode.DEFAULT)) {
       tenantMap.put(BaseCode.DEFAULT, redisProperties);
       properties.setTenant(tenantMap);
     }
-    AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> service = getService();
-    service.init(properties.getTenant(),context);
+    AbstractDataSourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory> service = getService();
+    service.init(properties.getTenant(), context);
   }
 
   @Bean(name = "redisTemplate")

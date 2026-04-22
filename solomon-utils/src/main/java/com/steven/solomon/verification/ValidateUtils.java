@@ -107,14 +107,10 @@ public class ValidateUtils {
     }
 
     public static boolean equalsIgnoreCase(String contrast, String var) {
-        boolean flag = false;
         if (isEmpty(contrast) || isEmpty(var)) {
             return false;
         }
-        if (contrast.equalsIgnoreCase(var)) {
-            flag = true;
-        }
-        return flag;
+        return contrast.equalsIgnoreCase(var);
     }
 
     /**
@@ -228,11 +224,11 @@ public class ValidateUtils {
      * 判断传入的数字类型的值是否等于0或者是否为空，如果等于0或者等于空都会返回一个true
      */
     public static boolean isZero(Object number) {
-        boolean flag = false;
-        if (isEmpty(number) || equals(String.valueOf(number), "0") || equals(String.valueOf(number), "0.0")) {
-            flag = true;
+        if (isEmpty(number)) {
+            return true;
         }
-        return flag;
+        String str = String.valueOf(number);
+        return "0".equals(str) || "0.0".equals(str);
     }
 
     /**
