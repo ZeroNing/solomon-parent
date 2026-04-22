@@ -106,7 +106,7 @@
     <poi.version>5.4.0</poi.version>
     <common-io.version>2.18.0</common-io.version>
     <clamav.version>2.1.2</clamav.version>
-    <vertx.mqtt.version>5.0.8</vertx.mqtt.version>
+    <vertx.mqtt.version>5.0.11</vertx.mqtt.version>
   </properties>
 
   <dependencyManagement>
@@ -248,6 +248,7 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
+        <version>6.2.5</version>
       </dependency>
       <!-- SpringBoot 框架 end-->
 
@@ -445,6 +446,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
+        <version>1.7.30</version>
       </dependency>
 
       <!-- Commons Codec，用于各种编码/解码算法 -->
