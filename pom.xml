@@ -42,12 +42,13 @@
     <module>test-solomon-bot-notice</module>
     <module>solomon-datasource</module>
     <module>test-solomon-datasource</module>
-    <module>solom-vertx-mqtt</module>
+    <module>solomon-vertx-mqtt</module>
   </modules>
+
+  <description>Solomon 微服务基础设施组件库 - 统一版本管理与模块聚合</description>
 
   <properties>
     <java.version>21</java.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>21</maven.compiler.source>
     <maven.compiler.target>21</maven.compiler.target>
     <commons.lang.version>2.6</commons.lang.version>
@@ -61,12 +62,11 @@
     <hibernate.jpa.2.1.api.version>1.0.2.Final</hibernate.jpa.2.1.api.version>
     <persistence.api.version>1.0.2</persistence.api.version>
     <commons.codec.version>1.13</commons.codec.version>
-    <fastJson.version>1.2.56</fastJson.version>
+    <!-- fastjson 1.2.x 有反序列化安全漏洞，已移除。建议使用 fastjson2 或 Jackson -->
     <dubbo.version>3.2.1</dubbo.version>
     <strive.version>1.0</strive.version>
-    <Spring.cloud.gateway.version>4.2.2</Spring.cloud.gateway.version>
+    <spring.cloud.gateway.version>4.2.2</spring.cloud.gateway.version>
     <spring.cloud.loadbalancer.version>3.0.4</spring.cloud.loadbalancer.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.context.support.version>1.0.11</spring.context.support.version>
     <nacos.client.version>2.2.2</nacos.client.version>
     <seata.version>2.0.0</seata.version>
@@ -76,9 +76,8 @@
     <maven.javadoc.plugin.version>2.9.1</maven.javadoc.plugin.version>
     <mysql.java.version>9.2.0</mysql.java.version>
     <minio.version>8.5.17</minio.version>
-    <spring.context.version>5.3.7</spring.context.version>
-    <slf4j.version>1.7.30</slf4j.version>
-    <mybatis-plus.version>3.5.1</mybatis-plus.version>
+    <!-- spring-context 由 Spring Boot 3.4.4 BOM 统一管理，无需手动指定版本 -->
+    <!-- slf4j 由 Spring Boot 3.4.4 BOM 统一管理，无需手动指定版本 -->
     <druid.version>1.2.24</druid.version>
     <xmpcore.version>6.1.11</xmpcore.version>
     <metadata.version>2.19.0</metadata.version>
@@ -90,7 +89,7 @@
     <bos.version>0.10.371</bos.version>
     <rocketMq.version>2.2.3</rocketMq.version>
     <mqtt.version>6.2.2</mqtt.version>
-    <druid.version>1.2.18</druid.version>
+    <!-- druid.version 已在上方统一定义为 1.2.24 -->
     <aws.s3.version>2.39.4</aws.s3.version>
     <bcprov.jdk15on.version>1.70</bcprov.jdk15on.version>
     <mqtt5.version>1.2.5</mqtt5.version>
@@ -107,7 +106,7 @@
     <poi.version>5.4.0</poi.version>
     <common-io.version>2.18.0</common-io.version>
     <clamav.version>2.1.2</clamav.version>
-    <vertx.mqtt>5.0.8</vertx.mqtt>
+    <vertx.mqtt.version>5.0.8</vertx.mqtt.version>
   </properties>
 
   <dependencyManagement>
@@ -116,14 +115,14 @@
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-mqtt</artifactId>
-        <version>${vertx.mqtt}</version>
+        <version>${vertx.mqtt.version}</version>
         <scope>compile</scope>
       </dependency>
 
       <dependency>
         <groupId>io.vertx</groupId>
         <artifactId>vertx-core</artifactId>
-        <version>${vertx.mqtt}</version>
+        <version>${vertx.mqtt.version}</version>
       </dependency>
 
       <dependency>
@@ -151,7 +150,7 @@
       <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-starter-gateway</artifactId>
-        <version>${Spring.cloud.gateway.version}</version>
+        <version>${spring.cloud.gateway.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.cloud</groupId>
@@ -245,11 +244,10 @@
         <version>${spring.boot.version}</version>
       </dependency>
 
-      <!-- Spring 核心上下文，提供核心的 Spring 功能 -->
+      <!-- Spring 核心上下文由 Spring Boot BOM 统一管理 -->
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>${spring.context.version}</version>
       </dependency>
       <!-- SpringBoot 框架 end-->
 
@@ -443,11 +441,10 @@
         <version>${knife4j-springdoc-openapi-jakarta.version}</version>
       </dependency>
 
-      <!-- SLF4J API，用于日志记录接口 -->
+      <!-- SLF4J API 由 Spring Boot BOM 统一管理 -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
       </dependency>
 
       <!-- Commons Codec，用于各种编码/解码算法 -->
@@ -522,12 +519,7 @@
         <version>${dubbo.version}</version>
       </dependency>
 
-      <!-- FastJSON，用于高效 JSON 序列化和反序列化 -->
-      <dependency>
-        <groupId>com.alibaba</groupId>
-        <artifactId>fastjson</artifactId>
-        <version>${fastJson.version}</version>
-      </dependency>
+
       <!-- 微服务相关版本 end -->
 
       <!-- 校验注解所有需要jar包 开始 -->
