@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.converter.DateToLocalDateConverter;
@@ -70,7 +70,7 @@ public class MongoConfig {
 
   @PostConstruct
   public void afterPropertiesSet() throws Throwable {
-    if(!mongoProperties.getEnabled()){
+    if (!mongoProperties.getEnabled()) {
       logger.error("mongoDb不启用,不初始化队列以及消费者");
       return;
     }
@@ -78,7 +78,7 @@ public class MongoConfig {
     AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> service = getService();
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
-      if(!tenantMap.containsKey(BaseCode.DEFAULT)){
+      if (!tenantMap.containsKey(BaseCode.DEFAULT)) {
         tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);
       }
@@ -113,7 +113,7 @@ public class MongoConfig {
     return context.getFactoryMap().values().iterator().next();
   }
 
-  private AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> getService(){
+  private AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> getService() {
     return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
             AbstractDataSourceInitService.class,
             ResolvableType.forClass(MongoProperties.class),  // 替换P为实际类型

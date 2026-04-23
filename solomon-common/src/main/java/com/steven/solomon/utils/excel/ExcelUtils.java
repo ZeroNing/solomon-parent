@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.excel;
+﻿package com.steven.solomon.utils.excel;
 
 import cn.hutool.core.date.StopWatch;
 import cn.idev.excel.ExcelWriter;
@@ -95,7 +95,7 @@ public class ExcelUtils {
 	 * @throws Exception
 	 */
 	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
-		try (ByteArrayOutputStream os = new ByteArrayOutputStream()){
+		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
 			//更新Class注解值
 			StopWatch stopWatch = new StopWatch();
 			stopWatch.start();
@@ -121,7 +121,7 @@ public class ExcelUtils {
 			logger.info("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
 			byte[] content = os.toByteArray();
 			//生成文件
-			try(InputStream is = new ByteArrayInputStream(content);){
+			try (InputStream is = new ByteArrayInputStream(content);) {
 				return new MockMultipartFile(excelName,excelName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
 			}
 		}
@@ -140,11 +140,11 @@ public class ExcelUtils {
 	}
 
 	private static void updateClassExcelPropertyValue(Class<?> clazz) throws Exception {
-		for(Field field : clazz.getDeclaredFields()){
+		for (Field field : clazz.getDeclaredFields()) {
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
 			String value = I18nUtils.getMessage(i18nKey,(String)null);
-			if(ValidateUtils.isNotEmpty(value)){
+			if (ValidateUtils.isNotEmpty(value)) {
 				annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
 				ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
 			}

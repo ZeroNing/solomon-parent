@@ -1,4 +1,4 @@
-package com.steven.solomon.service.impl;
+﻿package com.steven.solomon.service.impl;
 
 import com.steven.solomon.code.SqlErrorCode;
 import com.steven.solomon.exception.BaseException;
@@ -16,7 +16,7 @@ public class HikariCPDataSourceService implements DataSourceService {
     @Override
     public DataSource getDataSource(DataSourceProperties profile) throws Exception {
         DataSourceProperties.HikariCPProperties hikariData = profile.getHikariCP();
-        if(ValidateUtils.isEmpty(hikariData)){
+        if (ValidateUtils.isEmpty(hikariData)) {
             throw new BaseException(I18nUtils.getErrorMessage(SqlErrorCode.HIKARI_DATA_PROFILE_IS_NULL));
         }
         HikariConfig config = new HikariConfig();
@@ -24,7 +24,7 @@ public class HikariCPDataSourceService implements DataSourceService {
         config.setUsername(profile.getUsername());
         config.setPassword(profile.getPassword());
         config.setDriverClassName(profile.getDriverClassName());
-        if(ValidateUtils.isNotEmpty(config)){
+        if (ValidateUtils.isNotEmpty(config)) {
             config.setValidationTimeout(hikariData.getValidationTimeout());
             config.setConnectionTimeout(hikariData.getConnectionTimeout());
             config.setPoolName(hikariData.getPoolName());
@@ -44,7 +44,7 @@ public class HikariCPDataSourceService implements DataSourceService {
             config.setIsolateInternalQueries(hikariData.getIsIsolateInternalQueries());
             config.setRegisterMbeans(hikariData.getIsRegisterMbeans());
             config.setAllowPoolSuspension(hikariData.getIsAllowPoolSuspension());
-            if(ValidateUtils.isNotEmpty(hikariData.getDataSourceProperties())){
+            if (ValidateUtils.isNotEmpty(hikariData.getDataSourceProperties())) {
                 config.setDataSourceProperties(hikariData.getDataSourceProperties());
             }
         }

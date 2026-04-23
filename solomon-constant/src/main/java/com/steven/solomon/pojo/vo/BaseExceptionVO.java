@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.vo;
+﻿package com.steven.solomon.pojo.vo;
 
 
 import java.io.Serializable;
@@ -47,18 +47,18 @@ public class BaseExceptionVO implements Serializable {
     this.requestId = requestId;
   }
 
-  public BaseExceptionVO(){
+  public BaseExceptionVO() {
     super();
   }
 
-  public BaseExceptionVO(String code, String message,int statusCode){
+  public BaseExceptionVO(String code, String message,int statusCode) {
     super();
     this.code = code;
     this.message = message;
     this.statusCode = statusCode;
   }
 
-  public BaseExceptionVO(String code,int statusCode){
+  public BaseExceptionVO(String code,int statusCode) {
     super();
     this.code = code;
     this.statusCode = statusCode;

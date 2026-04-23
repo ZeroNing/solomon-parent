@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+﻿package com.steven.solomon.utils;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.verification.ValidateUtils;
@@ -14,21 +14,21 @@ public class LocaleUtils {
     @Value("${i18n.language}")
     public Locale DEFAULT_LOCALE;
 
-    public Locale getLocale(ServerRequest serverRequest){
+    public Locale getLocale(ServerRequest serverRequest) {
         return getLocale(serverRequest.headers().firstHeader(BaseCode.HTTP_ACCEPT_LANGUAGE));
     }
 
-    public Locale getLocale(ServerWebExchange serverWebExchange){
+    public Locale getLocale(ServerWebExchange serverWebExchange) {
         return getLocale(serverWebExchange.getRequest().getHeaders().getFirst(BaseCode.HTTP_ACCEPT_LANGUAGE));
     }
 
-    private Locale getLocale(String language){
-        if(ValidateUtils.isEmpty(language)){
+    private Locale getLocale(String language) {
+        if (ValidateUtils.isEmpty(language)) {
             return DEFAULT_LOCALE;
         }
         Locale resultLocale = Locale.forLanguageTag(language);
         List<Locale> defaultLocaleList = Arrays.asList(Locale.CHINA,Locale.ENGLISH,Locale.CHINESE);
-        if(ValidateUtils.isEmpty(resultLocale) || !defaultLocaleList.contains(resultLocale)){
+        if (ValidateUtils.isEmpty(resultLocale) || !defaultLocaleList.contains(resultLocale)) {
             resultLocale = DEFAULT_LOCALE;
         }
         return resultLocale;

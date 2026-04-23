@@ -1,4 +1,4 @@
-package com.steven.solomon.service.impl;
+﻿package com.steven.solomon.service.impl;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.steven.solomon.properties.DataSourceProperties;
@@ -18,7 +18,7 @@ public class DruidDataSourceService implements DataSourceService {
         dataSource.setPassword(profile.getPassword());
         dataSource.setDriverClassName(profile.getDriverClassName());
 
-        if(ValidateUtils.isNotEmpty(druidProperties)){
+        if (ValidateUtils.isNotEmpty(druidProperties)) {
             // 配置连接池
             dataSource.setInitialSize(druidProperties.getInitialSize());
             dataSource.setMinIdle(druidProperties.getMinIdle());

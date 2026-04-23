@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.userAgent;
+﻿package com.steven.solomon.utils.userAgent;
 
 import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +12,8 @@ public class UserAgentUtils {
 
   private UserAgentAnalyzer userAgentAnalyzer = null;
 
-  public UserAgentUtils(){
-    if(ValidateUtils.isEmpty(this.userAgentAnalyzer)){
+  public UserAgentUtils() {
+    if (ValidateUtils.isEmpty(this.userAgentAnalyzer)) {
       this.userAgentAnalyzer = UserAgentAnalyzer.newBuilder()
           .withFields(UserAgent.AGENT_NAME_VERSION, UserAgent.OPERATING_SYSTEM_NAME_VERSION, UserAgent.DEVICE_BRAND, UserAgent.DEVICE_CLASS, UserAgent.DEVICE_NAME)
           .hideMatcherLoadStats().withCache(10000).build();

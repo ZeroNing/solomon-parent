@@ -1,4 +1,4 @@
-package com.steven.solomon.manager;
+﻿package com.steven.solomon.manager;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.holder.RequestHeaderHolder;
@@ -43,9 +43,9 @@ public class SpringRedisAutoManager extends RedisCacheManager {
   @Override
   public Cache getCache(String name) {
     String tenantCode = RequestHeaderHolder.getTenantCode();
-    if(ValidateUtils.equalsIgnoreCase(SwitchModeEnum.TENANT_PREFIX.toString(),cacheProfile.getMode().toString()) && ValidateUtils.isNotEmpty(tenantCode)) {
+    if (ValidateUtils.equalsIgnoreCase(SwitchModeEnum.TENANT_PREFIX.toString(),cacheProfile.getMode().toString()) && ValidateUtils.isNotEmpty(tenantCode)) {
       name = tenantCode + StrUtil.COLON + name;
-    } else if(ValidateUtils.isEmpty(tenantCode)){
+    } else if (ValidateUtils.isEmpty(tenantCode)) {
       log.info("在{}模式下,获取到的租户id为空,将redis的Key转为默认模式",cacheProfile.getMode());
     }
     return super.getCache(name);

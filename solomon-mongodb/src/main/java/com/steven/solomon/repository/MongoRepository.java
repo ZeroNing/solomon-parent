@@ -1,4 +1,4 @@
-package com.steven.solomon.repository;
+﻿package com.steven.solomon.repository;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;
@@ -30,7 +30,7 @@ public class MongoRepository<T, I> {
 
   public MongoRepository(MongoTemplate mongoTemplate) {this.mongoTemplate = mongoTemplate;}
 
-  public String getIdField(){
+  public String getIdField() {
     return "_id";
   }
 
@@ -241,7 +241,7 @@ public class MongoRepository<T, I> {
     return querySortList;
   }
 
-  public List<AggregationOperation> page(BasePageParam param){
+  public List<AggregationOperation> page(BasePageParam param) {
     List<AggregationOperation> aggregationList = new ArrayList<>();
     int skip = (param.getPageNo() - 1) * param.getPageSize();
 

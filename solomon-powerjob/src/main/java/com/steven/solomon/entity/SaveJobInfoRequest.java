@@ -1,4 +1,4 @@
-package com.steven.solomon.entity;
+﻿package com.steven.solomon.entity;
 
 import cn.hutool.core.date.DateUtil;
 import com.steven.solomon.annotation.JobTask;
@@ -189,7 +189,7 @@ public class SaveJobInfoRequest {
         super();
     }
 
-    public SaveJobInfoRequest update(JobTask jobTask,String className){
+    public SaveJobInfoRequest update(JobTask jobTask,String className) {
         this.jobName = SpringUtil.getElValue(jobTask.taskName());
         this.jobDescription = jobTask.taskDesc();
         this.appId = Long.valueOf(appId);
@@ -210,34 +210,34 @@ public class SaveJobInfoRequest {
         this.enable = jobTask.enable();
         this.dispatchStrategy = jobTask.dispatchStrategy();
         this.dispatchStrategyConfig = jobTask.dispatchStrategyConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.lifeCycleStart()) && ValidateUtils.isNotEmpty(jobTask.lifeCycleEnd())){
+        if (ValidateUtils.isNotEmpty(jobTask.lifeCycleStart()) && ValidateUtils.isNotEmpty(jobTask.lifeCycleEnd())) {
             LifeCycle life = new LifeCycle();
             life.setStart(DateUtil.parse(jobTask.lifeCycleStart(),"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd HH:mm:ss:SSS").getTime());
             life.setEnd(DateUtil.parse(jobTask.lifeCycleEnd(),"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd HH:mm:ss:SSS").getTime());
             this.lifeCycle = life;
         }
         AlarmConfig alarmConfig = new AlarmConfig();
-        if(!ValidateUtils.equals(-1,jobTask.alertThreshold())){
+        if (!ValidateUtils.equals(-1,jobTask.alertThreshold())) {
             alarmConfig.setAlertThreshold(jobTask.alertThreshold());
             this.alarmConfig = alarmConfig;
         }
-        if(!ValidateUtils.equals(-1,jobTask.statisticWindowLen())){
+        if (!ValidateUtils.equals(-1,jobTask.statisticWindowLen())) {
             alarmConfig.setStatisticWindowLen(jobTask.statisticWindowLen());
             this.alarmConfig = alarmConfig;
         }
-        if(!ValidateUtils.equals(-1,jobTask.silenceWindowLen())){
+        if (!ValidateUtils.equals(-1,jobTask.silenceWindowLen())) {
             alarmConfig.setSilenceWindowLen(jobTask.silenceWindowLen());
             this.alarmConfig = alarmConfig;
         }
         this.logConfig = new LogConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.type())){
+        if (ValidateUtils.isNotEmpty(jobTask.type())) {
             logConfig.setType(jobTask.type().label());
         }
-        if(ValidateUtils.isNotEmpty(jobTask.level())){
+        if (ValidateUtils.isNotEmpty(jobTask.level())) {
             logConfig.setLevel(jobTask.level().label());
         }
         this.advancedRuntimeConfig = new JobAdvancedRuntimeConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.taskTrackerBehavior())){
+        if (ValidateUtils.isNotEmpty(jobTask.taskTrackerBehavior())) {
             this.advancedRuntimeConfig.setTaskTrackerBehavior(jobTask.taskTrackerBehavior().label());
         }
         return this;
@@ -265,7 +265,7 @@ public class SaveJobInfoRequest {
         this.enable = jobTask.enable();
         this.dispatchStrategy = jobTask.dispatchStrategy();
         this.dispatchStrategyConfig = jobTask.dispatchStrategyConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.lifeCycleStart()) && ValidateUtils.isNotEmpty(jobTask.lifeCycleEnd())){
+        if (ValidateUtils.isNotEmpty(jobTask.lifeCycleStart()) && ValidateUtils.isNotEmpty(jobTask.lifeCycleEnd())) {
             LifeCycle life = new LifeCycle();
             life.setStart(DateUtil.parse(jobTask.lifeCycleStart(),"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd HH:mm:ss:SSS").getTime());
             life.setEnd(DateUtil.parse(jobTask.lifeCycleEnd(),"yyyy-MM-dd HH:mm:ss","yyyy-MM-dd HH:mm:ss.SSS","yyyy-MM-dd HH:mm:ss:SSS").getTime());
@@ -277,14 +277,14 @@ public class SaveJobInfoRequest {
         alarmConfig.setSilenceWindowLen(jobTask.silenceWindowLen());
         this.alarmConfig = alarmConfig;
         this.logConfig = new LogConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.type())){
+        if (ValidateUtils.isNotEmpty(jobTask.type())) {
             logConfig.setType(jobTask.type().label());
         }
-        if(ValidateUtils.isNotEmpty(jobTask.level())){
+        if (ValidateUtils.isNotEmpty(jobTask.level())) {
             logConfig.setLevel(jobTask.level().label());
         }
         this.advancedRuntimeConfig = new JobAdvancedRuntimeConfig();
-        if(ValidateUtils.isNotEmpty(jobTask.taskTrackerBehavior())){
+        if (ValidateUtils.isNotEmpty(jobTask.taskTrackerBehavior())) {
             this.advancedRuntimeConfig.setTaskTrackerBehavior(jobTask.taskTrackerBehavior().label());
         }
     }

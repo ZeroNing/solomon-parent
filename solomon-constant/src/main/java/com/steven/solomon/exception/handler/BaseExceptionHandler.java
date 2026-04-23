@@ -1,10 +1,10 @@
-package com.steven.solomon.exception.handler;
+﻿package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration(proxyBeanMethods=false,value = "BaseExceptionProcessor")
+@Configuration(proxyBeanMethods = false,value = "BaseExceptionProcessor")
 public class BaseExceptionHandler extends AbstractExceptionHandler {
 
   @Override

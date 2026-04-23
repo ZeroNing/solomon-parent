@@ -1,4 +1,4 @@
-package com.steven.solomon.aspect;
+﻿package com.steven.solomon.aspect;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.holder.RequestHeaderHolder;
@@ -41,22 +41,22 @@ public class PowerJobAspect {
 
     @Around("cutPoint()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
-        if(!enabled){
+        if (!enabled) {
             logger.info("PowerJob组件不启用");
             return point.proceed();
         }
         // 获取方法参数
         Object[] args = point.getArgs();
         TaskContext taskContext = null;
-        if(ValidateUtils.isNotEmpty(args)){
-            for(Object arg : args){
-                if(arg instanceof TaskContext){
+        if (ValidateUtils.isNotEmpty(args)) {
+            for (Object arg : args) {
+                if (arg instanceof TaskContext) {
                     taskContext = (TaskContext) arg;
                 }
             }
         }
 
-        if(ValidateUtils.isNotEmpty(taskContext)){
+        if (ValidateUtils.isNotEmpty(taskContext)) {
             jobId = String.valueOf(taskContext.getJobId());
             instanceId = String.valueOf(taskContext.getInstanceId());
             subInstanceId = String.valueOf(taskContext.getSubInstanceId());
@@ -66,7 +66,7 @@ public class PowerJobAspect {
         Object result = null;
         try{
             result = point.proceed();
-        } catch (Throwable e){
+        } catch (Throwable e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);

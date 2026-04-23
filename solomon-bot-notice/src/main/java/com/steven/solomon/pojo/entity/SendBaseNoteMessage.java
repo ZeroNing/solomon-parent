@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.entity;
+﻿package com.steven.solomon.pojo.entity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -83,7 +83,7 @@ public class SendBaseNoteMessage implements Serializable {
          */
         private boolean isAtAll = false;
 
-        public SendAtMessage(){
+        public SendAtMessage() {
             super();
         }
 
@@ -145,7 +145,7 @@ public class SendBaseNoteMessage implements Serializable {
          */
         private String title;
 
-        public SendLinkMessage(){
+        public SendLinkMessage() {
             super();
         }
 
@@ -196,11 +196,11 @@ public class SendBaseNoteMessage implements Serializable {
          */
         private String message;
 
-        public SendTextMessage(){
+        public SendTextMessage() {
             super();
         }
 
-        public SendTextMessage(String message){
+        public SendTextMessage(String message) {
             super();
             this.message = message;
         }
@@ -224,11 +224,11 @@ public class SendBaseNoteMessage implements Serializable {
          */
         private String title;
 
-        public SendMarkdownMessage(){
+        public SendMarkdownMessage() {
             super();
         }
 
-        public SendMarkdownMessage(String text, String title){
+        public SendMarkdownMessage(String text, String title) {
             this.text = text;
             this.title = title;
         }

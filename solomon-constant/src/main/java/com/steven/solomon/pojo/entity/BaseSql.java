@@ -1,4 +1,4 @@
-//package com.steven.solomon.pojo.entity;
+﻿//package com.steven.solomon.pojo.entity;
 //
 //import cn.hutool.core.util.StrUtil;
 //
@@ -12,7 +12,7 @@
 //    this.sql = new StringBuilder();
 //  }
 //
-//  public BaseSql(String sql){
+//  public BaseSql(String sql) {
 //    this();
 //    this.sql = new StringBuilder();
 //    this.sql = this.sql.append(sql);

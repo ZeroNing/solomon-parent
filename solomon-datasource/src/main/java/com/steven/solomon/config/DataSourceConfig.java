@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.init.AbstractDataSourceInitService;
@@ -46,7 +46,7 @@ public class DataSourceConfig {
     public void afterPropertiesSet() throws Throwable {
         logger.info("数据源当前模式为:{}", properties.getMode().getDesc());
         Map<String, DataSourceProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) ? new HashMap<>() : properties.getTenant();
-        if(!tenantMap.containsKey(BaseCode.DEFAULT)){
+        if (!tenantMap.containsKey(BaseCode.DEFAULT)) {
             tenantMap.put(BaseCode.DEFAULT, properties.getDefaultDataSource());
             properties.setTenant(tenantMap);
         }
@@ -54,7 +54,7 @@ public class DataSourceConfig {
         service.init(properties.getTenant(),context);
     }
 
-    private AbstractDataSourceInitService<DataSourceProperties,DataSourceTenantContext, DataSource> getService(){
+    private AbstractDataSourceInitService<DataSourceProperties,DataSourceTenantContext, DataSource> getService() {
         return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
                 AbstractDataSourceInitService.class,
                 ResolvableType.forClass(DataSourceProperties.class),  // 替换P为实际类型

@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
@@ -138,11 +138,11 @@ public class RedisConfig extends CachingConfigurerSupport {
 
   @Bean
   @ConditionalOnMissingBean(ICacheService.class)
-  public ICacheService cacheService(RedisTemplate<String,Object> redisTemplate){
+  public ICacheService cacheService(RedisTemplate<String,Object> redisTemplate) {
     return new RedisService(redisTemplate);
   }
 
-  private AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> getService(){
+  private AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> getService() {
     return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
             AbstractDataSourceInitService.class,
             ResolvableType.forClass(RedisProperties.class),  // 替换P为实际类型

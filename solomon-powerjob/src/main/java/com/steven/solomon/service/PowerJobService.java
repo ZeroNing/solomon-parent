@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.BooleanUtil;
@@ -58,13 +58,13 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         String userName = jobProperties.getUserName();
         String password = jobProperties.getPassword();
 
-        if(ValidateUtils.isEmpty(adminAddresses)){
+        if (ValidateUtils.isEmpty(adminAddresses)) {
             throw new BaseException(POWER_JOB_URL_NULL);
         }
-        if(ValidateUtils.isEmpty(userName)){
+        if (ValidateUtils.isEmpty(userName)) {
             throw new BaseException(POWER_JOB_USER_NAME_NULL);
         }
-        if(ValidateUtils.isEmpty(password)){
+        if (ValidateUtils.isEmpty(password)) {
             throw new BaseException(POWER_JOB_PASSWORD_NULL);
         }
 
@@ -85,7 +85,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     @Override
     public void saveJob(String cookie, SaveJobInfoRequest job) throws Exception {
-        if(ValidateUtils.isNotEmpty(job.getId())){
+        if (ValidateUtils.isNotEmpty(job.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NULL);
         }
         String url = adminAddresses + "job/save";
@@ -95,7 +95,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     @Override
     public void updateJob(String cookie, SaveJobInfoRequest job) throws Exception {
-        if(ValidateUtils.isEmpty(job.getId())){
+        if (ValidateUtils.isEmpty(job.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NOT_NULL);
         }
         String url = adminAddresses + "job/save";
@@ -108,10 +108,10 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         cookie = ValidateUtils.getOrDefault(cookie, login());
         Map<String,SaveJobInfoRequest> jobMap = findByExecutorHandler(cookie,appId);
         SaveJobInfoRequest jobInfoRequest = jobMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(jobInfoRequest)){
+        if (ValidateUtils.isEmpty(jobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
-        if(ValidateUtils.isEmpty(jobInfoRequest.getId())){
+        if (ValidateUtils.isEmpty(jobInfoRequest.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NULL);
         }
         execute(cookie,adminAddresses+"job/delete?jobId="+jobInfoRequest.getId(),Method.GET,null,null);
@@ -122,7 +122,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         cookie = ValidateUtils.getOrDefault(cookie, login());
         Map<String,SaveJobInfoRequest> taskMap = findByExecutorHandler(cookie,appId);
         SaveJobInfoRequest saveJobInfoRequest = taskMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(saveJobInfoRequest)){
+        if (ValidateUtils.isEmpty(saveJobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
         saveJobInfoRequest.setEnable(true);
@@ -134,7 +134,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         cookie = ValidateUtils.getOrDefault(cookie, login());
         Map<String,SaveJobInfoRequest> taskMap = findByExecutorHandler(cookie,appId);
         SaveJobInfoRequest saveJobInfoRequest = taskMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(saveJobInfoRequest)){
+        if (ValidateUtils.isEmpty(saveJobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
         saveJobInfoRequest.setEnable(false);
@@ -152,7 +152,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         paramMap.put("pageSize",100000);
         String body = execute(cookie,url,Method.POST,ContentType.JSON,paramMap);
         ResultVO<String> data = JSONUtil.toBean(body, new TypeReference<ResultVO<String>>() {}, true);
-        if(ValidateUtils.isEmpty(data) || ValidateUtils.isEmpty(data.getData())){
+        if (ValidateUtils.isEmpty(data) || ValidateUtils.isEmpty(data.getData())) {
             return new HashMap<>();
         }
         List<SaveJobInfoRequest> list = JSONUtil.toList(data.getData(), SaveJobInfoRequest.class);
@@ -172,7 +172,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         String body = execute(cookie,url,Method.POST,ContentType.JSON,paramMap);
         Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         JSONArray jsonArray = (JSONArray) resultMap.get("data");
-        if(ValidateUtils.isEmpty(jsonArray)){
+        if (ValidateUtils.isEmpty(jsonArray)) {
             return new HashMap<>();
         }
         List<JobAppVO> appVOList = JSONUtil.toList(jsonArray, JobAppVO.class);
@@ -185,7 +185,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     public Integer createAppId(String cookie,String appName,Integer namespacesId)throws BaseException {
         Map<String,Integer> appIdMap = getAllAppId(cookie);
         Integer appId = appIdMap.get(appName);
-        if(ValidateUtils.isNotEmpty(appId)){
+        if (ValidateUtils.isNotEmpty(appId)) {
             return appId;
         }
         Map<String,Object> paramMap = new HashMap<>();
@@ -218,7 +218,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     public Integer createNamespace(String code,String cookie) throws BaseException {
         Map<String, JobNamespace> namespaceMap = getAllNamespaces(cookie);
         JobNamespace jobNamespace =  namespaceMap.get(code);
-        if(ValidateUtils.isNotEmpty(jobNamespace)){
+        if (ValidateUtils.isNotEmpty(jobNamespace)) {
             return jobNamespace.getId();
         }
         Map<String,Object> params = new HashMap<>();
@@ -235,23 +235,23 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
      */
     private HttpResponse executeResponse(String cookie, String url, Method requestMethod, ContentType contentType, Map<String, Object> paramMap) throws BaseException {
         HttpRequest request = HttpUtils.initRequest(requestMethod, url,contentType);
-        if(ValidateUtils.isNotEmpty(cookie)){
+        if (ValidateUtils.isNotEmpty(cookie)) {
             request = request.header("PowerJwt",cookie); // 需要替换为实际的认证信息
         }
-        if(ValidateUtils.isNotEmpty(paramMap)){
+        if (ValidateUtils.isNotEmpty(paramMap)) {
             request = request.body(JSONUtil.toJsonStr(paramMap));
         }
         HttpResponse response = request.execute();
         String body = response.body();
         Boolean success = null;
         String message = null;
-        if(JSONUtil.isTypeJSON(body)){
+        if (JSONUtil.isTypeJSON(body)) {
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             success = BooleanUtil.toBoolean(ValidateUtils.isEmpty(resultMap.get("success")) ? "false" : resultMap.get("success").toString());
             message = ValidateUtils.isEmpty(resultMap.get("message")) ? null : resultMap.get("message").toString();
         }
 
-        if(!response.isOk() || Boolean.FALSE.equals(success)){
+        if (!response.isOk() || Boolean.FALSE.equals(success)) {
             throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR,url,JSONUtil.toJsonStr(paramMap),message);
         }
         return response;
@@ -268,15 +268,15 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         }
     }
 
-    private String getUrl(){
+    private String getUrl() {
         String adminAddresses = powerJobProperties.getWorker().getProtocol().name().toLowerCase() +"://"+ powerJobProperties.getWorker().getServerAddress();
-        if(!adminAddresses.endsWith("/")){
+        if (!adminAddresses.endsWith("/")) {
             adminAddresses = adminAddresses + "/";
         }
         return adminAddresses;
     }
 
-    private Map<String,Object> initUserRole(){
+    private Map<String,Object> initUserRole() {
         Map<String,Object> componentUserRoleInfoMap = new HashMap<>();
         componentUserRoleInfoMap.put("observer",new String[]{});
         componentUserRoleInfoMap.put("qa",new String[]{});

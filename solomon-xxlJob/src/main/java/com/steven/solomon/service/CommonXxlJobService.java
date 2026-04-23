@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.http.HttpRequest;
@@ -39,13 +39,13 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     public String login() throws Exception {
         String userName = profile.getUserName();
         String password = profile.getPassword();
-        if(ValidateUtils.isEmpty(adminAddresses)){
+        if (ValidateUtils.isEmpty(adminAddresses)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_ADMIN_URL_IS_NULL);
         }
-        if(ValidateUtils.isEmpty(userName)){
+        if (ValidateUtils.isEmpty(userName)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_USERNAME_IS_NULL);
         }
-        if(ValidateUtils.isEmpty(password)){
+        if (ValidateUtils.isEmpty(password)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_PASSWORD_IS_NULL);
         }
 
@@ -68,13 +68,13 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void saveJob(String cookie,XxlJobInfo job) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
-        if(xxlJobInfoMap.containsKey(job.getExecutorHandler())){
+        if (xxlJobInfoMap.containsKey(job.getExecutorHandler())) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NOT_NULL,job.getExecutorHandler());
         }
         String url = adminAddresses + "jobinfo/add";
@@ -84,14 +84,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void updateJob(String cookie,XxlJobInfo job) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,job.getExecutorHandler());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(job.getExecutorHandler());
-        if(ValidateUtils.isEmpty(exitJob)){
+        if (ValidateUtils.isEmpty(exitJob)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,job.getExecutorHandler());
         }
         job.setId(exitJob.getId());
@@ -102,7 +102,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void deleteJob(String cookie,String executorHandler) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
 
@@ -110,7 +110,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(exitJob)){
+        if (ValidateUtils.isEmpty(exitJob)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,executorHandler);
         }
 
@@ -121,7 +121,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void startJob(String cookie,String executorHandler) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
 
@@ -130,7 +130,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(xxlJobInfo)){
+        if (ValidateUtils.isEmpty(xxlJobInfo)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_START_JOB_ERROR,executorHandler);
         }
         Map<String, Object> paramMap = new HashMap<>();
@@ -140,7 +140,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void stopJob(String cookie,String executorHandler) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
 
@@ -149,7 +149,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
-        if(ValidateUtils.isEmpty(xxlJobInfo)){
+        if (ValidateUtils.isEmpty(xxlJobInfo)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_STOP_JOB_ERROR,executorHandler);
         }
         Map<String, Object> paramMap = new HashMap<>();
@@ -158,7 +158,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     }
 
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws Exception {
-        if(ValidateUtils.isEmpty(cookie)){
+        if (ValidateUtils.isEmpty(cookie)) {
             cookie = login();
         }
         String url = adminAddresses + "jobinfo/pageList";
@@ -182,7 +182,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     protected String getCookie(String url, Map<String, Object> paramMap) throws BaseException {
         try (HttpResponse response = executeResponse(null, url, paramMap)) {
             List<String> cookies = response.headerList("Set-Cookie");
-            if(ValidateUtils.isEmpty(cookies)){
+            if (ValidateUtils.isEmpty(cookies)) {
                 throw new BaseException(XxlJobErrorCode.XXL_JOB_COOKIE_IS_NULL);
             }
             String cookie = cookies.getFirst();
@@ -204,31 +204,31 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     protected HttpResponse executeResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         HttpRequest request = HttpUtil.createPost(url);
-        if(ValidateUtils.isNotEmpty(cookie)){
+        if (ValidateUtils.isNotEmpty(cookie)) {
             request = request.header("Cookie", cookie);
         }
-        if(ValidateUtils.isNotEmpty(paramMap)){
+        if (ValidateUtils.isNotEmpty(paramMap)) {
             request = request.form(paramMap);
         }
         HttpResponse response = request.execute();
         String body = response.body();
         String code = null;
         String msg = null;
-        if(JSONUtil.isTypeJSON(body)){
+        if (JSONUtil.isTypeJSON(body)) {
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             code = ValidateUtils.isEmpty(resultMap.get("code")) ? null : resultMap.get("code").toString();
             msg = ValidateUtils.isEmpty(resultMap.get("msg")) ? null : resultMap.get("msg").toString();
         }
 
-        if(!response.isOk() || (ValidateUtils.isNotEmpty(code) && ValidateUtils.notEqualsIgnoreCase(code,"200"))){
+        if (!response.isOk() || (ValidateUtils.isNotEmpty(code) && ValidateUtils.notEqualsIgnoreCase(code,"200"))) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url,JSONUtil.toJsonStr(paramMap),msg);
         }
         return response;
     }
 
-    protected String getUrl(){
+    protected String getUrl() {
         String adminAddresses = profile.getAdminAddresses();
-        if(!adminAddresses.endsWith("/")){
+        if (!adminAddresses.endsWith("/")) {
             adminAddresses = adminAddresses + "/";
         }
         return adminAddresses;

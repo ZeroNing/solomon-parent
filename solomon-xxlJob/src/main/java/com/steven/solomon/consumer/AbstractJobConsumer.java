@@ -1,4 +1,4 @@
-package com.steven.solomon.consumer;
+﻿package com.steven.solomon.consumer;
 
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.annotation.JobTask;
@@ -24,7 +24,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
         try {
             stopWatch.start();
             handle(jobParam);
-        }catch(Throwable e){
+        }catch (Throwable e) {
             logger.error("BeanName:{} AbstractJobConsumer:调度报错 异常为:",xxlJobBeanName, e);
             saveLog(jobParam,e);
             throw e;
@@ -40,7 +40,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
     /**
      * 保存消费失败的消息
      */
-    public void saveLog(String jobParam,Throwable throwable){
+    public void saveLog(String jobParam,Throwable throwable) {
         logger.error("BeanName:{},任务参数:{}.出现了异常,异常为:",xxlJobBeanName,jobParam,throwable);
     }
 }

@@ -1,4 +1,4 @@
-package com.steven.solomon.execute;
+﻿package com.steven.solomon.execute;
 
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;
@@ -22,7 +22,7 @@ public class BasicTypeExecuteSql extends AbstractExecuteSql {
     protected List<Object> executeQuery(Class<?> clazz, ResultSetMetaData metaData, ResultSet resultSet, int columnCount) throws Exception {
         List<Object> list = new ArrayList<>();
         while (resultSet.next()) {
-            for(int i = 1; i <= columnCount; i++){
+            for (int i = 1; i <= columnCount; i++) {
                 //字段别名
                 String columnLabelName = metaData.getColumnLabel(i);
                 //获取字段的key

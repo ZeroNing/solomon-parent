@@ -1,4 +1,4 @@
-package com.steven.solomon.annotation;
+﻿package com.steven.solomon.annotation;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.XxlJobCondition;

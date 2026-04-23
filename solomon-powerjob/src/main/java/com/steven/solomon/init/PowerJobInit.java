@@ -1,4 +1,4 @@
-package com.steven.solomon.init;
+﻿package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
@@ -37,11 +37,11 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        if(!powerJobProperties.getWorker().isEnabled()){
+        if (!powerJobProperties.getWorker().isEnabled()) {
             logger.error("powerJob不启用,不初始化定时任务");
             return;
         }
-        if(!jobProperties.getAutoRegister()){
+        if (!jobProperties.getAutoRegister()) {
             logger.error("powerJob启用,配置了不自动注册任务");
             return;
         }
@@ -53,16 +53,16 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
         Integer appId = service.createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
         //获取全部任务
         Map<String,SaveJobInfoRequest> taskMap = service.findByExecutorHandler(cookie,appId);
-        for(Object obj : clazzList){
+        for (Object obj : clazzList) {
             Class<?> clazz = AopUtils.getTargetClass(obj);
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
-            if(ValidateUtils.isEmpty(jobTask)){
+            if (ValidateUtils.isEmpty(jobTask)) {
                 logger.error("{}没有JobTask注解,不进行初始化",clazz.getSimpleName());
                 continue;
             }
             String className = clazz.getName();
             SaveJobInfoRequest saveRequest = taskMap.get(className);
-            if(ValidateUtils.isEmpty(saveRequest)){
+            if (ValidateUtils.isEmpty(saveRequest)) {
                 saveRequest = new SaveJobInfoRequest(jobTask,appId,className);
                 service.saveJob(cookie,saveRequest);
             } else {

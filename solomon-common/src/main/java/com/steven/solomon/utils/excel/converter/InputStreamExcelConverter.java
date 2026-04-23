@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.excel.converter;
+﻿package com.steven.solomon.utils.excel.converter;
 
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.metadata.GlobalConfiguration;
@@ -21,12 +21,12 @@ public class InputStreamExcelConverter implements Converter<InputStream> {
     public WriteCellData<?> convertToExcelData(InputStream value, ExcelContentProperty contentProperty,
                                                GlobalConfiguration globalConfiguration) throws IOException {
         try {
-            if (ValidateUtils.isEmpty(value)){
+            if (ValidateUtils.isEmpty(value)) {
                 return new WriteCellData<>("InputStream为空");
             }
             byte[] bytes = IoUtils.toByteArray(value);
             return new WriteCellData<>(bytes);
-        }catch (Exception e){
+        }catch (Exception e) {
             return new WriteCellData<>("InputStream异常");
         } finally {
             if (value != null) {

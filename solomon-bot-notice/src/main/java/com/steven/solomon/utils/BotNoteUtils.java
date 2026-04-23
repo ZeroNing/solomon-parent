@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+﻿package com.steven.solomon.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;
@@ -37,9 +37,9 @@ public class BotNoteUtils {
         //获取机器人客户端链接
         String url = getUrl(client);
         NoteRequestVO noteRequestVO = null;
-        if(StrUtil.equalsIgnoreCase(BotClientEnum.WECHAT.name(),client.name())){
+        if (StrUtil.equalsIgnoreCase(BotClientEnum.WECHAT.name(),client.name())) {
             noteRequestVO = sendWeChatNote(message, url);
-        } else if(StrUtil.equalsIgnoreCase(BotClientEnum.DING_TALK.name(),client.name())){
+        } else if (StrUtil.equalsIgnoreCase(BotClientEnum.DING_TALK.name(),client.name())) {
             noteRequestVO = sendDingTalkNote(message, url);
         } else {
             throw new BaseException(BotNoticeErrorCode.BOT_CLIENT_NOT_EXIST,client.name());
@@ -49,9 +49,9 @@ public class BotNoteUtils {
 
     private String getUrl(BotClientEnum client) throws Exception {
         String url = null;
-        if(StrUtil.equalsIgnoreCase(BotClientEnum.WECHAT.name(),client.name())){
+        if (StrUtil.equalsIgnoreCase(BotClientEnum.WECHAT.name(),client.name())) {
             url = weComProfile.getUrl();
-        } else if(StrUtil.equalsIgnoreCase(BotClientEnum.DING_TALK.name(),client.name())){
+        } else if (StrUtil.equalsIgnoreCase(BotClientEnum.DING_TALK.name(),client.name())) {
             url = dingTalkProfile.getWebUrl();
         } else {
             throw new BaseException(BotNoticeErrorCode.BOT_CLIENT_NOT_EXIST,client.name());
@@ -67,27 +67,27 @@ public class BotNoteUtils {
         SendBaseNoteMessage.SendMarkdownMessage markdownMessage= message.getMarkdown();
 
         Map<String, Object> map = new HashMap<>();
-        if(ValidateUtils.isNotEmpty(textMessage)){
+        if (ValidateUtils.isNotEmpty(textMessage)) {
             map.put("msgtype", "text");
             Map<String,Object> detailMap = new HashMap<>();
             detailMap.put("content", textMessage.getMessage());
-            if(ValidateUtils.isNotEmpty(sendAtMessage)){
+            if (ValidateUtils.isNotEmpty(sendAtMessage)) {
                 List<String> metionedList = ValidateUtils.getOrDefault(sendAtMessage.getAtUserIds(),new ArrayList<>());
                 List<String> metionedMobileList = ValidateUtils.getOrDefault(sendAtMessage.getAtMobiles(),new ArrayList<>());
-                if(sendAtMessage.getIsAtAll()){
+                if (sendAtMessage.getIsAtAll()) {
                     metionedList.add("@all");
                 }
-                if(ValidateUtils.isNotEmpty(metionedList)){
+                if (ValidateUtils.isNotEmpty(metionedList)) {
                     detailMap.put("mentioned_list", metionedList);
                 }
-                if(ValidateUtils.isNotEmpty(metionedMobileList)){
+                if (ValidateUtils.isNotEmpty(metionedMobileList)) {
                     detailMap.put("mentioned_mobile_list", metionedMobileList);
                 }
             }
             map.put("text", detailMap);
         }
 
-        if(ValidateUtils.isNotEmpty(linkMessage)){
+        if (ValidateUtils.isNotEmpty(linkMessage)) {
             map.put("msgtype", "news");
 
             Map<String,Object> detailMap = new HashMap<>();
@@ -100,7 +100,7 @@ public class BotNoteUtils {
             map.put("news", detailMap);
         }
 
-        if(ValidateUtils.isNotEmpty(markdownMessage)){
+        if (ValidateUtils.isNotEmpty(markdownMessage)) {
             map.put("msgtype", "markdown");
 
             Map<String,Object> detailMap = new HashMap<>();
@@ -109,7 +109,7 @@ public class BotNoteUtils {
         }
 
         HttpResponse response = HttpRequest.post(url).body(JackJsonUtils.formatJsonByFilter(map)).execute();
-        if(ValidateUtils.isNotEmpty(response)){
+        if (ValidateUtils.isNotEmpty(response)) {
             response.close();
         }
         return new NoteRequestVO(response.isOk(),response.body());
@@ -124,20 +124,20 @@ public class BotNoteUtils {
         SendBaseNoteMessage.SendTextMessage textMessage = message.getText();
         SendBaseNoteMessage.SendMarkdownMessage markdownMessage= message.getMarkdown();
         //设置需要@的人处理
-        if(ValidateUtils.isNotEmpty(sendAtMessage)){
+        if (ValidateUtils.isNotEmpty(sendAtMessage)) {
             OapiRobotSendRequest.At at = new OapiRobotSendRequest.At();
             at.setIsAtAll(sendAtMessage.getIsAtAll());
             at.setAtMobiles(sendAtMessage.getAtMobiles());
             at.setAtUserIds(sendAtMessage.getAtUserIds());
             request.setAt(at);
         }
-        if(ValidateUtils.isNotEmpty(textMessage)){
+        if (ValidateUtils.isNotEmpty(textMessage)) {
             OapiRobotSendRequest.Text text = new OapiRobotSendRequest.Text();
             text.setContent(textMessage.getMessage());
             request.setText(text);
             request.setMsgtype("text");
         }
-        if(ValidateUtils.isNotEmpty(linkMessage)){
+        if (ValidateUtils.isNotEmpty(linkMessage)) {
             OapiRobotSendRequest.Link link = new OapiRobotSendRequest.Link();
             link.setText(linkMessage.getText());
             link.setMessageUrl(linkMessage.getMessageUrl());
@@ -146,7 +146,7 @@ public class BotNoteUtils {
             request.setLink(link);
             request.setMsgtype("link");
         }
-        if(ValidateUtils.isNotEmpty(markdownMessage)){
+        if (ValidateUtils.isNotEmpty(markdownMessage)) {
             OapiRobotSendRequest.Markdown markdown = new OapiRobotSendRequest.Markdown();
             markdown.setText(markdownMessage.getText());
             markdown.setTitle(markdownMessage.getTitle());

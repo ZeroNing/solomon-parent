@@ -1,4 +1,4 @@
-//package com.steven.solomon.json;
+﻿//package com.steven.solomon.json;
 //
 //import cn.hutool.core.lang.TypeReference;
 //import com.alibaba.fastjson.JSON;
@@ -20,7 +20,7 @@
 //     */
 //    public static String formatJsonByFilter(Object result, SerializeFilter... filter) {
 //        List<SerializeFilter> serializeFilters = new ArrayList<>();
-//        if(ValidateUtils.isNotEmpty(filter)){
+//        if (ValidateUtils.isNotEmpty(filter)) {
 //            serializeFilters.addAll(Arrays.asList(filter));
 //        }
 //        serializeFilters.add(new FastJsonAfterFilter());
@@ -32,7 +32,7 @@
 //     */
 //    public static byte[] formatBytesByFilter(Object result, SerializeFilter... filter) {
 //        List<SerializeFilter> serializeFilters = new ArrayList<>();
-//        if(ValidateUtils.isNotEmpty(filter)){
+//        if (ValidateUtils.isNotEmpty(filter)) {
 //            serializeFilters.addAll(Arrays.asList(filter));
 //        }
 //        serializeFilters.add(new FastJsonAfterFilter());

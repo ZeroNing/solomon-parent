@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.baidubce.Protocol;
 import com.baidubce.Region;
@@ -32,7 +32,7 @@ public class BOSService extends AbstractFileService {
     configuration.setEndpoint(properties.getEndpoint());
     configuration.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
     configuration.setSocketTimeoutInMillis(properties.getSocketTimeout());
-    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
       configuration.setRegion(Region.fromValue(properties.getRegionName()));
     }
     boolean             isHttps         = properties.getEndpoint().contains("https");
@@ -49,7 +49,7 @@ public class BOSService extends AbstractFileService {
   protected void multipartUpload(MultipartFile file, String bucketName, long fileSize, String uploadId, String filePath,int partCount)
       throws Exception {
     List<PartETag> partETags = new ArrayList<>();
-    for(int i = 0; i < partCount; i++){
+    for (int i = 0; i < partCount; i++) {
       InputStream inputStream = file.getInputStream();
       // 跳到每个分块的开头
       long skipBytes = partSize * i;
@@ -119,7 +119,7 @@ public class BOSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
      return new ArrayList<>();
     }
     ListObjectsResponse response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
@@ -140,7 +140,7 @@ public class BOSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -150,8 +150,8 @@ public class BOSService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     ListBucketsResponse listBucketsResponse     = client.listBuckets();
     List<String>        bucketNameList = new ArrayList<>();
-    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
-      for(BucketSummary bucket : listBucketsResponse.getBuckets()){
+    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+      for (BucketSummary bucket : listBucketsResponse.getBuckets()) {
         bucketNameList.add(bucket.getName());
       }
     }

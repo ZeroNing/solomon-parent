@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.aliyun.oss.ClientConfiguration;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
@@ -36,7 +36,7 @@ public class S3Service extends AbstractFileService {
 
   private S3Presigner presigner;
 
-  public S3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService){
+  public S3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService) {
     super(fileNamingRulesGenerationService);
   }
 
@@ -122,7 +122,7 @@ public class S3Service extends AbstractFileService {
     try{
       client.headObject(HeadObjectRequest.builder().bucket(bucketName).key(objectName).build());
       return true;
-    } catch (NoSuchKeyException e){
+    } catch (NoSuchKeyException e) {
       return false;  // 对象不存在
     } catch (S3Exception e) {
       logger.warn("检查S3对象是否存在时发生异常: bucket={}, key={}, error={}", bucketName, objectName, e.getMessage());
@@ -159,7 +159,7 @@ public class S3Service extends AbstractFileService {
     try{
       client.headBucket(HeadBucketRequest.builder().bucket(bucketName).build());
       return true;
-    } catch (NoSuchBucketException e){
+    } catch (NoSuchBucketException e) {
       return false;  // 桶不存在
     } catch (S3Exception e) {
       logger.warn("检查S3桶是否存在时发生异常: bucket={}, error={}", bucketName, e.getMessage());
@@ -325,7 +325,7 @@ public class S3Service extends AbstractFileService {
   @Override
   public void deleteBucket(String bucketName) throws Exception {
     if (ValidateUtils.isEmpty(bucketName)) {
-      logger.error("[S3] 删除桶失败，参数为空: bucketName=null");
+      logger.error("[S3] 删除桶失败，参数为空: bucketName= null");
       return;
     }
 

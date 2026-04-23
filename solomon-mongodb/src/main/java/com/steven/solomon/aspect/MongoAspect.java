@@ -1,4 +1,4 @@
-package com.steven.solomon.aspect;
+﻿package com.steven.solomon.aspect;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.config.MongoTenantContext;
@@ -42,7 +42,7 @@ public class MongoAspect {
 
   @Around("cutPoint()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
-    if(!enabled){
+    if (!enabled) {
       logger.info("MongoDB组件不启用");
       return point.proceed();
     }

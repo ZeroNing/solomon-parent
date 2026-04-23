@@ -1,4 +1,4 @@
-package com.steven.solomon.init;
+﻿package com.steven.solomon.init;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;
@@ -22,7 +22,7 @@ public abstract class AbstractMessageLineRunner<T extends Annotation> implements
     public void run(String... args) throws Exception {
         Class<T> clazz = ClassUtil.loadClass(TypeUtil.getTypeArgument(getClass(),0).getTypeName());
         List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(clazz).values());
-        if(ValidateUtils.isEmpty(clazzList)){
+        if (ValidateUtils.isEmpty(clazzList)) {
             logger.error("AbstractMessageLineRunner:没有{}消费者",clazz.getSimpleName());
             return;
         }

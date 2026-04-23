@@ -1,4 +1,4 @@
-package com.steven.solomon.profile;
+﻿package com.steven.solomon.profile;
 
 import com.steven.solomon.verification.ValidateUtils;
 import org.apache.commons.codec.binary.Base64;
@@ -62,7 +62,7 @@ public class BotNoteProfile {
         }
 
         public String getWebUrl() throws Exception {
-            if(ValidateUtils.isNotEmpty(url)){
+            if (ValidateUtils.isNotEmpty(url)) {
                 long timestamp = Instant.now().toEpochMilli();
                 String stringToSign = timestamp + "\n" + secret;
                 Mac mac = Mac.getInstance("HmacSHA256");

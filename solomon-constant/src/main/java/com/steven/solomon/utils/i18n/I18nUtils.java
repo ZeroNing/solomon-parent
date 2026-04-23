@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.i18n;
+﻿package com.steven.solomon.utils.i18n;
 
 import com.steven.solomon.code.BaseCode;
 import org.springframework.context.MessageSource;
@@ -7,7 +7,7 @@ import org.springframework.context.i18n.LocaleContextHolder;
 
 import java.util.Locale;
 
-@Configuration(proxyBeanMethods=false)
+@Configuration(proxyBeanMethods = false)
 public class I18nUtils {
 
   private static MessageSource messageSource;
@@ -23,7 +23,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    */
   public static String getErrorMessage(String code, Object... args) {
-    if(code == null || code.isEmpty()){
+    if (code == null || code.isEmpty()) {
       return null;
     }
     return getMessage(BaseCode.BASE_EXCEPTION_CODE + code, args);
@@ -36,7 +36,7 @@ public class I18nUtils {
    * @param args 可替换信息参数
    */
   public static String getErrorMessage(String code,Locale locale, Object... args) {
-    if(code == null || code.isEmpty()){
+    if (code == null || code.isEmpty()) {
       return null;
     }
     return getMessage(BaseCode.BASE_EXCEPTION_CODE + code,locale, args);
@@ -49,7 +49,7 @@ public class I18nUtils {
    * @param enumClazz 枚举Class
    */
   public static String getEnumMessage(String code, Class<?> enumClazz) {
-    if(code == null || code.isEmpty()){
+    if (code == null || code.isEmpty()) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName()+"."+code);
@@ -62,14 +62,14 @@ public class I18nUtils {
    * @param enumClazz 枚举Class
    */
   public static String getEnumMessage(Enum<?> enumCode, Class<?> enumClazz) {
-    if(enumCode == null){
+    if (enumCode == null) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName()+"."+enumCode.name());
   }
 
   public static String getEnumMessage(String code) {
-    if(code == null || code.isEmpty()){
+    if (code == null || code.isEmpty()) {
       return null;
     }
     return getMessage(code, "");

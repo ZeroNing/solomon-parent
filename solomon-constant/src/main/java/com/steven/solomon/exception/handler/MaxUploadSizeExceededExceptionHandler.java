@@ -1,10 +1,10 @@
-package com.steven.solomon.exception.handler;
+﻿package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration(proxyBeanMethods=false,value = "MaxUploadSizeExceededExceptionProcessor")
+@Configuration(proxyBeanMethods = false,value = "MaxUploadSizeExceededExceptionProcessor")
 public class MaxUploadSizeExceededExceptionHandler extends AbstractExceptionHandler {
 
   @Override

@@ -1,4 +1,4 @@
-package com.steven.solomon.graphics2D.entity;
+﻿package com.steven.solomon.graphics2D.entity;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.crypto.digest.DigestUtil;
@@ -25,7 +25,7 @@ public class FileUpload implements Serializable {
    */
   Long size;
 
-  public FileUpload(){
+  public FileUpload() {
     super();
   }
 

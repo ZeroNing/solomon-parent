@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.entity;
+﻿package com.steven.solomon.pojo.entity;
 
 import java.io.Serializable;
 
@@ -27,11 +27,11 @@ public class BaseMq<T> implements Serializable {
         this.msgId = msgId;
     }
 
-    public BaseMq(){
+    public BaseMq() {
 
     }
 
-    public BaseMq(T body){
+    public BaseMq(T body) {
         this.body = body;
     }
 

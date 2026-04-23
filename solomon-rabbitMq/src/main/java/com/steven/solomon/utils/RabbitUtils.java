@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+﻿package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
@@ -59,7 +59,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void send(RabbitMqModel<?> mq) throws Exception {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -73,7 +73,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendDelay(RabbitMqModel<?> mq, long delay) throws Exception {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -87,7 +87,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      */
     @Override
     public void sendExpiration(RabbitMqModel<?> mq, long expiration) throws Exception {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
@@ -100,7 +100,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 重置队列并发使用者
      */
     public boolean resetQueueConcurrentConsumers(String queueName, int concurrentConsumers) throws BaseException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -117,7 +117,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 重启消息监听者
      */
     public boolean restartMessageListener(String queueName) throws BaseException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -139,7 +139,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 停止消息监听者
      */
     public boolean stopMessageListener(String queueName) throws BaseException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
@@ -175,7 +175,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //  }
 
     private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("rabbitmq没开启,不发送消息");
             return false;
         }
@@ -235,7 +235,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * @param queueName     队列名
      */
     public void handleQueueMessageManually(boolean transactional, String queueName) throws Exception {
-        if(!enabled){
+        if (!enabled) {
             logger.error("rabbitmq没开启,不发送消息");
             return;
         }
@@ -248,7 +248,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(MessageListener.class);
         for (Object obj : annotationMap.values()) {
             MessageListener messageListener = AnnotationUtil.getAnnotation(obj.getClass(), MessageListener.class);
-            if(ValidateUtils.isEmpty(messageListener)){
+            if (ValidateUtils.isEmpty(messageListener)) {
                 continue;
             }
             List<String> queues = Arrays.asList(messageListener.queues());
@@ -265,11 +265,11 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 请求回复消息发送
      */
     public Object convertSendAndReceive(RabbitMqModel<?> model) throws BaseException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("rabbitmq没开启,不发送消息");
             return null;
         }
-        if(ValidateUtils.isEmpty(model.getReplyTo())){
+        if (ValidateUtils.isEmpty(model.getReplyTo())) {
             throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
         }
         return rabbitTemplate.convertSendAndReceive(model.getRoutingKey(), model, message -> {
@@ -283,7 +283,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
      * 回复消息发送
      */
     public void sendReplyTo(String routingKey, final Message object) throws AmqpException {
-        if(!enabled){
+        if (!enabled) {
             logger.error("rabbitmq没开启,不发送消息");
             return;
         }

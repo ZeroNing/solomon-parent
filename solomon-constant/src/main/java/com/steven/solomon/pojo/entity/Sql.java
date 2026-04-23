@@ -1,4 +1,4 @@
-//package com.steven.solomon.pojo.entity;
+﻿//package com.steven.solomon.pojo.entity;
 //
 //import com.steven.solomon.enums.OrderByEnum;
 //import com.steven.solomon.verification.ValidateUtils;
@@ -16,20 +16,20 @@
 //    super(sql);
 //  }
 //
-//  public static Sql SelectAll(){
+//  public static Sql SelectAll() {
 //    return new Sql("SELECT *");
 //  }
 //
-//  public static Sql SelectAll(String table){
+//  public static Sql SelectAll(String table) {
 //    return new Sql("SELECT * FROM " + table);
 //  }
 //
-//  public Sql from(String table){
+//  public Sql from(String table) {
 //    this.sql = sql.append(" FROM ").append(table);
 //    return this;
 //  }
 //
-//  public Sql from(String table,String alias){
+//  public Sql from(String table,String alias) {
 //    this.sql = sql.append(" FROM ").append(table).append(" ").append(alias);
 //    return this;
 //  }
@@ -48,41 +48,41 @@
 //    return this;
 //  }
 //
-//  public Sql where(){
+//  public Sql where() {
 //    this.sql.append(" WHERE 1=1 ");
 //    return this;
 //  }
 //
-//  public Sql leftJoin(String table,String alias,String on){
+//  public Sql leftJoin(String table,String alias,String on) {
 //    this.sql.append(" LEFT JOIN ").append(table).append(" ").append(alias).append(" ").append("ON ").append(on);
 //    return this;
 //  }
 //
-//  public Sql rightJoin(String table,String alias,String on){
+//  public Sql rightJoin(String table,String alias,String on) {
 //    this.sql.append(" RIGHT JOIN ").append(table).append(" ").append(alias).append(" ").append("ON ").append(on);
 //    return this;
 //  }
 //
-//  public Sql join(String table,String alias,String on){
+//  public Sql join(String table,String alias,String on) {
 //    this.sql.append(" JOIN ").append(table).append(" ").append(alias).append(" ").append("ON ").append(on);
 //    return this;
 //  }
 //
-//  public Sql fullJoin(String table,String alias,String on){
+//  public Sql fullJoin(String table,String alias,String on) {
 //    this.sql.append(" FULL JOIN ").append(table).append(" ").append(alias).append(" ").append("ON ").append(on);
 //    return this;
 //  }
 //
-//  public Sql groupBy(String fields){
+//  public Sql groupBy(String fields) {
 //    this.sql.append(" GROUP BY ").append(fields);
 //    return this;
 //  }
 //
-//  public Sql and(Cond cond, boolean isMoreCond){
-//    if(ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
+//  public Sql and(Cond cond, boolean isMoreCond) {
+//    if (ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())) {
 //      return this;
 //    }
-//    if(isMoreCond){
+//    if (isMoreCond) {
 //      this.sql.append(" AND (").append(cond.getSql()).append(")");
 //    } else {
 //      this.sql.append(" AND ").append(cond.getSql());
@@ -90,15 +90,15 @@
 //    return this;
 //  }
 //
-//  public Sql and(Cond cond){
+//  public Sql and(Cond cond) {
 //    return and(cond,false);
 //  }
 //
-//  public Sql or(Cond cond, boolean isMoreCond){
-//    if(ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())){
+//  public Sql or(Cond cond, boolean isMoreCond) {
+//    if (ValidateUtils.isEmpty(cond) || ValidateUtils.isEmpty(cond.getSql())) {
 //      return this;
 //    }
-//    if(isMoreCond){
+//    if (isMoreCond) {
 //      this.sql.append(" OR (").append(cond.getSql()).append(")");
 //    } else {
 //      this.sql.append(" OR ").append(cond.getSql());
@@ -106,20 +106,20 @@
 //    return this;
 //  }
 //
-//  public Sql or(Cond cond){
+//  public Sql or(Cond cond) {
 //    return or(cond,false);
 //  }
 //
-//  public Sql orderBy(String fields){
+//  public Sql orderBy(String fields) {
 //    return orderBy(fields, OrderByEnum.ASC);
 //  }
 //
-//  public Sql orderBy(String fields, OrderByEnum orderByEnum){
+//  public Sql orderBy(String fields, OrderByEnum orderByEnum) {
 //    this.sql.append(" ORDER BY ").append(fields).append(" ").append(orderByEnum.label());
 //    return this;
 //  }
 //
-//  public Sql limit(int pageNo,int pageSize){
+//  public Sql limit(int pageNo,int pageSize) {
 //    this.sql.append(" LIMIT").append(pageNo).append(",").append(pageSize);
 //    return this;
 //  }

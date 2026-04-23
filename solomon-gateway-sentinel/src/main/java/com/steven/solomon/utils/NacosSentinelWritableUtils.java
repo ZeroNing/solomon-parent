@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+﻿package com.steven.solomon.utils;
 
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.property.SentinelProperty;
@@ -38,13 +38,13 @@ public class NacosSentinelWritableUtils {
   private ConfigService getConfigService() throws NacosException {
     Properties properties = new Properties();
     properties.setProperty(PropertyKeyConst.SERVER_ADDR,url);
-    if(ValidateUtils.isNotEmpty(userName)){
+    if (ValidateUtils.isNotEmpty(userName)) {
       properties.setProperty(PropertyKeyConst.USERNAME,userName);
     }
-    if(ValidateUtils.isNotEmpty(password)){
+    if (ValidateUtils.isNotEmpty(password)) {
       properties.setProperty(PropertyKeyConst.PASSWORD,password);
     }
-    if(ValidateUtils.isNotEmpty(namespace)){
+    if (ValidateUtils.isNotEmpty(namespace)) {
       properties.setProperty(PropertyKeyConst.NAMESPACE,namespace);
     }
     return ConfigFactory.createConfigService(properties);

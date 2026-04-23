@@ -1,4 +1,4 @@
-package com.steven.solomon.execute;
+﻿package com.steven.solomon.execute;
 
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;
@@ -32,12 +32,12 @@ public abstract class AbstractExecuteSql {
 
     public Object executeQuery(String sql,List<Object> paramList,Class<?> clazz,boolean isList) throws Exception {
         try (Connection connection = temple.getDataSource().getConnection();PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            if(ValidateUtils.isNotEmpty(paramList)) {
-                for(int index = 0; index < paramList.size(); index++) {
+            if (ValidateUtils.isNotEmpty(paramList)) {
+                for (int index = 0; index < paramList.size(); index++) {
                     preparedStatement.setObject(index + 1, paramList.get(index));
                 }
             }
-            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 // 获取sql里的字段以及别名
                 ResultSetMetaData metaData = resultSet.getMetaData();
                 // 获取有多少个字段

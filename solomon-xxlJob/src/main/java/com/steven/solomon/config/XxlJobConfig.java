@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.properties.XxlJobProperties;
@@ -24,10 +24,10 @@ public class XxlJobConfig {
         xxlJobSpringExecutor.setIp(profile.getIp());
         xxlJobSpringExecutor.setPort(profile.getPort());
         xxlJobSpringExecutor.setAccessToken(profile.getAccessToken());
-        if(ValidateUtils.isNotEmpty(profile.getLogPath())){
+        if (ValidateUtils.isNotEmpty(profile.getLogPath())) {
             xxlJobSpringExecutor.setLogPath(profile.getLogPath());
         }
-        if(ValidateUtils.isNotEmpty(profile.getTimeout())){
+        if (ValidateUtils.isNotEmpty(profile.getTimeout())) {
             xxlJobSpringExecutor.setTimeout(profile.getTimeout());
         }
         xxlJobSpringExecutor.setLogRetentionDays(profile.getLogRetentionDays());

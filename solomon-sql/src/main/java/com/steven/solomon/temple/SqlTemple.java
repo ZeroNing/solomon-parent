@@ -1,4 +1,4 @@
-package com.steven.solomon.temple;
+﻿package com.steven.solomon.temple;
 
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.enums.ConvertEnums;
@@ -22,7 +22,7 @@ public class SqlTemple {
     public SqlTemple() {
         super();
         this.convertMap = new HashMap<>();
-        for(ConvertEnums convertEnum : ConvertEnums.values()){
+        for (ConvertEnums convertEnum : ConvertEnums.values()) {
             convertMap.put(convertEnum.getColumnType(),convertEnum.getConvert());
         }
     }

@@ -1,4 +1,4 @@
-package com.steven.solomon.consumer;
+﻿package com.steven.solomon.consumer;
 
 import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;
@@ -67,7 +67,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
             if (checkMessageKey(model)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
             }
-            if(ValidateUtils.isNotEmpty(tenantCode)){
+            if (ValidateUtils.isNotEmpty(tenantCode)) {
                 RequestHeaderHolder.setTenantCode(tenantCode);
             }
             // 消费消息
@@ -123,8 +123,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
     /**
      * 发送请求-回应方法
      */
-    public void sendReplyTo(R result){
-        if(ValidateUtils.isEmpty(messageProperties.getReplyTo())){
+    public void sendReplyTo(R result) {
+        if (ValidateUtils.isEmpty(messageProperties.getReplyTo())) {
             return;
         }
         ResultVO<R> resultVO = new ResultVO<>(result);

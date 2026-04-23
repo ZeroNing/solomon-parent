@@ -1,4 +1,4 @@
-package com.steven.handler;
+﻿package com.steven.handler;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.csv.*;
@@ -36,7 +36,7 @@ public class TestHandler2 extends AbstractJobConsumer {
         List<Map<String, String>> dataMaps = new ArrayList<>();
         CsvData csvData = CsvUtil.getReader(config).read(csvFile, CharsetUtil.CHARSET_UTF_8);
         List<CsvRow> rows = csvData.getRows();
-        for(CsvRow row: rows){
+        for (CsvRow row: rows) {
             if (headersRef.get() == null) {
                 // 第一行：保存标题头
                 headersRef.set(row.getRawList());

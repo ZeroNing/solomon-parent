@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.vo;
+﻿package com.steven.solomon.pojo.vo;
 
 import com.steven.solomon.code.BaseCode;
 import java.io.Serializable;
@@ -11,22 +11,22 @@ public class ResultVO<T> implements Serializable {
 
   private T data;
 
-  public static<T> ResultVO<T> success(T data){
+  public static<T> ResultVO<T> success(T data) {
     return new ResultVO<>(data);
   }
 
-  public static<T> ResultVO<T> success(){
+  public static<T> ResultVO<T> success() {
     return new ResultVO<>();
   }
 
-  public ResultVO(T data){
+  public ResultVO(T data) {
     super();
     this.message = BaseCode.DEFAULT_SUCCESS_PHRASE;
     this.data = data;
     this.status = 200;
   }
 
-  public ResultVO(){
+  public ResultVO() {
     super();
     this.message = BaseCode.DEFAULT_SUCCESS_PHRASE;
     this.data = null;

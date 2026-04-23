@@ -1,4 +1,4 @@
-package com.steven.solomon.init;
+﻿package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
@@ -37,21 +37,21 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        if(!profile.getEnabled()){
+        if (!profile.getEnabled()) {
             logger.error("xxl-Job不启用,不初始化定时任务");
             return;
         }
-        if(!profile.getAutoRegister()){
+        if (!profile.getAutoRegister()) {
             logger.error("xxl-Job启用,但是配置了不允许自动注册");
             return;
         }
         String cookie = service.login();
         List<XxlJobInfo> xxlJobInfoList = service.findByExecutorHandler(cookie,"");
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
-        for(Object obj : clazzList){
+        for (Object obj : clazzList) {
             Class<?> clazz = obj.getClass();
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
-            if(ValidateUtils.isEmpty(jobTask)){
+            if (ValidateUtils.isEmpty(jobTask)) {
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
@@ -70,9 +70,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 service.updateJob(cookie, xxlJobInfo);
             }
             //启用或禁止任务，调度类型必须不是不调度才可以
-            if(!ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())){
-                if(isCreate){
-                    if(jobTask.start()){
+            if (!ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())) {
+                if (isCreate) {
+                    if (jobTask.start()) {
                         service.startJob(cookie, xxlJobInfo.getExecutorHandler());
                     } else {
                         service.stopJob(cookie, xxlJobInfo.getExecutorHandler());

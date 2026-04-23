@@ -1,4 +1,4 @@
-package com.steven.solomon.consumer;
+﻿package com.steven.solomon.consumer;
 
 
 import cn.hutool.core.lang.TypeReference;
@@ -43,15 +43,15 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
           model = conversion(body);
           tenantCode = model.getTenantCode();
           // 判断是否重复消费
-          if(checkMessageKey(model)){
+          if (checkMessageKey(model)) {
               throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
           }
-          if(ValidateUtils.isNotEmpty(tenantCode)){
+          if (ValidateUtils.isNotEmpty(tenantCode)) {
               RequestHeaderHolder.setTenantCode(tenantCode);
          }
           logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);
           result = this.handleMessage(model.getBody());
-        } catch (Throwable e){
+        } catch (Throwable e) {
           // 消费失败次数不等于空并且失败次数大于某个次数,不处理直接return,并记录到数据库
           logger.error("AbstractConsumer:消费报错 异常为:", e);
           throwable = e;

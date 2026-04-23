@@ -12,21 +12,22 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 
 import java.util.*;
 
-@Configuration(proxyBeanMethods=false)
+@Configuration(proxyBeanMethods = false)
 public class I18nConfig {
 
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger logger = LoggerFactory.getLogger(I18nConfig.class);
 
-  @Value("${i18n.language: zh}")
-  public Locale DEFAULT_LOCALE;
-  @Value("${i18n.all-locale: zh}")
-  private String ALL_LOCALE;
+  @Value("${i18n.language:zh}")
+  private Locale defaultLocale;
+
+  @Value("${i18n.all-locale:zh}")
+  private String allLocale;
 
   @Value("${i18n.path:}")
-  private String PATH;
+  private String path;
 
   @Value("${i18n.is-scan-class:true}")
-  private boolean IS_SCAN_CLASS;
+  private boolean isScanClass;
 
   /**
    * 初始化I18N国际化文件
@@ -35,38 +36,37 @@ public class I18nConfig {
   @ConditionalOnMissingBean(MessageSource.class)
   public MessageSource init() {
     List<String> allPath = new ArrayList<>();
-    List<String> allLocale = Arrays.asList(ALL_LOCALE.split(","));
-    if(!PATH.isEmpty()){
-      allPath.addAll(Arrays.asList(PATH.split(",")));
+    List<String> localeList = Arrays.asList(allLocale.split(","));
+    if (!path.isEmpty()) {
+      allPath.addAll(Arrays.asList(path.split(",")));
     }
-    if(IS_SCAN_CLASS){
+    if (isScanClass) {
       allPath.add("classpath*:i18n/messages");
     }
     List<String> beanNames = new ArrayList<>();
-    for(String path : allPath){
-      ResourceBundle resourceBundle = initResources(allLocale,0,null,path);
+    for (String p : allPath) {
+      ResourceBundle resourceBundle = initResources(localeList, 0, null, p);
       beanNames.add(resourceBundle.getBaseBundleName());
     }
 
     ResourceBundleMessageSource bundleMessageSource = new ResourceBundleMessageSource();
     bundleMessageSource.setDefaultEncoding(BaseCode.UTF8);
-
     bundleMessageSource.setBasenames(beanNames.toArray(new String[]{}));
-    bundleMessageSource.setDefaultLocale(DEFAULT_LOCALE == null ? Locale.CHINESE : DEFAULT_LOCALE);
-    logger.info("BaseI18nConfig初始化I18N国际化文件成功,国际化默认语言为:{},国际化文件路径为:{}",DEFAULT_LOCALE == null ? Locale.CHINESE.toString() : DEFAULT_LOCALE.toString(), beanNames.toString());
+    Locale effectiveLocale = defaultLocale == null ? Locale.CHINESE : defaultLocale;
+    bundleMessageSource.setDefaultLocale(effectiveLocale);
+    logger.info("I18nConfig初始化I18N国际化文件成功, 默认语言={}, 文件路径={}", effectiveLocale, beanNames);
     return bundleMessageSource;
   }
 
-  private ResourceBundle initResources(List<String> locales,int index,ResourceBundle resourceBundle,String basePath){
-    if(index >= locales.size()){
+  private ResourceBundle initResources(List<String> locales, int index, ResourceBundle resourceBundle, String basePath) {
+    if (index >= locales.size()) {
       return resourceBundle;
     }
     String language = locales.get(index);
-    if(null == language || language.isEmpty()){
+    if (language == null || language.isEmpty()) {
       return resourceBundle;
     }
     resourceBundle = ResourceBundle.getBundle(basePath, new Locale(language), new I18nControl());
-    return initResources(locales,index+1,resourceBundle,basePath);
+    return initResources(locales, index + 1, resourceBundle, basePath);
   }
-
 }

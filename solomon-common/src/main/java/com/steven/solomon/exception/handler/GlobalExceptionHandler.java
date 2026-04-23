@@ -33,17 +33,17 @@ public class GlobalExceptionHandler {
   /**
    * 捕获全局异常
    */
-  @ExceptionHandler(value = {Throwable.class})
+  @ExceptionHandler(value = {Exception.class})
   @ResponseBody
-  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Throwable ex, Locale locale) {
-    //获取异常名字
+  public Map<String, Object> handleException(HttpServletRequest request, HttpServletResponse response, Exception ex, Locale locale) {
+    // 获取异常名字
     String requestParameter = null;
-    if(request instanceof ContentCachingRequestWrapper){
+    if (request instanceof ContentCachingRequestWrapper) {
       ContentCachingRequestWrapper wrapper = (ContentCachingRequestWrapper) request;
       requestParameter = new String(wrapper.getContentAsByteArray(), Charset.forName(wrapper.getCharacterEncoding()));
     }
-    logger.error("GlobalExceptionHandler处理全局异常,请求ID:{},请求参数:{}当前异常是:", ExceptionUtil.requestId.get(), JSONUtil.toJsonStr(requestParameter), ex);
-    return BaseGlobalExceptionHandler.handlerMap(ex,serverId,locale,response);
+    logger.error("GlobalExceptionHandler处理全局异常, 请求ID={}, 请求参数={}, 当前异常是:", ExceptionUtil.requestId.get(), JSONUtil.toJsonStr(requestParameter), ex);
+    return BaseGlobalExceptionHandler.handlerMap(ex, serverId, locale, response);
   }
 
 }

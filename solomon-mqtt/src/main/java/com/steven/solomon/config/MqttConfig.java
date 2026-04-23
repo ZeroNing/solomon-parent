@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.init.AbstractMessageLineRunner;
@@ -52,18 +52,18 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
 
   @Override
   public void init(List<Object> clazzList) throws Exception {
-    if(!profile.getEnabled()){
+    if (!profile.getEnabled()) {
       logger.error("mqtt不启用,不初始化队列以及消费者");
       return;
     }
     Map<String,MqttProfile> tenantProfileMap = profile.getTenant();
-    if(ValidateUtils.isEmpty(tenantProfileMap)){
+    if (ValidateUtils.isEmpty(tenantProfileMap)) {
       logger.error("AbstractMessageLineRunner:没有MQTT配置");
       return;
     }
     Map<String, MqttInitService> abstractMQMap = SpringUtil.getBeansOfType(MqttInitService.class);
     MqttInitService mqttInitService = ValidateUtils.isNotEmpty(abstractMQMap) ? abstractMQMap.values().stream().findFirst().get() : new DefaultMqttInitService(mqttUtils);
-    for(Entry<String,MqttProfile> entry: tenantProfileMap.entrySet()){
+    for (Entry<String,MqttProfile> entry: tenantProfileMap.entrySet()) {
       mqttInitService.initMqttClient(entry.getKey(),entry.getValue(), clazzList);
     }
   }

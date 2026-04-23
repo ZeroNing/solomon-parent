@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.code.FileErrorCode;
@@ -49,7 +49,7 @@ public class MinioService extends AbstractFileService {
             .build();
 
     MinioClient.Builder builder = MinioClient.builder().credentials(properties.getAccessKey(), properties.getSecretKey()).endpoint(properties.getEndpoint());
-    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
       builder.region(properties.getRegionName());
     }
     builder.httpClient(okHttpClient);
@@ -89,7 +89,7 @@ public class MinioService extends AbstractFileService {
   @Override
   protected String shareUrl(String bucketName, String filePath, long expiry) throws Exception  {
     Builder builder = GetPresignedObjectUrlArgs.builder().bucket(bucketName);
-    if(expiry >= Integer.MAX_VALUE){
+    if (expiry >= Integer.MAX_VALUE) {
       throw new BaseException(FileErrorCode.MORE_THAN_THE_SHARING_TIME);
     }
     return client.getPresignedObjectUrl(builder.expiry((int)expiry,TimeUnit.SECONDS).object(filePath).method(Method.GET).build());
@@ -129,7 +129,7 @@ public class MinioService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
     Iterable<Result<Item>> response = ValidateUtils.isEmpty(key) ? client.listObjects(ListObjectsArgs.builder().bucket(bucketName).build()) : client.listObjects(ListObjectsArgs.builder().bucket(bucketName).prefix(key).build());
@@ -138,7 +138,7 @@ public class MinioService extends AbstractFileService {
       for (Result<Item> result : response) {
         objectNames.add(result.get().objectName());
       }
-    }catch (Exception e){
+    }catch (Exception e) {
       return objectNames;
     }
     return objectNames;
@@ -151,7 +151,7 @@ public class MinioService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
@@ -161,8 +161,8 @@ public class MinioService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     List<Bucket> listBucketsResponse = client.listBuckets();
     List<String> bucketNameList      = new ArrayList<>();
-    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
-      for(Bucket bucket : listBucketsResponse){
+    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+      for (Bucket bucket : listBucketsResponse) {
         bucketNameList.add(bucket.name());
       }
     }
@@ -170,7 +170,7 @@ public class MinioService extends AbstractFileService {
   }
 
   @Override
-  public boolean isMultipartUpload(){
+  public boolean isMultipartUpload() {
     return false;
   }
 }

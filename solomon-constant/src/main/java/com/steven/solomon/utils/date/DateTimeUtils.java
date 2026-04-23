@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.date;
+﻿package com.steven.solomon.utils.date;
 
 
 import java.time.Duration;
@@ -27,14 +27,14 @@ public class DateTimeUtils {
 	/**
 	 * 获取LocalTime所有时区
 	 */
-	public static Set<String> getZoneIds(){
+	public static Set<String> getZoneIds() {
 		 return ZoneId.getAvailableZoneIds();
 	}
 
 	/**
 	 * 获取Localtime时区
 	 */
-	public static ZoneId getZoneId(String zoneId){
+	public static ZoneId getZoneId(String zoneId) {
 		return ZoneId.of(zoneId);
 	}
 
@@ -251,7 +251,7 @@ public class DateTimeUtils {
 	}
 
 	public static Date localDate2Date(LocalDate localDate) {
-		if(localDate == null) {
+		if (localDate == null) {
 			return null;
 		}
 		ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
@@ -327,84 +327,84 @@ public class DateTimeUtils {
 	/**
 	 * 获取某天0点0分0秒
 	 */
-	public static LocalDateTime getNowZeroDayTime(LocalDateTime date){
+	public static LocalDateTime getNowZeroDayTime(LocalDateTime date) {
 		return date.toLocalDate().atStartOfDay();
 	}
 
 	/**
 	 * 获取某天0点0分0秒
 	 */
-	public static LocalDateTime getNowZeroDayTime(Date date){
+	public static LocalDateTime getNowZeroDayTime(Date date) {
 		return LocalDateTime.of(date2LocalDate(date),LocalTime.MIN);
 	}
 
 	/**
 	 * 获取某天0点0分0秒
 	 */
-	public static Date getNowZeroDayDate(Date date){
+	public static Date getNowZeroDayDate(Date date) {
 		return localDateTime2Date(getNowZeroDayTime(date));
 	}
 
 	/**
 	 * 获取某天0点0分0秒字符串
 	 */
-	public static String getNowZeroDayTimeStr(Date date,DateTimeFormatter dateTimeFormatter){
+	public static String getNowZeroDayTimeStr(Date date,DateTimeFormatter dateTimeFormatter) {
 		return dateTimeFormatter.format(getNowZeroDayTime(date));
 	}
 
 	/**
 	 * 获取某天23点59分59秒
 	 */
-	public static LocalDateTime getNowMaxDayTime(LocalDate date){
+	public static LocalDateTime getNowMaxDayTime(LocalDate date) {
 		return LocalDateTime.of(date,LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
 	 */
-	public static LocalDateTime getNowMaxDayTime(LocalDateTime date){
+	public static LocalDateTime getNowMaxDayTime(LocalDateTime date) {
 		return LocalDateTime.of(date.toLocalDate(),LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
 	 */
-	public static LocalDateTime getNowMaxDayTime(Date date){
+	public static LocalDateTime getNowMaxDayTime(Date date) {
 		return LocalDateTime.of(date2LocalDate(date),LocalTime.MAX);
 	}
 
 	/**
 	 * 获取某天23点59分59秒
 	 */
-	public static Date getNowMaxDayDate(Date date){
+	public static Date getNowMaxDayDate(Date date) {
 		return localDateTime2Date(getNowMaxDayTime(date));
 	}
 
 	/**
 	 * 获取某天23点59分59秒
 	 */
-	public static String getNowMaxDayTime(Date date,DateTimeFormatter dateTimeFormatter){
+	public static String getNowMaxDayTime(Date date,DateTimeFormatter dateTimeFormatter) {
 		return dateTimeFormatter.format(getNowMaxDayTime(date));
 	}
 
 	/**
 	 * 获取当月第一天
 	 */
-	public static LocalDate getNowMonthFirstDayTime(){
+	public static LocalDate getNowMonthFirstDayTime() {
 		return LocalDateTime.now().with(TemporalAdjusters.firstDayOfMonth()).toLocalDate();
 	}
 
 	/**
 	 * 获取当月第一天字符串
 	 */
-	public static String getNowMonthFirstDayTimeStr(DateTimeFormatter dateTimeFormatter){
+	public static String getNowMonthFirstDayTimeStr(DateTimeFormatter dateTimeFormatter) {
 		return dateTimeFormatter.format(getNowMonthFirstDayTime());
 	}
 
 	/**
 	 * 获取当月最后一天
 	 */
-	public static LocalDate getNowMonthLaseDayTime(){
+	public static LocalDate getNowMonthLaseDayTime() {
 		LocalDateTime lastDay = LocalDateTime.now().with(TemporalAdjusters.lastDayOfMonth());
 		return lastDay.toLocalDate();
 	}
@@ -412,7 +412,7 @@ public class DateTimeUtils {
 	/**
 	 * 获取当月第一天字符串
 	 */
-	public static String getNowMonthLaseDayTimeStr(DateTimeFormatter dateTimeFormatter){
+	public static String getNowMonthLaseDayTimeStr(DateTimeFormatter dateTimeFormatter) {
 		return dateTimeFormatter.format(getNowMonthLaseDayTime());
 	}
 
@@ -421,7 +421,7 @@ public class DateTimeUtils {
 	 * @param number 减少数量
 	 * @param chronoUnit 减少年还是月还是天
 	 */
-	public static LocalDate minus(int number, ChronoUnit chronoUnit){
+	public static LocalDate minus(int number, ChronoUnit chronoUnit) {
 		LocalDate localDate = getLocalDate();
 		return minus(localDate,number,chronoUnit);
 	}
@@ -431,12 +431,12 @@ public class DateTimeUtils {
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
 	 */
-	public static LocalDate minus(LocalDate localDate,int number, ChronoUnit chronoUnit){
+	public static LocalDate minus(LocalDate localDate,int number, ChronoUnit chronoUnit) {
 		localDate = localDate.minus(number,chronoUnit);
 		return localDate;
 	}
 
-	public static Date minus(Date date,int number, ChronoUnit chronoUnit){
+	public static Date minus(Date date,int number, ChronoUnit chronoUnit) {
 		LocalDate localDate = date2LocalDate(date);
 		return localDate2Date(minus(localDate,number,chronoUnit));
 	}
@@ -446,7 +446,7 @@ public class DateTimeUtils {
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
 	 */
-	public static LocalDate add(int number, ChronoUnit chronoUnit){
+	public static LocalDate add(int number, ChronoUnit chronoUnit) {
 		LocalDate localDate = getLocalDate();
 		return add(localDate,number,chronoUnit);
 	}
@@ -456,17 +456,17 @@ public class DateTimeUtils {
 	 * @param number 新增数量
 	 * @param chronoUnit 减少年还是月还是天
 	 */
-	public static LocalDate add(LocalDate localDate,int number, ChronoUnit chronoUnit){
+	public static LocalDate add(LocalDate localDate,int number, ChronoUnit chronoUnit) {
 		localDate = localDate.plus(number,chronoUnit);
 		return localDate;
 	}
 
-	public static Date add(Date date,int number, ChronoUnit chronoUnit){
+	public static Date add(Date date,int number, ChronoUnit chronoUnit) {
 		LocalDateTime localDate = date2LocalDateTime(date);
 		return localDateTime2Date(add(localDate,number,chronoUnit));
 	}
 
-	public static LocalDateTime add(LocalDateTime localDate,int number, ChronoUnit chronoUnit){
+	public static LocalDateTime add(LocalDateTime localDate,int number, ChronoUnit chronoUnit) {
 		localDate = localDate.plus(number,chronoUnit);
 		return localDate;
 	}
@@ -474,14 +474,14 @@ public class DateTimeUtils {
 	/**
 	 * 判断传入的时间是否在当前时间之前
 	 */
-	public static boolean isBefore(LocalDateTime dateTime){
+	public static boolean isBefore(LocalDateTime dateTime) {
 		return dateTime.isBefore(LocalDateTime.now());
 	}
 
 	/**
 	 * 判断传入的时间是否在当前时间之后
 	 */
-	public static boolean isAfter(LocalDateTime dateTime){
+	public static boolean isAfter(LocalDateTime dateTime) {
 		return dateTime.isAfter(LocalDateTime.now());
 	}
 
@@ -501,7 +501,7 @@ public class DateTimeUtils {
 	 * @param localDateTimeStr	字符串时间
 	 * @param formatter					需要转换的时间格式
 	 */
-	public static LocalDateTime getLocalDateTime(String localDateTimeStr,DateTimeFormatter formatter){
+	public static LocalDateTime getLocalDateTime(String localDateTimeStr,DateTimeFormatter formatter) {
 		return LocalDateTime.parse(localDateTimeStr,formatter);
 	}
 
@@ -510,7 +510,7 @@ public class DateTimeUtils {
 	 * @param localDateTimeStr	字符串时间
 	 * @param formatter					需要转换的时间格式
 	 */
-	public static LocalDate getLocalDate(String localDateTimeStr,DateTimeFormatter formatter){
+	public static LocalDate getLocalDate(String localDateTimeStr,DateTimeFormatter formatter) {
 		return LocalDate.parse(localDateTimeStr,formatter);
 	}
 }

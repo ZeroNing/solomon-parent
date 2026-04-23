@@ -1,4 +1,4 @@
-package com.steven.solomon.annotation;
+﻿package com.steven.solomon.annotation;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.config.RabbitCondition;
@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 @Conditional(RabbitCondition.class)
 public @interface MessageListener {
 
-    @AliasFor(annotation = Component.class)
+    @Aliasfor (annotation = Component.class)
     String value() default StrUtil.EMPTY;
 
     /**

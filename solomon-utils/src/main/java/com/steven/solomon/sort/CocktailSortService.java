@@ -1,4 +1,4 @@
-package com.steven.solomon.sort;
+﻿package com.steven.solomon.sort;
 
 
 import java.util.ArrayList;
@@ -20,38 +20,38 @@ public class CocktailSortService implements SortService {
         int  end  =  dataList.size()  -  1;
 
         do  {
-            swapped  =  false;
+            swapped  = false;
 
             //  正向遍历，找到最大元素
-            for  (int  i  =  start;  i  <  end;  ++i)  {
-                if  (comparator.compare(dataList.get(i),  dataList.get(i  +  1))  >  0)  {
+            for (int  i  =  start;  i  <  end;  ++i) {
+                if (comparator.compare(dataList.get(i),  dataList.get(i  +  1))  >  0) {
                     T  temp  =  dataList.get(i);
                     dataList.set(i,  dataList.get(i  +  1));
                     dataList.set(i  +  1,  temp);
-                    swapped  =  true;
+                    swapped  = true;
                 }
             }
 
-            if  (!swapped)  {
+            if (!swapped) {
                 break;
             }
 
-            swapped  =  false;
+            swapped  = false;
             end--;
 
             //  反向遍历，找到最小元素
-            for  (int  i  =  end  -  1;  i  >=  start;  --i)  {
-                if  (comparator.compare(dataList.get(i),  dataList.get(i  +  1))  >  0)  {
+            for (int  i  =  end  -  1;  i  >=  start;  --i) {
+                if (comparator.compare(dataList.get(i),  dataList.get(i  +  1))  >  0) {
                     T  temp  =  dataList.get(i);
                     dataList.set(i,  dataList.get(i  +  1));
                     dataList.set(i  +  1,  temp);
-                    swapped  =  true;
+                    swapped  = true;
                 }
             }
 
             start++;
 
-        }  while  (swapped);
+        }  while (swapped);
 
         return  dataList;
     }

@@ -1,4 +1,4 @@
-package com.steven.solomon.utils.ip;
+﻿package com.steven.solomon.utils.ip;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -21,12 +21,12 @@ public class IPAddressUtils {
 	 * 功能：判断IPv4地址的正则表达式：
 	 */
 	private static final Pattern IPV4_REGEX = Pattern
-			.compile("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}$");
+			.compile("^(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)) {3}$");
 
 	/**
 	 * 功能：判断标准IPv6地址的正则表达式
 	 */
-	private static final Pattern IPV6_STD_REGEX = Pattern.compile("^(?:[0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$");
+	private static final Pattern IPV6_STD_REGEX = Pattern.compile("^(?:[0-9a-fA-F]{1,4}:) {7}[0-9a-fA-F]{1,4}$");
 
 	/**
 	 *  功能：判断一般情况压缩的IPv6正则表达式
@@ -42,7 +42,7 @@ public class IPAddressUtils {
 	 * 功能：抽取特殊的边界压缩情况
 	 */
 	private static final Pattern IPV6_COMPRESS_REGEX_BORDER = Pattern.compile(
-			"^(::(?:[0-9A-Fa-f]{1,4})(?::[0-9A-Fa-f]{1,4}){5})|((?:[0-9A-Fa-f]{1,4})(?::[0-9A-Fa-f]{1,4}){5}::)$");
+			"^(::(?:[0-9A-Fa-f]{1,4})(?::[0-9A-Fa-f]{1,4}) {5})|((?:[0-9A-Fa-f]{1,4})(?::[0-9A-Fa-f]{1,4}) {5}::)$");
 
 	/**
 	 * 判断是否为合法IPv4地址

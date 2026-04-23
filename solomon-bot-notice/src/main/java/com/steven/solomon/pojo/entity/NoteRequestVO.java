@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.entity;
+﻿package com.steven.solomon.pojo.entity;
 
 import java.io.Serializable;
 
@@ -8,11 +8,11 @@ public class NoteRequestVO implements Serializable {
 
     private String body;
 
-    public NoteRequestVO(){
+    public NoteRequestVO() {
         super();
     }
 
-    public NoteRequestVO(boolean ok,String body){
+    public NoteRequestVO(boolean ok,String body) {
         super();
         this.ok = ok;
         this.body = body;

@@ -1,4 +1,4 @@
-package com.steven.solomon.template;
+﻿package com.steven.solomon.template;
 
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;
@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 public class DynamicRedisTemplate<K,V> extends RedisTemplate<K,V> {
 
-  public DynamicRedisTemplate(){
+  public DynamicRedisTemplate() {
     super();
   }
 

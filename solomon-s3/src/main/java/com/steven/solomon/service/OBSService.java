@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
 import com.obs.services.ObsConfiguration;
@@ -115,7 +115,7 @@ public class OBSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
     ListObjectsRequest request = new ListObjectsRequest(bucketName);
@@ -138,7 +138,7 @@ public class OBSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -149,8 +149,8 @@ public class OBSService extends AbstractFileService {
     ListBucketsResult result = client.listBucketsV2(new ListBucketsRequest());
     List<ObsBucket> bucketList = result.getBuckets();
     List<String>   bucketNameList      = new ArrayList<>();
-    if(ValidateUtils.isNotEmpty(bucketList)){
-      for(ObsBucket bucket : bucketList){
+    if (ValidateUtils.isNotEmpty(bucketList)) {
+      for (ObsBucket bucket : bucketList) {
         bucketNameList.add(bucket.getBucketName());
       }
     }

@@ -1,4 +1,4 @@
-package com.steven.solomon.lambda;
+﻿package com.steven.solomon.lambda;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;
@@ -1091,7 +1091,7 @@ public class Lambda {
 
         System.out.println("============多字段排序算法降序开始=======================\n");
         System.out.println("总记录数:" + b.size() + "排序测试\n");
-        for(SortTypeEnum typeEnum : SortTypeEnum.values()){
+        for (SortTypeEnum typeEnum : SortTypeEnum.values()) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             SortUtil.sort(typeEnum,b, Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed());

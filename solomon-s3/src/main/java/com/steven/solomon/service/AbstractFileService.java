@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.StrUtil;
@@ -38,19 +38,19 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected ClamAvUtils clamAvUtils;
 
-  public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService,ClamAvUtils clamAvUtils){
+  public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService,ClamAvUtils clamAvUtils) {
     this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
     this.properties = properties;
     this.partSize = (long) (this.properties.getPartSize() * 1024 * 1024);
     this.clamAvUtils = clamAvUtils;
   }
 
-  public AbstractFileService(FileNamingRulesGenerationService fileNamingRulesGenerationService){
+  public AbstractFileService(FileNamingRulesGenerationService fileNamingRulesGenerationService) {
       this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
       this.partSize = (long) (5 * 1024 * 1024);
   }
 
-  public AbstractFileService(){
+  public AbstractFileService() {
     super();
   }
 
@@ -76,8 +76,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
     makeBucket(bucketName);
     String       filePath = getFilePath(!isUseOriginalName ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);
     long fileSize = file.getSize();
-    if(isMultipartUpload()){
-      if(fileSize >= partSize){
+    if (isMultipartUpload()) {
+      if (fileSize >= partSize) {
         return multipartUpload(file,bucketName,isUseOriginalName);
       } else {
         this.upload(file,bucketName,filePath);
@@ -124,7 +124,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
     String filePath = getFilePath(fileName,properties);
-    if(!objectExist(bucketName,filePath)){
+    if (!objectExist(bucketName,filePath)) {
       throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
     }
     return getObject(bucketName,filePath);
@@ -132,7 +132,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void makeBucket(String bucketName) throws Exception {
-    if(bucketExists(bucketName)){
+    if (bucketExists(bucketName)) {
       return;
     }
     this.createBucket(bucketName);
@@ -140,7 +140,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception{
-    if(!objectExist(sourceBucket,sourceObjectName)){
+    if (!objectExist(sourceBucket,sourceObjectName)) {
       throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
     }
     copyFile(sourceBucket,getFilePath(sourceObjectName,properties),targetBucket,getFilePath(targetObjectName,properties));
@@ -151,7 +151,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
   public boolean objectExist(String bucketName,String objectName) throws Exception{
     try {
       return checkObjectExist(bucketName,getFilePath(objectName,properties));
-    } catch (Throwable e){
+    } catch (Throwable e) {
       logger.error("检查文件出现异常",e);
       return false;
     }
@@ -163,14 +163,14 @@ public abstract class AbstractFileService implements FileServiceInterface{
     String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
     objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
     String thumbnailName = new StringBuilder(ValidateUtils.getOrDefault(filePath,ValidateUtils.getOrDefault(properties.getRootDirectory(), StrUtil.EMPTY))).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
-    if(!objectExist(bucketName,thumbnailName)){
+    if (!objectExist(bucketName,thumbnailName)) {
       MockMultipartFile file = null;
-      try(ByteArrayOutputStream baos = new ByteArrayOutputStream()){
+      try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
         ImgUtil.scale(getObject(bucketName,objectName+"."+extensionName), baos, width, height, Color.decode("0xFFFFFF"));
         try (ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray())) {
           bais.reset();
-          try(InputStream is = new ByteArrayInputStream(bais.readAllBytes())){
-            if(isUpload){
+          try (InputStream is = new ByteArrayInputStream(bais.readAllBytes())) {
+            if (isUpload) {
               file = new MockMultipartFile(thumbnailName,thumbnailName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
               upload(file,bucketName,true);
               return file.getInputStream();
@@ -191,12 +191,12 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
     long contentLength = file.getSize();
     int partCount = (int) (contentLength / partSize);
-    if (contentLength % partSize != 0){
+    if (contentLength % partSize != 0) {
       partCount++;
     }
     try{
       multipartUpload(file,bucketName,contentLength,uploadId,filePath,partCount);
-    }catch (Exception e){
+    }catch (Exception e) {
       abortMultipartUpload(uploadId,bucketName,filePath);
       throw e;
     }
@@ -281,7 +281,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
    */
   protected abstract String initiateMultipartUploadTask(String bucketName,String objectName) throws Exception;
 
-  public boolean isMultipartUpload(){
+  public boolean isMultipartUpload() {
     return true;
   }
 }

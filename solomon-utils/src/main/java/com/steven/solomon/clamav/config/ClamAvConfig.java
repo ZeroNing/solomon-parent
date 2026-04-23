@@ -1,4 +1,4 @@
-package com.steven.solomon.clamav.config;
+﻿package com.steven.solomon.clamav.config;
 
 import com.steven.solomon.clamav.properties.ClamAvProperties;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
@@ -24,7 +24,7 @@ public class ClamAvConfig {
     @Bean
     public ClamAvUtils clamAvUtils() {
         ClamavClient client = null;
-        if(clamAVProperties.getEnabled()){
+        if (clamAVProperties.getEnabled()) {
             client = new ClamavClient(clamAVProperties.getHost(), clamAVProperties.getPort(), clamAVProperties.getPlatform());
         }
         return new ClamAvUtils(client,clamAVProperties);

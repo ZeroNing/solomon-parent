@@ -1,4 +1,4 @@
-package com.steven.solomon.utils;
+﻿package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
@@ -88,7 +88,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    * @param consumer 消费者
    */
   public void subscribe(String tenantCode,String topic,int qos, IMqttMessageListener consumer) throws MqttException, BaseException {
-    if(ValidateUtils.isEmpty(topic)){
+    if (ValidateUtils.isEmpty(topic)) {
       return;
     }
     getClient(tenantCode).subscribe(topic, qos,consumer);
@@ -115,7 +115,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
           continue;
         }
         List<String> rangeList = Lambda.toList(Arrays.asList(messageListener.tenantRange()), ValidateUtils::isNotEmpty, key->key);
-        if(ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)){
+        if (ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)) {
           for (String topic : messageListener.topics()) {
             topic = SpringUtil.getElValue(topic);
             AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
@@ -133,7 +133,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
    * @param topic 主题
    */
   public void unsubscribe(String tenantCode,String[] topic) throws MqttException, BaseException {
-    if(ValidateUtils.isEmpty(topic)){
+    if (ValidateUtils.isEmpty(topic)) {
       return;
     }
     getClient(tenantCode).unsubscribe(topic);
@@ -152,7 +152,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   public void reconnect(String tenantCode) throws MqttException, BaseException {
 
     MqttClient client = getClient(tenantCode);
-    if(!client.isConnected()){
+    if (!client.isConnected()) {
       client.connect(getOptionsMap().get(tenantCode));
       subscribe(client,tenantCode);
     }
@@ -160,7 +160,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
 
   public void reconnect(String tenantCode,MqttProfile mqttProfile) throws MqttException, BaseException {
     MqttClient client = getClient(tenantCode);
-    if(!client.isConnected()){
+    if (!client.isConnected()) {
       client.connect(initMqttConnectOptions(mqttProfile));
       subscribe(client,tenantCode);
     }
@@ -168,7 +168,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
   
   private MqttClient getClient(String tenantCode) throws BaseException {
     MqttClient client = getClientMap().get(tenantCode);
-    if(ValidateUtils.isEmpty(client)){
+    if (ValidateUtils.isEmpty(client)) {
       throw new BaseException(MqttErrorCode.CLIENT_IS_NULL,tenantCode);
     }
     return client;
@@ -201,7 +201,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     if (ValidateUtils.isNotEmpty(will)) {
       mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
     }
-    if(!mqttProfile.getVerifyCertificate()){
+    if (!mqttProfile.getVerifyCertificate()) {
       try {
         // 创建信任所有证书的 SSLContext
         SSLContext sslContext = SSLContext.getInstance("TLS");

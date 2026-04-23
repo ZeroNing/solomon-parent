@@ -4,66 +4,78 @@ import java.time.ZoneId;
 
 public class RequestHeaderHolder {
 
-  protected static final ThreadLocal<RequestHeader> threadLocal = ThreadLocal.withInitial(() -> {
-    RequestHeader header = new RequestHeader();
-    return header;
-  });
+  protected static final ThreadLocal<RequestHeader> THREAD_LOCAL = ThreadLocal.withInitial(RequestHeader::new);
 
-  public static String getTimeZone(){
-    String serverTimeZone = threadLocal.get().getTimezone();
-    if(serverTimeZone.isEmpty()){
+  /**
+   * 获取当前时区
+   */
+  public static String getTimeZone() {
+    String serverTimeZone = THREAD_LOCAL.get().getTimezone();
+    if (serverTimeZone.isEmpty()) {
       serverTimeZone = ZoneId.systemDefault().getId();
     }
     try {
       ZoneId.of(serverTimeZone);
-    } catch (Throwable e){
+    } catch (Exception e) {
       serverTimeZone = ZoneId.systemDefault().getId();
     }
     return serverTimeZone;
   }
+
   public static void setTimeZone(String serverTimeZone) {
-    threadLocal.get().setTimezone(serverTimeZone);
+    THREAD_LOCAL.get().setTimezone(serverTimeZone);
   }
 
-  public static String getTenantId(){
-    RequestHeader heard = threadLocal.get();
-    if(heard != null && !heard.getTenantId().isEmpty()){
-      return heard.getTenantId();
-    } else {
-      return "";
+  /**
+   * 获取租户ID
+   */
+  public static String getTenantId() {
+    RequestHeader header = THREAD_LOCAL.get();
+    if (header != null && !header.getTenantId().isEmpty()) {
+      return header.getTenantId();
     }
+    return "";
   }
 
-  public static String getTenantCode(){
-    RequestHeader heard = threadLocal.get();
-    if(heard != null && !heard.getTenantCode().isEmpty()){
-      return heard.getTenantCode();
-    } else {
-      return "";
+  /**
+   * 获取租户编码
+   */
+  public static String getTenantCode() {
+    RequestHeader header = THREAD_LOCAL.get();
+    if (header != null && !header.getTenantCode().isEmpty()) {
+      return header.getTenantCode();
     }
+    return "";
   }
 
-  public static String getTenantName(){
-    RequestHeader heard = threadLocal.get();
-    if(heard != null && !heard.getTenantName().isEmpty()){
-      return heard.getTenantName();
-    } else {
-      return "";
+  /**
+   * 获取租户名称
+   */
+  public static String getTenantName() {
+    RequestHeader header = THREAD_LOCAL.get();
+    if (header != null && !header.getTenantName().isEmpty()) {
+      return header.getTenantName();
     }
+    return "";
   }
 
-  public static void setTenantId(String tenantId){
-    RequestHeader heard = threadLocal.get();
-    heard.setTenantId(tenantId);
+  public static void setTenantId(String tenantId) {
+    THREAD_LOCAL.get().setTenantId(tenantId);
   }
 
-  public static void setTenantCode(String tenantCode){
-    RequestHeader heard = threadLocal.get();
-    heard.setTenantCode(tenantCode);
+  public static void setTenantCode(String tenantCode) {
+    THREAD_LOCAL.get().setTenantCode(tenantCode);
   }
 
-  public static void setTenantName(String tenantName){
-    RequestHeader heard = threadLocal.get();
-    heard.setTenantName(tenantName);
+  public static void setTenantName(String tenantName) {
+    THREAD_LOCAL.get().setTenantName(tenantName);
+  }
+
+  /**
+   * 清理ThreadLocal，防止内存泄漏
+   * <p>⚠️ 重要：在请求处理完成后必须调用此方法</p>
+   */
+  public static void remove() {
+    THREAD_LOCAL.remove();
   }
 }

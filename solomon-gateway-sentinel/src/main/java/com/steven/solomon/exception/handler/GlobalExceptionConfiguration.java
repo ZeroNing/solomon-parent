@@ -1,4 +1,4 @@
-package com.steven.solomon.exception.handler;
+﻿package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.code.BaseCode;
@@ -68,7 +68,7 @@ public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandle
     return RouterFunctions.route(RequestPredicates.all(), this::renderErrorResponse);
   }
 
-  private Exception getException(Throwable throwable){
+  private Exception getException(Throwable throwable) {
     return (Exception) throwable;
   }
 }

@@ -1,4 +1,4 @@
-package com.steven.solomon.enums;
+﻿package com.steven.solomon.enums;
 
 public enum MongoDbRoleEnum {
   /**
@@ -30,7 +30,7 @@ public enum MongoDbRoleEnum {
   private String value;
   private String desc;
 
-  MongoDbRoleEnum(String value,String desc){
+  MongoDbRoleEnum(String value,String desc) {
     this.desc = desc;
     this.value = value;
   }

@@ -1,4 +1,4 @@
-package com.steven.solomon.entity;
+﻿package com.steven.solomon.entity;
 
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.enums.*;
@@ -48,7 +48,7 @@ public class XxlJobInfo {
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = ValidateUtils.getOrDefault(jobTask.taskName(),className);
 		String author = null;
-		if(ValidateUtils.isEmpty(jobTask.author())){
+		if (ValidateUtils.isEmpty(jobTask.author())) {
 			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
 		} else {
 			author = jobTask.author();
@@ -68,11 +68,11 @@ public class XxlJobInfo {
 		this.triggerStatus = jobTask.start() ? 1 : 0;
 	}
 
-	public XxlJobInfo update(JobTask jobTask,String className){
+	public XxlJobInfo update(JobTask jobTask,String className) {
 		this.jobGroup = jobTask.jobGroup();
 		this.jobDesc = ValidateUtils.getOrDefault(jobTask.taskName(),className);
 		String author = null;
-		if(ValidateUtils.isEmpty(jobTask.author())){
+		if (ValidateUtils.isEmpty(jobTask.author())) {
 			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
 		} else {
 			author = jobTask.author();

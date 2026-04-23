@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
@@ -17,9 +17,9 @@ public abstract class AbsICacheService implements  ICacheService {
 
   public String assembleKey(String group, String key) {
     StringBuilder sb = new StringBuilder();
-    if(ValidateUtils.isNotEmpty(properties) && ValidateUtils.equalsIgnoreCase(SwitchModeEnum.TENANT_PREFIX.toString(),properties.getMode().toString())){
+    if (ValidateUtils.isNotEmpty(properties) && ValidateUtils.equalsIgnoreCase(SwitchModeEnum.TENANT_PREFIX.toString(),properties.getMode().toString())) {
       String tenantCode = RequestHeaderHolder.getTenantCode();
-      if(ValidateUtils.isEmpty(tenantCode)){
+      if (ValidateUtils.isEmpty(tenantCode)) {
         logger.error("当前模式是:{},但是缺乏租户信息,所以不拼接",SwitchModeEnum.TENANT_PREFIX.getDesc());
       } else {
         sb.append(tenantCode).append(":");

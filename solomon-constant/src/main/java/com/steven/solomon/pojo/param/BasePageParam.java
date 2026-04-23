@@ -1,4 +1,4 @@
-package com.steven.solomon.pojo.param;
+﻿package com.steven.solomon.pojo.param;
 
 
 import ch.qos.logback.core.util.StringCollectionUtil;
@@ -35,13 +35,13 @@ public class BasePageParam implements Serializable {
 
         private OrderByEnum orderByMethod = OrderByEnum.DESCEND;
 
-        public Sort(String  orderByField,OrderByEnum orderByMethod){
+        public Sort(String  orderByField,OrderByEnum orderByMethod) {
             this.orderByField = orderByField;
             this.orderByMethod = orderByMethod;
         }
 
-        public String getSort(){
-            if(orderByField == null || orderByField.isEmpty()){
+        public String getSort() {
+            if (orderByField == null || orderByField.isEmpty()) {
                 return "";
             }
             return orderByField + " " + orderByMethod.label();
@@ -96,12 +96,12 @@ public class BasePageParam implements Serializable {
         this.sorted = sorted;
     }
 
-    public String getSort(){
-        if(CollectionUtils.isEmpty(getSorted())){
+    public String getSort() {
+        if (CollectionUtils.isEmpty(getSorted())) {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        for(Sort sort : getSorted()){
+        for (Sort sort : getSorted()) {
             sb.append(sort.getSort()).append(",");
         }
         return sb.substring(0,sb.lastIndexOf(","));

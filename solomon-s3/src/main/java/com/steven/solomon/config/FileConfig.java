@@ -1,4 +1,4 @@
-package com.steven.solomon.config;
+﻿package com.steven.solomon.config;
 
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;
@@ -25,7 +25,7 @@ public class FileConfig {
 
   @Bean
   @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
-  public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties){
+  public FileNamingRulesGenerationService fileNamingMethodService(FileChoiceProperties fileProperties) {
     logger.info("选择 {} 命名规则", fileProperties.getFileNamingMethod().getDesc());
     switch (fileProperties.getFileNamingMethod()) {
       case DATE:
@@ -42,7 +42,7 @@ public class FileConfig {
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   @ConditionalOnClass(OkHttpClient.Builder.class)
-  public FileServiceInterface fileService(FileChoiceProperties fileProperties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils){
+  public FileServiceInterface fileService(FileChoiceProperties fileProperties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     logger.info("选择 {} 文件服务", fileProperties.getChoice().getDesc());
     switch (fileProperties.getChoice()) {
       case MINIO:

@@ -1,4 +1,4 @@
-//package com.steven.solomon.base.config;
+﻿//package com.steven.solomon.base.config;
 //
 //import java.net.URL;
 //import java.util.ArrayList;
@@ -33,9 +33,9 @@
 //  @ConditionalOnMissingBean(Docket.class)
 //  public Docket createRestApi() {
 //    List<RequestParameter> requestParameters = new ArrayList<>();
-//    if(ObjectUtil.isNotEmpty(profile.getGlobalRequestParameters())){
+//    if (ObjectUtil.isNotEmpty(profile.getGlobalRequestParameters())) {
 //      // 创建必要参数对象
-//      for(SwaggerProfile.DocRequestParameter requestParameter: profile.getGlobalRequestParameters()){
+//      for (SwaggerProfile.DocRequestParameter requestParameter: profile.getGlobalRequestParameters()) {
 //        requestParameters.add(new RequestParameterBuilder().name(requestParameter.getName())
 //                .in(requestParameter.getIn())
 //                .description(requestParameter.getDescription())

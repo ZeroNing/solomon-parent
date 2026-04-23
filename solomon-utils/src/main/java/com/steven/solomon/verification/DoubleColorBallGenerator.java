@@ -1,4 +1,4 @@
-package com.steven.solomon.verification;
+﻿package com.steven.solomon.verification;
 
 import cn.hutool.core.util.StrUtil;
 
@@ -29,7 +29,7 @@ public class DoubleColorBallGenerator {
         ballSize = ValidateUtils.getOrDefault(ballSize,BLUE_BALL_COUNT);
         while (result.size() < (ballSize)) {
             Integer blue = (int) (Math.random() * MAX_BLUE_BALL_NUMBER) + 1;
-            if(!result.contains(blue)){
+            if (!result.contains(blue)) {
                 result.add(blue);
             }
         }

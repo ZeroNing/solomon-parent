@@ -1,4 +1,4 @@
-package com.steven.solomon.clamav.utils;
+﻿package com.steven.solomon.clamav.utils;
 
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.clamav.properties.ClamAvProperties;
@@ -34,17 +34,17 @@ public class ClamAvUtils {
      * @throws BaseException
      */
     public boolean scanFile(InputStream inputStream) throws BaseException {
-        if(!properties.getEnabled()){
+        if (!properties.getEnabled()) {
             return false;
         }
-        if(ValidateUtils.isEmpty(inputStream)){
+        if (ValidateUtils.isEmpty(inputStream)) {
             throw new IllegalArgumentException("Input stream is empty");
         }
         ScanResult scanResult = client.scan(inputStream);
-        if(scanResult instanceof ScanResult.OK) {
+        if (scanResult instanceof ScanResult.OK) {
            return false;
         }
-        if(scanResult instanceof ScanResult.VirusFound) {
+        if (scanResult instanceof ScanResult.VirusFound) {
             Map<String, Collection<String>> foundViruses = ((ScanResult.VirusFound) scanResult).getFoundViruses();
             logger.info("扫描文件出现高风险病毒:{}", JSONUtil.toJsonStr(foundViruses.toString()));
             return true;
@@ -59,7 +59,7 @@ public class ClamAvUtils {
      * @throws BaseException
      */
     public void scanFile(InputStream inputStream,String errorCode) throws BaseException {
-        if(scanFile(inputStream)){
+        if (scanFile(inputStream)) {
             throw new BaseException(errorCode);
         }
     }

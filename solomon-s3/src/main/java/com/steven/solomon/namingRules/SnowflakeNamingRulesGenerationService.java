@@ -1,4 +1,4 @@
-package com.steven.solomon.namingRules;
+﻿package com.steven.solomon.namingRules;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.generator.SnowflakeGenerator;
@@ -12,7 +12,7 @@ public class SnowflakeNamingRulesGenerationService implements FileNamingRulesGen
 
   private final Snowflake generator;
 
-  public SnowflakeNamingRulesGenerationService(){
+  public SnowflakeNamingRulesGenerationService() {
     this.generator = new Snowflake();
   }
 

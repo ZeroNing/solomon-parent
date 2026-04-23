@@ -1,4 +1,4 @@
-package com.steven.solomon.init;
+﻿package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
@@ -75,7 +75,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        if(!properties.getEnabled()){
+        if (!properties.getEnabled()) {
             logger.error("rabbitMq不启用,不初始化队列以及消费者");
             return;
         }
@@ -83,7 +83,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
             messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
-            if(ValidateUtils.isEmpty(messageListener)){
+            if (ValidateUtils.isEmpty(messageListener)) {
                 logger.error("{}没有RabbitMq注解,不进行初始化",abstractConsumer.getClass().getSimpleName());
                 continue;
             }
@@ -153,14 +153,14 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         MessageListenerRetry messageListenerRetry = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
         if (ValidateUtils.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
-            container.setAdviceChain(setRabbitRetry(messageListenerRetry));
+            container.setAdviceChain(setRabbitRetry (messageListenerRetry));
         }
         // 启动对应的适配器
         container.start();
         return container;
     }
 
-    public RetryOperationsInterceptor setRabbitRetry(MessageListenerRetry messageListenerRetry) {
+    public RetryOperationsInterceptor setRabbitRetry (MessageListenerRetry messageListenerRetry) {
         RetryTemplate retryTemplate = new RetryTemplate();
         retryTemplate.setBackOffPolicy(backOffPolicyByProperties(messageListenerRetry));
         retryTemplate.setRetryPolicy(retryPolicyByProperties(messageListenerRetry));

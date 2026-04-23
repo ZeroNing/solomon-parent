@@ -1,4 +1,4 @@
-package com.steven.solomon.execute;
+﻿package com.steven.solomon.execute;
 
 import com.steven.solomon.annotation.Column;
 import com.steven.solomon.config.profile.SqlProfile;
@@ -29,9 +29,9 @@ public class ClazzExecuteSql extends AbstractExecuteSql {
         List<Object> list = new ArrayList<>();
         Constructor<?> constructor = clazz.getConstructor();
         Map<String,Field> fieldMap = new HashMap<>();
-        for(Field field : clazz.getDeclaredFields() ){
+        for (Field field : clazz.getDeclaredFields() ) {
             Column column = field.getAnnotation(Column.class);
-            if(ValidateUtils.isNotEmpty(column) && ValidateUtils.isNotEmpty(column.name())){
+            if (ValidateUtils.isNotEmpty(column) && ValidateUtils.isNotEmpty(column.name())) {
                 fieldMap.put(column.name(), field);
             } else {
                 fieldMap.put(Lambda.toSnakeCase(field.getName(),ValidateUtils.isNotEmpty(column) ? column.regex() : "_"), field);
@@ -39,7 +39,7 @@ public class ClazzExecuteSql extends AbstractExecuteSql {
         }
         while (resultSet.next()) {
             Object obj = constructor.newInstance();
-            for(int i = 1; i <= columnCount; i++){
+            for (int i = 1; i <= columnCount; i++) {
                 //字段别名
                 String columnLabelName = metaData.getColumnLabel(i);
                 //获取字段的key
@@ -52,7 +52,7 @@ public class ClazzExecuteSql extends AbstractExecuteSql {
                 Object value = resultSet.getObject(objectKey);
                 //获取Class内的字段
                 Field field = fieldMap.get(objectKey);
-                if(ValidateUtils.isEmpty(field)){
+                if (ValidateUtils.isEmpty(field)) {
                     logger.info("{}在{}的Class对象中不存在",objectKey,clazz.getSimpleName());
                     continue;
                 }

@@ -24,9 +24,9 @@ public class RequestFilter extends OncePerRequestFilter {
       RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
       chain.doFilter(new ContentCachingRequestWrapper(request), response);
     } finally {
-      // 必须清理 ThreadLocal
+      // 清理 ThreadLocal，防止内存泄漏
       ExceptionUtil.requestId.remove();
-      // RequestHeaderHolder 也需要添加 remove 方法
+      RequestHeaderHolder.remove();
     }
   }
 }

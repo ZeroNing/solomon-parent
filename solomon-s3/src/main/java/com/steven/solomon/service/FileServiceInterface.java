@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.steven.solomon.graphics2D.entity.FileUpload;
@@ -131,7 +131,7 @@ public interface FileServiceInterface {
     return DigestUtil.md5Hex(file.getInputStream());
   }
 
-  default String getFilePath(String fileName, FileChoiceProperties properties){
+  default String getFilePath(String fileName, FileChoiceProperties properties) {
     return ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName : properties.getRootDirectory() + fileName;
   }
 }

@@ -1,4 +1,4 @@
-package com.steven.solomon.verification;
+﻿package com.steven.solomon.verification;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.exception.BaseException;
@@ -450,7 +450,7 @@ public class ValidateUtils {
         return null; // 如果没有匹配到，返回null
     }
 
-    public static String getElDefaultValue(String expression){
+    public static String getElDefaultValue(String expression) {
         String defaultValue = null;
 
         if (expression.contains(":")) {

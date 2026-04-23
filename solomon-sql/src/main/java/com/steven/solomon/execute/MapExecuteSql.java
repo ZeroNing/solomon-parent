@@ -1,4 +1,4 @@
-package com.steven.solomon.execute;
+﻿package com.steven.solomon.execute;
 
 import com.steven.solomon.config.profile.SqlProfile;
 import com.steven.solomon.convert.ColumnConvert;
@@ -26,7 +26,7 @@ public class MapExecuteSql extends AbstractExecuteSql {
         List<Object> list = new ArrayList<>();
         Map<String,Object> map = new HashMap<>();
         while (resultSet.next()) {
-            for(int i = 1; i <= columnCount; i++){
+            for (int i = 1; i <= columnCount; i++) {
                 //字段别名
                 String columnLabelName = metaData.getColumnLabel(i);
                 //获取字段的key

@@ -1,4 +1,4 @@
-package com.steven.solomon.service;
+﻿package com.steven.solomon.service;
 
 import com.baidubce.Protocol;
 import com.qcloud.cos.COSClient;
@@ -33,10 +33,10 @@ public class COSService extends AbstractFileService {
     this.client = initClient(properties);
   }
 
-  private static COSClient initClient(FileChoiceProperties properties){
+  private static COSClient initClient(FileChoiceProperties properties) {
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
     ClientConfig configuration = null;
-    if(ValidateUtils.isNotEmpty(properties.getRegionName())){
+    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
       Region         region       = new Region(properties.getRegionName());
       configuration = new ClientConfig(region);
     } else {
@@ -126,7 +126,7 @@ public class COSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
     ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
@@ -147,7 +147,7 @@ public class COSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if(ValidateUtils.isEmpty(bucketName)){
+    if (ValidateUtils.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -157,8 +157,8 @@ public class COSService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     List<Bucket> listBucketsResponse = client.listBuckets();
     List<String> bucketNameList      = new ArrayList<>();
-    if(ValidateUtils.isNotEmpty(listBucketsResponse)){
-      for(Bucket bucket : listBucketsResponse){
+    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+      for (Bucket bucket : listBucketsResponse) {
         bucketNameList.add(bucket.getName());
       }
     }

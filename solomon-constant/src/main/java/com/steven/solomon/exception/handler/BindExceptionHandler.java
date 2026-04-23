@@ -1,10 +1,10 @@
-package com.steven.solomon.exception.handler;
+﻿package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.BindException;
 
-@Configuration(proxyBeanMethods=false,value = "BindExceptionProcessor")
+@Configuration(proxyBeanMethods = false,value = "BindExceptionProcessor")
 public class BindExceptionHandler extends AbstractExceptionHandler {
 
   @Override

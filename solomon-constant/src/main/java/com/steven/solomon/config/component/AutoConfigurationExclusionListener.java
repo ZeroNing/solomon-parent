@@ -1,4 +1,4 @@
-package com.steven.solomon.config.component;
+﻿package com.steven.solomon.config.component;
 
 import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
@@ -19,13 +19,13 @@ public abstract class AutoConfigurationExclusionListener implements ApplicationL
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
         String enabledKey = getEnabledKey();
         String enabledValue = event.getEnvironment().getProperty(enabledKey);
-        if(null == enabledValue || enabledValue.isEmpty()){
+        if (null == enabledValue || enabledValue.isEmpty()) {
             enabledValue = "true";
         }
         enabledValue = enabledValue.trim();
         boolean enabled = TRUE_SET.contains(enabledValue);
         logger.info("{}:配置为:{},{}",getComponentName(),enabledValue,enabled ? "不禁用该组件" : "禁用该组件");
-        if(enabled){
+        if (enabled) {
            return;
         }
         ConfigurableEnvironment environment = event.getEnvironment();

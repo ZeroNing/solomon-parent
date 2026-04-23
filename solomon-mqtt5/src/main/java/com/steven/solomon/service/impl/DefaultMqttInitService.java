@@ -1,4 +1,4 @@
-package com.steven.solomon.service.impl;
+﻿package com.steven.solomon.service.impl;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
@@ -66,12 +66,12 @@ public class DefaultMqttInitService implements MqttInitService {
             @Override
             public void connectComplete(boolean reconnect, String serverURI) {
                 logger.info("租户:{} 重连{}",tenantCode,reconnect ? "成功" : "失败");
-                if(reconnect){
+                if (reconnect) {
                     for (Object abstractConsumer : clazzList) {
                         MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
                         if (ValidateUtils.isNotEmpty(messageListener)) {
                             try {
-                                for(String topic : messageListener.topics()){
+                                for (String topic : messageListener.topics()) {
                                     topic = SpringUtil.getElValue(topic);
                                     logger.info("租户:{} 重新订阅[{}]主题",tenantCode,topic);
                                     client.subscribe(new MqttSubscription[]{new MqttSubscription(topic, messageListener.qos())}, new IMqttMessageListener[]{(IMqttMessageListener) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass())});

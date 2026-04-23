@@ -1,4 +1,4 @@
-package com.steven.solomon.spring;
+﻿package com.steven.solomon.spring;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -94,15 +94,15 @@ public class SpringUtil implements ApplicationContextAware {
     /**
      * 读取#{}和${}值
      */
-    public static String getElValue(String elKey,String defaultValue){
+    public static String getElValue(String elKey,String defaultValue) {
         return ValidateUtils.getOrDefault(getElValue(elKey),defaultValue);
     }
 
     /**
      * 读取#{}和${}值
      */
-    public static String getElValue(String elKey){
-        if(ValidateUtils.isNotEmpty(elKey) && ValidateUtils.isELExpression(elKey)){
+    public static String getElValue(String elKey) {
+        if (ValidateUtils.isNotEmpty(elKey) && ValidateUtils.isELExpression(elKey)) {
             return context.getEnvironment().resolveRequiredPlaceholders(elKey);
         }
         return elKey;

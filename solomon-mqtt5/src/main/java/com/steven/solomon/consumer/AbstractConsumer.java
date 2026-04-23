@@ -1,4 +1,4 @@
-package com.steven.solomon.consumer;
+﻿package com.steven.solomon.consumer;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
@@ -45,15 +45,15 @@ public abstract class AbstractConsumer<T,R> implements IMqttMessageListener, Com
       tenantCode = model.getTenantCode();
       logger.info("线程名:{},租户编码为:{},消息ID:{},topic主题:{},AbstractConsumer:消费者消息: {}",Thread.currentThread().getName(),tenantCode,message.getId(),topic, json);
       // 判断是否重复消费
-      if(checkMessageKey(model)){
+      if (checkMessageKey(model)) {
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
-      if(ValidateUtils.isNotEmpty(tenantCode)){
+      if (ValidateUtils.isNotEmpty(tenantCode)) {
         RequestHeaderHolder.setTenantCode(tenantCode);
       }
       // 消费消息
       result = this.handleMessage(model.getBody());
-    } catch (Throwable e){
+    } catch (Throwable e) {
       logger.error("AbstractConsumer:消费报错,消息为:{}, 异常为:",json, e);
       throwable = e;
     } finally {

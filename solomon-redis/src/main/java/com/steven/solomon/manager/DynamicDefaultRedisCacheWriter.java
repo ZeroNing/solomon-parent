@@ -1,4 +1,4 @@
-package com.steven.solomon.manager;
+﻿package com.steven.solomon.manager;
 
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;
@@ -70,7 +70,7 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
     this.statistics = cacheStatisticsCollector;
   }
 
-  public RedisConnectionFactory getRedisConnectionFactory(){
+  public RedisConnectionFactory getRedisConnectionFactory() {
     RedisConnectionFactory connectionFactory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
     return ValidateUtils.isEmpty(connectionFactory) ? this.connectionFactory : connectionFactory;
   }
