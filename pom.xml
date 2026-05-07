@@ -174,7 +174,7 @@
 
       <dependency>
         <groupId>org.dromara.mica-mqtt</groupId>
-        <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
+        <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
         <version>${mica.mqtt.version}</version>
       </dependency>
 
