@@ -318,40 +318,69 @@ mqtt:
       name: client-name                 # 客户端名称
       username: admin                   # MQTT 用户名
       password: password               # MQTT 密码
-      ip: tcp://localhost:1883         # Broker 地址
-      client-id: client-001            # 客户端 ID（唯一）
-      clean-session: true               # 断开后清除会话
-      keep-alive-interval: 60          # 心跳间隔（秒）
+      ip: 127.0.0.1                    # Broker IP 地址
+      port: 1883                       # Broker 端口
+      client-id: client-001            # 客户端 ID（唯一标识）
+      keep-alive-secs: 60              # 心跳间隔（秒）
       timeout: 30                       # 连接超时（秒）
+      clean-start: true                 # 干净启动
+      reconnect: true                   # 是否自动重连
+      re-interval: 1000                # 重连间隔（毫秒）
+      retry-count: -1                   # 重试次数（-1 无限重试）
+      biz-thread-pool-size: 8           # 业务线程池大小
+      debug: false                      # 调试模式
+      # 遗嘱消息配置
+      will-message:
+        topic: device/status            # 遗嘱主题
+        message: offline                # 遗嘱消息内容
+        qos: 1                          # 遗嘱消息 QoS
+        retain: false                   # 是否保留消息
 ```
 
 **消费者示例:**
 ```java
 @MessageListener(topics = "device/+/data", qos = 2)
-public class DeviceMqttConsumer extends AbstractConsumer {
+public class DeviceMqttConsumer extends AbstractConsumer<String, String> {
 
     @Override
-    public void consume(MqttModel mqttModel) throws Exception {
-        logger.info("收到 Mica MQTT 消息 - Topic: {}, Payload: {}", 
-            mqttModel.getTopic(), mqttModel.getPayload());
+    public String handleMessage(String body) throws Exception {
+        logger.info("收到 Mica MQTT 消息 - Payload: {}", body);
         
         // 处理消息逻辑
-        String payload = mqttModel.getPayload();
-        // ...
+        // body 是消息内容（JSON 字符串或普通字符串）
+        // MqttModel 包含 tenantCode、topic、qos、retained 等信息
+        
+        // 返回处理结果（如果不需要返回结果，返回 null 即可）
+        return "success";
+    }
+
+    @Override
+    public void saveLog(String result, Throwable throwable, MqttModel<String> model) {
+        // 保存消费日志或记录消费结果
+        if (throwable != null) {
+            logger.error("消息消费失败，topic: {}", model.getTopic(), throwable);
+        } else {
+            logger.info("消息消费成功，topic: {}, result: {}", model.getTopic(), result);
+        }
     }
 }
 ```
 
 **发送消息:**
 ```java
-// 发送消息到指定主题
-MqttUtils.publish("device/command", "turn_on");
+@Resource
+private MqttUtils mqttUtils;
 
-// 指定 QoS 发送
-MqttUtils.publish("device/command", "turn_on", 1);
+// 发送消息到指定主题
+MqttModel<String> model = new MqttModel<>("default", "device/command", "turn_on");
+model.setQos(1);                     // 设置 QoS
+model.setRetained(false);            // 是否保留消息
+mqttUtils.send(model);
 
 // 指定租户发送
-MqttUtils.publish("tenant_001", "device/command", "turn_on", 2);
+MqttModel<String> model = new MqttModel<>("tenant_001", "device/command", "turn_on");
+model.setQos(2);
+mqttUtils.send(model);
 ```
 
 **主要特点:**
@@ -400,32 +429,48 @@ mqtt:
 **消费者示例:**
 ```java
 @MessageListener(topics = "sensor/#", qos = 1)
-public class SensorMqttConsumer extends AbstractConsumer {
+public class SensorMqttConsumer extends AbstractConsumer<String, String> {
 
     @Override
-    public void consume(MqttModel mqttModel) throws Exception {
-        logger.info("收到 Vert.x MQTT 消息");
-        logger.info("  - Topic: {}", mqttModel.getTopic());
-        logger.info("  - Payload: {}", mqttModel.getPayload());
-        logger.info("  - QoS: {}", mqttModel.getQos());
-        logger.info("  - Retained: {}", mqttModel.isRetained());
+    public String handleMessage(String body) throws Exception {
+        logger.info("收到 Vert.x MQTT 消息 - Payload: {}", body);
+        logger.info("  - 当前 Topic: {}", this.topic);
+        logger.info("  - 租户编码: {}", this.tenantCode);
         
         // 处理消息逻辑
-        // ...
+        // body 是消息内容（JSON 字符串或普通字符串）
+        
+        // 返回处理结果（如果不需要返回结果，返回 null 即可）
+        return "processed";
+    }
+
+    @Override
+    public void saveLog(String result, Throwable throwable, MqttModel<String> model) {
+        // 保存消费日志或记录消费结果
+        if (throwable != null) {
+            logger.error("消息消费失败，topic: {}", model.getTopic(), throwable);
+        } else {
+            logger.info("消息消费成功，topic: {}, result: {}", model.getTopic(), result);
+        }
     }
 }
 ```
 
 **发送消息:**
 ```java
-// 发送消息到指定主题
-MqttUtils.publish("device/command", "{\"action\":\"restart\"}");
+@Resource
+private MqttUtils mqttUtils;
 
-// 指定 QoS 发送
-MqttUtils.publish("device/command", "payload", 2);
+// 发送消息到指定主题
+MqttModel<String> model = new MqttModel<>("default", "device/command", "{\"action\":\"restart\"}");
+model.setQos(2);                     // 设置 QoS
+model.setRetained(false);            // 是否保留消息
+mqttUtils.send(model);
 
 // 指定租户发送
-MqttUtils.publish("tenant_001", "device/command", "payload", 1);
+MqttModel<String> model = new MqttModel<>("tenant_001", "device/command", "payload");
+model.setQos(1);
+mqttUtils.send(model);
 ```
 
 **主要特点:**
