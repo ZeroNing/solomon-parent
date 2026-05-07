@@ -307,7 +307,7 @@ public class MqttConsumer extends AbstractConsumer<String> {
 }
 ```
 
-#### 6.1 Mica MQTT 消息协议
+#### Mica MQTT 消息协议
 
 **配置文件:**
 ```yaml
@@ -393,7 +393,7 @@ mqttUtils.send(model);
 
 ---
 
-#### 6.2 Vert.x MQTT 消息协议（响应式）
+#### Vert.x MQTT 消息协议（响应式）
 
 **配置文件:**
 ```yaml
