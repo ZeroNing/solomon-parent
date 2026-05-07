@@ -46,7 +46,7 @@
     <module>solomon-mqtt5</module>
     <module>solomon-vertx-mqtt</module>
     <module>solomon-rabbitMq</module>
-
+    <module>solomon-mica-mqtt</module>
     <!-- 云存储模块 -->
     <module>solomon-s3</module>
 
@@ -57,7 +57,7 @@
     <!-- 网关与通知模块 -->
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
-    <module>solomon-mica-mqtt</module>
+
   </modules>
 
   <profiles>
@@ -75,6 +75,8 @@
         <module>test-solomon-powerjob</module>
         <module>test-solomon-bot-notice</module>
         <module>test-solomon-vertx-mqtt</module>
+        <module>test-solomon-vertx-mqtt</module>
+        <module>test-solonmon-mica-mqtt</module>
       </modules>
     </profile>
   </profiles>
