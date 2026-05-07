@@ -8,6 +8,7 @@ import com.steven.solomon.service.impl.DefaultMqttInitService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.verification.ValidateUtils;
+import org.dromara.mica.mqtt.spring.client.config.MqttClientProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -40,7 +41,7 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
             logger.error("mqtt不启用,不初始化队列以及消费者");
             return;
         }
-        Map<String, MqttProfile> tenantProfileMap = profile.getTenant();
+        Map<String, MqttClientProperties> tenantProfileMap = profile.getTenant();
         if (ValidateUtils.isEmpty(tenantProfileMap)) {
             logger.error("AbstractMessageLineRunner:没有MQTT配置");
             return;
@@ -49,7 +50,7 @@ public class MqttConfig extends AbstractMessageLineRunner<MessageListener> {
         MqttInitService mqttInitService = ValidateUtils.isNotEmpty(abstractMQMap) 
                 ? abstractMQMap.values().stream().findFirst().get() 
                 : new DefaultMqttInitService(mqttUtils);
-        for (Entry<String, MqttProfile> entry : tenantProfileMap.entrySet()) {
+        for (Entry<String, MqttClientProperties> entry : tenantProfileMap.entrySet()) {
             mqttInitService.initMqttClient(entry.getKey(), entry.getValue(), clazzList);
         }
     }
