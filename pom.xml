@@ -57,6 +57,7 @@
     <!-- 网关与通知模块 -->
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
+    <module>solomon-mica-mqtt</module>
   </modules>
 
   <profiles>
@@ -103,6 +104,7 @@
     <mqtt5.version>1.2.5</mqtt5.version>
     <vertx.mqtt.version>5.0.11</vertx.mqtt.version>
     <spring.integration.version>6.4.2</spring.integration.version>
+    <mica.mqtt.version>2.5.9</mica.mqtt.version>
 
     <!-- 云存储相关 -->
     <aws.s3.version>2.39.4</aws.s3.version>
@@ -169,6 +171,12 @@
   <!-- 依赖管理：导入Spring Boot/Cloud BOM -->
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>org.dromara.mica-mqtt</groupId>
+        <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
+        <version>${mica.mqtt.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.vertx</groupId>
