@@ -55,7 +55,8 @@ solomon-parent
 ├── solomon-rabbitMq                # RabbitMQ 模块：注解式消息队列
 ├── solomon-mqtt                    # MQTT 模块 (基于 Spring Integration)
 ├── solomon-mqtt5                   # MQTT5 模块 (基于 Paho)
-├── solom-vertx-mqtt                # Vert.x MQTT 模块 (响应式)
+├── solomon-vertx-mqtt              # Vert.x MQTT 模块 (响应式)
+├── solomon-mica-mqtt               # Mica MQTT 模块 (高性能物联网消息协议)
 ├── solomon-xxlJob                  # XXL-Job 模块：自动创建任务
 ├── solomon-powerjob                # PowerJob 模块：自动创建任务
 ├── solomon-gateway-sentinel        # Gateway 网关 + Sentinel 限流熔断
@@ -306,7 +307,64 @@ public class MqttConsumer extends AbstractConsumer<String> {
 }
 ```
 
-### 7️⃣ 定时任务
+### 7️⃣ Mica MQTT 消息协议
+
+**配置文件:**
+```yaml
+mqtt:
+  enabled: true
+  tenant:
+    default:
+      name: client-name
+      username: admin
+      password: password
+      ip: tcp://localhost:1883
+      client-id: client-001
+      clean-session: true
+      keep-alive-interval: 60
+      timeout: 30
+```
+
+**消费者示例:**
+```java
+@MessageListener(topics = "device/+/data", qos = 2)
+public class DeviceMqttConsumer extends AbstractConsumer {
+
+    @Override
+    public void consume(MqttModel mqttModel) throws Exception {
+        logger.info("收到 Mica MQTT 消息 - Topic: {}, Payload: {}", 
+            mqttModel.getTopic(), mqttModel.getPayload());
+        
+        // 处理消息逻辑
+        String payload = mqttModel.getPayload();
+        // ...
+    }
+}
+```
+
+**发送消息:**
+```java
+// 发送消息到指定主题
+MqttUtils.publish("device/command", "turn_on");
+
+// 指定 QoS 发送
+MqttUtils.publish("device/command", "turn_on", 1);
+
+// 指定租户发送
+MqttUtils.publish("tenant_001", "device/command", "turn_on", 2);
+```
+
+**主要特点:**
+- ✅ 基于 Mica MQTT 高性能客户端
+- ✅ 注解式消息监听，支持通配符主题
+- ✅ 多租户支持，每个租户独立连接
+- ✅ 自动重连机制
+- ✅ QoS 0/1/2 消息质量支持
+- ✅ 遗嘱消息配置
+
+---
+
+### 8️⃣ 定时任务
 
 #### XXL-Job 自动创建任务
 **配置:**
@@ -367,7 +425,7 @@ public class TestJob implements BasicProcessor {
 }
 ```
 
-### 8️⃣ Redis 缓存
+### 9️⃣ Redis 缓存
 
 **单机版配置:**
 ```yaml
@@ -399,7 +457,7 @@ spring:
         database: 0
 ```
 
-### 9️⃣ MongoDB
+### 🔟 MongoDB
 
 **多租户配置:**
 ```yaml
@@ -426,7 +484,7 @@ public class LogEntity {
 }
 ```
 
-### 🔟 病毒扫描 (ClamAV)
+### 1️⃣1️⃣ 病毒扫描 (ClamAV)
 
 **配置:**
 ```yaml
@@ -451,7 +509,7 @@ public ResultVO<String> upload(@RequestPart("file") MultipartFile file) throws E
 }
 ```
 
-### 1️⃣1️⃣ 机器人通知
+### 1️⃣2️⃣ 机器人通知
 
 支持钉钉、微信机器人发送通知:
 
