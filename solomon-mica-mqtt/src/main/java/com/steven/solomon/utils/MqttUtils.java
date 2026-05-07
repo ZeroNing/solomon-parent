@@ -15,6 +15,7 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.dromara.mica.mqtt.codec.MqttQoS;
+import org.dromara.mica.mqtt.codec.message.builder.MqttTopicSubscription;
 import org.dromara.mica.mqtt.core.client.IMqttClientConnectListener;
 import org.dromara.mica.mqtt.core.client.MqttClient;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
@@ -22,7 +23,9 @@ import org.dromara.mica.mqtt.core.client.MqttWillMessage;
 import org.dromara.mica.mqtt.spring.client.config.MqttClientProperties;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
 import org.tio.core.ChannelContext;
+import org.tio.core.ssl.SslConfig;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -194,45 +197,73 @@ public class MqttUtils implements SendService<MqttModel<?>> {
      * 创建 Mica MQTT 客户端
      *
      * @param tenantCode  租户编码
-     * @param mqttProfile MQTT配置
+     * @param properties MQTT配置
      * @return MqttClient
      */
-    public MqttClient createMqttClient(String tenantCode, MqttClientProperties mqttProfile) {
-        putProfile(tenantCode, mqttProfile);
+    public MqttClient createMqttClient(String tenantCode, MqttClientProperties properties) {
+        putProfile(tenantCode, properties);
         // 将 MqttClientProperties 中的属性逐一映射到 Creator
-        MqttClientCreator client = MqttClient.create()
-                // --- 基础连接配置 ---
-                .ip(mqttProfile.getIp()) // 设置 IP
-                .port(mqttProfile.getPort()) // 设置端口
-                .clientId(ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString())) // 设置处理后的 ClientId
-                .username(mqttProfile.getUsername()) // 设置用户名
-                .password(mqttProfile.getPassword()) // 设置密码
-                .keepAliveSecs(mqttProfile.getKeepAliveSecs()) // 设置心跳间隔
-
-                // --- 连接选项 (Options) ---
-                .cleanStart(mqttProfile.isCleanStart()) // 设置 Clean Session
-                .timeout(mqttProfile.getTimeout() != null ? mqttProfile.getTimeout() : 30) // 设置超时时间
-
-                // --- 遗嘱消息 (Will Message) ---
-                .willMessage(mqttProfile.getWillMessage() != null ?MqttWillMessage.builder()
-                        .message(mqttProfile.getWillMessage().getMessage().getBytes(StandardCharsets.UTF_8))
-                        .topic(mqttProfile.getWillMessage().getTopic())
-                        .qos(MqttQoS.valueOf(mqttProfile.getWillMessage().getQos().value()))
-                        .retain(mqttProfile.getWillMessage().isRetain())
-                        .build() : null)
-                .heartbeatTimeoutStrategy(mqttProfile.getHeartbeatTimeoutStrategy())
-
-                // --- 高级特性 (MQTT 5.0 / 性能调优) ---
-                .reconnect(mqttProfile.isReconnect()) // 开启自动重连
-                .reInterval(mqttProfile.getReInterval()) // 重连间隔
-                .retryCount(mqttProfile.getRetryCount()) // 最大重试次数
-                .maxClientIdLength(mqttProfile.getMaxClientIdLength()) // 最大 ClientId 长度限制
-                .maxBytesInMessage(Integer.valueOf(String.valueOf(mqttProfile.getMaxBytesInMessage().toBytes()))) // 最大消息字节数
-                .readBufferSize(Integer.valueOf(String.valueOf(mqttProfile.getReadBufferSize().toBytes()))) // 读取缓冲区大小
-                ;
-
-        // 4. 构建并返回实例
-        return client.connect();
+        MqttClientCreator clientCreator = MqttClient.create()
+                .name(properties.getName())
+                .ip(properties.getIp())
+                .port(properties.getPort())
+                .username(properties.getUsername())
+                .password(properties.getPassword())
+                .clientId(properties.getClientId())
+                .bindIp(properties.getBindIp())
+                .bindNetworkInterface(properties.getBindNetworkInterface())
+                .readBufferSize((int) properties.getReadBufferSize().toBytes())
+                .maxBytesInMessage((int) properties.getMaxBytesInMessage().toBytes())
+                .maxClientIdLength(properties.getMaxClientIdLength())
+                .keepAliveSecs(properties.getKeepAliveSecs())
+                .heartbeatMode(properties.getHeartbeatMode())
+                .heartbeatTimeoutStrategy(properties.getHeartbeatTimeoutStrategy())
+                .reconnect(properties.isReconnect())
+                .reInterval(properties.getReInterval())
+                .retryCount(properties.getRetryCount())
+                .reSubscribeBatchSize(properties.getReSubscribeBatchSize())
+                .version(properties.getVersion())
+                .cleanStart(properties.isCleanStart())
+                .sessionExpiryIntervalSecs(properties.getSessionExpiryIntervalSecs())
+                .statEnable(properties.isStatEnable())
+                .debug(properties.isDebug())
+                .disconnectBeforeStop(properties.isDisconnectBeforeStop());
+        Integer timeout = properties.getTimeout();
+        if (timeout != null && timeout > 0) {
+            clientCreator.timeout(timeout);
+        }
+        // mqtt 业务线程数
+        Integer bizThreadPoolSize = properties.getBizThreadPoolSize();
+        if (bizThreadPoolSize != null && bizThreadPoolSize > 0) {
+            clientCreator.bizThreadPoolSize(bizThreadPoolSize);
+        }
+        // 开启 ssl
+//        MqttClientProperties.Ssl ssl = properties.getSsl();
+//        if (ssl.isEnabled()) {
+//            SslConfig sslConfig = SslConfig.forClient(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass());
+//            clientCreator.sslConfig(sslConfig);
+//            sslCustomizers.ifAvailable(sslConfig::setSslEngineCustomizer);
+//        }
+        // 构造遗嘱消息
+        MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
+        if (willMessage != null && StringUtils.hasText(willMessage.getTopic())) {
+            clientCreator.willMessage(builder -> {
+                builder.topic(willMessage.getTopic())
+                        .qos(willMessage.getQos())
+                        .retain(willMessage.isRetain());
+                if (StringUtils.hasText(willMessage.getMessage())) {
+                    builder.messageText(willMessage.getMessage());
+                }
+            });
+        }
+        // 全局订阅
+        List<MqttTopicSubscription> globalSubscribe = properties.getGlobalSubscribe();
+        if (globalSubscribe != null && !globalSubscribe.isEmpty()) {
+            clientCreator.globalSubscribe(globalSubscribe);
+        }
+        MqttClient client = clientCreator.connect();
+        putClient(tenantCode, client);
+        return client;
     }
 
 }

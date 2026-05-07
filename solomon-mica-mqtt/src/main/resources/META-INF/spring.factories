@@ -2,3 +2,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.steven.solomon.config.MqttConfig,\
 com.steven.solomon.utils.MqttUtils
+
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+com.steven.solomon.config.ExcludeMqttClientConfiguration
