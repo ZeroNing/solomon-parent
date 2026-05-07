@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils.i18n;
+package com.steven.solomon.utils.i18n;
 
 import com.steven.solomon.code.BaseCode;
 import org.springframework.context.MessageSource;

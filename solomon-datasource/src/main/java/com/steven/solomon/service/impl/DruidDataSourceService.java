@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service.impl;
+package com.steven.solomon.service.impl;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.steven.solomon.properties.DataSourceProperties;

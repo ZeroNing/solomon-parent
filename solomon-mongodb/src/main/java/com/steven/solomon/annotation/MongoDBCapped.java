@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.annotation;
+package com.steven.solomon.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Conditional(MongoCondition.class)
 public @interface MongoDBCapped {
 
-  @Aliasfor (annotation = Component.class)
+  @AliasFor(annotation = Component.class)
   String value() default StrUtil.EMPTY;
 
   /**

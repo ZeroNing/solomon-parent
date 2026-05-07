@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.consumer;
+package com.steven.solomon.consumer;
 
 import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;

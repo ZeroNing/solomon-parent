@@ -57,6 +57,7 @@
     <!-- 网关与通知模块 -->
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
+    <module>test-solomon-vertx-mqtt</module>
   </modules>
 
   <profiles>
@@ -168,6 +169,15 @@
   <!-- 依赖管理：导入Spring Boot/Cloud BOM -->
   <dependencyManagement>
     <dependencies>
+
+      <dependency>
+        <groupId>io.vertx</groupId>
+        <artifactId>vertx-stack-depchain</artifactId>
+        <version>${vertx.mqtt.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <!-- Spring Boot Dependencies -->
       <dependency>
         <groupId>org.springframework.boot</groupId>

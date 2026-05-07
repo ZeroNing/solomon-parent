@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.config;
+package com.steven.solomon.config;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.properties.XxlJobProperties;

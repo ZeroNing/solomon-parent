@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.exception.handler;
+package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;

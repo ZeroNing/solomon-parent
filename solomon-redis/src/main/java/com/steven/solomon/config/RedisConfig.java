@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.config;
+package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;

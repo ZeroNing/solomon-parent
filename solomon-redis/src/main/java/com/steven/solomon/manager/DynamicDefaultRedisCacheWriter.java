@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.manager;
+package com.steven.solomon.manager;
 
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;

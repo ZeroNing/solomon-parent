@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.init;
+package com.steven.solomon.init;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;

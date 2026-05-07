@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils.userAgent;
+package com.steven.solomon.utils.userAgent;
 
 import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletRequest;

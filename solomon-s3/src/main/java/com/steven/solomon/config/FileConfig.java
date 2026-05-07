@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.config;
+package com.steven.solomon.config;
 
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.namingRules.DateNamingRulesGenerationService;

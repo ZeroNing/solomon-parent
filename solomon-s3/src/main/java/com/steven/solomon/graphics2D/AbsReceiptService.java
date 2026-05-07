@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.graphics2D;
+package com.steven.solomon.graphics2D;
 
 import com.steven.solomon.graphics2D.entity.BaseReceipt;
 import com.steven.solomon.graphics2D.entity.FileUpload;

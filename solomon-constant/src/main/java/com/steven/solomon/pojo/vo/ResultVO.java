@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.pojo.vo;
+package com.steven.solomon.pojo.vo;
 
 import com.steven.solomon.code.BaseCode;
 import java.io.Serializable;

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils;
+package com.steven.solomon.utils;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.verification.ValidateUtils;

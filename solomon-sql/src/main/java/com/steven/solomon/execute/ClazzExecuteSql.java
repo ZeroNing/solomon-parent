@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.execute;
+package com.steven.solomon.execute;
 
 import com.steven.solomon.annotation.Column;
 import com.steven.solomon.config.profile.SqlProfile;

@@ -1,4 +1,4 @@
-﻿//package com.steven.solomon.pojo.entity;
+//package com.steven.solomon.pojo.entity;
 //
 //import cn.hutool.core.util.StrUtil;
 //

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.http;
+package com.steven.solomon.http;
 
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;

@@ -48,6 +48,7 @@ public class ControllerAspect {
     String startTime = DateTimeUtils.getLocalDateTimeString(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
     try {
       obj = pjp.proceed();
+      return obj;
     } catch (Exception e) {
       ex = e;
       throw e;

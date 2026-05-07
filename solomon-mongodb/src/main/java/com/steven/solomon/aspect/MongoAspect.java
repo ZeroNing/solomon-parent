@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.aspect;
+package com.steven.solomon.aspect;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.config.MongoTenantContext;

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service;
+package com.steven.solomon.service;
 
 import cn.hutool.crypto.digest.DigestUtil;
 import com.steven.solomon.graphics2D.entity.FileUpload;

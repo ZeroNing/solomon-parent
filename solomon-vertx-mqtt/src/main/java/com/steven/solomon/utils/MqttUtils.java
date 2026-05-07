@@ -3,6 +3,7 @@ package com.steven.solomon.utils;
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.MessageListener;
@@ -46,6 +47,8 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     public Map<String, MqttClientOptions> getOptionsMap() {
         return optionsMap;
     }
+
+    public static Map<String,AbstractConsumer<?,?>> consumerMap = new HashMap<>();
 
     public void putOptionsMap(String tenantCode, MqttClientOptions options) {
         this.optionsMap.put(tenantCode, options);
@@ -157,16 +160,21 @@ public class MqttUtils implements SendService<MqttModel<?>> {
                         AbstractConsumer<?, ?> consumer = (AbstractConsumer<?, ?>) BeanUtil.copyProperties(abstractConsumer, abstractConsumer.getClass(), (String) null);
                         // 订阅主题
                         client.subscribe(topic, messageListener.qos());
-                        // 设置消息处理器
-                        String finalTopic = topic;
-                        client.publishHandler(message -> {
-                            try {
-                                consumer.messageArrived(finalTopic, message);
-                            } catch (Exception e) {
-                                logger.error("消费消息异常,topic:{}", finalTopic, e);
-                            }
-                        });
+                        consumerMap.put(topic, consumer);
                     }
+                    client.publishHandler(message -> {
+                        try {
+                            String topic = MqttTopicFilterMatcher.findFirstMatchingFilter(message.topicName(), new ArrayList<>(consumerMap.keySet()));
+                            AbstractConsumer<?, ?> consumer = consumerMap.get(topic);
+                            if(ObjectUtil.isNull(consumer)){
+                                logger.error("主题:{},不存在消费者,消费内容为:{}",message.topicName(),String.valueOf(message.payload()));
+                                return;
+                            }
+                            consumer.messageArrived(message.topicName(), message);
+                        } catch (Exception e) {
+                            logger.error("消费消息异常,topic:{}", message.topicName(), e);
+                        }
+                    });
                 } else {
                     logger.info("{}租户,{}只支持{}范围", tenantCode, abstractConsumer.getClass().getSimpleName(), rangeList.toArray());
                 }

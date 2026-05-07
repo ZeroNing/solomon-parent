@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.pojo.param;
+package com.steven.solomon.pojo.param;
 
 
 import ch.qos.logback.core.util.StringCollectionUtil;

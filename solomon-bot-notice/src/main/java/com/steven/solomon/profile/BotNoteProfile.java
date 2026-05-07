@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.profile;
+package com.steven.solomon.profile;
 
 import com.steven.solomon.verification.ValidateUtils;
 import org.apache.commons.codec.binary.Base64;

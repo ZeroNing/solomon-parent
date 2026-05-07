@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.verification;
+package com.steven.solomon.verification;
 
 import cn.hutool.core.util.StrUtil;
 

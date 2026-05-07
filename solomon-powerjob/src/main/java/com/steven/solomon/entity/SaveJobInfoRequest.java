@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.entity;
+package com.steven.solomon.entity;
 
 import cn.hutool.core.date.DateUtil;
 import com.steven.solomon.annotation.JobTask;

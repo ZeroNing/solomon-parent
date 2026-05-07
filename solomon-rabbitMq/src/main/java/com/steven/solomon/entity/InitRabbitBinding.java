@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.entity;
+package com.steven.solomon.entity;
 
 
 import com.steven.solomon.annotation.MessageListener;

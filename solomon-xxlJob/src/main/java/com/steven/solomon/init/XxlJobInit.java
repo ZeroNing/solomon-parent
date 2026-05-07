@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.init;
+package com.steven.solomon.init;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;

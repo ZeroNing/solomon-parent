@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.repository;
+package com.steven.solomon.repository;
 
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;

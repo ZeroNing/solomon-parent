@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service;
+package com.steven.solomon.service;
 
 import com.obs.services.ObsClient;
 import com.obs.services.ObsConfiguration;

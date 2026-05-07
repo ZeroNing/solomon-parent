@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.consumer;
+package com.steven.solomon.consumer;
 
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.annotation.JobTask;

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.manager;
+package com.steven.solomon.manager;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.holder.RequestHeaderHolder;

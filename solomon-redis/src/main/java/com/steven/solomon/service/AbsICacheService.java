@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service;
+package com.steven.solomon.service;
 
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;

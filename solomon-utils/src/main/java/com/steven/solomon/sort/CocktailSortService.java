@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.sort;
+package com.steven.solomon.sort;
 
 
 import java.util.ArrayList;

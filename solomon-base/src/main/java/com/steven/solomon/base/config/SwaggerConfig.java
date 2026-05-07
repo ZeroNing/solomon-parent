@@ -1,4 +1,4 @@
-﻿//package com.steven.solomon.base.config;
+//package com.steven.solomon.base.config;
 //
 //import java.net.URL;
 //import java.util.ArrayList;

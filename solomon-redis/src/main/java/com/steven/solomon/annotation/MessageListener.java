@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.annotation;
+package com.steven.solomon.annotation;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.enums.TopicMode;
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Component
 public @interface MessageListener {
 
-    @Aliasfor (annotation = Component.class)
+    @AliasFor(annotation = Component.class)
     String value() default StrUtil.EMPTY;
 
     /**

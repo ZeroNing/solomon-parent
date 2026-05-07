@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.clamav.config;
+package com.steven.solomon.clamav.config;
 
 import com.steven.solomon.clamav.properties.ClamAvProperties;
 import com.steven.solomon.clamav.utils.ClamAvUtils;

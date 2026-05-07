@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils;
+package com.steven.solomon.utils;
 
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.property.SentinelProperty;

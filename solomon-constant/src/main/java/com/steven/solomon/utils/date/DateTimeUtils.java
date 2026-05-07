@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils.date;
+package com.steven.solomon.utils.date;
 
 
 import java.time.Duration;

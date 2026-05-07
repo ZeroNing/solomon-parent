@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.namingRules;
+package com.steven.solomon.namingRules;
 
 import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.lang.generator.SnowflakeGenerator;

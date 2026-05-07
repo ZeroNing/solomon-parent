@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.lambda;
+package com.steven.solomon.lambda;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.StopWatch;

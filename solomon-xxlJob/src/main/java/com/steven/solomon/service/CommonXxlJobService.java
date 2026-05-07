@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service;
+package com.steven.solomon.service;
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.http.HttpRequest;

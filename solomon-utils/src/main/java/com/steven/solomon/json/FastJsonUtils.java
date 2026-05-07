@@ -1,4 +1,4 @@
-﻿//package com.steven.solomon.json;
+//package com.steven.solomon.json;
 //
 //import cn.hutool.core.lang.TypeReference;
 //import com.alibaba.fastjson.JSON;

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.config;
+package com.steven.solomon.config;
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.init.AbstractMessageLineRunner;

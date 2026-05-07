@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.temple;
+package com.steven.solomon.temple;
 
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.enums.ConvertEnums;

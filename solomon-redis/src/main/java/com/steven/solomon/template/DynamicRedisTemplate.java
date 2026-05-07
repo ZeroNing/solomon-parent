@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.template;
+package com.steven.solomon.template;
 
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;

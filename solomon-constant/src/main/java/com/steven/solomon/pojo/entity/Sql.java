@@ -1,4 +1,4 @@
-﻿//package com.steven.solomon.pojo.entity;
+//package com.steven.solomon.pojo.entity;
 //
 //import com.steven.solomon.enums.OrderByEnum;
 //import com.steven.solomon.verification.ValidateUtils;

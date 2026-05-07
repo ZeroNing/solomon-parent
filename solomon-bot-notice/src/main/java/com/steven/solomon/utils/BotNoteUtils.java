@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.utils;
+package com.steven.solomon.utils;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpRequest;

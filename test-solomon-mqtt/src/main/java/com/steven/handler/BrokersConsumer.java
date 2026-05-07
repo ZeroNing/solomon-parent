@@ -1,4 +1,4 @@
-﻿package com.steven.handler;
+package com.steven.handler;
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.consumer.AbstractConsumer;

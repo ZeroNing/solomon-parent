@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.execute;
+package com.steven.solomon.execute;
 
 import com.steven.solomon.convert.ColumnConvert;
 import com.steven.solomon.temple.SqlTemple;

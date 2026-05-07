@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.enums;
+package com.steven.solomon.enums;
 
 public enum MongoDbRoleEnum {
   /**

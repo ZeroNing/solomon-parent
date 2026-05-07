@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.clamav.utils;
+package com.steven.solomon.clamav.utils;
 
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.clamav.properties.ClamAvProperties;
