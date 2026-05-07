@@ -307,7 +307,7 @@ public class MqttConsumer extends AbstractConsumer<String> {
 }
 ```
 
-### 7️⃣ Mica MQTT 消息协议
+#### 6.1 Mica MQTT 消息协议
 
 **配置文件:**
 ```yaml
@@ -393,7 +393,7 @@ mqttUtils.send(model);
 
 ---
 
-### 8️⃣ Vert.x MQTT 消息协议（响应式）
+#### 6.2 Vert.x MQTT 消息协议（响应式）
 
 **配置文件:**
 ```yaml
@@ -484,7 +484,9 @@ mqttUtils.send(model);
 
 ---
 
-### 9️⃣ 定时任务
+---
+
+### 7️⃣ 定时任务
 
 #### XXL-Job 自动创建任务
 **配置:**
@@ -545,7 +547,7 @@ public class TestJob implements BasicProcessor {
 }
 ```
 
-### 1️⃣0️⃣ Redis 缓存
+### 8️⃣ Redis 缓存
 
 **单机版配置:**
 ```yaml
@@ -577,7 +579,7 @@ spring:
         database: 0                    # 租户 002 数据库编号
 ```
 
-### 1️⃣1️⃣ MongoDB
+### 9️⃣ MongoDB
 
 **多租户配置:**
 ```yaml
@@ -604,7 +606,7 @@ public class LogEntity {
 }
 ```
 
-### 1️⃣2️⃣ 病毒扫描 (ClamAV)
+### 1️⃣0️⃣ 病毒扫描 (ClamAV)
 
 **配置:**
 ```yaml
@@ -629,7 +631,7 @@ public ResultVO<String> upload(@RequestPart("file") MultipartFile file) throws E
 }
 ```
 
-### 1️⃣3️⃣ 机器人通知
+### 1️⃣1️⃣ 机器人通知
 
 支持钉钉、微信机器人发送通知:
 
