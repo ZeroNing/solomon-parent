@@ -20,7 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-vertx-mqtt</artifactId>
+            <artifactId>solomon-mqtt5</artifactId>
             <version>1.0</version>
         </dependency>
 
