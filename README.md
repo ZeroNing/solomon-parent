@@ -631,17 +631,100 @@ public ResultVO<String> upload(@RequestPart("file") MultipartFile file) throws E
 }
 ```
 
-### 1️⃣1️⃣ 机器人通知
+### 1️⃣1️⃣ 机器人通知 (solomon-bot-notice)
 
-支持钉钉、微信机器人发送通知:
+轻量级多渠道机器人通知组件，支持企业微信、钉钉、飞书三大办公机器人，全类型消息发送、动态@、签名验证、异步发送等功能。
 
-```java
-// 发送钉钉消息
-BotNoteUtils.sendDingTalkNote("webhook_url", "标题", "内容");
+**✅ 已测试功能**：
+- ✅ 企业微信：全类型消息、@用户/所有人、签名验证、卡片按钮（100% 测试通过）
+- ✅ 钉钉：全类型消息、@用户/手机号/所有人、签名验证、卡片按钮、Feed流（100% 测试通过）
+- 🔄 飞书：功能已实现，待测试
 
-// 发送微信消息
-BotNoteUtils.sendWeChatNote("webhook_url", "标题", "内容");
+**配置示例 (application.yml)**：
+```yaml
+solomon:
+  notice:
+    enabled: true
+    global-signature: true
+    signature: 【Solomon系统通知】
+    
+    # 企业微信机器人
+    wechat-work:
+      webhook-url: https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=你的key
+      secret: 你的签名密钥
+    
+    # 钉钉机器人
+    ding-talk:
+      webhook-url: https://oapi.dingtalk.com/robot/send?access_token=你的token
+      secret: 你的签名密钥
+        
+    # 飞书机器人
+    feishu:
+      webhook-url: https://open.feishu.cn/open-apis/bot/v2/hook/你的hook_key
+      secret: 你的签名密钥
 ```
+
+**使用示例**：
+```java
+@Autowired
+private NoticeUtils noticeUtils;
+
+// 1. 一行代码发送通知（默认Markdown格式）
+noticeUtils.send(
+    NoticeChannelEnum.WECHAT_WORK,  // 渠道
+    "通知标题",                     // 标题
+    "这是通知内容"                  // 内容
+);
+
+// 2. 发送紧急告警并@所有人
+noticeUtils.send(
+    NoticeChannelEnum.DING_TALK,
+    "紧急告警",
+    "CPU使用率超过90%",
+    true, // @所有人
+    List.of("13800138000") // 额外@指定手机号用户
+);
+
+// 3. 发送交互卡片消息（带按钮）
+NoticeMessage cardMsg = new NoticeMessage();
+cardMsg.setMsgType(NoticeMsgTypeEnum.CARD);
+cardMsg.setChannels(List.of(NoticeChannelEnum.WECHAT_WORK, NoticeChannelEnum.DING_TALK));
+cardMsg.setLevel(NoticeLevelEnum.ERROR); // 消息等级：红色显示
+cardMsg.setTitle("审批通知");
+cardMsg.setContent("您有一个待审批的请假申请\n申请人：张三\n天数：3天");
+cardMsg.setLinkPicUrl("https://example.com/leave.jpg"); // 企业微信有图自动用news_notice类型
+// 添加按钮（最多支持3个）
+cardMsg.setButtons(List.of(
+    new NoticeMessage.Button("同意", "https://example.com/approve/123"),
+    new NoticeMessage.Button("拒绝", "https://example.com/reject/123")
+));
+noticeUtils.send(cardMsg);
+
+// 4. 多渠道同时发送（企业微信+钉钉同时收到）
+NoticeMessage message = new NoticeMessage();
+message.setChannels(List.of(
+    NoticeChannelEnum.WECHAT_WORK, 
+    NoticeChannelEnum.DING_TALK
+));
+message.setTitle("系统异常");
+message.setContent("CPU使用率超过90%");
+message.setLevel(NoticeLevelEnum.ERROR);
+message.setAtAll(true); // 所有渠道都@所有人
+message.setAsync(true); // 异步发送不阻塞业务
+noticeUtils.send(message);
+```
+
+**支持的消息类型**：
+| 消息类型 | 企业微信 | 钉钉 | 飞书 | 说明 |
+|---------|---------|-----|-----|-----|
+| TEXT（纯文本） | ✅ | ✅ | 🔄 | 普通文字消息，支持@ |
+| MARKDOWN（富文本） | ✅ | ✅ | 🔄 | 富文本格式，支持@ |
+| LINK（链接图文） | ✅ | ✅ | 🔄 | 带链接的消息 |
+| IMAGE（图片） | ✅ | ✅ | 🔄 | 发送图片 |
+| FILE（文件） | ✅ | ✅ | 🔄 | 发送任意文件 |
+| VOICE（语音） | ✅ | ✅ | 🔄 | 发送语音消息 |
+| CARD（交互卡片） | ✅ | ✅ | 🔄 | 带按钮的卡片，支持点击跳转 |
+| FEED_CARD（Feed流卡片） | ❌ | ✅ | ❌ | 多图文消息，钉钉专属 |
 
 ---
 
