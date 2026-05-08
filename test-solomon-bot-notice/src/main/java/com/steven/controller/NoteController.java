@@ -1,10 +1,7 @@
 package com.steven.controller;
 
-import com.steven.solomon.pojo.entity.NoteRequestVO;
-import com.steven.solomon.pojo.entity.SendBaseNoteMessage;
-import com.steven.solomon.pojo.enums.BotClientEnum;
-import com.steven.solomon.pojo.vo.ResultVO;
-import com.steven.solomon.utils.BotNoteUtils;
+import com.steven.solomon.entity.NoticeMessage;
+import com.steven.solomon.utils.NoticeUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,17 +13,17 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class NoteController {
 
-    private final BotNoteUtils botNoteUtils;
+    private final NoticeUtils noticeUtils;
 
     private final Logger logger = LoggerUtils.logger(NoteController.class);
 
-    public NoteController(BotNoteUtils botNoteUtils) {
-        this.botNoteUtils = botNoteUtils;
+    public NoteController(NoticeUtils noticeUtils) {
+        this.noticeUtils = noticeUtils;
     }
 
 
     @PostMapping("/test")
-    public ResultVO<NoteRequestVO> test(@RequestBody SendBaseNoteMessage noteMessage) throws Exception {
-        return new ResultVO<NoteRequestVO>(botNoteUtils.sendBotNote(BotClientEnum.DING_TALK,noteMessage));
+    public void test(@RequestBody NoticeMessage message) throws Exception {
+        noticeUtils.send(message);
     }
 }

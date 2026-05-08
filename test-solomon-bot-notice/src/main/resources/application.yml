@@ -24,10 +24,11 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
-bot:
-  note:
+solomon:
+  notice:
+    global-signature: false
     ding-talk:
+      webhook-url:
       secret:
-      url:
-    wechat:
-      url:
+    wechat-work:
+      webhook-url:
