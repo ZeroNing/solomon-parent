@@ -36,8 +36,6 @@
     <module>solomon-common</module>
 
     <!-- 数据存储模块 -->
-    <module>solomon-datasource</module>
-    <module>solomon-sql</module>
     <module>solomon-redis</module>
     <module>solomon-mongodb</module>
 
@@ -65,7 +63,6 @@
     <profile>
       <id>test-modules</id>
       <modules>
-        <module>test-solomon-datasource</module>
         <module>test-solomon-mongo</module>
         <module>test-solomon-mqtt</module>
         <module>test-solomon-mqtt5</module>
