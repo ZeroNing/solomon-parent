@@ -1088,16 +1088,11 @@ public class Lambda {
         for (Integer i = 0; i < 10000000; i++) {
             b.add(new Person(String.valueOf(i*21), i*13));
         }
-
-        System.out.println("============多字段排序算法降序开始=======================\n");
-        System.out.println("总记录数:" + b.size() + "排序测试\n");
         for (SortTypeEnum typeEnum : SortTypeEnum.values()) {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
             SortUtil.sort(typeEnum,b, Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed());
             stopWatch.stop();
-            System.out.println(typeEnum.getDesc() + "算法：降序耗时:" + stopWatch.getTotalTimeSeconds() + "秒");
-            System.out.print("\n");
         }
     }
 

@@ -38,14 +38,8 @@ public class DoubleColorBallGenerator {
 
     public static void main(String[] args) throws InterruptedException {
         for (int i = 1; i <= 5; i++) {
-            System.out.print("第" + i + "组号码: " + StrUtil.EMPTY);
             List<Integer> redBalls = generateRedBalls(8);
             List<Integer> blueBall = generateBlueBall(4);
-            System.out.print("红球：");
-            for (int ball : redBalls) {
-                System.out.print(ball + " ");
-            }
-            System.out.println("蓝球：" + blueBall);
         }
     }
 

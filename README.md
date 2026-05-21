@@ -962,6 +962,239 @@ SortUtil.sort(
 
 ---
 
+## 📚 接入与模块说明
+
+### 模块职责
+
+| 模块 | 主要职责 | 典型使用场景 | 关键依赖 |
+|------|----------|--------------|----------|
+| `solomon-constant` | 通用常量、错误码、上下文 Holder、基础 VO/Param | 所有业务服务的基础模型和错误码 | Spring Context、AOP、SLF4J |
+| `solomon-utils` | JSON、日期、校验、加密、Spring、ClamAV 等工具 | 通用工具能力、自动 JSON 配置、病毒扫描 | Spring Boot AutoConfigure、Jackson、Hutool |
+| `solomon-base` | Swagger、全局异常处理、基础自动配置 | Web/API 服务的基础能力 | Knife4j、Springdoc、Servlet API |
+| `solomon-common` | WebConfig、请求过滤器、Controller 日志切面、Excel 工具 | Spring MVC 应用公共能力 | Spring Web、POI、FastExcel |
+| `solomon-redis` | 多租户 Redis、缓存服务、Redis 队列消费 | 缓存、租户隔离、Redis 消息监听 | Spring Data Redis、Lettuce |
+| `solomon-mongodb` | 多租户 MongoDB、动态 MongoTemplate、集合初始化 | 文档数据库、多租户数据隔离 | Spring Data MongoDB |
+| `solomon-rabbitMq` | RabbitMQ 自动声明、发送工具、注解式监听 | Direct/Fanout/Topic/Headers/Delay 队列 | Spring AMQP |
+| `solomon-mqtt` | Spring Integration MQTT 封装 | MQTT 3.x 消息发布订阅 | Spring Integration MQTT |
+| `solomon-mqtt5` | Paho MQTT v5 封装 | MQTT 5 消息发布订阅 | Eclipse Paho MQTT v5 |
+| `solomon-vertx-mqtt` | Vert.x MQTT 封装 | 响应式 MQTT 场景 | Vert.x MQTT |
+| `solomon-mica-mqtt` | Mica MQTT 封装 | 高性能 MQTT 客户端 | mica-mqtt starter |
+| `solomon-s3` | 统一文件服务、多云对象存储、缩略图、病毒扫描 | 文件上传下载、预签名分享、多云适配 | AWS SDK、MinIO、各云厂商 SDK |
+| `solomon-xxlJob` | XXL-Job 执行器和任务自动创建 | 分布式任务调度 | xxl-job-core |
+| `solomon-powerjob` | PowerJob worker 和任务自动创建 | 分布式任务调度 | powerjob worker starter |
+| `solomon-gateway-sentinel` | Spring Cloud Gateway + Sentinel | 网关限流、熔断、规则加载 | Spring Cloud Gateway、Sentinel |
+| `solomon-bot-notice` | 企业微信、钉钉、飞书机器人通知 | 告警、业务通知、异步通知 | Hutool HTTP、BouncyCastle |
+| `solomon-epc-coder` | GS1 EPC 编解码 | SGTIN/GIAI 编码、解析、反译 | solomon-utils |
+
+### 最小接入示例
+
+只接入基础 Web 能力:
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-common</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+接入对象存储:
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-s3</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+接入 Redis 多租户缓存:
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-redis</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+接入机器人通知:
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-bot-notice</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+## ⚙️ 配置项速查
+
+### 通用配置
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `i18n.language` | `zh` | 默认语言 |
+| `i18n.all-locale` | `zh` | 需要加载的语言列表，多个值用逗号分隔 |
+| `i18n.path` | 空 | 额外 i18n basename |
+| `i18n.is-scan-class` | `true` | 是否扫描 classpath 下的 `i18n/messages` |
+
+### 对象存储 `file`
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `file.choice` | 依代码默认值 | 存储类型，如 `MINIO`、`OSS`、`OBS`、`COS`、`S3` |
+| `file.endpoint` | 空 | 对象存储服务地址 |
+| `file.accessKey` | 空 | 访问密钥 |
+| `file.secretKey` | 空 | 私密密钥 |
+| `file.regionName` | 空 | 区域名称 |
+| `file.bucket-name` | 空 | 默认 bucket |
+| `file.root-directory` | 空 | 文件根目录前缀 |
+| `file.file-naming-method` | 依代码默认值 | 文件命名方式，如 `ORIGINAL`、`DATE`、`UUID`、`SNOWFLAKE` |
+| `file.part-size` | 依代码默认值 | 分片大小，单位 MB |
+| `file.path-style-access-enabled` | 依代码默认值 | 是否启用 path-style 访问 |
+
+### ClamAV `clamav`
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `clamav.enabled` | 依代码默认值 | 是否启用病毒扫描 |
+| `clamav.host` | 依代码默认值 | ClamAV 服务地址 |
+| `clamav.port` | 依代码默认值 | ClamAV 服务端口 |
+| `clamav.platform` | 依代码默认值 | ClamAV 平台类型 |
+
+### Redis
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `spring.redis.enabled` | `true` | 是否启用 Redis 自动配置 |
+| `spring.redis.mode` | 依代码默认值 | 租户模式 |
+| `spring.redis.multiple` | 空 | 多租户 Redis 配置列表 |
+| `spring.cache.mode` | 依代码默认值 | 缓存 key 处理模式 |
+
+### MongoDB
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `spring.data.mongodb.enabled` | `true` | 是否启用 MongoDB 自动配置 |
+| `spring.data.mongodb.mode` | 依代码默认值 | 租户模式 |
+| `spring.data.mongodb.multiple` | 空 | 多租户 MongoDB 配置列表 |
+
+### MQTT
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `mqtt.enabled` | `true` | 是否启用 MQTT 自动配置 |
+| `mqtt.mode` | 依代码默认值 | MQTT 租户模式 |
+| `mqtt.multiple` | 空 | 多 broker 配置列表 |
+
+### RabbitMQ
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `spring.rabbitmq.enabled` | `true` | 是否启用 RabbitMQ 自动声明与工具 |
+| `spring.rabbitmq.host` | Spring Boot 默认值 | RabbitMQ 地址 |
+| `spring.rabbitmq.port` | Spring Boot 默认值 | RabbitMQ 端口 |
+| `spring.rabbitmq.username` | Spring Boot 默认值 | 用户名 |
+| `spring.rabbitmq.password` | Spring Boot 默认值 | 密码 |
+
+### 任务调度
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `xxl.enabled` | 依代码默认值 | 是否启用 XXL-Job 任务创建 |
+| `xxl.admin-addresses` | 空 | XXL-Job Admin 地址 |
+| `xxl.access-token` | 空 | XXL-Job access token |
+| `powerjob.worker.enabled` | 依代码默认值 | 是否启用 PowerJob worker |
+| `powerjob.worker.server-address` | 空 | PowerJob 服务地址 |
+
+### 机器人通知
+
+| 配置项 | 默认值 | 说明 |
+|--------|--------|------|
+| `solomon.notice.enabled` | `true` | 是否启用通知模块 |
+| `solomon.notice.global-signature` | 依代码默认值 | 是否追加全局签名 |
+| `solomon.notice.signature` | 空 | 全局签名内容 |
+| `solomon.notice.wechat-work.webhook-url` | 空 | 企业微信机器人地址 |
+| `solomon.notice.wechat-work.secret` | 空 | 企业微信签名密钥 |
+| `solomon.notice.ding-talk.webhook-url` | 空 | 钉钉机器人地址 |
+| `solomon.notice.ding-talk.secret` | 空 | 钉钉签名密钥 |
+| `solomon.notice.feishu.webhook-url` | 空 | 飞书机器人地址 |
+| `solomon.notice.feishu.secret` | 空 | 飞书签名密钥 |
+
+## 🧩 版本兼容矩阵
+
+| 项目版本 | JDK | Spring Boot | Spring Cloud | Spring Cloud Alibaba | 说明 |
+|----------|-----|-------------|--------------|----------------------|------|
+| `1.0` | 21 | 3.4.4 | 2024.0.0 | 2023.0.3.2 | 当前主线版本 |
+
+构建和运行建议:
+
+- 使用 JDK 21。
+- 使用 Maven 3.9 或更高版本。
+- Spring Boot 2.x 项目不建议直接接入当前版本。
+- 如果业务项目仍在 Java 8/11/17，需要单独维护兼容分支。
+
+## 🧯 常见问题排查
+
+| 问题 | 常见原因 | 处理方式 |
+|------|----------|----------|
+| 启动时报 Bean 重复 | 业务项目和 starter 同时声明了同名 Bean | 优先使用业务自定义 Bean，starter 配置应配合 `@ConditionalOnMissingBean` |
+| 自动配置没有生效 | 未引入对应模块，或 `enabled=false` | 检查依赖和配置开关，确认 `AutoConfiguration.imports` 被打入 jar |
+| `ClamAvUtils` 缺失 | 未加载 `ClamAvConfig` 或依赖版本不完整 | 确认引入 `solomon-utils`，并检查 `clamav.enabled` 配置 |
+| 文件上传失败 | endpoint、region、accessKey、secretKey 或 bucket 配置错误 | 先用对象存储控制台验证账号，再检查 `file.*` 配置 |
+| Redis/Mongo 多租户切换失败 | tenantCode 未设置或租户连接未注册 | 检查请求头、`RequestHeaderHolder` 和 multiple 配置 |
+| ThreadLocal 数据串租户 | 业务线程池中未清理上下文 | 使用 `try/finally` 或 `TenantContext.trySetFactory` |
+| Controller 日志过大 | 请求/响应体较大或包含文件内容 | 生产环境建议限制日志长度并做敏感字段脱敏 |
+| 编译失败提示 Java 版本不匹配 | 本机 JDK 低于 21 | 安装并切换到 JDK 21 |
+
+## 🚢 发布与升级说明
+
+### 发布前检查
+
+1. 使用 JDK 21 执行完整构建。
+2. 清理所有模块下的 `target/` 目录，确认没有构建产物进入 Git。
+3. 执行单元测试和 starter 自动装配测试。
+4. 检查 README、配置项和版本号是否同步。
+5. 检查敏感信息，示例配置中不要提交真实 token、webhook、accessKey、secretKey。
+
+### 版本号建议
+
+建议使用语义化版本:
+
+- 主版本号: 不兼容 API 或配置变更。
+- 次版本号: 新增模块、新增功能、兼容性增强。
+- 修订号: Bug 修复、文档修复、小范围优化。
+
+示例:
+
+```text
+1.0.0  初始稳定版本
+1.1.0  新增模块或能力
+1.1.1  修复问题
+2.0.0  破坏性升级
+```
+
+### 升级检查清单
+
+| 检查项 | 说明 |
+|--------|------|
+| JDK 版本 | 当前版本要求 JDK 21 |
+| Spring Boot 版本 | 当前版本基于 Spring Boot 3.4.4 |
+| 自动配置入口 | Boot 3 优先使用 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` |
+| 配置项变更 | 升级前比对 `application.yml` 中的模块配置 |
+| 外部服务版本 | Redis、MongoDB、RabbitMQ、MQTT broker、对象存储服务需要单独验证 |
+| 敏感日志 | 升级后检查请求日志、任务日志、通知日志是否泄露密钥 |
+
+### 模块接入原则
+
+- 只引入实际使用的模块，避免把 MQ、S3、MongoDB 等重依赖全部带入业务服务。
+- Web 服务优先引入 `solomon-common`；非 Web 服务优先只引入 `solomon-utils` 或具体中间件模块。
+- 如果业务项目已经定义了 `ObjectMapper`、`RedisTemplate`、`RabbitTemplate` 等 Bean，starter 应让业务 Bean 优先生效。
+- 生产环境不要使用 README 中的示例密码、默认 token 和本地地址。
+
+---
+
 ## ⚠️ 注意事项
 
 ### ThreadLocal 使用警告

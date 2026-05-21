@@ -28,7 +28,6 @@ public class ConvertUpMoney {
     private static String toChinese(String str) {
         //判断输入的金额字符串是否符合要求
         if (ValidateUtils.isEmpty(str) || !str.matches("(-)?[\\d]*(.)?[\\d]*")) {
-            System.out.println("抱歉，请输入数字！");
             return str;
         }
 
@@ -62,14 +61,12 @@ public class ConvertUpMoney {
 
         //beyond超出计算能力，直接返回
         if (integerStr.length() > IUNIT.length) {
-            System.out.println(str + "：超出计算能力");
             return str;
         }
 
         int[] integers = toIntArray(integerStr);//整数部分数字
         //判断整数部分是否存在输入012的情况
         if (integers.length > 1 && integers[0] == 0) {
-            System.out.println("抱歉，请输入数字！");
             if (flag) {
                 str = "-" + str;
             }

@@ -90,10 +90,5 @@ public class UserAgentUtils {
     com.steven.solomon.utils.userAgent.entity.UserAgent userAgent = new UserAgentUtils().getUserAgentVO(
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
       );
-      System.out.println("系统以及版本:" + userAgent.getOsNameVersion());
-      System.out.println("型号:" + userAgent.getDevice());
-      System.out.println("设备厂商:"+userAgent.getDeviceBrand());
-      System.out.println("设备类型:"+userAgent.getDeviceType());
-      System.out.println("浏览器名称以及版本号:" + userAgent.getBrowserNameVersion());
   }
 }

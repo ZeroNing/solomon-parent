@@ -120,11 +120,6 @@ public class EpcCoderMainTest {
    * @param result GS1 译码结果
    */
   private static void printGs1(String title, Gs1BarcodeResult result) {
-    System.out.println("\n========== " + title + " ==========");
-    System.out.println("content=" + result.getContent());
-    System.out.println("AI 01=" + result.getAi01());
-    System.out.println("AI 21=" + result.getAi21());
-    System.out.println("AI 8004=" + result.getAi8004());
   }
 
   /**
@@ -134,17 +129,5 @@ public class EpcCoderMainTest {
    * @param result EPC 结果
    */
   private static void printEpc(String title, EpcResult result) {
-    System.out.println("\n========== " + title + " ==========");
-    System.out.println("type=" + result.getType());
-    System.out.println("bitLength=" + result.getBitLength());
-    System.out.println("hex=" + result.getHex());
-    System.out.println("uri=" + result.getUri());
-    System.out.println("AI 01=" + result.getAi01());
-    System.out.println("AI 21=" + result.getAi21());
-    System.out.println("AI 8004=" + result.getAi8004());
-    System.out.println("companyPrefix=" + result.getCompanyPrefix());
-    System.out.println("itemReference=" + result.getItemReference());
-    System.out.println("assetReference=" + result.getAssetReference());
-    System.out.println("serial=" + result.getSerial());
   }
 }

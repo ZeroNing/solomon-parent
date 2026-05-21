@@ -51,6 +51,6 @@ public class TestHandler2 extends AbstractJobConsumer {
                 dataMaps.add(map);
             }
         }
-        System.out.println(JSONUtil.toJsonStr(dataMaps.get(0)));
+
     }
 }

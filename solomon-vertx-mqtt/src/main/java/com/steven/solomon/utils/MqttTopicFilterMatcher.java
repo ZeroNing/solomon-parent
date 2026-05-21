@@ -139,14 +139,8 @@ public class MqttTopicFilterMatcher {
 
         // 场景1：获取第一个匹配的过滤器
         String firstMatch = findFirstMatchingFilter(topic, filters);
-        System.out.println("第一个匹配: " + firstMatch);
-        // 输出: sensor/+/temperature
-
         // 场景2：获取所有匹配的过滤器
         List<String> allMatches = findAllMatchingFilters(topic, filters);
-        System.out.println("所有匹配: " + allMatches);
-        // 输出: [sensor/+/temperature, sensor/room1/temperature, sensor/room1/+]
-
         // 验证纯文本主题匹配
         assert matches("sensor/room1/temperature", "sensor/room1/temperature"); // true
         assert !matches("sensor/room1/temp", "sensor/room1/temperature");     // false
