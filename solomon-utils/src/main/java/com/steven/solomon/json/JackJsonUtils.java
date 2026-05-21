@@ -1,12 +1,12 @@
 package com.steven.solomon.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
 import com.fasterxml.jackson.databind.type.CollectionType;
+import com.steven.solomon.json.config.JsonConfig;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
 
 import java.io.IOException;
@@ -19,17 +19,15 @@ public class JackJsonUtils {
 
     private static final Logger logger = LoggerUtils.logger(JackJsonUtils.class);
 
-    private static final ObjectMapper mapper = ValidateUtils.getOrDefault(SpringUtil.getBean(ObjectMapper.class),new ObjectMapper());
+    private static final ObjectMapper mapper = new JsonConfig().objectMapper();
 
     public static <T> T convertValue(Object obj, Class<T> clazz) {
         return convertValue(obj, clazz, false);
     }
 
     public static <T> T convertValue(Object obj, Class<T> clazz, boolean isIgnoreNull) {
-        if (isIgnoreNull) {
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        }
-        return mapper.convertValue(obj, clazz);
+        ObjectMapper targetMapper = isIgnoreNull ? mapper.copy().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false) : mapper;
+        return targetMapper.convertValue(obj, clazz);
     }
 
     /**
@@ -48,9 +46,9 @@ public class JackJsonUtils {
      */
     public static <T> List<T> conversionClassList(String json, Class<T> clazz) throws IOException {
         //忽略多余属性
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         CollectionType listType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
-        return mapper.readValue(json, listType);
+        ObjectReader reader = mapper.readerFor(listType).without(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        return reader.readValue(json);
     }
 
     /**

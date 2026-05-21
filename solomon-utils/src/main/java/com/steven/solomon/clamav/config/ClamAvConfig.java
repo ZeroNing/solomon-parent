@@ -22,6 +22,7 @@ public class ClamAvConfig {
     }
 
     @Bean
+    @ConditionalOnMissingBean(ClamAvUtils.class)
     public ClamAvUtils clamAvUtils() {
         ClamavClient client = null;
         if (clamAVProperties.getEnabled()) {

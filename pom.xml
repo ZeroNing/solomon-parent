@@ -72,7 +72,6 @@
         <module>test-solomon-powerjob</module>
         <module>test-solomon-bot-notice</module>
         <module>test-solomon-vertx-mqtt</module>
-        <module>test-solomon-vertx-mqtt</module>
         <module>test-solonmon-mica-mqtt</module>
       </modules>
     </profile>

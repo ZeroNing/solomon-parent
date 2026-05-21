@@ -13,8 +13,7 @@ gen
 /.project
 /.settings/
 /.springBeans
-/target/
-/.gitignore
+target/
+**/target/
 /user-profile-analysis.iml
-/.idea
 .DS_Store

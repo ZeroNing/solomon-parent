@@ -1,7 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.steven.solomon.utils.NoticeUtils,\
-com.steven.solomon.service.impl.DingTalkServiceImpl,\
-com.steven.solomon.service.impl.WechatWorkServiceImpl,\
-com.steven.solomon.service.impl.FeishuServiceImpl
+com.steven.solomon.config.NoticeAutoConfig
 
