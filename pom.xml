@@ -55,7 +55,7 @@
     <!-- 网关与通知模块 -->
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
-
+    <module>solomon-epc-coder</module>
   </modules>
 
   <profiles>

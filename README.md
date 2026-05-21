@@ -61,6 +61,7 @@ solomon-parent
 ├── solomon-powerjob                # PowerJob 模块：自动创建任务
 ├── solomon-gateway-sentinel        # Gateway 网关 + Sentinel 限流熔断
 ├── solomon-bot-notice              # 机器人通知模块：钉钉/微信机器人
+├── solomon-epc-coder               # GS1 EPC 编解码模块：SGTIN/GIAI 生成与反译
 └── test-*                          # 各模块的测试示例项目
 ```
 
@@ -725,6 +726,104 @@ noticeUtils.send(message);
 | VOICE（语音） | ✅ | ✅ | 🔄 | 发送语音消息 |
 | CARD（交互卡片） | ✅ | ✅ | 🔄 | 带按钮的卡片，支持点击跳转 |
 | FEED_CARD（Feed流卡片） | ❌ | ✅ | ❌ | 多图文消息，钉钉专属 |
+
+---
+
+### 1️⃣2️⃣ GS1 EPC 编解码 (solomon-epc-coder)
+
+`solomon-epc-coder` 用于 GS1 条码和 EPC RFID 标签编码之间的生成、译码和反译，适用于一般 RFID 贴标单品、物流单元（纸箱、栈板）以及资产、车辆等场景。
+
+**主要能力**：
+- 支持 `AI 01 + AI 21`，即 GTIN + 序列号，并且 `AI 01`、`AI 21` 独立字段传入和输出。
+- 支持 `SGTIN-96`、`SGTIN-198`。
+- 支持 `AI 8004`，即 GIAI 资产标识。
+- 支持 `GIAI-96`、`GIAI-202`。
+- 支持 EPC 十六进制自动识别类型并反译。
+- 使用 `BaseException` 统一报错，并支持 i18n 国际化错误信息。
+- 支持链式调用。
+
+**依赖引入**：
+```xml
+<dependency>
+    <groupId>com.steven</groupId>
+    <artifactId>solomon-epc-coder</artifactId>
+    <version>1.0</version>
+</dependency>
+```
+
+**SGTIN-96：AI 01 和 AI 21 分开传入**：
+```java
+EpcService epcService = new EpcService();
+
+EpcResult encodeResult = epcService.gs1()
+    .ai01("06901234567892")
+    .ai21("1234567890")
+    .companyPrefixLength(6)
+    .tagSize(96)
+    .encode();
+
+EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
+
+String ai01 = decodeResult.getAi01();
+String ai21 = decodeResult.getAi21();
+```
+
+**SGTIN-198：支持字母数字序列号**：
+```java
+EpcResult encodeResult = epcService.gs1()
+    .ai01("06901234567892")
+    .ai21("ABC123")
+    .companyPrefixLength(6)
+    .tagSize(198)
+    .encode();
+
+EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
+```
+
+**GIAI-96：AI 8004 数字资产标识**：
+```java
+EpcResult encodeResult = epcService.gs1()
+    .ai8004("690123123456")
+    .companyPrefixLength(6)
+    .tagSize(96)
+    .encode();
+
+EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
+
+String ai8004 = decodeResult.getAi8004();
+String assetReference = decodeResult.getAssetReference();
+```
+
+**GIAI-202：AI 8004 字母数字资产标识**：
+```java
+EpcResult encodeResult = epcService.gs1()
+    .ai8004("690123ASSET001")
+    .companyPrefixLength(6)
+    .tagSize(202)
+    .encode();
+
+EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
+```
+
+**GS1 条码译码**：
+```java
+Gs1BarcodeResult gs1Result = epcService.parseGs1Barcode("(01)06901234567892(21)ABC123");
+
+String ai01 = gs1Result.getAi01();
+String ai21 = gs1Result.getAi21();
+String ai8004 = gs1Result.getAi8004();
+```
+
+**main 方法测试**：
+```java
+com.steven.solomon.EpcCoderMainTest
+```
+
+该 main 方法覆盖以下类型的 GS1 译码、EPC 生成和 EPC 反译：
+- `SGTIN-96`
+- `SGTIN-198`
+- `GIAI-96`
+- `GIAI-202`
 
 ---
 
