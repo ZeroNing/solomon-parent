@@ -6,7 +6,11 @@ import com.steven.solomon.model.Gs1BarcodeResult;
 import com.steven.solomon.service.EpcService;
 
 /**
- * EPC 编解码 main 方法测试。
+ * EPC 编解码主方法测试类。
+ *
+ * <p>该类用于手动测试 SGTIN-96、SGTIN-198、GIAI-96、GIAI-202 的编码和解码功能。
+ *
+ * <p>注意：为了避免控制台输出，测试方法已移除 System.out.println，但保留了完整的测试逻辑。
  */
 public class EpcCoderMainTest {
 
@@ -114,7 +118,7 @@ public class EpcCoderMainTest {
   }
 
   /**
-   * 打印 GS1 译码结果。
+   * 打印 GS1 译码结果（方法保留，无控制台输出）。
    *
    * @param title 输出标题
    * @param result GS1 译码结果
@@ -123,7 +127,7 @@ public class EpcCoderMainTest {
   }
 
   /**
-   * 打印 EPC 编码或反译结果。
+   * 打印 EPC 编码或反译结果（方法保留，无控制台输出）。
    *
    * @param title 输出标题
    * @param result EPC 结果
