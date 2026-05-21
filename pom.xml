@@ -38,6 +38,7 @@
     <!-- 数据存储模块 -->
     <module>solomon-redis</module>
     <module>solomon-mongodb</module>
+    <module>solomon-dataSource</module>
 
     <!-- 消息队列模块 -->
     <module>solomon-mqtt</module>
@@ -92,6 +93,9 @@
 
     <!-- 数据库相关 -->
     <mysql.connector.version>9.2.0</mysql.connector.version>
+    <postgresql.version>42.7.4</postgresql.version>
+    <mssql-jdbc.version>12.8.1.jre11</mssql-jdbc.version>
+    <oracle.jdbc.version>23.5.0.24.07</oracle.jdbc.version>
     <druid.version>1.2.24</druid.version>
     <mybatis-plus.version>3.5.1</mybatis-plus.version>
     <hikaricp.version>6.3.0</hikaricp.version>
@@ -238,6 +242,21 @@
         <groupId>com.mysql</groupId>
         <artifactId>mysql-connector-j</artifactId>
         <version>${mysql.connector.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.microsoft.sqlserver</groupId>
+        <artifactId>mssql-jdbc</artifactId>
+        <version>${mssql-jdbc.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.oracle.database.jdbc</groupId>
+        <artifactId>ojdbc11</artifactId>
+        <version>${oracle.jdbc.version}</version>
       </dependency>
       <dependency>
         <groupId>com.alibaba</groupId>

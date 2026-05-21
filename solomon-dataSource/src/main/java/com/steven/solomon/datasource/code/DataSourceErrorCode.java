@@ -1,0 +1,27 @@
+package com.steven.solomon.datasource.code;
+
+import com.steven.solomon.code.BaseExceptionCode;
+
+/**
+ * 数据源模块错误码。
+ */
+public interface DataSourceErrorCode extends BaseExceptionCode {
+
+  /** 数据源配置不存在。 */
+  String DATA_SOURCE_CONFIG_NOT_FOUND = "DATASOURCE_CONFIG_NOT_FOUND";
+
+  /** 租户数据源不存在。 */
+  String DATA_SOURCE_NOT_FOUND = "DATASOURCE_NOT_FOUND";
+
+  /** 租户不存在。 */
+  String DATA_SOURCE_TENANT_NOT_FOUND = "DATASOURCE_TENANT_NOT_FOUND";
+
+  /** 数据源连接池类型不支持。 */
+  String DATA_SOURCE_POOL_NOT_SUPPORTED = "DATASOURCE_POOL_NOT_SUPPORTED";
+
+  /** 数据库类型不支持。 */
+  String DATA_SOURCE_DB_NOT_SUPPORTED = "DATASOURCE_DB_NOT_SUPPORTED";
+
+  /** 数据源初始化失败。 */
+  String DATA_SOURCE_INIT_FAILED = "DATASOURCE_INIT_FAILED";
+}

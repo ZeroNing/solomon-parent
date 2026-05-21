@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.datasource.config.DataSourceAutoConfiguration,\
+com.steven.solomon.datasource.aspect.DataSourceTenantAspect

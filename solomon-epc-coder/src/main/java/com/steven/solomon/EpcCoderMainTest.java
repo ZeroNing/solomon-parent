@@ -6,11 +6,7 @@ import com.steven.solomon.model.Gs1BarcodeResult;
 import com.steven.solomon.service.EpcService;
 
 /**
- * EPC 编解码主方法测试类。
- *
- * <p>该类用于手动测试 SGTIN-96、SGTIN-198、GIAI-96、GIAI-202 的编码和解码功能。
- *
- * <p>注意：为了避免控制台输出，测试方法已移除 System.out.println，但保留了完整的测试逻辑。
+ * EPC 编解码 main 方法测试。
  */
 public class EpcCoderMainTest {
 
@@ -40,11 +36,11 @@ public class EpcCoderMainTest {
     String ai21 = "1234567890";
     Gs1BarcodeResult gs1Result = epcService.parseGs1Barcode("(01)" + ai01 + "(21)" + ai21);
     EpcResult encodeResult = epcService.gs1()
-        .ai01(ai01)
-        .ai21(ai21)
-        .companyPrefixLength(6)
-        .tagSize(96)
-        .encode();
+            .ai01(ai01)
+            .ai21(ai21)
+            .companyPrefixLength(6)
+            .tagSize(96)
+            .encode();
     EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
 
     printGs1("SGTIN-96 GS1译码", gs1Result);
@@ -63,11 +59,11 @@ public class EpcCoderMainTest {
     String ai21 = "ABC123";
     Gs1BarcodeResult gs1Result = epcService.parseGs1Barcode("(01)" + ai01 + "(21)" + ai21);
     EpcResult encodeResult = epcService.gs1()
-        .ai01(ai01)
-        .ai21(ai21)
-        .companyPrefixLength(6)
-        .tagSize(198)
-        .encode();
+            .ai01(ai01)
+            .ai21(ai21)
+            .companyPrefixLength(6)
+            .tagSize(198)
+            .encode();
     EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
 
     printGs1("SGTIN-198 GS1译码", gs1Result);
@@ -85,10 +81,10 @@ public class EpcCoderMainTest {
     String ai8004 = "690123123456";
     Gs1BarcodeResult gs1Result = epcService.parseGs1Barcode("(8004)" + ai8004);
     EpcResult encodeResult = epcService.gs1()
-        .ai8004(ai8004)
-        .companyPrefixLength(6)
-        .tagSize(96)
-        .encode();
+            .ai8004(ai8004)
+            .companyPrefixLength(6)
+            .tagSize(96)
+            .encode();
     EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
 
     printGs1("GIAI-96 GS1译码", gs1Result);
@@ -106,10 +102,10 @@ public class EpcCoderMainTest {
     String ai8004 = "690123ASSET001";
     Gs1BarcodeResult gs1Result = epcService.parseGs1Barcode("(8004)" + ai8004);
     EpcResult encodeResult = epcService.gs1()
-        .ai8004(ai8004)
-        .companyPrefixLength(6)
-        .tagSize(202)
-        .encode();
+            .ai8004(ai8004)
+            .companyPrefixLength(6)
+            .tagSize(202)
+            .encode();
     EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
 
     printGs1("GIAI-202 GS1译码", gs1Result);
@@ -118,20 +114,37 @@ public class EpcCoderMainTest {
   }
 
   /**
-   * 打印 GS1 译码结果（方法保留，无控制台输出）。
+   * 打印 GS1 译码结果。
    *
    * @param title 输出标题
    * @param result GS1 译码结果
    */
   private static void printGs1(String title, Gs1BarcodeResult result) {
+    System.out.println("\n========== " + title + " ==========");
+    System.out.println("content=" + result.getContent());
+    System.out.println("AI 01=" + result.getAi01());
+    System.out.println("AI 21=" + result.getAi21());
+    System.out.println("AI 8004=" + result.getAi8004());
   }
 
   /**
-   * 打印 EPC 编码或反译结果（方法保留，无控制台输出）。
+   * 打印 EPC 编码或反译结果。
    *
    * @param title 输出标题
    * @param result EPC 结果
    */
   private static void printEpc(String title, EpcResult result) {
+    System.out.println("\n========== " + title + " ==========");
+    System.out.println("type=" + result.getType());
+    System.out.println("bitLength=" + result.getBitLength());
+    System.out.println("hex=" + result.getHex());
+    System.out.println("uri=" + result.getUri());
+    System.out.println("AI 01=" + result.getAi01());
+    System.out.println("AI 21=" + result.getAi21());
+    System.out.println("AI 8004=" + result.getAi8004());
+    System.out.println("companyPrefix=" + result.getCompanyPrefix());
+    System.out.println("itemReference=" + result.getItemReference());
+    System.out.println("assetReference=" + result.getAssetReference());
+    System.out.println("serial=" + result.getSerial());
   }
 }
