@@ -1,0 +1,5 @@
+com.steven.solomon.base.config.ToolPackageAutoConfiguration
+com.steven.solomon.base.config.SwaggerConfig
+com.steven.solomon.base.exception.ConstraintViolationExceptionHandler
+com.steven.solomon.base.exception.MethodArgumentNotValidExceptionHandler
+com.steven.solomon.base.exception.WebExchangeBindExceptionHandler
