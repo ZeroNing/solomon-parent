@@ -1,13 +1,14 @@
 package com.steven.solomon.datasource.config;
 
-import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.aspect.DataSourceTenantAspect;
+import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import com.steven.solomon.datasource.factory.DynamicDataSourceFactory;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties.SingleDataSourceProperties;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
 import com.steven.solomon.datasource.routing.DynamicRoutingDataSource;
+import com.steven.solomon.datasource.sql.SqlExecutor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -19,6 +20,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.CollectionUtils;
 
 /**
@@ -33,24 +35,69 @@ public class DataSourceAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(DataSourceAutoConfiguration.class);
 
+  /**
+   * 创建动态数据源工厂。
+   *
+   * @return 动态数据源工厂
+   */
   @Bean
   @ConditionalOnMissingBean
   public DynamicDataSourceFactory dynamicDataSourceFactory() {
     return new DynamicDataSourceFactory();
   }
 
+  /**
+   * 创建数据源租户上下文。
+   *
+   * @return 数据源租户上下文
+   */
   @Bean
   @ConditionalOnMissingBean
   public DataSourceTenantContext dataSourceTenantContext() {
     return new DataSourceTenantContext();
   }
 
+  /**
+   * 创建数据源租户切面。
+   *
+   * @param context 数据源租户上下文
+   * @param properties 动态数据源配置
+   * @return 数据源租户切面
+   */
   @Bean
   @ConditionalOnMissingBean
-  public DataSourceTenantAspect dataSourceTenantAspect(DataSourceTenantContext context) {
-    return new DataSourceTenantAspect(context);
+  public DataSourceTenantAspect dataSourceTenantAspect(
+      DataSourceTenantContext context,
+      SolomonDataSourceProperties properties) {
+    return new DataSourceTenantAspect(context, properties);
   }
 
+  /**
+   * 创建SQL执行器。
+   *
+   * @param jdbcTemplate Spring命名参数JDBC模板
+   * @param properties 动态数据源配置
+   * @param context 数据源租户上下文
+   * @return SQL执行器
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  public SqlExecutor sqlExecutor(
+      NamedParameterJdbcTemplate jdbcTemplate,
+      SolomonDataSourceProperties properties,
+      DataSourceTenantContext context) {
+    return new SqlExecutor(jdbcTemplate, properties, context);
+  }
+
+  /**
+   * 创建Spring主数据源。
+   *
+   * @param properties 动态数据源配置，包含所有租户数据源
+   * @param factory 数据源工厂，用于创建Hikari或Druid连接池
+   * @param context 数据源租户上下文，用于注册租户数据源
+   * @return 动态路由数据源
+   * @throws DataSourceException 配置缺失或数据源初始化失败时抛出
+   */
   @Bean
   @ConditionalOnMissingBean(DataSource.class)
   public DataSource dataSource(

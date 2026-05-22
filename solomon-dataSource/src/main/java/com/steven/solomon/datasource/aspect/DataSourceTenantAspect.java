@@ -1,10 +1,9 @@
 package com.steven.solomon.datasource.aspect;
 
-import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.datasource.properties.SolomonDataSourceProperties;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -15,7 +14,8 @@ import org.springframework.util.StringUtils;
 /**
  * 数据源租户切换AOP。
  *
- * <p>在常见数据库访问入口前，根据当前请求上下文中的租户编码切换数据源，执行完成后自动清理。</p>
+ * <p>在常见数据库访问入口和Repository仓储入口前，根据请求头中的租户编码切换数据源；
+ * 执行完成后自动清理线程上下文。</p>
  */
 @Aspect
 public class DataSourceTenantAspect {
@@ -24,26 +24,52 @@ public class DataSourceTenantAspect {
 
   private final DataSourceTenantContext context;
 
-  public DataSourceTenantAspect(DataSourceTenantContext context) {
+  private final SolomonDataSourceProperties properties;
+
+  /**
+   * 构造数据源租户切面。
+   *
+   * @param context 数据源租户上下文
+   * @param properties 动态数据源配置，用于读取默认租户
+   */
+  public DataSourceTenantAspect(
+      DataSourceTenantContext context,
+      SolomonDataSourceProperties properties) {
     this.context = context;
+    this.properties = properties;
   }
 
   @Pointcut("execution(* org.springframework.jdbc.core.JdbcTemplate.*(..)) || "
       + "execution(* org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.*(..)) || "
-      + "execution(* org.springframework.data.repository.Repository+.*(..)) || "
-      + "execution(* com.baomidou.mybatisplus.core.mapper.BaseMapper+.*(..))")
+      + "execution(* com.steven.solomon.datasource.sql.SqlExecutor.*(..)) || "
+      + "execution(* com.steven.solomon.datasource.sql.Repository+.*(..))")
   void dataSourcePointCut() {
   }
 
+  /**
+   * 在数据库访问入口周围切换租户数据源。
+   *
+   * @param point AOP连接点
+   * @return 原方法执行结果
+   * @throws Throwable 原方法执行异常或数据源切换异常
+   */
   @Around("dataSourcePointCut()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
-    String tenantCode = ValidateUtils.isNotEmpty(RequestHeaderHolder.getTenantCode()) ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
-    logger.info("[DataSource] AOP切换租户数据源: tenant={}", tenantCode);
+    String tenantCode = resolveTenantCode();
+    logger.info("[DataSource] AOP切换租户数据源 tenant={}", tenantCode);
     context.switchTenant(tenantCode);
     try {
       return point.proceed();
     } finally {
       context.removeFactory();
     }
+  }
+
+  private String resolveTenantCode() {
+    String tenantCode = RequestHeaderHolder.getTenantCode();
+    if (StringUtils.hasText(tenantCode)) {
+      return tenantCode;
+    }
+    return properties.getDefaultTenant();
   }
 }

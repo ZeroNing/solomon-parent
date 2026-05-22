@@ -29,6 +29,13 @@ import org.springframework.util.StringUtils;
  */
 public class DynamicDataSourceFactory {
 
+  /**
+   * 根据单租户配置创建数据源。
+   *
+   * @param properties 单租户数据源配置，包含连接池类型、数据库类型、JDBC地址和连接池参数
+   * @return Hikari或Druid数据源
+   * @throws DataSourceException 配置缺失、连接池类型不支持或数据库类型不支持时抛出
+   */
   public DataSource createDataSource(SingleDataSourceProperties properties) throws DataSourceException {
     if (properties == null) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_CONFIG_NOT_FOUND);

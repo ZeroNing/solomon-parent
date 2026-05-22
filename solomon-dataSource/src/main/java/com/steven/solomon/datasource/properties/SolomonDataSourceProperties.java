@@ -2,6 +2,7 @@ package com.steven.solomon.datasource.properties;
 
 import com.steven.solomon.datasource.enums.DataBaseTypeEnum;
 import com.steven.solomon.datasource.enums.DataSourcePoolTypeEnum;
+import com.steven.solomon.datasource.enums.SqlServerVersionEnum;
 import java.time.Duration;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -23,6 +24,9 @@ public class SolomonDataSourceProperties {
 
   /** 多租户数据源配置。 */
   private Map<String, SingleDataSourceProperties> tenants = new LinkedHashMap<>();
+
+  /** 分页配置，用于控制普通分页何时自动切换为深度分页。 */
+  private Page page = new Page();
 
   public boolean isEnabled() {
     return enabled;
@@ -48,6 +52,64 @@ public class SolomonDataSourceProperties {
     this.tenants = tenants;
   }
 
+  public Page getPage() {
+    return page;
+  }
+
+  public void setPage(Page page) {
+    this.page = page;
+  }
+
+  /**
+   * 分页配置。
+   */
+  public static class Page {
+
+    /** 是否自动把大页码分页切换为游标深度分页。 */
+    private boolean autoSeekEnabled = true;
+
+    /** 触发深度分页的最小页码，默认第500页开始。 */
+    private int seekPageNo = 500;
+
+    /** 触发深度分页的最小页大小，默认每页10条开始。 */
+    private int seekPageSize = 10;
+
+    /** 默认游标字段；调用方未传seekColumn时使用。 */
+    private String defaultSeekColumn = "id";
+
+    public boolean isAutoSeekEnabled() {
+      return autoSeekEnabled;
+    }
+
+    public void setAutoSeekEnabled(boolean autoSeekEnabled) {
+      this.autoSeekEnabled = autoSeekEnabled;
+    }
+
+    public int getSeekPageNo() {
+      return seekPageNo;
+    }
+
+    public void setSeekPageNo(int seekPageNo) {
+      this.seekPageNo = seekPageNo;
+    }
+
+    public int getSeekPageSize() {
+      return seekPageSize;
+    }
+
+    public void setSeekPageSize(int seekPageSize) {
+      this.seekPageSize = seekPageSize;
+    }
+
+    public String getDefaultSeekColumn() {
+      return defaultSeekColumn;
+    }
+
+    public void setDefaultSeekColumn(String defaultSeekColumn) {
+      this.defaultSeekColumn = defaultSeekColumn;
+    }
+  }
+
   /**
    * 单个数据源配置。
    */
@@ -58,6 +120,9 @@ public class SolomonDataSourceProperties {
 
     /** 数据库类型，用于补齐驱动类。 */
     private DataBaseTypeEnum databaseType = DataBaseTypeEnum.MYSQL;
+
+    /** SQL Server版本，仅databaseType为SQL_SERVER时生效。 */
+    private SqlServerVersionEnum sqlServerVersion = SqlServerVersionEnum.SQL_SERVER_2012;
 
     /** JDBC连接地址。 */
     private String url;
@@ -97,6 +162,14 @@ public class SolomonDataSourceProperties {
 
     public void setDatabaseType(DataBaseTypeEnum databaseType) {
       this.databaseType = databaseType;
+    }
+
+    public SqlServerVersionEnum getSqlServerVersion() {
+      return sqlServerVersion;
+    }
+
+    public void setSqlServerVersion(SqlServerVersionEnum sqlServerVersion) {
+      this.sqlServerVersion = sqlServerVersion;
     }
 
     public String getUrl() {

@@ -1,0 +1,257 @@
+package com.steven.solomon.datasource.sql;
+
+import com.steven.solomon.datasource.annotation.Column;
+import com.steven.solomon.datasource.annotation.PrimaryKey;
+import com.steven.solomon.datasource.annotation.Table;
+import com.steven.solomon.datasource.code.DataSourceErrorCode;
+import com.steven.solomon.datasource.exception.DataSourceException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import org.springframework.util.StringUtils;
+
+/**
+ * SQL元数据工具。
+ */
+public class SqlMetadataUtils {
+
+  private SqlMetadataUtils() {
+  }
+
+  /**
+   * 解析实体对应的表名。
+   *
+   * @param entityClass 实体类型，必须标注 {@link Table}
+   * @return 数据库表名
+   * @throws DataSourceException 未标注表注解时抛出
+   */
+  public static String tableName(Class<?> entityClass) throws DataSourceException {
+    Table table = entityClass.getAnnotation(Table.class);
+    if (table == null) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_TABLE_NOT_FOUND,
+          entityClass.getName());
+    }
+    if (StringUtils.hasText(table.value())) {
+      return SqlInjectionGuard.validateTableExpression(table.value(), "tableAnnotation");
+    }
+    if (StringUtils.hasText(table.name())) {
+      return SqlInjectionGuard.validateTableExpression(table.name(), "tableAnnotation");
+    }
+    return SqlInjectionGuard.validateTableExpression(entityClass.getSimpleName(),
+        "tableAnnotation");
+  }
+
+  /**
+   * 解析实体主键列名。
+   *
+   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上的 {@link Column#value()}，
+   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}。</p>
+   *
+   * @param entityClass 实体类型，必须存在 {@link PrimaryKey} 字段
+   * @return 数据库主键列名
+   * @throws DataSourceException 未找到主键注解时抛出
+   */
+  public static String primaryKeyName(Class<?> entityClass) throws DataSourceException {
+    return primaryKeyField(entityClass).getColumnName();
+  }
+
+  /**
+   * 解析实体主键字段元数据。
+   *
+   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上的 {@link Column#value()}，
+   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}。</p>
+   *
+   * @param entityClass 实体类型，必须存在 {@link PrimaryKey} 字段
+   * @return 主键字段映射信息
+   * @throws DataSourceException 未找到主键注解时抛出
+   */
+  public static ColumnField primaryKeyField(Class<?> entityClass) throws DataSourceException {
+    for (Field field : entityClass.getDeclaredFields()) {
+      PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
+      if (primaryKey == null) {
+        continue;
+      }
+      field.setAccessible(true);
+      return new ColumnField(field, resolveColumnName(field, field.getAnnotation(Column.class)),
+          true);
+    }
+    throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_PRIMARY_KEY_NOT_FOUND,
+        entityClass.getName());
+  }
+
+  /**
+   * 解析实体可插入字段。
+   *
+   * @param entityClass 实体类型
+   * @return 可插入字段映射列表
+   * @throws DataSourceException 未找到可插入字段时抛出
+   */
+  public static List<ColumnField> insertFields(Class<?> entityClass) throws DataSourceException {
+    List<ColumnField> fields = columnFields(entityClass, null, true);
+    if (fields.isEmpty()) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
+          entityClass.getName());
+    }
+    return fields;
+  }
+
+  /**
+   * 解析实体可更新字段。
+   *
+   * @param entityClass 实体类型
+   * @param includeFields 指定更新字段；支持Java字段名或数据库列名，空时返回所有可更新字段
+   * @return 可更新字段映射列表，不包含主键字段
+   * @throws DataSourceException 未找到可更新字段时抛出
+   */
+  public static List<ColumnField> updateFields(Class<?> entityClass, String... includeFields)
+      throws DataSourceException {
+    List<ColumnField> fields = columnFields(entityClass, includeFields, false);
+    if (fields.isEmpty()) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
+          entityClass.getName());
+    }
+    return fields;
+  }
+
+  private static List<ColumnField> columnFields(
+      Class<?> entityClass,
+      String[] includeFields,
+      boolean insert) throws DataSourceException {
+    Set<String> includeFieldSet = new HashSet<>();
+    if (includeFields != null) {
+      for (String field : includeFields) {
+        if (StringUtils.hasText(field)) {
+          includeFieldSet.add(field);
+        }
+      }
+    }
+
+    List<ColumnField> fields = new ArrayList<>();
+    for (Field field : entityClass.getDeclaredFields()) {
+      Column column = field.getAnnotation(Column.class);
+      PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
+      if (column == null && primaryKey == null) {
+        continue;
+      }
+      String columnName = resolveColumnName(field, column);
+      if (!insert && primaryKey != null) {
+        continue;
+      }
+      if (column != null && insert && !column.insertable()) {
+        continue;
+      }
+      if (column != null && !insert && !column.updatable()) {
+        continue;
+      }
+      if (!includeFieldSet.isEmpty()
+          && !includeFieldSet.contains(field.getName())
+          && !includeFieldSet.contains(columnName)) {
+        continue;
+      }
+      field.setAccessible(true);
+      fields.add(new ColumnField(field, columnName, primaryKey != null));
+    }
+    return fields;
+  }
+
+  private static String resolveColumnName(Field field, Column column) throws DataSourceException {
+    if (column != null && StringUtils.hasText(column.value())) {
+      return SqlInjectionGuard.validateQualifiedIdentifier(column.value(), "columnAnnotation");
+    }
+    return SqlInjectionGuard.validateQualifiedIdentifier(camelToUnderline(field.getName()),
+        "columnAnnotation");
+  }
+
+  private static String camelToUnderline(String value) {
+    if (!StringUtils.hasText(value)) {
+      return value;
+    }
+    StringBuilder builder = new StringBuilder(value.length() + 8);
+    for (int i = 0; i < value.length(); i++) {
+      char current = value.charAt(i);
+      if (Character.isUpperCase(current)) {
+        if (i > 0) {
+          builder.append('_');
+        }
+        builder.append(Character.toLowerCase(current));
+      } else {
+        builder.append(current);
+      }
+    }
+    return builder.toString();
+  }
+
+  /**
+   * 实体字段和数据库字段映射。
+   */
+  public static class ColumnField {
+
+    private final Field field;
+
+    private final String columnName;
+
+    private final boolean primaryKey;
+
+    /**
+     * 构造字段映射信息。
+     *
+     * @param field Java反射字段
+     * @param columnName 数据库列名
+     * @param primaryKey 是否主键字段
+     */
+    public ColumnField(Field field, String columnName, boolean primaryKey) {
+      this.field = field;
+      this.columnName = columnName;
+      this.primaryKey = primaryKey;
+    }
+
+    /**
+     * 获取Java反射字段。
+     *
+     * @return Java反射字段
+     */
+    public Field getField() {
+      return field;
+    }
+
+    /**
+     * 获取Java字段名。
+     *
+     * @return Java字段名
+     */
+    public String getFieldName() {
+      return field.getName();
+    }
+
+    /**
+     * 获取数据库列名。
+     *
+     * @return 数据库列名
+     */
+    public String getColumnName() {
+      return columnName;
+    }
+
+    /**
+     * 判断是否主键字段。
+     *
+     * @return true表示主键字段
+     */
+    public boolean isPrimaryKey() {
+      return primaryKey;
+    }
+
+    /**
+     * 从目标对象读取字段值。
+     *
+     * @param target 目标实体对象
+     * @return 字段值
+     * @throws IllegalAccessException 反射读取失败时抛出
+     */
+    public Object getValue(Object target) throws IllegalAccessException {
+      return field.get(target);
+    }
+  }
+}

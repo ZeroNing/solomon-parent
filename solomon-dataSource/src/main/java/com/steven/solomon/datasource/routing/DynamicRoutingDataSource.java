@@ -12,15 +12,30 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
 
   private final DataSourceTenantContext tenantContext;
 
+  /**
+   * 构造动态路由数据源。
+   *
+   * @param tenantContext 数据源租户上下文，用于获取当前线程绑定的数据源
+   */
   public DynamicRoutingDataSource(DataSourceTenantContext tenantContext) {
     this.tenantContext = tenantContext;
   }
 
+  /**
+   * 获取当前路由键。
+   *
+   * @return 当前租户编码；未切换时返回unknown
+   */
   @Override
   protected Object determineCurrentLookupKey() {
     return tenantContext.getCurrentTenantId();
   }
 
+  /**
+   * 获取当前线程实际使用的数据源。
+   *
+   * @return 当前线程绑定的数据源；未绑定时返回默认数据源
+   */
   @Override
   protected DataSource determineTargetDataSource() {
     DataSource dataSource = tenantContext.getFactory();
