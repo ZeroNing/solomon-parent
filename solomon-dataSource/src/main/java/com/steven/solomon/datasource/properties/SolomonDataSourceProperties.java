@@ -28,6 +28,9 @@ public class SolomonDataSourceProperties {
   /** 分页配置，用于控制普通分页何时自动切换为深度分页。 */
   private Page page = new Page();
 
+  /** SQL脚本执行配置，用于控制脚本执行记录表。 */
+  private Script script = new Script();
+
   public boolean isEnabled() {
     return enabled;
   }
@@ -58,6 +61,31 @@ public class SolomonDataSourceProperties {
 
   public void setPage(Page page) {
     this.page = page;
+  }
+
+  public Script getScript() {
+    return script;
+  }
+
+  public void setScript(Script script) {
+    this.script = script;
+  }
+
+  /**
+   * SQL脚本执行配置。
+   */
+  public static class Script {
+
+    /** 脚本执行记录表名，每个租户库中会各自维护一张。 */
+    private String recordTable = "solomon_sql_script_record";
+
+    public String getRecordTable() {
+      return recordTable;
+    }
+
+    public void setRecordTable(String recordTable) {
+      this.recordTable = recordTable;
+    }
   }
 
   /**

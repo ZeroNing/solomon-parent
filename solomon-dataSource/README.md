@@ -268,3 +268,57 @@ solomon:
 ```bash
 mvn -Ptest-modules -pl test-solomon-datasource -am -DskipTests compile
 ```
+
+## SQL脚本执行工具
+
+`SqlScriptExecutor` 会跟随当前租户数据源执行 SQL，并在租户库中自动创建脚本记录表，默认表名为
+`solomon_sql_script_record`。同一个 `scriptCode` 已经执行过时会自动跳过；如果 `scriptCode`
+相同但脚本内容的 SHA-256 校验值发生变化，会抛出 `DataSourceException`，避免重复或误执行升级脚本。
+
+```yaml
+solomon:
+  datasource:
+    script:
+      record-table: solomon_sql_script_record
+```
+
+```java
+@Service
+public class DbUpgradeService {
+
+  private final SqlScriptExecutor sqlScriptExecutor;
+
+  public DbUpgradeService(SqlScriptExecutor sqlScriptExecutor) {
+    this.sqlScriptExecutor = sqlScriptExecutor;
+  }
+
+  public void upgrade() {
+    sqlScriptExecutor.execute(
+        "V20260522_001_create_user",
+        """
+        CREATE TABLE sys_user (
+          id BIGINT PRIMARY KEY,
+          user_name VARCHAR(100) NOT NULL
+        );
+        INSERT INTO sys_user(id, user_name) VALUES (1, 'admin');
+        """);
+  }
+
+  public void upgradeTenant(String tenantCode) {
+    sqlScriptExecutor.executeForTenant(
+        tenantCode,
+        "V20260522_002_add_user_status",
+        "ALTER TABLE sys_user ADD status INT");
+  }
+}
+```
+
+也可以执行 classpath 资源：
+
+```java
+sqlScriptExecutor.executeResource(
+    "V20260522_003_init_menu",
+    new ClassPathResource("db/V20260522_003_init_menu.sql"),
+    "初始化菜单",
+    "初始化系统菜单数据");
+```

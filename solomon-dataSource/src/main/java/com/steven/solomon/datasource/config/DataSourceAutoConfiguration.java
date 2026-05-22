@@ -11,6 +11,7 @@ import com.steven.solomon.datasource.routing.DynamicRoutingDataSource;
 import com.steven.solomon.datasource.sql.SqlExecutor;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterCustomizer;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterRegistry;
+import com.steven.solomon.datasource.sql.script.SqlScriptExecutor;
 import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -114,6 +115,23 @@ public class DataSourceAutoConfiguration {
       DataSourceTenantContext context,
       SqlTypeConverterRegistry converterRegistry) {
     return new SqlExecutor(jdbcTemplate, properties, context, converterRegistry);
+  }
+
+  /**
+   * 创建SQL脚本执行工具。
+   *
+   * @param jdbcTemplate Spring命名参数JDBC模板
+   * @param properties 动态数据源配置
+   * @param context 数据源租户上下文
+   * @return SQL脚本执行工具
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  public SqlScriptExecutor sqlScriptExecutor(
+      NamedParameterJdbcTemplate jdbcTemplate,
+      SolomonDataSourceProperties properties,
+      DataSourceTenantContext context) {
+    return new SqlScriptExecutor(jdbcTemplate, properties, context);
   }
 
   /**
