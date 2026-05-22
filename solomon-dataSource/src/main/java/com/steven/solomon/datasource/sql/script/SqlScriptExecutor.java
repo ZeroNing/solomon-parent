@@ -92,7 +92,14 @@ public class SqlScriptExecutor {
         StringUtils.hasText(scriptName) ? scriptName : scriptCode,
         "fileName");
     String normalizedScriptText = requireText(scriptText, "scriptText");
-    String fileMd5 = md5(normalizedScriptText);
+    String fileMd5 = md5(normalizedScriptText.getBytes(StandardCharsets.UTF_8));
+    return executeInternal(fileName, normalizedScriptText, fileMd5);
+  }
+
+  private SqlScriptExecuteResult executeInternal(
+      String fileName,
+      String normalizedScriptText,
+      String fileMd5) throws DataSourceException {
     long startTime = System.currentTimeMillis();
     ensureScriptTable();
     ScriptRecord record = findRecordByMd5(fileMd5);
@@ -198,8 +205,12 @@ public class SqlScriptExecutor {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SCRIPT_EMPTY, "resource");
     }
     try {
-      return execute(scriptCode, resource.getContentAsString(StandardCharsets.UTF_8), scriptName,
-          description);
+      byte[] content = resource.getContentAsByteArray();
+      String fileName = requireText(
+          StringUtils.hasText(scriptName) ? scriptName : scriptCode,
+          "fileName");
+      String scriptText = requireText(new String(content, StandardCharsets.UTF_8), "scriptText");
+      return executeInternal(fileName, scriptText, md5(content));
     } catch (DataSourceException e) {
       throw e;
     } catch (Exception e) {
@@ -249,24 +260,24 @@ public class SqlScriptExecutor {
     return Boolean.TRUE.equals(jdbcTemplate.getJdbcOperations().execute(
         (ConnectionCallback<Boolean>) connection -> {
           DatabaseMetaData metaData = connection.getMetaData();
-          String upperTableName = tableName.toUpperCase(Locale.ROOT);
-          String lowerTableName = tableName.toLowerCase(Locale.ROOT);
-          try (ResultSet rs = metaData.getTables(connection.getCatalog(), null, tableName, null)) {
-            if (rs.next()) {
-              return true;
-            }
-          }
-          try (ResultSet rs = metaData.getTables(connection.getCatalog(), null, upperTableName,
-              null)) {
-            if (rs.next()) {
-              return true;
-            }
-          }
-          try (ResultSet rs = metaData.getTables(connection.getCatalog(), null, lowerTableName,
-              null)) {
-            return rs.next();
-          }
+          TableNameParts tableNameParts = parseTableNameParts(tableName, null);
+          return tableExists(metaData, connection.getCatalog(), tableNameParts.schema(),
+              tableNameParts.table())
+              || tableExists(metaData, connection.getCatalog(), upper(tableNameParts.schema()),
+              upper(tableNameParts.table()))
+              || tableExists(metaData, connection.getCatalog(), lower(tableNameParts.schema()),
+              lower(tableNameParts.table()));
         }));
+  }
+
+  private boolean tableExists(
+      DatabaseMetaData metaData,
+      String catalog,
+      String schema,
+      String table) throws java.sql.SQLException {
+    try (ResultSet rs = metaData.getTables(catalog, schema, table, null)) {
+      return rs.next();
+    }
   }
 
   private String createTableSql(String tableName) {
@@ -277,13 +288,12 @@ public class SqlScriptExecutor {
           + "create_time TIMESTAMP NOT NULL, "
           + "update_time TIMESTAMP NOT NULL, "
           + "file_name VARCHAR2(255) NOT NULL, "
-          + "file_md5 VARCHAR2(32) NOT NULL, "
+          + "file_md5 VARCHAR2(32) NOT NULL UNIQUE, "
           + "success NUMBER(1) NOT NULL, "
           + "fail_reason CLOB, "
           + "tenant_code VARCHAR2(100), "
           + "statement_count NUMBER(10), "
-          + "execution_time_ms NUMBER(19), "
-          + "CONSTRAINT uk_" + tableName + "_md5 UNIQUE (file_md5)"
+          + "execution_time_ms NUMBER(19)"
           + ")";
     }
     if (databaseType == DataBaseTypeEnum.SQL_SERVER) {
@@ -334,21 +344,42 @@ public class SqlScriptExecutor {
     if (databaseType == DataBaseTypeEnum.POSTGRESQL || databaseType == DataBaseTypeEnum.ORACLE) {
       for (Map.Entry<String, String> entry : comments.entrySet()) {
         sqlList.add("COMMENT ON COLUMN " + tableName + "." + entry.getKey() + " IS '"
-            + entry.getValue() + "'");
+            + escapeSqlLiteral(entry.getValue()) + "'");
       }
       return sqlList;
     }
     if (databaseType == DataBaseTypeEnum.SQL_SERVER) {
+      TableNameParts tableNameParts = parseTableNameParts(tableName, "dbo");
       for (Map.Entry<String, String> entry : comments.entrySet()) {
         sqlList.add("EXEC sp_addextendedproperty "
             + "@name=N'MS_Description', "
-            + "@value=N'" + entry.getValue() + "', "
-            + "@level0type=N'SCHEMA', @level0name=N'dbo', "
-            + "@level1type=N'TABLE', @level1name=N'" + tableName + "', "
-            + "@level2type=N'COLUMN', @level2name=N'" + entry.getKey() + "'");
+            + "@value=N'" + escapeSqlLiteral(entry.getValue()) + "', "
+            + "@level0type=N'SCHEMA', @level0name=N'" + escapeSqlLiteral(tableNameParts.schema()) + "', "
+            + "@level1type=N'TABLE', @level1name=N'" + escapeSqlLiteral(tableNameParts.table()) + "', "
+            + "@level2type=N'COLUMN', @level2name=N'" + escapeSqlLiteral(entry.getKey()) + "'");
       }
     }
     return sqlList;
+  }
+
+  private TableNameParts parseTableNameParts(String tableName, String defaultSchema) {
+    if (tableName.contains(".")) {
+      int index = tableName.lastIndexOf('.');
+      return new TableNameParts(tableName.substring(0, index), tableName.substring(index + 1));
+    }
+    return new TableNameParts(defaultSchema, tableName);
+  }
+
+  private String upper(String value) {
+    return value == null ? null : value.toUpperCase(Locale.ROOT);
+  }
+
+  private String lower(String value) {
+    return value == null ? null : value.toLowerCase(Locale.ROOT);
+  }
+
+  private String escapeSqlLiteral(String value) {
+    return value == null ? "" : value.replace("'", "''");
   }
 
   private Map<String, String> scriptRecordColumnComments() {
@@ -374,10 +405,21 @@ public class SqlScriptExecutor {
           Map.of("fileMd5", fileMd5),
           (rs, rowNum) -> new ScriptRecord(
               rs.getLong("id"),
-              Boolean.TRUE.equals(rs.getObject("success")) || rs.getInt("success") == 1));
+              parseSuccess(rs.getObject("success"))));
     } catch (EmptyResultDataAccessException e) {
       return null;
     }
+  }
+
+  private boolean parseSuccess(Object value) {
+    if (value instanceof Boolean booleanValue) {
+      return booleanValue;
+    }
+    if (value instanceof Number numberValue) {
+      return numberValue.intValue() == 1;
+    }
+    return "true".equalsIgnoreCase(String.valueOf(value))
+        || "1".equals(String.valueOf(value));
   }
 
   private void saveScriptRecord(
@@ -452,10 +494,10 @@ public class SqlScriptExecutor {
     return value.trim();
   }
 
-  private String md5(String scriptText) throws DataSourceException {
+  private String md5(byte[] content) throws DataSourceException {
     try {
       MessageDigest digest = MessageDigest.getInstance("MD5");
-      byte[] bytes = digest.digest(scriptText.getBytes(StandardCharsets.UTF_8));
+      byte[] bytes = digest.digest(content);
       StringBuilder builder = new StringBuilder(bytes.length * 2);
       for (byte value : bytes) {
         builder.append(String.format("%02x", value));
@@ -482,6 +524,9 @@ public class SqlScriptExecutor {
   }
 
   private record ScriptRecord(long id, boolean success) {
+  }
+
+  private record TableNameParts(String schema, String table) {
   }
 
   private List<String> splitStatements(String scriptText) {
