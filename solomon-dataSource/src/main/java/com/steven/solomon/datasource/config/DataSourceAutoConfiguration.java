@@ -4,6 +4,7 @@ import com.steven.solomon.datasource.aspect.DataSourceTenantAspect;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import com.steven.solomon.datasource.factory.DynamicDataSourceFactory;
+import com.steven.solomon.datasource.manager.DataSourceTenantManager;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties.SingleDataSourceProperties;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
@@ -132,6 +133,23 @@ public class DataSourceAutoConfiguration {
       SolomonDataSourceProperties properties,
       DataSourceTenantContext context) {
     return new SqlScriptExecutor(jdbcTemplate, properties, context);
+  }
+
+  /**
+   * 创建数据源租户运行时管理器。
+   *
+   * @param properties 动态数据源配置
+   * @param factory 数据源工厂
+   * @param context 数据源租户上下文
+   * @return 数据源租户运行时管理器
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  public DataSourceTenantManager dataSourceTenantManager(
+      SolomonDataSourceProperties properties,
+      DynamicDataSourceFactory factory,
+      DataSourceTenantContext context) {
+    return new DataSourceTenantManager(properties, factory, context);
   }
 
   /**

@@ -322,3 +322,49 @@ sqlScriptExecutor.executeResource(
     "初始化菜单",
     "初始化系统菜单数据");
 ```
+
+## 不重启新增或更新租户
+
+`DataSourceTenantManager` 支持在服务运行中新增、更新或删除租户数据源。新增成功后，后续通过
+租户编码切换数据源即可命中新连接池，不需要重启服务。
+
+```java
+@Service
+public class TenantOpenService {
+
+  private final DataSourceTenantManager dataSourceTenantManager;
+
+  public TenantOpenService(DataSourceTenantManager dataSourceTenantManager) {
+    this.dataSourceTenantManager = dataSourceTenantManager;
+  }
+
+  public void openTenant() {
+    SingleDataSourceProperties properties = new SingleDataSourceProperties();
+    properties.setDatabaseType(DataBaseTypeEnum.MYSQL);
+    properties.setPoolType(DataSourcePoolTypeEnum.HIKARI);
+    properties.setUrl("jdbc:mysql://127.0.0.1:3306/order_tenant_001");
+    properties.setUsername("root");
+    properties.setPassword("root");
+
+    dataSourceTenantManager.addTenant("tenant001", properties);
+  }
+
+  public void refreshTenant() {
+    SingleDataSourceProperties properties = new SingleDataSourceProperties();
+    properties.setDatabaseType(DataBaseTypeEnum.MYSQL);
+    properties.setPoolType(DataSourcePoolTypeEnum.DRUID);
+    properties.setUrl("jdbc:mysql://127.0.0.1:3306/order_tenant_001_new");
+    properties.setUsername("root");
+    properties.setPassword("root");
+
+    dataSourceTenantManager.addOrUpdateTenant("tenant001", properties);
+  }
+}
+```
+
+推荐流程：
+
+1. 新租户配置先写入配置中心或租户配置表。
+2. 当前微服务收到租户新增事件。
+3. 调用 `dataSourceTenantManager.addTenant(...)` 或 `addOrUpdateTenant(...)` 刷新本进程数据源。
+4. 后续请求带租户编码，AOP 切换即可使用新租户库。

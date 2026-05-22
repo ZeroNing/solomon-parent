@@ -51,4 +51,7 @@ public interface DataSourceErrorCode extends BaseExceptionCode {
 
   /** SQL脚本执行失败。 */
   String DATA_SOURCE_SCRIPT_EXECUTE_FAILED = "DATASOURCE_SCRIPT_EXECUTE_FAILED";
+
+  /** 租户数据源已经存在。 */
+  String DATA_SOURCE_TENANT_ALREADY_EXISTS = "DATASOURCE_TENANT_ALREADY_EXISTS";
 }
