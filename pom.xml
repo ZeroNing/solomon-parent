@@ -64,6 +64,7 @@
     <profile>
       <id>test-modules</id>
       <modules>
+        <module>test-solomon-datasource</module>
         <module>test-solomon-mongo</module>
         <module>test-solomon-mqtt</module>
         <module>test-solomon-mqtt5</module>

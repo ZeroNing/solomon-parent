@@ -6,16 +6,19 @@ import com.steven.solomon.datasource.exception.DataSourceException;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties.SingleDataSourceProperties;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
+import com.steven.solomon.datasource.sql.converter.SqlResultRowMapper;
+import com.steven.solomon.datasource.sql.converter.SqlTypeConverterRegistry;
 import com.steven.solomon.datasource.sql.dialect.SqlDialect;
 import com.steven.solomon.datasource.sql.param.DataSourcePageParam;
 import com.steven.solomon.datasource.sql.result.PageResult;
 import java.math.BigDecimal;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.util.StringUtils;
@@ -34,6 +37,8 @@ public class SqlExecutor {
 
   private final DataSourceTenantContext context;
 
+  private final SqlTypeConverterRegistry converterRegistry;
+
   /**
    * 构造SQL执行器。
    *
@@ -45,9 +50,28 @@ public class SqlExecutor {
       NamedParameterJdbcTemplate jdbcTemplate,
       SolomonDataSourceProperties properties,
       DataSourceTenantContext context) {
+    this(jdbcTemplate, properties, context, SqlTypeConverterRegistry.defaultRegistry());
+  }
+
+  /**
+   * 构造SQL执行器。
+   *
+   * @param jdbcTemplate Spring命名参数JDBC模板，用于执行SQL和绑定命名参数
+   * @param properties 动态数据源配置，用于解析当前租户的数据库类型和SQL方言
+   * @param context 数据源租户上下文，用于获取当前线程中的租户编码
+   * @param converterRegistry SQL类型转换器注册器，用于查询结果和写入参数转换
+   */
+  public SqlExecutor(
+      NamedParameterJdbcTemplate jdbcTemplate,
+      SolomonDataSourceProperties properties,
+      DataSourceTenantContext context,
+      SqlTypeConverterRegistry converterRegistry) {
     this.jdbcTemplate = jdbcTemplate;
     this.properties = properties;
     this.context = context;
+    this.converterRegistry = converterRegistry == null
+        ? SqlTypeConverterRegistry.defaultRegistry()
+        : converterRegistry;
   }
 
   /**
@@ -59,7 +83,7 @@ public class SqlExecutor {
    */
   public int update(Sql sql) throws DataSourceException {
     try {
-      return jdbcTemplate.update(sql.getText(), sql.getParams());
+      return jdbcTemplate.update(sql.getText(), convertParams(sql.getParams()));
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e,
           sql.getText());
@@ -77,7 +101,7 @@ public class SqlExecutor {
   public int[] batchUpdate(String sql, Map<String, ?>[] params) throws DataSourceException {
     try {
       SqlInjectionGuard.validateRawSql(sql, "batchUpdate");
-      return jdbcTemplate.batchUpdate(sql, params);
+      return jdbcTemplate.batchUpdate(sql, convertBatchParams(params));
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e, sql);
     }
@@ -93,7 +117,16 @@ public class SqlExecutor {
    * @throws DataSourceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> List<T> query(Sql sql, Class<T> resultType) throws DataSourceException {
-    return query(sql, BeanPropertyRowMapper.newInstance(resultType));
+    if (converterRegistry.isSimpleValueType(resultType)) {
+      return query(sql, (rs, rowNum) -> {
+        try {
+          return converterRegistry.convertForJava(rs.getObject(1), resultType);
+        } catch (DataSourceException e) {
+          throw new SQLException(e);
+        }
+      });
+    }
+    return query(sql, SqlResultRowMapper.of(resultType, converterRegistry));
   }
 
   /**
@@ -107,7 +140,7 @@ public class SqlExecutor {
    */
   public <T> List<T> query(Sql sql, RowMapper<T> rowMapper) throws DataSourceException {
     try {
-      return jdbcTemplate.query(sql.getText(), sql.getParams(), rowMapper);
+      return jdbcTemplate.query(sql.getText(), convertParams(sql.getParams()), rowMapper);
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e,
           sql.getText());
@@ -123,7 +156,7 @@ public class SqlExecutor {
    */
   public List<Map<String, Object>> queryForList(Sql sql) throws DataSourceException {
     try {
-      return jdbcTemplate.queryForList(sql.getText(), sql.getParams());
+      return jdbcTemplate.queryForList(sql.getText(), convertParams(sql.getParams()));
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e,
           sql.getText());
@@ -141,7 +174,8 @@ public class SqlExecutor {
    */
   public <T> T queryForObject(Sql sql, Class<T> resultType) throws DataSourceException {
     try {
-      return jdbcTemplate.queryForObject(sql.getText(), sql.getParams(), resultType);
+      List<T> records = query(sql, resultType);
+      return records.isEmpty() ? null : records.get(0);
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e,
           sql.getText());
@@ -475,6 +509,41 @@ public class SqlExecutor {
    */
   public BigDecimal avg(Sql sql, String columnName) throws DataSourceException {
     return aggregate(sql, "AVG", columnName, BigDecimal.class);
+  }
+
+  /**
+   * 转换命名SQL参数。
+   *
+   * @param params 原始命名参数，key为参数名，value为Java参数值
+   * @return 转换后的JDBC参数，LocalDateTime、Date、枚举、集合等会被统一处理
+   */
+  private Map<String, Object> convertParams(Map<String, ?> params) {
+    Map<String, Object> converted = new LinkedHashMap<>();
+    if (params == null || params.isEmpty()) {
+      return converted;
+    }
+    for (Map.Entry<String, ?> entry : params.entrySet()) {
+      converted.put(entry.getKey(), converterRegistry.convertForJdbc(entry.getValue()));
+    }
+    return converted;
+  }
+
+  /**
+   * 转换批量SQL参数。
+   *
+   * @param params 原始批量参数数组，每个Map对应一次SQL执行
+   * @return 转换后的批量参数数组
+   */
+  @SuppressWarnings("unchecked")
+  private Map<String, ?>[] convertBatchParams(Map<String, ?>[] params) {
+    if (params == null || params.length == 0) {
+      return new Map[0];
+    }
+    Map<String, ?>[] converted = new Map[params.length];
+    for (int i = 0; i < params.length; i++) {
+      converted[i] = convertParams(params[i]);
+    }
+    return converted;
   }
 
   private DataBaseTypeEnum resolveDatabaseType(SingleDataSourceProperties tenantProperties) {

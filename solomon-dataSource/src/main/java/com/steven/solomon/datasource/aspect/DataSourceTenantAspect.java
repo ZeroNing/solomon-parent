@@ -39,9 +39,7 @@ public class DataSourceTenantAspect {
     this.properties = properties;
   }
 
-  @Pointcut("execution(* org.springframework.jdbc.core.JdbcTemplate.*(..)) || "
-      + "execution(* org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate.*(..)) || "
-      + "execution(* com.steven.solomon.datasource.sql.SqlExecutor.*(..)) || "
+  @Pointcut("execution(* com.steven.solomon.datasource.sql.SqlExecutor.*(..)) || "
       + "execution(* com.steven.solomon.datasource.sql.Repository+.*(..))")
   void dataSourcePointCut() {
   }
@@ -66,7 +64,12 @@ public class DataSourceTenantAspect {
   }
 
   private String resolveTenantCode() {
-    String tenantCode = RequestHeaderHolder.getTenantCode();
+    String tenantCode = "";
+    try {
+      tenantCode = RequestHeaderHolder.getTenantCode();
+    } catch (Exception e) {
+      logger.debug("[DataSource] 读取请求头租户编码失败，使用默认租户", e);
+    }
     if (StringUtils.hasText(tenantCode)) {
       return tenantCode;
     }

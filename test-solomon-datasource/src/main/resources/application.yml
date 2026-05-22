@@ -1,0 +1,64 @@
+i18n:
+  all-locale: zh,en
+  language: zh
+  path: i18n/messages
+server:
+  port: 8001
+doc:
+  title: datasource测试用例
+  enabled: true
+  globalRequestParameters:
+    - name: token
+      in: HEADER
+      description: 用户认证令牌
+      required: true
+      deprecated: false
+      hidden: false
+spring:
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jmx:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  rabbitmq:
+    username: guest
+    password: guest
+    host: localhost
+    port: 5672
+    auto-delete-queue: false #是否自动删除队列以及交换机
+    enabled: false
+
+solomon:
+  datasource:
+    enabled: true
+    default-tenant: default
+    page:
+      auto-seek-enabled: true
+      seek-page-no: 100
+      seek-page-size: 100
+      default-seek-column: id
+    tenants:
+      default:
+        pool-type: HIKARI
+        database-type: MYSQL
+        url:
+        username:
+        password:
+        hikari:
+          maximum-pool-size: 5
+          minimum-idle: 1
+          pool-name: test-solomon-datasource
+      test:
+        pool-type: HIKARI
+        database-type: MYSQL
+        url:
+        username:
+        password:
+        hikari:
+          maximum-pool-size: 5
+          minimum-idle: 1
+          pool-name: test-solomon-datasource

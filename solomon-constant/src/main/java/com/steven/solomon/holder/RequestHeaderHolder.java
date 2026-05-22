@@ -11,7 +11,7 @@ public class RequestHeaderHolder {
    */
   public static String getTimeZone() {
     String serverTimeZone = THREAD_LOCAL.get().getTimezone();
-    if (serverTimeZone.isEmpty()) {
+    if (serverTimeZone == null || serverTimeZone.isEmpty()) {
       serverTimeZone = ZoneId.systemDefault().getId();
     }
     try {
@@ -31,7 +31,7 @@ public class RequestHeaderHolder {
    */
   public static String getTenantId() {
     RequestHeader header = THREAD_LOCAL.get();
-    if (header != null && !header.getTenantId().isEmpty()) {
+    if (header != null && header.getTenantId() != null && !header.getTenantId().isEmpty()) {
       return header.getTenantId();
     }
     return "";
@@ -42,7 +42,7 @@ public class RequestHeaderHolder {
    */
   public static String getTenantCode() {
     RequestHeader header = THREAD_LOCAL.get();
-    if (header != null && !header.getTenantCode().isEmpty()) {
+    if (header != null && header.getTenantCode() != null && !header.getTenantCode().isEmpty()) {
       return header.getTenantCode();
     }
     return "";
@@ -53,7 +53,7 @@ public class RequestHeaderHolder {
    */
   public static String getTenantName() {
     RequestHeader header = THREAD_LOCAL.get();
-    if (header != null && !header.getTenantName().isEmpty()) {
+    if (header != null && header.getTenantName() != null && !header.getTenantName().isEmpty()) {
       return header.getTenantName();
     }
     return "";

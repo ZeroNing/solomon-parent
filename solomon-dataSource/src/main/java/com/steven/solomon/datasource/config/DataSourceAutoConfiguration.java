@@ -9,6 +9,9 @@ import com.steven.solomon.datasource.properties.SolomonDataSourceProperties.Sing
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
 import com.steven.solomon.datasource.routing.DynamicRoutingDataSource;
 import com.steven.solomon.datasource.sql.SqlExecutor;
+import com.steven.solomon.datasource.sql.converter.SqlTypeConverterCustomizer;
+import com.steven.solomon.datasource.sql.converter.SqlTypeConverterRegistry;
+import java.util.List;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.sql.DataSource;
@@ -73,6 +76,29 @@ public class DataSourceAutoConfiguration {
   }
 
   /**
+   * 创建SQL类型转换器注册器。
+   *
+   * <p>默认注册器内置常见时间、数字、枚举等类型转换；业务模块可以声明
+   * {@link SqlTypeConverterCustomizer} Bean，通过 {@code registry.addConverter(...)}
+   * 追加自定义转换器。</p>
+   *
+   * @param customizers 业务侧提供的转换器自定义回调集合
+   * @return SQL类型转换器注册器
+   */
+  @Bean
+  @ConditionalOnMissingBean
+  public SqlTypeConverterRegistry sqlTypeConverterRegistry(
+      List<SqlTypeConverterCustomizer> customizers) {
+    SqlTypeConverterRegistry registry = SqlTypeConverterRegistry.defaultRegistry();
+    if (customizers != null) {
+      for (SqlTypeConverterCustomizer customizer : customizers) {
+        customizer.customize(registry);
+      }
+    }
+    return registry;
+  }
+
+  /**
    * 创建SQL执行器。
    *
    * @param jdbcTemplate Spring命名参数JDBC模板
@@ -85,8 +111,9 @@ public class DataSourceAutoConfiguration {
   public SqlExecutor sqlExecutor(
       NamedParameterJdbcTemplate jdbcTemplate,
       SolomonDataSourceProperties properties,
-      DataSourceTenantContext context) {
-    return new SqlExecutor(jdbcTemplate, properties, context);
+      DataSourceTenantContext context,
+      SqlTypeConverterRegistry converterRegistry) {
+    return new SqlExecutor(jdbcTemplate, properties, context, converterRegistry);
   }
 
   /**

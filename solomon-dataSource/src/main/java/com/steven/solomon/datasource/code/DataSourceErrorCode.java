@@ -36,4 +36,7 @@ public interface DataSourceErrorCode extends BaseExceptionCode {
 
   /** 字段注解不存在。 */
   String DATA_SOURCE_COLUMN_NOT_FOUND = "DATASOURCE_COLUMN_NOT_FOUND";
+
+  /** SQL类型转换失败。 */
+  String DATA_SOURCE_TYPE_CONVERT_FAILED = "DATASOURCE_TYPE_CONVERT_FAILED";
 }
