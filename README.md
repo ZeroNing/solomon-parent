@@ -1,5 +1,52 @@
 # Solomon Parent
 
+## Swagger / OpenAPI
+
+项目当前使用 Spring Boot 3 + Springdoc OpenAPI + Knife4j。测试模块已经统一使用新的 Swagger 配置，不再使用旧版 `doc.*` 配置。
+
+配置分工：
+
+- `springdoc.*`：配置 `/v3/api-docs`、`/swagger-ui.html`、分组和扫描包。
+- `knife4j.*`：配置 Knife4j 增强 UI，可通过 `/doc.html` 访问。
+- `solomon.swagger.*`：Solomon 自定义文档配置，支持标题、版本和全局请求参数。
+
+示例：
+
+```yaml
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.steven
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+solomon:
+  swagger:
+    enabled: true
+    title: datasource测试用例
+    version: 1.0.0
+    global-request-parameters:
+      - name: token
+        in: header
+        description: 用户认证令牌
+        required: true
+        hidden: false
+```
+
+启动任意 Web 测试模块后可访问：
+
+- Swagger UI：`http://localhost:8001/swagger-ui.html`
+- Knife4j UI：`http://localhost:8001/doc.html`
+- OpenAPI JSON：`http://localhost:8001/v3/api-docs`
+
 Solomon Parent 是一个基于 Java 21 和 Spring Boot 3 的企业基础设施组件库。它把常见的 Web 基础能力、异常处理、国际化、多租户上下文、缓存、消息队列、对象存储、任务调度、机器人通知和 GS1 EPC 编解码封装成独立模块，方便业务项目按需接入。
 
 这个项目更适合作为内部基础组件库使用，而不是一个单体应用。业务项目应只引入自己需要的模块，避免把所有中间件能力一次性带入运行时。

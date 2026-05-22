@@ -4,4 +4,3 @@ com.steven.solomon.exception.DegradeExceptionHandler
 com.steven.solomon.exception.FlowExceptionHandler
 com.steven.solomon.exception.NotFoundExceptionHandler
 com.steven.solomon.exception.ResponseStatusExceptionHandler
-com.steven.solomon.swagger.SwaggerProvider

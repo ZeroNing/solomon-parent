@@ -1,65 +1,154 @@
-# solomon-dataSource
+# solomon-datasource
 
-`solomon-dataSource` 是关系型数据库动态数据源模块，沿用当前工程 starter 风格，提供多租户数据源切换、Hikari/Druid 连接池、命名参数 SQL 执行、基础 ORM、普通分页和深度分页能力。
+`solomon-datasource` 是 Solomon 的关系型数据库动态数据源和轻量 ORM 模块，支持多租户数据源路由、Hikari/Druid 连接池、命名参数 SQL、对象插入更新、分页、深度分页和可扩展类型转换器。
 
-## 设计目标
+## 能力概览
 
-- 自动配置入口：`SolomonDataSourceAutoConfiguration`
-- 多租户上下文：基于 `DataSourceTenantContext` 保存当前线程租户编码
-- 异常体系：通过 `DataSourceException extends BaseException` 抛出，错误文案走国际化
-- 数据库：支持 MySQL、MariaDB、PostgreSQL、SQL Server、Oracle
-- 连接池：支持 Hikari 和 Druid
-- 租户模型：一个租户配置一个数据源，连接池、监控和安全配置跟随租户配置
-- 路由模型：路由键就是租户编码，业务代码不按数据源名或 token 切换
+- 支持数据库：MySQL、MariaDB、PostgreSQL、SQL Server、Oracle。
+- 支持连接池：Hikari、Druid。
+- 支持多租户：一个租户一个数据源，通过租户编码切换。
+- 支持自动切换：Repository 和 SqlExecutor 调用时会根据当前租户上下文切换数据源。
+- 支持 SQL 方言：分页语法按数据库类型自动生成，SQL Server 区分 2005/2008 与 2012+。
+- 支持 ORM 注解：`@Table`、`@Column`、`@PrimaryKey`。
+- 支持对象写入：单对象、集合、数组插入和更新，更新可指定字段。
+- 支持分页：普通分页和深度分页入口合并，由配置控制自动切换。
+- 支持类型转换器：不配置时使用默认转换器，也可以通过 `addConverter` 添加业务转换器。
+- 异常体系：统一抛出 `DataSourceException`，继承项目 `BaseException`，错误文案走 i18n。
 
-## 使用方式
+## Maven 依赖
 
-默认情况下，AOP 会在常见数据库访问入口前自动读取 `RequestHeaderHolder.getTenantCode()` 并切换租户数据源；如果当前上下文没有租户编码，则使用 `default-tenant`。
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-datasource</artifactId>
+  <version>1.0</version>
+</dependency>
+```
 
-需要手动切换时，可以直接使用 `DataSourceTenantContext`。业务执行完成后必须清理线程上下文：
+业务模块如果需要 Web、Swagger、全局异常处理，可以像测试模块一样引入 `solomon-common`。
+
+## 数据源配置
+
+```yaml
+solomon:
+  datasource:
+    enabled: true
+    default-tenant: default
+    page:
+      auto-seek-enabled: true
+      seek-page-no: 500
+      seek-page-size: 10
+      default-seek-column: id
+    tenants:
+      default:
+        pool-type: HIKARI
+        database-type: MYSQL
+        url: jdbc:mysql://127.0.0.1:3306/demo?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+        username: root
+        password: root
+        hikari:
+          maximum-pool-size: 10
+          minimum-idle: 2
+          pool-name: solomon-datasource-default
+      tenant-a:
+        pool-type: DRUID
+        database-type: POSTGRESQL
+        url: jdbc:postgresql://127.0.0.1:5432/demo
+        username: postgres
+        password: postgres
+        druid:
+          initial-size: 2
+          min-idle: 2
+          max-active: 10
+```
+
+## 租户切换
+
+框架会优先从当前请求上下文读取租户编码；没有租户编码时使用 `default-tenant`。
+
+手动切换示例：
 
 ```java
 dataSourceTenantContext.switchTenant("tenant-a");
 try {
-  // 执行业务查询
+  List<Tenant> tenants = tenantRepository.findAll();
 } finally {
   dataSourceTenantContext.clear();
 }
 ```
 
-## SQL执行
+## 实体注解
 
-实体注解：
+`@PrimaryKey` 只用于标记主键；字段列名由 `@Column` 指定。如果 `@Column` 不填值，会自动把 Java 驼峰字段转为下划线列名，例如 `userId -> user_id`。
 
 ```java
 @Table("sys_user")
 public class SysUser {
+
   @PrimaryKey
-  @Column("id")
+  @Column
   private Long id;
 
-  @Column("name")
-  private String name;
+  @Column
+  private String userName;
+
+  @Column
+  private LocalDateTime createTime;
 }
 ```
 
-对象插入和更新：
+## Repository 用法
+
+```java
+public class UserRepository extends BaseRepository<SysUser> {
+
+  public UserRepository(SqlExecutor sqlExecutor) {
+    super(sqlExecutor);
+  }
+}
+```
+
+常用查询：
+
+```java
+SysUser user = userRepository.getById(1L);
+List<SysUser> users = userRepository.findByField("status", 1);
+long total = userRepository.count();
+```
+
+插入和更新：
 
 ```java
 userRepository.insert(user);
 userRepository.insert(userList);
 
 userRepository.update(user);
-userRepository.update(user, List.of("name", "status"));
-userRepository.update(userList, List.of("name"));
+userRepository.update(user, List.of("userName", "status"));
+userRepository.update(userList, List.of("status"));
 ```
 
-普通连表查询：
+## SQL 构建
+
+兼容手写 SQL：
 
 ```java
-Sql sql = Sql.select("u.id", "u.name", "o.amount")
+Sql sql = Sql.New("select * from (");
+sql.append("select u.*, d.name as dept_name from sys_user u ");
+sql.append("left join sys_dept d on d.id = u.dept_id ");
+sql.where().and(Cond.eq("u.id", userId, false));
+sql.append(") t ").orderBy(param.orderBy());
+
+return userRepository.findPageLite(sql, param);
+```
+
+结构化 SQL：
+
+```java
+Sql sql = Sql.select("u.id", "u.user_name", "d.name as dept_name")
     .from("sys_user", "u")
-    .leftJoin("sys_order", "o", "o.user_id = u.id")
+    .leftJoin("sys_dept", "d")
+    .on("d.id = u.dept_id")
+    .on("d.deleted = 0")
     .eq("u.status", 1)
     .orderByDesc("u.id");
 
@@ -76,76 +165,106 @@ Sql sql = Sql.select("u.dept_id", "COUNT(1) AS user_count", "SUM(o.amount) AS am
     .havingGt("SUM(o.amount)", BigDecimal.ZERO);
 ```
 
-常用条件语法：
+## 分页和深度分页
+
+分页统一使用 `page` 方法。达到配置阈值时自动切换到深度分页。
 
 ```java
-Sql sql = Sql.select("u.id", "u.name")
-    .from("sys_user", "u")
-    .eq("u.status", 1)
-    .like("u.name", "%张%")
-    .in("u.type", List.of("A", "B"))
-    .between("u.created_time", startTime, endTime)
-    .isNotNull("u.mobile")
-    .orderByAsc("u.id");
+PageResult<UserVO> page = userRepository.query(sql)
+    .page(DataSourcePageParam.of(10000, 10000)
+        .desc("u.id")
+        .seekColumn("u.id"));
 ```
 
-连表聚合：
+返回值包含：
+
+- `records`：当前页数据。
+- `total`：总数。
+- `hasNext`：是否有下一页。
+- `seekPage`：是否使用深度分页。
+- `nextSeekValue`：下一页游标值。
+
+## 类型转换器
+
+不配置时会使用默认转换器，默认支持 `LocalDateTime`、`LocalDate`、`LocalTime`、`Date`、`Long`、常见数字类型、`Boolean`、`Enum` 等。
+
+业务模块可以通过 `SqlTypeConverterCustomizer` 添加转换器：
 
 ```java
-Sql sql = Sql.select("u.id", "o.amount")
-    .from("sys_user", "u")
-    .leftJoin("sys_order", "o", "o.user_id = u.id")
-    .eq("u.status", 1);
+@Configuration
+public class DataSourceConverterConfig {
 
-BigDecimal totalAmount = userRepository.query(sql).sum("amount");
-long totalCount = userRepository.query(sql).count();
+  @Bean
+  public SqlTypeConverterCustomizer sqlTypeConverterCustomizer() {
+    return registry -> registry.addConverter(new SqlValueConverter() {
+
+      @Override
+      public boolean supportsJava(Object value, Class<?> targetType) {
+        return targetType == String.class && value instanceof java.sql.Timestamp;
+      }
+
+      @Override
+      public Object convertForJava(Object value, Class<?> targetType) {
+        return ((java.sql.Timestamp) value)
+            .toLocalDateTime()
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+      }
+
+      @Override
+      public boolean supportsJdbc(Object value) {
+        return false;
+      }
+
+      @Override
+      public Object convertForJdbc(Object value) {
+        return value;
+      }
+    });
+  }
+}
 ```
 
-普通分页适合浅页：
+## Swagger 测试模块配置
 
-```java
-PageResult<UserVO> page = userRepository.query(
-    Sql.select("u.id", "u.name").from("sys_user", "u")
-).page(DataSourcePageParam.of(1, 20).desc("u.id").seekColumn("u.id"));
-```
-
-分页入口已经合并。业务侧继续调用 `page`，当页码和页大小达到配置阈值时，框架会自动切换为游标深分页。
-如果没有传 `lastValue`，框架会先查询一次锚点游标值，再使用游标条件读取当前页数据。
-
-基础分页参数：
-
-```java
-DataSourcePageParam param = DataSourcePageParam.of(1, 20)
-    .desc("u.id")
-    .asc("u.created_time")
-    .seekColumn("u.id");
-
-// 如果排序字段已经由后端白名单转换，也可以直接设置原始排序表达式。
-param.setOrderBy("u.id DESC");
-```
-
-自动深分页配置：
+测试模块统一使用 Springdoc + Knife4j。`solomon.swagger` 负责标题和全局请求头，`springdoc` 负责接口文档路径和扫描包，`knife4j` 负责增强 UI。
 
 ```yaml
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.steven
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
 solomon:
-  datasource:
-    page:
-      auto-seek-enabled: true
-      seek-page-no: 500
-      seek-page-size: 10
-      default-seek-column: id
+  swagger:
+    enabled: true
+    title: datasource测试用例
+    version: 1.0.0
+    global-request-parameters:
+      - name: token
+        in: header
+        description: 用户认证令牌
+        required: true
+        hidden: false
 ```
 
-默认配置表示：`pageNo >= 500` 且 `pageSize >= 10` 时自动使用深度分页。
-`default-seek-column` 可以按业务SQL配置成 `id`、`u.id` 或其他有索引且排序稳定的字段。
+启动测试模块后访问：
 
-深度分页仍会按当前租户数据库方言生成 SQL：MySQL、MariaDB、PostgreSQL 使用 `LIMIT`，SQL Server 2005/2008 使用 `ROW_NUMBER`，SQL Server 2012+ 和 Oracle 12c+ 使用 `OFFSET/FETCH`。
+- Swagger UI：`http://localhost:8001/swagger-ui.html`
+- Knife4j UI：`http://localhost:8001/doc.html`
+- OpenAPI JSON：`http://localhost:8001/v3/api-docs`
 
-分页方言按数据库拆分为独立实现：
+## 编译验证
 
-- `MySqlDialect`
-- `MariaDbDialect`
-- `PostgreSqlDialect`
-- `SqlServerDialect`：SQL Server 2005/2008，使用 `ROW_NUMBER`
-- `SqlServer2012Dialect`：SQL Server 2012 及以上，使用 `OFFSET FETCH`
-- `OracleDialect`
+```bash
+mvn -Ptest-modules -pl test-solomon-datasource -am -DskipTests compile
+```
