@@ -5,14 +5,17 @@ package com.steven.solomon.datasource.sql.script;
  */
 public class SqlScriptExecuteResult {
 
-  /** 脚本编码，作为脚本记录表的唯一标识。 */
-  private final String scriptCode;
+  /** SQL文件名或脚本名。 */
+  private final String fileName;
 
-  /** 脚本内容SHA-256校验值，用于发现同一编码脚本内容被修改的情况。 */
-  private final String checksum;
+  /** SQL文件内容的MD5值，用于唯一校验和防重复执行。 */
+  private final String fileMd5;
 
-  /** 是否因为脚本已经执行过而跳过。 */
+  /** 是否因为脚本已经成功执行过而跳过。 */
   private final boolean skipped;
+
+  /** 本次脚本是否执行成功。 */
+  private final boolean success;
 
   /** 本次实际执行的SQL语句数量。 */
   private final int statementCount;
@@ -23,35 +26,42 @@ public class SqlScriptExecuteResult {
   /**
    * 构造脚本执行结果。
    *
-   * @param scriptCode 脚本编码，不能为空
-   * @param checksum 脚本内容SHA-256校验值
-   * @param skipped 是否跳过执行
+   * @param fileName SQL文件名或脚本名
+   * @param fileMd5 SQL文件内容的MD5值
+   * @param skipped 是否因为已经成功执行过而跳过
+   * @param success 本次脚本是否执行成功
    * @param statementCount 实际执行的SQL语句数量
    * @param executionTimeMillis 执行耗时，单位毫秒
    */
   public SqlScriptExecuteResult(
-      String scriptCode,
-      String checksum,
+      String fileName,
+      String fileMd5,
       boolean skipped,
+      boolean success,
       int statementCount,
       long executionTimeMillis) {
-    this.scriptCode = scriptCode;
-    this.checksum = checksum;
+    this.fileName = fileName;
+    this.fileMd5 = fileMd5;
     this.skipped = skipped;
+    this.success = success;
     this.statementCount = statementCount;
     this.executionTimeMillis = executionTimeMillis;
   }
 
-  public String getScriptCode() {
-    return scriptCode;
+  public String getFileName() {
+    return fileName;
   }
 
-  public String getChecksum() {
-    return checksum;
+  public String getFileMd5() {
+    return fileMd5;
   }
 
   public boolean isSkipped() {
     return skipped;
+  }
+
+  public boolean isSuccess() {
+    return success;
   }
 
   public int getStatementCount() {
@@ -60,5 +70,23 @@ public class SqlScriptExecuteResult {
 
   public long getExecutionTimeMillis() {
     return executionTimeMillis;
+  }
+
+  /**
+   * 兼容旧调用，返回文件名。
+   *
+   * @return SQL文件名或脚本名
+   */
+  public String getScriptCode() {
+    return fileName;
+  }
+
+  /**
+   * 兼容旧调用，返回文件MD5。
+   *
+   * @return SQL文件内容的MD5值
+   */
+  public String getChecksum() {
+    return fileMd5;
   }
 }
