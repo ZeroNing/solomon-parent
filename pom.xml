@@ -38,7 +38,7 @@
     <!-- 数据存储模块 -->
     <module>solomon-redis</module>
     <module>solomon-mongodb</module>
-    <module>solomon-dataSource</module>
+    <module>solomon-datasource</module>
 
     <!-- 消息队列模块 -->
     <module>solomon-mqtt</module>
