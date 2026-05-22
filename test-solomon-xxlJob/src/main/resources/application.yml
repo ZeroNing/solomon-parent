@@ -4,17 +4,37 @@ i18n:
   path: i18n/messages
 server:
   port: 8001
-doc:
-  title: xxlJob测试用例
-  enabled: true
-  globalRequestParameters:
-    - name: token
-      in: HEADER
-      description: 用户认证令牌
-      required: true
-      deprecated: false
-      hidden: false
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.steven
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+solomon:
+  swagger:
+    enabled: true
+    title: xxlJob测试用例
+    version: 1.0.0
+    global-request-parameters:
+      - name: token
+        in: header
+        description: 用户认证令牌
+        required: true
+        hidden: false
 spring:
+  application:
+    name: test-solomon-xxlJob
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -24,8 +44,6 @@ spring:
     multipart:
       max-file-size: 20MB
       max-request-size: 20MB
-  application:
-    name: 123456
 xxl:
   access-token: default_token
   app-name: xxl-job-executor-sample
@@ -34,4 +52,3 @@ xxl:
   password: 123456
   log-path: 日志路径
   auto-register: false
-

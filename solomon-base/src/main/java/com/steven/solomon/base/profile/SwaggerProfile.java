@@ -1,122 +1,154 @@
-//package com.steven.solomon.base.profile;
-//
-//import org.springframework.boot.context.properties.ConfigurationProperties;
-//import springfox.documentation.service.ParameterType;
-//import springfox.documentation.service.RequestParameter;
-//
-//import java.io.Serializable;
-//import java.util.List;
-//
-//@ConfigurationProperties("doc")
-//public class SwaggerProfile {
-//
-//    /**
-//     * 文档名称
-//     */
-//    private String title;
-//    /**
-//     * 是否启用文档
-//     */
-//    private boolean enabled;
-//
-//    private List<DocRequestParameter> globalRequestParameters;
-//
-//    public static class DocRequestParameter implements Serializable {
-//        /**
-//         * 参数名
-//         */
-//        private String name;
-//        /**
-//         * 参数位置类型
-//         */
-//        private ParameterType in;
-//        /**
-//         * 参数描述说明
-//         */
-//        private String description;
-//        /**
-//         * 是否必填参数
-//         */
-//        private Boolean required;
-//        /**
-//         * 是否已弃用参数
-//         */
-//        private Boolean deprecated;
-//        /**
-//         * 是否隐藏参数
-//         */
-//        private Boolean hidden;
-//
-//        public String getName() {
-//            return name;
-//        }
-//
-//        public void setName(String name) {
-//            this.name = name;
-//        }
-//
-//        public ParameterType getIn() {
-//            return in;
-//        }
-//
-//        public void setIn(ParameterType in) {
-//            this.in = in;
-//        }
-//
-//        public String getDescription() {
-//            return description;
-//        }
-//
-//        public void setDescription(String description) {
-//            this.description = description;
-//        }
-//
-//        public Boolean getRequired() {
-//            return required;
-//        }
-//
-//        public void setRequired(Boolean required) {
-//            this.required = required;
-//        }
-//
-//        public Boolean getDeprecated() {
-//            return deprecated;
-//        }
-//
-//        public void setDeprecated(Boolean deprecated) {
-//            this.deprecated = deprecated;
-//        }
-//
-//        public Boolean getHidden() {
-//            return hidden;
-//        }
-//
-//        public void setHidden(Boolean hidden) {
-//            this.hidden = hidden;
-//        }
-//    }
-//
-//    public List<DocRequestParameter> getGlobalRequestParameters() {
-//        return globalRequestParameters;
-//    }
-//
-//    public void setGlobalRequestParameters(List<DocRequestParameter> globalRequestParameters) {
-//        this.globalRequestParameters = globalRequestParameters;
-//    }
-//
-//    public String getTitle() {
-//        return title;
-//    }
-//
-//    public void setTitle(String title) {
-//        this.title = title;
-//    }
-//
-//    public boolean getEnabled() {
-//        return enabled;
-//    }
-//
-//    public void setEnabled(boolean enabled) {
-//        this.enabled = enabled;
-//    }
-//}
+package com.steven.solomon.base.profile;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+/**
+ * Swagger/OpenAPI文档配置。
+ *
+ * <p>配置前缀为 {@code solomon.swagger}，用于设置接口文档标题、版本和全局请求参数。
+ * Springdoc自身的页面路径、分组扫描仍然使用 {@code springdoc.*} 配置。</p>
+ */
+@ConfigurationProperties("solomon.swagger")
+public class SwaggerProfile {
+
+  /**
+   * 是否启用Solomon文档增强配置。
+   */
+  private boolean enabled = true;
+
+  /**
+   * OpenAPI文档标题。
+   */
+  private String title = "Solomon API";
+
+  /**
+   * OpenAPI文档版本。
+   */
+  private String version = "1.0.0";
+
+  /**
+   * OpenAPI文档描述。
+   */
+  private String description = "";
+
+  /**
+   * 全局请求参数列表，常用于token、tenantCode等请求头。
+   */
+  private List<DocRequestParameter> globalRequestParameters = new ArrayList<>();
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public void setEnabled(boolean enabled) {
+    this.enabled = enabled;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public List<DocRequestParameter> getGlobalRequestParameters() {
+    return globalRequestParameters;
+  }
+
+  public void setGlobalRequestParameters(List<DocRequestParameter> globalRequestParameters) {
+    this.globalRequestParameters = globalRequestParameters;
+  }
+
+  /**
+   * Swagger全局请求参数配置。
+   */
+  public static class DocRequestParameter implements Serializable {
+
+    private static final long serialVersionUID = -5307736496899117806L;
+
+    /**
+     * 参数名称。
+     */
+    private String name;
+
+    /**
+     * 参数位置，支持header、query、path、cookie。
+     */
+    private String in = "header";
+
+    /**
+     * 参数说明。
+     */
+    private String description;
+
+    /**
+     * 是否必填。
+     */
+    private boolean required;
+
+    /**
+     * 是否隐藏；隐藏后不会写入OpenAPI文档。
+     */
+    private boolean hidden;
+
+    public String getName() {
+      return name;
+    }
+
+    public void setName(String name) {
+      this.name = name;
+    }
+
+    public String getIn() {
+      return in;
+    }
+
+    public void setIn(String in) {
+      this.in = in;
+    }
+
+    public String getDescription() {
+      return description;
+    }
+
+    public void setDescription(String description) {
+      this.description = description;
+    }
+
+    public boolean isRequired() {
+      return required;
+    }
+
+    public void setRequired(boolean required) {
+      this.required = required;
+    }
+
+    public boolean isHidden() {
+      return hidden;
+    }
+
+    public void setHidden(boolean hidden) {
+      this.hidden = hidden;
+    }
+  }
+}

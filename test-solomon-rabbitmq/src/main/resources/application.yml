@@ -4,16 +4,34 @@ i18n:
   path: i18n/messages
 server:
   port: 8001
-doc:
-  title: rabbitmq测试用例
-  enabled: true
-  globalRequestParameters:
-    - name: token
-      in: HEADER
-      description: 用户认证令牌
-      required: true
-      deprecated: false
-      hidden: false
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  group-configs:
+    - group: default
+      paths-to-match: /**
+      packages-to-scan: com.steven
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+solomon:
+  swagger:
+    enabled: true
+    title: rabbitmq测试用例
+    version: 1.0.0
+    global-request-parameters:
+      - name: token
+        in: header
+        description: 用户认证令牌
+        required: true
+        hidden: false
 spring:
   mvc:
     pathmatch:
@@ -29,5 +47,5 @@ spring:
     password: guest
     host: localhost
     port: 5672
-    auto-delete-queue: false #是否自动删除队列以及交换机
+    auto-delete-queue: false
     enabled: false
