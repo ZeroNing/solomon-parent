@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.enums.DataBaseTypeEnum;
 import com.steven.solomon.datasource.sql.dialect.SqlDialect;
 import com.steven.solomon.pojo.enums.OrderByEnum;
@@ -9,7 +11,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL语句对象。
@@ -62,7 +63,7 @@ public class Sql {
    */
   public Sql(String text) {
     SqlInjectionGuard.validateRawSql(text, "sqlText");
-    this.text = new StringBuilder(text == null ? "" : text);
+    this.text = new StringBuilder(StrUtil.nullToEmpty(text));
   }
 
   /**
@@ -73,7 +74,7 @@ public class Sql {
    */
   public Sql(String text, Map<String, Object> params) {
     this(text);
-    if (params != null) {
+    if (ObjectUtil.isNotEmpty(params)) {
       params.forEach(this::param);
     }
   }
@@ -86,8 +87,8 @@ public class Sql {
    */
   public Sql(String text, Collection<?> params) {
     SqlInjectionGuard.validateRawSql(text, "sqlText");
-    this.text = new StringBuilder(text == null ? "" : text);
-    if (params != null) {
+    this.text = new StringBuilder(StrUtil.nullToEmpty(text));
+    if (ObjectUtil.isNotEmpty(params)) {
       int index = 1;
       for (Object value : params) {
         String paramName = "p" + index;
@@ -232,7 +233,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql column(String column) {
-    if (StringUtils.hasText(column)) {
+    if (StrUtil.isNotBlank(column)) {
       SqlInjectionGuard.validateExpression(column, "selectColumn");
       this.selects.add(column);
       this.selectMode = true;
@@ -247,7 +248,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql columns(String... columns) {
-    if (columns != null) {
+    if (ObjectUtil.isNotEmpty(columns)) {
       for (String column : columns) {
         column(column);
       }
@@ -466,7 +467,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql where(String condition) {
-    if (!StringUtils.hasText(condition)) {
+    if (StrUtil.isBlank(condition)) {
       return this;
     }
     SqlInjectionGuard.validateRawSql(condition, "where");
@@ -509,7 +510,7 @@ public class Sql {
     if (selectMode) {
       return appendBuilderCond(wheres, cond);
     }
-    if (cond == null || !StringUtils.hasText(cond.getText())) {
+    if (ObjectUtil.isEmpty(cond) || StrUtil.isBlank(cond.getText())) {
       return this;
     }
     this.text.append(" AND ");
@@ -536,11 +537,11 @@ public class Sql {
    */
   public Sql or(Cond cond, boolean isMoreCond) {
     if (selectMode) {
-      if (cond == null || !StringUtils.hasText(cond.getText())) {
+      if (ObjectUtil.isEmpty(cond) || StrUtil.isBlank(cond.getText())) {
         return this;
       }
       SqlInjectionGuard.validateRawSql(cond.getText(), "condition");
-      if (wheres.isEmpty()) {
+      if (ObjectUtil.isEmpty(wheres)) {
         wheres.add(cond.getText());
       } else {
         int lastIndex = wheres.size() - 1;
@@ -549,7 +550,7 @@ public class Sql {
       params.putAll(cond.getParams());
       return this;
     }
-    if (cond == null || !StringUtils.hasText(cond.getText())) {
+    if (ObjectUtil.isEmpty(cond) || StrUtil.isBlank(cond.getText())) {
       return this;
     }
     this.text.append(" OR ");
@@ -623,7 +624,7 @@ public class Sql {
   }
 
   public Sql exists(String sql) {
-    if (StringUtils.hasText(sql)) {
+    if (StrUtil.isNotBlank(sql)) {
       SqlInjectionGuard.validateRawSql(sql, "exists");
       this.wheres.add("EXISTS (" + sql + ")");
       this.selectMode = true;
@@ -632,7 +633,7 @@ public class Sql {
   }
 
   public Sql notExists(String sql) {
-    if (StringUtils.hasText(sql)) {
+    if (StrUtil.isNotBlank(sql)) {
       SqlInjectionGuard.validateRawSql(sql, "notExists");
       this.wheres.add("NOT EXISTS (" + sql + ")");
       this.selectMode = true;
@@ -669,7 +670,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql params(Map<String, Object> params) {
-    if (params != null) {
+    if (ObjectUtil.isNotEmpty(params)) {
       params.forEach(this::param);
     }
     return this;
@@ -682,7 +683,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql orderBy(String orderBy) {
-    if (!StringUtils.hasText(orderBy)) {
+    if (StrUtil.isBlank(orderBy)) {
       return this;
     }
     SqlInjectionGuard.validateOrderBy(orderBy, "orderBy");
@@ -701,7 +702,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql groupBy(String groupBy) {
-    if (!StringUtils.hasText(groupBy)) {
+    if (StrUtil.isBlank(groupBy)) {
       return this;
     }
     SqlInjectionGuard.validateExpression(groupBy, "groupBy");
@@ -714,7 +715,7 @@ public class Sql {
   }
 
   public Sql groupBy(String... groupBy) {
-    if (groupBy != null) {
+    if (ObjectUtil.isNotEmpty(groupBy)) {
       for (String item : groupBy) {
         groupBy(item);
       }
@@ -732,7 +733,7 @@ public class Sql {
     if (selectMode) {
       return appendBuilderCond(havings, cond);
     }
-    if (cond == null || !StringUtils.hasText(cond.getText())) {
+    if (ObjectUtil.isEmpty(cond) || StrUtil.isBlank(cond.getText())) {
       return this;
     }
     this.text.append(" HAVING ");
@@ -747,7 +748,7 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql having(String having) {
-    if (!StringUtils.hasText(having)) {
+    if (StrUtil.isBlank(having)) {
       return this;
     }
     SqlInjectionGuard.validateRawSql(having, "having");
@@ -802,8 +803,8 @@ public class Sql {
    * @return 当前SQL对象
    */
   public Sql orderBy(String fields, OrderByEnum orderByEnum) {
-    if (StringUtils.hasText(fields)) {
-      OrderByEnum method = orderByEnum == null ? OrderByEnum.DESCEND : orderByEnum;
+    if (StrUtil.isNotBlank(fields)) {
+      OrderByEnum method = ObjectUtil.defaultIfNull(orderByEnum, OrderByEnum.DESCEND);
       return orderBy(fields + " " + method.label());
     }
     return this;
@@ -888,7 +889,7 @@ public class Sql {
     String operator = asc ? ">" : "<";
     Map<String, Object> seekParams = new LinkedHashMap<>();
     String seekWhere = null;
-    if (lastValue != null) {
+    if (ObjectUtil.isNotNull(lastValue)) {
       seekWhere = seekColumn + " " + operator + " :" + paramName;
       seekParams.put(paramName, lastValue);
     }
@@ -925,7 +926,7 @@ public class Sql {
       Map<String, Object> extraParams,
       String orderByOverride) {
     Map<String, Object> renderedParams = new LinkedHashMap<>(params);
-    if (extraParams != null) {
+    if (ObjectUtil.isNotEmpty(extraParams)) {
       renderedParams.putAll(extraParams);
     }
     if (!selectMode) {
@@ -937,9 +938,9 @@ public class Sql {
     if (distinct) {
       sql.append("DISTINCT ");
     }
-    sql.append(selects.isEmpty() ? "*" : String.join(", ", selects));
+    sql.append(ObjectUtil.isEmpty(selects) ? "*" : String.join(", ", selects));
     sql.append(" FROM ").append(table);
-    if (StringUtils.hasText(alias)) {
+    if (StrUtil.isNotBlank(alias)) {
       sql.append(" ").append(alias);
     }
     for (JoinSegment join : joins) {
@@ -947,20 +948,20 @@ public class Sql {
     }
 
     List<String> allWheres = new ArrayList<>(wheres);
-    if (StringUtils.hasText(extraWhere)) {
+    if (StrUtil.isNotBlank(extraWhere)) {
       allWheres.add(extraWhere);
     }
-    if (!allWheres.isEmpty()) {
+    if (ObjectUtil.isNotEmpty(allWheres)) {
       sql.append(" WHERE ").append(String.join(" AND ", allWheres));
     }
-    if (!groupBys.isEmpty()) {
+    if (ObjectUtil.isNotEmpty(groupBys)) {
       sql.append(" GROUP BY ").append(String.join(", ", groupBys));
     }
-    if (!havings.isEmpty()) {
+    if (ObjectUtil.isNotEmpty(havings)) {
       sql.append(" HAVING ").append(String.join(" AND ", havings));
     }
-    String finalOrderBy = StringUtils.hasText(orderByOverride) ? orderByOverride : orderBy;
-    if (StringUtils.hasText(finalOrderBy)) {
+    String finalOrderBy = StrUtil.isNotBlank(orderByOverride) ? orderByOverride : orderBy;
+    if (StrUtil.isNotBlank(finalOrderBy)) {
       sql.append(" ORDER BY ").append(finalOrderBy);
     }
     return new RenderedSql(sql.toString(), renderedParams);
@@ -977,7 +978,7 @@ public class Sql {
   }
 
   private Sql appendBuilderCond(List<String> target, Cond cond) {
-    if (cond != null && StringUtils.hasText(cond.getText())) {
+    if (ObjectUtil.isNotEmpty(cond) && StrUtil.isNotBlank(cond.getText())) {
       SqlInjectionGuard.validateRawSql(cond.getText(), "condition");
       target.add(cond.getText());
       params.putAll(cond.getParams());
@@ -1010,7 +1011,7 @@ public class Sql {
   }
 
   private Sql on(String keyword, String condition) {
-    if (lastJoin == null || !StringUtils.hasText(condition)) {
+    if (ObjectUtil.isEmpty(lastJoin) || StrUtil.isBlank(condition)) {
       return this;
     }
     SqlInjectionGuard.validateRawSql(condition, "joinOn");
@@ -1041,7 +1042,7 @@ public class Sql {
     }
 
     private void addOn(String keyword, String condition) {
-      if (onConditions.isEmpty()) {
+      if (ObjectUtil.isEmpty(onConditions)) {
         onConditions.add(condition);
       } else {
         onConditions.add(keyword + " " + condition);
@@ -1053,10 +1054,10 @@ public class Sql {
           .append(joinType.getKeyword())
           .append(" ")
           .append(table);
-      if (StringUtils.hasText(alias)) {
+      if (StrUtil.isNotBlank(alias)) {
         join.append(" ").append(alias);
       }
-      if (!onConditions.isEmpty()) {
+      if (ObjectUtil.isNotEmpty(onConditions)) {
         join.append(" ON ").append(String.join(" ", onConditions));
       }
       return join.toString();

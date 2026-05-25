@@ -42,6 +42,31 @@ public abstract class TenantContext<F> {
   }
 
   /**
+   * 获取已注册的租户工厂。
+   *
+   * <p>提供给子类实现更细粒度的切换逻辑，避免子类直接触碰内部 Map。</p>
+   */
+  protected F getRegisteredFactory(String tenantId) {
+    return factoryMap.get(tenantId);
+  }
+
+  /**
+   * 将工厂对象绑定到当前线程。
+   */
+  protected void bindFactory(F factory) {
+    threadLocal.set(factory);
+  }
+
+  /**
+   * 获取当前租户标识。
+   *
+   * <p>默认返回 unknown，子类可以覆盖为具体租户编码，供路由数据源或日志使用。</p>
+   */
+  protected String getCurrentTenantId() {
+    return "unknown";
+  }
+
+  /**
    * 将指定租户的工厂对象绑定到当前线程。
    *
    * @param tenantId 租户编码

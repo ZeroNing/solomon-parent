@@ -1,10 +1,11 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import java.util.Locale;
 import java.util.regex.Pattern;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL注入防护工具。
@@ -37,7 +38,7 @@ public final class SqlInjectionGuard {
    * @return 原始SQL片段
    */
   public static String validateRawSql(String value, String scene) {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     String text = value.trim();
@@ -53,7 +54,7 @@ public final class SqlInjectionGuard {
    * @return 原始标识符
    */
   public static String validateIdentifier(String value, String scene) {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     String text = trimQuote(value.trim());
@@ -72,7 +73,7 @@ public final class SqlInjectionGuard {
    */
   public static String validateQualifiedIdentifier(String value, String scene)
       {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     String text = normalizeIdentifierQuote(value.trim());
@@ -90,7 +91,7 @@ public final class SqlInjectionGuard {
    * @return 原始表达式
    */
   public static String validateExpression(String value, String scene) {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     String text = value.trim();
@@ -110,7 +111,7 @@ public final class SqlInjectionGuard {
    */
   public static String validateTableExpression(String value, String scene)
       {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     String text = value.trim();
@@ -129,13 +130,13 @@ public final class SqlInjectionGuard {
    * @return 原始排序表达式
    */
   public static String validateOrderBy(String value, String scene) {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     rejectDangerousToken(value, scene);
     for (String item : value.split(",")) {
       String orderItem = item.trim();
-      if (!StringUtils.hasText(orderItem)) {
+      if (StrUtil.isBlank(orderItem)) {
         throw risk(scene, value);
       }
       String[] parts = orderItem.split("\\s+");
@@ -160,7 +161,7 @@ public final class SqlInjectionGuard {
    * @return 原始聚合函数名
    */
   public static String validateAggregateFunction(String value) {
-    if (!StringUtils.hasText(value) || !AGGREGATE_FUNCTION.matcher(value.trim()).matches()) {
+    if (StrUtil.isBlank(value) || !AGGREGATE_FUNCTION.matcher(value.trim()).matches()) {
       throw risk("aggregateFunction", value);
     }
     return value;
@@ -196,7 +197,7 @@ public final class SqlInjectionGuard {
     String[] parts = value.split("\\.");
     StringBuilder builder = new StringBuilder();
     for (String part : parts) {
-      if (!builder.isEmpty()) {
+      if (ObjectUtil.isNotEmpty(builder)) {
         builder.append(".");
       }
       builder.append(trimQuote(part));

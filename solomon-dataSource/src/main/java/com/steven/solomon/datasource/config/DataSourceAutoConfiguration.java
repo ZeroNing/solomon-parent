@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.config;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.aspect.DataSourceTenantAspect;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
@@ -13,8 +15,8 @@ import com.steven.solomon.datasource.sql.SqlExecutor;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterCustomizer;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterRegistry;
 import com.steven.solomon.datasource.sql.script.SqlScriptExecutor;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
@@ -26,7 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.util.CollectionUtils;
 
 /**
  * Solomon动态数据源自动配置。
@@ -92,7 +93,7 @@ public class DataSourceAutoConfiguration {
   public SqlTypeConverterRegistry sqlTypeConverterRegistry(
       List<SqlTypeConverterCustomizer> customizers) {
     SqlTypeConverterRegistry registry = SqlTypeConverterRegistry.defaultRegistry();
-    if (customizers != null) {
+    if (ObjectUtil.isNotEmpty(customizers)) {
       for (SqlTypeConverterCustomizer customizer : customizers) {
         customizer.customize(registry);
       }
@@ -167,7 +168,7 @@ public class DataSourceAutoConfiguration {
       SolomonDataSourceProperties properties,
       DynamicDataSourceFactory factory,
       DataSourceTenantContext context) throws DataSourceException {
-    if (CollectionUtils.isEmpty(properties.getTenants())) {
+    if (ObjectUtil.isEmpty(properties.getTenants())) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_CONFIG_NOT_FOUND);
     }
 
@@ -177,6 +178,10 @@ public class DataSourceAutoConfiguration {
 
     for (Map.Entry<String, SingleDataSourceProperties> tenantEntry : properties.getTenants().entrySet()) {
       String tenantCode = tenantEntry.getKey();
+      if (StrUtil.isBlank(tenantCode) || ObjectUtil.isEmpty(tenantEntry.getValue())) {
+        throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_CONFIG_NOT_FOUND,
+            tenantCode);
+      }
       try {
         DataSource dataSource = factory.createDataSource(tenantEntry.getValue());
         context.registerFactory(tenantCode, dataSource);
@@ -192,11 +197,13 @@ public class DataSourceAutoConfiguration {
       }
     }
 
-    if (targetDataSources.isEmpty()) {
+    if (ObjectUtil.isEmpty(targetDataSources)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_CONFIG_NOT_FOUND);
     }
-    if (defaultTargetDataSource == null) {
+    if (ObjectUtil.isEmpty(defaultTargetDataSource)) {
       defaultTargetDataSource = (DataSource) targetDataSources.values().iterator().next();
+      log.warn("[DataSource] 未找到默认租户数据源 defaultTenant={}，已回退到第一个可用数据源",
+          defaultTenant);
     }
 
     DynamicRoutingDataSource routingDataSource = new DynamicRoutingDataSource(context);

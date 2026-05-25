@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.manager;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import com.steven.solomon.datasource.factory.DynamicDataSourceFactory;
@@ -11,7 +13,6 @@ import java.util.Set;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 /**
  * 数据源租户运行时管理器。
@@ -61,7 +62,7 @@ public class DataSourceTenantManager {
       String tenantCode,
       SingleDataSourceProperties tenantProperties) throws DataSourceException {
     String normalizedTenantCode = requireTenantCode(tenantCode);
-    if (tenantProperties == null) {
+    if (ObjectUtil.isEmpty(tenantProperties)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_CONFIG_NOT_FOUND);
     }
 
@@ -121,7 +122,7 @@ public class DataSourceTenantManager {
    * @return 已注册返回 {@code true}，否则返回 {@code false}
    */
   public boolean exists(String tenantCode) {
-    return StringUtils.hasText(tenantCode) && context.isRegistered(tenantCode.trim());
+    return StrUtil.isNotBlank(tenantCode) && context.isRegistered(tenantCode.trim());
   }
 
   /**
@@ -143,14 +144,14 @@ public class DataSourceTenantManager {
   }
 
   private String requireTenantCode(String tenantCode) throws DataSourceException {
-    if (!StringUtils.hasText(tenantCode)) {
+    if (StrUtil.isBlank(tenantCode)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_NOT_FOUND, tenantCode);
     }
     return tenantCode.trim();
   }
 
   private void closeQuietly(DataSource dataSource, String tenantCode) {
-    if (dataSource == null) {
+    if (ObjectUtil.isEmpty(dataSource)) {
       return;
     }
     if (dataSource instanceof AutoCloseable closeable) {

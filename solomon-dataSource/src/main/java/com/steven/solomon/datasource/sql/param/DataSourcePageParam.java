@@ -1,12 +1,12 @@
 package com.steven.solomon.datasource.sql.param;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.pojo.enums.OrderByEnum;
 import com.steven.solomon.datasource.sql.SqlInjectionGuard;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * 数据源基础分页请求参数。
@@ -146,7 +146,7 @@ public class DataSourcePageParam implements Serializable {
    * @param orderBy 排序表达式，不包含 {@code ORDER BY}，例如 {@code "id DESC"}
    */
   public void setOrderBy(String orderBy) {
-    if (StringUtils.hasText(orderBy)) {
+    if (StrUtil.isNotBlank(orderBy)) {
       SqlInjectionGuard.validateOrderBy(orderBy, "pageOrderBy");
     }
     this.orderBy = orderBy;
@@ -315,22 +315,22 @@ public class DataSourcePageParam implements Serializable {
    * @return 排序表达式，例如 {@code "id DESC,create_time ASC"}；无排序时返回空字符串
    */
   public String orderBy() {
-    if (StringUtils.hasText(orderBy)) {
+    if (StrUtil.isNotBlank(orderBy)) {
       SqlInjectionGuard.validateOrderBy(orderBy, "pageOrderBy");
       return orderBy;
     }
-    if (CollectionUtils.isEmpty(sorted)) {
+    if (ObjectUtil.isEmpty(sorted)) {
       return "";
     }
     StringBuilder builder = new StringBuilder();
     for (Sort sort : sorted) {
       String value = sort.getSort();
-      if (StringUtils.hasText(value)) {
+      if (StrUtil.isNotBlank(value)) {
         SqlInjectionGuard.validateOrderBy(value, "pageOrderBy");
         builder.append(value).append(",");
       }
     }
-    if (builder.isEmpty()) {
+    if (ObjectUtil.isEmpty(builder)) {
       return "";
     }
     return builder.substring(0, builder.length() - 1);
@@ -372,11 +372,11 @@ public class DataSourcePageParam implements Serializable {
      * @return 排序表达式，例如 {@code "id DESC"}；字段为空时返回空字符串
      */
     public String getSort() {
-      if (!StringUtils.hasText(orderByField)) {
+      if (StrUtil.isBlank(orderByField)) {
         return "";
       }
       SqlInjectionGuard.validateExpression(orderByField, "pageOrderByField");
-      OrderByEnum method = orderByMethod == null ? OrderByEnum.DESCEND : orderByMethod;
+      OrderByEnum method = ObjectUtil.defaultIfNull(orderByMethod, OrderByEnum.DESCEND);
       return orderByField + " " + method.label();
     }
 

@@ -1,5 +1,6 @@
 package com.steven.solomon.datasource.aspect;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.properties.SolomonDataSourceProperties;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
@@ -9,7 +10,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
-import org.springframework.util.StringUtils;
 
 /**
  * 数据源租户切换AOP。
@@ -70,8 +70,8 @@ public class DataSourceTenantAspect {
     } catch (Exception e) {
       logger.debug("[DataSource] 读取请求头租户编码失败，使用默认租户", e);
     }
-    if (StringUtils.hasText(tenantCode)) {
-      return tenantCode;
+    if (StrUtil.isNotBlank(tenantCode)) {
+      return tenantCode.trim();
     }
     return properties.getDefaultTenant();
   }

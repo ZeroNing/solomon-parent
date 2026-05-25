@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.routing;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.context.TenantContext;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
@@ -25,11 +27,14 @@ public class DataSourceTenantContext extends TenantContext<DataSource> {
    * @throws DataSourceException 数据源未注册时抛出国际化异常
    */
   public void switchTenant(String tenantCode) throws DataSourceException {
-    DataSource dataSource = factoryMap.get(tenantCode);
-    if (dataSource == null) {
+    if (StrUtil.isBlank(tenantCode)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_NOT_FOUND, tenantCode);
     }
-    threadLocal.set(dataSource);
+    DataSource dataSource = getRegisteredFactory(tenantCode);
+    if (ObjectUtil.isEmpty(dataSource)) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_NOT_FOUND, tenantCode);
+    }
+    bindFactory(dataSource);
     currentTenantCode.set(tenantCode);
     switchDepth.set(switchDepth.get() + 1);
     logger.info("[DataSource] 切换租户数据源成功 tenant={}", tenantCode);
@@ -52,7 +57,7 @@ public class DataSourceTenantContext extends TenantContext<DataSource> {
   @Override
   protected String getCurrentTenantId() {
     String tenantCode = currentTenantCode.get();
-    return tenantCode == null ? "unknown" : tenantCode;
+    return StrUtil.blankToDefault(tenantCode, "unknown");
   }
 
   /**

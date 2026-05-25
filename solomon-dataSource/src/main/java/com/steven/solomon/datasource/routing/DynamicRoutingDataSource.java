@@ -1,5 +1,6 @@
 package com.steven.solomon.datasource.routing;
 
+import cn.hutool.core.util.ObjectUtil;
 import javax.sql.DataSource;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 
@@ -39,6 +40,6 @@ public class DynamicRoutingDataSource extends AbstractRoutingDataSource {
   @Override
   protected DataSource determineTargetDataSource() {
     DataSource dataSource = tenantContext.getFactory();
-    return dataSource == null ? super.determineTargetDataSource() : dataSource;
+    return ObjectUtil.isEmpty(dataSource) ? super.determineTargetDataSource() : dataSource;
   }
 }

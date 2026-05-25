@@ -1,5 +1,6 @@
 package com.steven.solomon.datasource.sql.converter;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +37,7 @@ public class SqlTypeConverterRegistry {
    * @return 当前注册器，方便链式调用
    */
   public SqlTypeConverterRegistry addConverter(SqlValueConverter converter) {
-    if (converter != null) {
+    if (ObjectUtil.isNotEmpty(converter)) {
       customConverters.add(converter);
     }
     return this;
@@ -63,7 +64,7 @@ public class SqlTypeConverterRegistry {
    */
   @SuppressWarnings("unchecked")
   public <T> T convertForJava(Object value, Class<T> targetType) throws DataSourceException {
-    if (value == null) {
+    if (ObjectUtil.isNull(value)) {
       return null;
     }
     for (SqlValueConverter converter : customConverters) {
@@ -81,7 +82,7 @@ public class SqlTypeConverterRegistry {
    * @return 转换后的JDBC参数
    */
   public Object convertForJdbc(Object value) {
-    if (value == null) {
+    if (ObjectUtil.isNull(value)) {
       return null;
     }
     if (value instanceof Collection<?> collection) {

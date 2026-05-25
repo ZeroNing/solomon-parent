@@ -1,5 +1,6 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import com.steven.solomon.datasource.sql.param.DataSourcePageParam;
@@ -78,7 +79,7 @@ public class Repository<TModel> {
    * @throws DataSourceException 主键元数据缺失或SQL执行失败时抛出
    */
   public TModel getById(Object id) throws DataSourceException {
-    if (id == null) {
+    if (ObjectUtil.isEmpty(id)) {
       return null;
     }
     SqlMetadataUtils.ColumnField primaryKey = SqlMetadataUtils.primaryKeyField(modelClass);
@@ -139,7 +140,7 @@ public class Repository<TModel> {
    */
   public TModel get(Sql sql) throws DataSourceException {
     List<TModel> list = find(sql);
-    return list.isEmpty() ? null : list.get(0);
+    return ObjectUtil.isEmpty(list) ? null : list.get(0);
   }
 
   /**
@@ -330,7 +331,7 @@ public class Repository<TModel> {
    */
   public int[] create(Collection<TModel> entities) throws DataSourceException {
     List<TModel> entityList = toModelList(entities);
-    if (entityList.isEmpty()) {
+    if (ObjectUtil.isEmpty(entityList)) {
       return new int[0];
     }
     try {
@@ -423,7 +424,7 @@ public class Repository<TModel> {
    */
   public int[] update(Collection<TModel> entities, String[] columns) throws DataSourceException {
     List<TModel> entityList = toModelList(entities);
-    if (entityList.isEmpty()) {
+    if (ObjectUtil.isEmpty(entityList)) {
       return new int[0];
     }
     try {
@@ -486,7 +487,7 @@ public class Repository<TModel> {
    * @throws DataSourceException 主键元数据缺失或SQL执行失败时抛出
    */
   public int delete(TModel entity) throws DataSourceException {
-    if (entity == null) {
+    if (ObjectUtil.isEmpty(entity)) {
       return 0;
     }
     try {
@@ -508,7 +509,7 @@ public class Repository<TModel> {
    * @throws DataSourceException 主键元数据缺失或SQL执行失败时抛出
    */
   public int deleteById(Object id) throws DataSourceException {
-    if (id == null) {
+    if (ObjectUtil.isEmpty(id)) {
       return 0;
     }
     SqlMetadataUtils.ColumnField primaryKey = SqlMetadataUtils.primaryKeyField(modelClass);
@@ -642,12 +643,12 @@ public class Repository<TModel> {
   }
 
   private String[] toStringArray(Collection<String> values) {
-    if (values == null || values.isEmpty()) {
+    if (ObjectUtil.isEmpty(values)) {
       return null;
     }
     List<String> list = new ArrayList<>();
     for (String value : values) {
-      if (value != null) {
+      if (ObjectUtil.isNotEmpty(value)) {
         list.add(value);
       }
     }
@@ -655,19 +656,19 @@ public class Repository<TModel> {
   }
 
   private List<TModel> toModelList(TModel entity) {
-    if (entity == null) {
+    if (ObjectUtil.isEmpty(entity)) {
       return List.of();
     }
     return List.of(entity);
   }
 
   private List<TModel> toModelList(TModel[] entities) {
-    if (entities == null || entities.length == 0) {
+    if (ObjectUtil.isEmpty(entities)) {
       return List.of();
     }
     List<TModel> list = new ArrayList<>(entities.length);
     for (TModel entity : entities) {
-      if (entity != null) {
+      if (ObjectUtil.isNotEmpty(entity)) {
         list.add(entity);
       }
     }
@@ -675,12 +676,12 @@ public class Repository<TModel> {
   }
 
   private List<TModel> toModelList(Collection<TModel> entities) {
-    if (entities == null || entities.isEmpty()) {
+    if (ObjectUtil.isEmpty(entities)) {
       return List.of();
     }
     List<TModel> list = new ArrayList<>(entities.size());
     for (TModel entity : entities) {
-      if (entity != null) {
+      if (ObjectUtil.isNotEmpty(entity)) {
         list.add(entity);
       }
     }
@@ -712,7 +713,7 @@ public class Repository<TModel> {
 
   private Class<?> resolveModelClass(Class<?> clazz) {
     Type type = clazz.getGenericSuperclass();
-    while (type != null) {
+    while (ObjectUtil.isNotEmpty(type)) {
       if (type instanceof ParameterizedType parameterizedType) {
         Type actualType = parameterizedType.getActualTypeArguments()[0];
         if (actualType instanceof Class<?> actualClass) {
@@ -720,7 +721,7 @@ public class Repository<TModel> {
         }
       }
       clazz = clazz.getSuperclass();
-      type = clazz == null ? null : clazz.getGenericSuperclass();
+      type = ObjectUtil.isEmpty(clazz) ? null : clazz.getGenericSuperclass();
     }
     return Object.class;
   }

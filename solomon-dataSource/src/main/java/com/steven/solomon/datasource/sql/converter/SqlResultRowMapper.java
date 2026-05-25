@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql.converter;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.annotation.Column;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
@@ -13,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL结果行映射器。
@@ -50,9 +51,9 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
   public SqlResultRowMapper(Class<T> resultType, SqlTypeConverterRegistry converterRegistry) {
     this.resultType = resultType;
     this.fields = resolveFields(resultType);
-    this.converterRegistry = converterRegistry == null
-        ? SqlTypeConverterRegistry.defaultRegistry()
-        : converterRegistry;
+    this.converterRegistry = ObjectUtil.defaultIfNull(
+        converterRegistry,
+        SqlTypeConverterRegistry.defaultRegistry());
   }
 
   /**
@@ -96,7 +97,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
     for (int i = 1; i <= columnCount; i++) {
       String columnLabel = metaData.getColumnLabel(i);
       Field field = findField(columnLabel);
-      if (field == null) {
+      if (ObjectUtil.isNull(field)) {
         continue;
       }
       Object rawValue = rs.getObject(i);
@@ -106,7 +107,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
       } catch (DataSourceException e) {
         throw new SQLException(e);
       }
-      if (value == null && field.getType().isPrimitive()) {
+      if (ObjectUtil.isNull(value) && field.getType().isPrimitive()) {
         continue;
       }
       setValue(target, field, value);
@@ -131,17 +132,17 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
     } catch (Exception e) {
       throw new SQLException(new DataSourceException(
           DataSourceErrorCode.DATA_SOURCE_TYPE_CONVERT_FAILED, e,
-          value == null ? "null" : value.getClass().getName(), field.getType().getName(),
+          ObjectUtil.isNull(value) ? "null" : value.getClass().getName(), field.getType().getName(),
           field.getName()));
     }
   }
 
   private Field findField(String columnLabel) {
-    if (!StringUtils.hasText(columnLabel)) {
+    if (StrUtil.isBlank(columnLabel)) {
       return null;
     }
     Field field = fields.get(normalize(columnLabel));
-    if (field != null) {
+    if (ObjectUtil.isNotNull(field)) {
       return field;
     }
     return fields.get(normalize(underlineToCamel(columnLabel)));
@@ -150,7 +151,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
   private Map<String, Field> resolveFields(Class<?> type) {
     Map<String, Field> mapping = new LinkedHashMap<>();
     Class<?> current = type;
-    while (current != null && current != Object.class) {
+    while (ObjectUtil.isNotEmpty(current) && current != Object.class) {
       for (Field field : current.getDeclaredFields()) {
         if (Modifier.isStatic(field.getModifiers()) || Modifier.isFinal(field.getModifiers())) {
           continue;
@@ -159,7 +160,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
         mapping.putIfAbsent(normalize(field.getName()), field);
         mapping.putIfAbsent(normalize(camelToUnderline(field.getName())), field);
         Column column = field.getAnnotation(Column.class);
-        if (column != null && StringUtils.hasText(column.value())) {
+        if (ObjectUtil.isNotEmpty(column) && StrUtil.isNotBlank(column.value())) {
           mapping.putIfAbsent(normalize(column.value()), field);
         }
       }
@@ -169,7 +170,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
   }
 
   private String normalize(String value) {
-    return value == null ? "" : value.replace("`", "")
+    return ObjectUtil.isNull(value) ? "" : value.replace("`", "")
         .replace("\"", "")
         .replace("[", "")
         .replace("]", "")

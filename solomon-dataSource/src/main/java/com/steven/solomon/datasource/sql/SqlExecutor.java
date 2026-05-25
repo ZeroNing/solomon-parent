@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.enums.DataBaseTypeEnum;
 import com.steven.solomon.datasource.exception.DataSourceException;
@@ -21,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL执行器。
@@ -69,9 +70,9 @@ public class SqlExecutor {
     this.jdbcTemplate = jdbcTemplate;
     this.properties = properties;
     this.context = context;
-    this.converterRegistry = converterRegistry == null
-        ? SqlTypeConverterRegistry.defaultRegistry()
-        : converterRegistry;
+    this.converterRegistry = ObjectUtil.defaultIfNull(
+        converterRegistry,
+        SqlTypeConverterRegistry.defaultRegistry());
   }
 
   /**
@@ -175,7 +176,7 @@ public class SqlExecutor {
   public <T> T queryForObject(Sql sql, Class<T> resultType) throws DataSourceException {
     try {
       List<T> records = query(sql, resultType);
-      return records.isEmpty() ? null : records.get(0);
+      return ObjectUtil.isEmpty(records) ? null : records.get(0);
     } catch (Exception e) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e,
           sql.getText());
@@ -278,7 +279,7 @@ public class SqlExecutor {
     Object lastValue = resolveSeekStartValue(sql, param, seekColumn, currentPageNo,
         currentPageSize);
     long total = count(sql);
-    if (currentPageNo > 1 && lastValue == null) {
+    if (currentPageNo > 1 && ObjectUtil.isEmpty(lastValue)) {
       return new PageResult<>(List.of(), total, currentPageNo, currentPageSize, true, null);
     }
     Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.getAsc(),
@@ -301,7 +302,7 @@ public class SqlExecutor {
     Object lastValue = resolveSeekStartValue(sql, param, seekColumn, currentPageNo,
         currentPageSize);
     long total = count(sql);
-    if (currentPageNo > 1 && lastValue == null) {
+    if (currentPageNo > 1 && ObjectUtil.isEmpty(lastValue)) {
       return new PageResult<>(List.of(), total, currentPageNo, currentPageSize, true, null);
     }
     Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.getAsc(),
@@ -327,7 +328,7 @@ public class SqlExecutor {
     Long value = queryForObject(Sql.of(resolveDialect().countSql(countSql.getText()),
             countSql.getParams()),
         Long.class);
-    return value == null ? 0 : value;
+    return ObjectUtil.isEmpty(value) ? 0 : value;
   }
 
   /**
@@ -351,7 +352,7 @@ public class SqlExecutor {
   public long count(String tableName) throws DataSourceException {
     SqlInjectionGuard.validateTableExpression(tableName, "countTable");
     Long value = aggregate(tableName, "COUNT", "1", Long.class);
-    return value == null ? 0 : value;
+    return ObjectUtil.isEmpty(value) ? 0 : value;
   }
 
   /**
@@ -519,7 +520,7 @@ public class SqlExecutor {
    */
   private Map<String, Object> convertParams(Map<String, ?> params) {
     Map<String, Object> converted = new LinkedHashMap<>();
-    if (params == null || params.isEmpty()) {
+    if (ObjectUtil.isEmpty(params)) {
       return converted;
     }
     for (Map.Entry<String, ?> entry : params.entrySet()) {
@@ -536,7 +537,7 @@ public class SqlExecutor {
    */
   @SuppressWarnings("unchecked")
   private Map<String, ?>[] convertBatchParams(Map<String, ?>[] params) {
-    if (params == null || params.length == 0) {
+    if (ObjectUtil.isEmpty(params)) {
       return new Map[0];
     }
     Map<String, ?>[] converted = new Map[params.length];
@@ -547,37 +548,42 @@ public class SqlExecutor {
   }
 
   private DataBaseTypeEnum resolveDatabaseType(SingleDataSourceProperties tenantProperties) {
-    return tenantProperties == null ? DataBaseTypeEnum.MYSQL : tenantProperties.getDatabaseType();
+    if (ObjectUtil.isEmpty(tenantProperties)) {
+      return DataBaseTypeEnum.MYSQL;
+    }
+    return ObjectUtil.defaultIfNull(
+        tenantProperties.getDatabaseType(),
+        DataBaseTypeEnum.fromJdbcUrl(tenantProperties.getUrl()));
   }
 
   private SqlDialect resolveDialect() {
     SingleDataSourceProperties tenantProperties = resolveTenantProperties();
     return SqlDialectFactory.getDialect(
         resolveDatabaseType(tenantProperties),
-        tenantProperties == null ? null : tenantProperties.getSqlServerVersion());
+        ObjectUtil.isEmpty(tenantProperties) ? null : tenantProperties.getSqlServerVersion());
   }
 
   private SingleDataSourceProperties resolveTenantProperties() {
     String tenantCode = context.getCurrentTenantCode();
-    if (!StringUtils.hasText(tenantCode)) {
+    if (StrUtil.isBlank(tenantCode)) {
       tenantCode = properties.getDefaultTenant();
     }
     SingleDataSourceProperties tenantProperties = properties.getTenants().get(tenantCode);
-    if (tenantProperties == null && !properties.getTenants().isEmpty()) {
+    if (ObjectUtil.isEmpty(tenantProperties) && ObjectUtil.isNotEmpty(properties.getTenants())) {
       tenantProperties = properties.getTenants().values().iterator().next();
     }
     return tenantProperties;
   }
 
   private Object resolveNextSeekValue(List<?> records, String seekColumn) {
-    if (records.isEmpty()) {
+    if (ObjectUtil.isEmpty(records)) {
       return null;
     }
     Object lastRecord = records.get(records.size() - 1);
     String seekColumnName = normalizeSeekColumnName(seekColumn);
     if (lastRecord instanceof Map<?, ?> map) {
       Object value = map.get(seekColumn);
-      if (value == null) {
+      if (ObjectUtil.isEmpty(value)) {
         value = map.get(seekColumnName);
       }
       return value;
@@ -601,22 +607,23 @@ public class SqlExecutor {
 
   private boolean shouldUseSeekPage(DataSourcePageParam param) {
     SolomonDataSourceProperties.Page page = properties.getPage();
-    if (page == null || !page.isAutoSeekEnabled() || param == null || !param.getSeek()) {
+    if (ObjectUtil.isEmpty(page) || !page.isAutoSeekEnabled()
+        || ObjectUtil.isEmpty(param) || !param.getSeek()) {
       return false;
     }
     int currentPageNo = normalizePageNo(param.getPageNo());
     int currentPageSize = normalizePageSize(param.getPageSize());
     return currentPageNo >= Math.max(page.getSeekPageNo(), 1)
         && currentPageSize >= Math.max(page.getSeekPageSize(), 1)
-        && StringUtils.hasText(resolveSeekColumn(param));
+        && StrUtil.isNotBlank(resolveSeekColumn(param));
   }
 
   private String resolveSeekColumn(DataSourcePageParam param) {
-    if (param != null && StringUtils.hasText(param.getSeekColumn())) {
+    if (ObjectUtil.isNotEmpty(param) && StrUtil.isNotBlank(param.getSeekColumn())) {
       return param.getSeekColumn();
     }
     SolomonDataSourceProperties.Page page = properties.getPage();
-    return page == null ? null : page.getDefaultSeekColumn();
+    return ObjectUtil.isEmpty(page) ? null : page.getDefaultSeekColumn();
   }
 
   private Object resolveSeekStartValue(
@@ -625,7 +632,7 @@ public class SqlExecutor {
       String seekColumn,
       int pageNo,
       int pageSize) throws DataSourceException {
-    if (param.getLastValue() != null || pageNo <= 1) {
+    if (ObjectUtil.isNotEmpty(param.getLastValue()) || pageNo <= 1) {
       return param.getLastValue();
     }
     long anchorPageNo = ((long) pageNo - 1) * pageSize;
@@ -640,12 +647,14 @@ public class SqlExecutor {
     Sql anchorSql = Sql.of(resolveDialect().pageSql(orderedSql, (int) anchorPageNo, 1),
         sql.getParams());
     List<Map<String, Object>> rows = queryForList(anchorSql);
-    if (rows.isEmpty()) {
+    if (ObjectUtil.isEmpty(rows)) {
       return null;
     }
     Map<String, Object> row = rows.get(0);
     Object value = row.get(seekColumnName);
-    return value == null && !row.isEmpty() ? row.values().iterator().next() : value;
+    return ObjectUtil.isEmpty(value) && ObjectUtil.isNotEmpty(row)
+        ? row.values().iterator().next()
+        : value;
   }
 
   private String normalizeSeekFieldName(String seekColumn) {
@@ -669,14 +678,14 @@ public class SqlExecutor {
   }
 
   private String normalizeSeekColumnName(String seekColumn) {
-    if (seekColumn.contains(".")) {
+    if (StrUtil.contains(seekColumn, ".")) {
       return seekColumn.substring(seekColumn.lastIndexOf('.') + 1);
     }
     return seekColumn;
   }
 
   private Sql applyOrderBy(Sql sql, DataSourcePageParam param) throws DataSourceException {
-    if (param == null || !StringUtils.hasText(param.orderBy())) {
+    if (ObjectUtil.isEmpty(param) || StrUtil.isBlank(param.orderBy())) {
       return sql;
     }
     SqlInjectionGuard.validateOrderBy(param.orderBy(), "pageOrderBy");
@@ -684,7 +693,7 @@ public class SqlExecutor {
   }
 
   private DataSourcePageParam normalizePageParam(DataSourcePageParam param) {
-    return param == null ? new DataSourcePageParam() : param;
+    return ObjectUtil.isEmpty(param) ? new DataSourcePageParam() : param;
   }
 
   private int normalizePageNo(int pageNo) {

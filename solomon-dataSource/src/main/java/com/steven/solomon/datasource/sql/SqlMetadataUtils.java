@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.annotation.Column;
 import com.steven.solomon.datasource.annotation.PrimaryKey;
 import com.steven.solomon.datasource.annotation.Table;
@@ -10,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL元数据工具。
@@ -29,14 +30,14 @@ public class SqlMetadataUtils {
    */
   public static String tableName(Class<?> entityClass) throws DataSourceException {
     Table table = entityClass.getAnnotation(Table.class);
-    if (table == null) {
+    if (ObjectUtil.isNull(table)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_TABLE_NOT_FOUND,
           entityClass.getName());
     }
-    if (StringUtils.hasText(table.value())) {
+    if (StrUtil.isNotBlank(table.value())) {
       return SqlInjectionGuard.validateTableExpression(table.value(), "tableAnnotation");
     }
-    if (StringUtils.hasText(table.name())) {
+    if (StrUtil.isNotBlank(table.name())) {
       return SqlInjectionGuard.validateTableExpression(table.name(), "tableAnnotation");
     }
     return SqlInjectionGuard.validateTableExpression(entityClass.getSimpleName(),
@@ -70,7 +71,7 @@ public class SqlMetadataUtils {
   public static ColumnField primaryKeyField(Class<?> entityClass) throws DataSourceException {
     for (Field field : entityClass.getDeclaredFields()) {
       PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-      if (primaryKey == null) {
+      if (ObjectUtil.isNull(primaryKey)) {
         continue;
       }
       field.setAccessible(true);
@@ -90,7 +91,7 @@ public class SqlMetadataUtils {
    */
   public static List<ColumnField> insertFields(Class<?> entityClass) throws DataSourceException {
     List<ColumnField> fields = columnFields(entityClass, null, true);
-    if (fields.isEmpty()) {
+    if (ObjectUtil.isEmpty(fields)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
           entityClass.getName());
     }
@@ -108,7 +109,7 @@ public class SqlMetadataUtils {
   public static List<ColumnField> updateFields(Class<?> entityClass, String... includeFields)
       throws DataSourceException {
     List<ColumnField> fields = columnFields(entityClass, includeFields, false);
-    if (fields.isEmpty()) {
+    if (ObjectUtil.isEmpty(fields)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
           entityClass.getName());
     }
@@ -120,9 +121,9 @@ public class SqlMetadataUtils {
       String[] includeFields,
       boolean insert) throws DataSourceException {
     Set<String> includeFieldSet = new HashSet<>();
-    if (includeFields != null) {
+    if (ObjectUtil.isNotEmpty(includeFields)) {
       for (String field : includeFields) {
-        if (StringUtils.hasText(field)) {
+        if (StrUtil.isNotBlank(field)) {
           includeFieldSet.add(field);
         }
       }
@@ -132,32 +133,32 @@ public class SqlMetadataUtils {
     for (Field field : entityClass.getDeclaredFields()) {
       Column column = field.getAnnotation(Column.class);
       PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-      if (column == null && primaryKey == null) {
+      if (ObjectUtil.isNull(column) && ObjectUtil.isNull(primaryKey)) {
         continue;
       }
       String columnName = resolveColumnName(field, column);
-      if (!insert && primaryKey != null) {
+      if (!insert && ObjectUtil.isNotEmpty(primaryKey)) {
         continue;
       }
-      if (column != null && insert && !column.insertable()) {
+      if (ObjectUtil.isNotEmpty(column) && insert && !column.insertable()) {
         continue;
       }
-      if (column != null && !insert && !column.updatable()) {
+      if (ObjectUtil.isNotEmpty(column) && !insert && !column.updatable()) {
         continue;
       }
-      if (!includeFieldSet.isEmpty()
+      if (ObjectUtil.isNotEmpty(includeFieldSet)
           && !includeFieldSet.contains(field.getName())
           && !includeFieldSet.contains(columnName)) {
         continue;
       }
       field.setAccessible(true);
-      fields.add(new ColumnField(field, columnName, primaryKey != null));
+      fields.add(new ColumnField(field, columnName, ObjectUtil.isNotEmpty(primaryKey)));
     }
     return fields;
   }
 
   private static String resolveColumnName(Field field, Column column) throws DataSourceException {
-    if (column != null && StringUtils.hasText(column.value())) {
+    if (ObjectUtil.isNotEmpty(column) && StrUtil.isNotBlank(column.value())) {
       return SqlInjectionGuard.validateQualifiedIdentifier(column.value(), "columnAnnotation");
     }
     return SqlInjectionGuard.validateQualifiedIdentifier(camelToUnderline(field.getName()),
@@ -165,7 +166,7 @@ public class SqlMetadataUtils {
   }
 
   private static String camelToUnderline(String value) {
-    if (!StringUtils.hasText(value)) {
+    if (StrUtil.isBlank(value)) {
       return value;
     }
     StringBuilder builder = new StringBuilder(value.length() + 8);

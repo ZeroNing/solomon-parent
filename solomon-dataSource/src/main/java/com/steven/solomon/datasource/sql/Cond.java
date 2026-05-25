@@ -1,11 +1,11 @@
 package com.steven.solomon.datasource.sql;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 /**
  * SQL条件对象。
@@ -285,7 +285,7 @@ public class Cond {
    * @return 条件对象，可能为null
    */
   public static Cond raw(String text) {
-    if (!StringUtils.hasText(text)) {
+    if (StrUtil.isBlank(text)) {
       return null;
     }
     SqlInjectionGuard.validateRawSql(text, "condition");
@@ -300,11 +300,12 @@ public class Cond {
    * @return 条件对象，可能为null
    */
   public static Cond raw(String text, Map<String, Object> params) {
-    if (!StringUtils.hasText(text)) {
+    if (StrUtil.isBlank(text)) {
       return null;
     }
     SqlInjectionGuard.validateRawSql(text, "condition");
-    return new Cond(text, params == null ? new LinkedHashMap<>() : new LinkedHashMap<>(params));
+    return new Cond(text,
+        ObjectUtil.isEmpty(params) ? new LinkedHashMap<>() : new LinkedHashMap<>(params));
   }
 
   /**
@@ -395,7 +396,7 @@ public class Cond {
   }
 
   private Cond join(String keyword, Cond cond) {
-    if (cond == null || !StringUtils.hasText(cond.getText())) {
+    if (ObjectUtil.isEmpty(cond) || StrUtil.isBlank(cond.getText())) {
       return this;
     }
     Map<String, Object> joinParams = new LinkedHashMap<>(this.params);
@@ -419,7 +420,7 @@ public class Cond {
       Collection<?> values,
       boolean isRequired,
       boolean notIn) {
-    if (!isRequired && CollectionUtils.isEmpty(values)) {
+    if (!isRequired && ObjectUtil.isEmpty(values)) {
       return null;
     }
     SqlInjectionGuard.validateExpression(field, "conditionField");
@@ -434,14 +435,14 @@ public class Cond {
   }
 
   private static boolean isEmpty(Object value) {
-    if (value == null) {
+    if (ObjectUtil.isEmpty(value)) {
       return true;
     }
     if (value instanceof String str) {
-      return !StringUtils.hasText(str);
+      return StrUtil.isBlank(str);
     }
     if (value instanceof Collection<?> collection) {
-      return collection.isEmpty();
+      return ObjectUtil.isEmpty(collection);
     }
     return false;
   }
