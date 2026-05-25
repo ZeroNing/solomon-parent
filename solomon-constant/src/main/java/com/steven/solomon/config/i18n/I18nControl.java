@@ -1,5 +1,6 @@
 package com.steven.solomon.config.i18n;
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,7 +46,7 @@ public class I18nControl extends ResourceBundle.Control {
     while (urls.hasMoreElements()) {
       URL url = urls.nextElement();
       try (InputStream stream = openStreamWithReload(url, reload)) {
-        if (stream != null) {
+        if (ValidateUtils.isNotEmpty(stream)) {
           combinedBundle.combine(newBundle(stream));
         }
       }
@@ -56,11 +57,11 @@ public class I18nControl extends ResourceBundle.Control {
   private I18nPropertyResourceBundle getBundleFromClasspath(String resourceName,
       ClassLoader classLoader, boolean reload) throws IOException {
     URL url = classLoader.getResource(resourceName);
-    if (url == null) {
+    if (ValidateUtils.isEmpty(url)) {
       return null;
     }
     try (InputStream stream = openStreamWithReload(url, reload)) {
-      return stream == null ? null : newBundle(stream);
+      return ValidateUtils.isEmpty(stream) ? null : newBundle(stream);
     }
   }
 

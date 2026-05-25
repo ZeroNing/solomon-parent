@@ -2,6 +2,7 @@ package com.steven.solomon.base.exception;
 
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,9 @@ public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
   public BaseExceptionVO handleBaseException(Throwable ex) {
     WebExchangeBindException exception = (WebExchangeBindException) ex;
     List<ObjectError> errors = exception.getAllErrors();
-    String message = errors.isEmpty() ? exception.getMessage() : errors.get(0).getDefaultMessage();
+    String message = ValidateUtils.isEmpty(errors)
+        ? exception.getMessage()
+        : errors.get(0).getDefaultMessage();
     return messageResponse(message, 400);
   }
 }

@@ -118,7 +118,7 @@ public class ImageCellWriteHandler implements CellWriteHandler {
         int picWidth = Units.pixelToEMU(imageWidth);
         int index = sheet.getWorkbook().addPicture(pictureData, HSSFWorkbook.PICTURE_TYPE_PNG);
         Drawing<?> drawing = sheet.getDrawingPatriarch();
-        if (drawing == null) {
+        if (ValidateUtils.isEmpty(drawing)) {
             drawing = sheet.createDrawingPatriarch();
         }
         CreationHelper helper = sheet.getWorkbook().getCreationHelper();

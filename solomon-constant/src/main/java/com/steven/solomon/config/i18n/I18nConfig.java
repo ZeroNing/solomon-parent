@@ -1,6 +1,7 @@
 package com.steven.solomon.config.i18n;
 
 import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +49,7 @@ public class I18nConfig {
     List<String> beanNames = new ArrayList<>();
     for (String basePath : allPath) {
       ResourceBundle resourceBundle = initResources(localeList, basePath);
-      if (resourceBundle != null) {
+      if (ValidateUtils.isNotEmpty(resourceBundle)) {
         beanNames.add(resourceBundle.getBaseBundleName());
       }
     }
@@ -56,7 +57,7 @@ public class I18nConfig {
     ResourceBundleMessageSource bundleMessageSource = new ResourceBundleMessageSource();
     bundleMessageSource.setDefaultEncoding(BaseCode.UTF8);
     bundleMessageSource.setBasenames(beanNames.toArray(new String[0]));
-    Locale effectiveLocale = defaultLocale == null ? Locale.CHINESE : defaultLocale;
+    Locale effectiveLocale = ValidateUtils.getOrDefault(defaultLocale, Locale.CHINESE);
     bundleMessageSource.setDefaultLocale(effectiveLocale);
     logger.info("I18nConfig初始化I18N国际化文件成功, 默认语言={}, 文件路径={}", effectiveLocale, beanNames);
     return bundleMessageSource;
@@ -72,7 +73,7 @@ public class I18nConfig {
   }
 
   private List<String> splitConfig(String value) {
-    if (value == null || value.isEmpty()) {
+    if (ValidateUtils.isEmpty(value)) {
       return new ArrayList<>();
     }
     return new ArrayList<>(Arrays.asList(value.split(",")));
@@ -81,7 +82,7 @@ public class I18nConfig {
   private ResourceBundle initResources(List<String> locales, String basePath) {
     ResourceBundle resourceBundle = null;
     for (String language : locales) {
-      if (language == null || language.isEmpty()) {
+      if (ValidateUtils.isEmpty(language)) {
         continue;
       }
       resourceBundle = ResourceBundle.getBundle(basePath, new Locale(language), new I18nControl());

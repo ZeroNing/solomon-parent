@@ -1,5 +1,6 @@
 package com.steven.solomon.utils.i18n;
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
@@ -48,7 +49,7 @@ public class I18nUtils {
    * 根据枚举类和枚举值获取国际化文案。
    */
   public static String getEnumMessage(String code, Class<?> enumClazz) {
-    if (isBlank(code) || enumClazz == null) {
+    if (ValidateUtils.isEmpty(code) || ValidateUtils.isEmpty(enumClazz)) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName() + "." + code);
@@ -58,7 +59,7 @@ public class I18nUtils {
    * 根据枚举对象和枚举类获取国际化文案。
    */
   public static String getEnumMessage(Enum<?> enumCode, Class<?> enumClazz) {
-    if (enumCode == null || enumClazz == null) {
+    if (ValidateUtils.isEmpty(enumCode) || ValidateUtils.isEmpty(enumClazz)) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName() + "." + enumCode.name());
@@ -79,7 +80,7 @@ public class I18nUtils {
   }
 
   private static String getMessage(String code, Locale locale, Object... args) {
-    if (isBlank(code) || messageSource == null) {
+    if (ValidateUtils.isEmpty(code) || ValidateUtils.isEmpty(messageSource)) {
       return null;
     }
     try {
@@ -91,9 +92,5 @@ public class I18nUtils {
 
   private static Locale currentLocale() {
     return LocaleContextHolder.getLocale();
-  }
-
-  private static boolean isBlank(String value) {
-    return value == null || value.isEmpty();
   }
 }

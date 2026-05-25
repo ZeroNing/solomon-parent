@@ -1,6 +1,7 @@
 package com.steven.solomon.base.config;
 
 import com.steven.solomon.base.profile.SwaggerProfile;
+import com.steven.solomon.verification.ValidateUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -12,7 +13,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.util.StringUtils;
 
 /**
  * Solomon 的 OpenAPI 自动配置。
@@ -61,14 +61,15 @@ public class SwaggerConfig {
   @ConditionalOnMissingBean(name = "solomonOpenApiCustomizer")
   public OpenApiCustomizer solomonOpenApiCustomizer(SwaggerProfile profile) {
     return openApi -> {
-      if (openApi.getPaths() == null || profile.getGlobalRequestParameters() == null) {
+      if (ValidateUtils.isEmpty(openApi.getPaths())
+          || ValidateUtils.isEmpty(profile.getGlobalRequestParameters())) {
         return;
       }
       openApi.getPaths().values().forEach(pathItem ->
           pathItem.readOperations().forEach(operation ->
               profile.getGlobalRequestParameters().stream()
-                  .filter(parameter -> parameter != null
-                      && StringUtils.hasText(parameter.getName())
+                  .filter(parameter -> ValidateUtils.isNotEmpty(parameter)
+                      && ValidateUtils.isNotEmpty(parameter.getName())
                       && !parameter.isHidden())
                   .map(this::toOpenApiParameter)
                   .forEach(operation::addParametersItem)));
@@ -76,7 +77,7 @@ public class SwaggerConfig {
   }
 
   private Parameter toOpenApiParameter(SwaggerProfile.DocRequestParameter parameter) {
-    String position = StringUtils.hasText(parameter.getIn())
+    String position = ValidateUtils.isNotEmpty(parameter.getIn())
         ? parameter.getIn().toLowerCase()
         : "header";
     return new Parameter()

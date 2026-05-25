@@ -4,6 +4,7 @@ import cn.hutool.json.JSONUtil;
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.nio.charset.Charset;
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler {
   private Charset getCharset(HttpServletRequest request) {
     try {
       String encoding = request.getCharacterEncoding();
-      return encoding == null ? StandardCharsets.UTF_8 : Charset.forName(encoding);
+      return ValidateUtils.isEmpty(encoding) ? StandardCharsets.UTF_8 : Charset.forName(encoding);
     } catch (Exception ex) {
       return StandardCharsets.UTF_8;
     }

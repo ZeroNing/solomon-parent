@@ -39,7 +39,7 @@ public class SpringUtil implements ApplicationContextAware {
    * <p>只允许首次赋值，避免运行期被其他上下文覆盖后出现不可预期的 Bean 解析结果。</p>
    */
   public static void setContext(ApplicationContext applicationContext) {
-    if (context == null) {
+    if (ValidateUtils.isEmpty(context)) {
       context = applicationContext;
     }
   }
@@ -137,7 +137,7 @@ public class SpringUtil implements ApplicationContextAware {
   }
 
   private static ApplicationContext requireContext() {
-    if (context == null) {
+    if (ValidateUtils.isEmpty(context)) {
       throw new IllegalStateException("Spring ApplicationContext 尚未初始化");
     }
     return context;

@@ -2,6 +2,7 @@ package com.steven.solomon.base.exception;
 
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.FieldError;
@@ -21,7 +22,9 @@ public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHan
   public BaseExceptionVO handleBaseException(Throwable ex) {
     MethodArgumentNotValidException exception = (MethodArgumentNotValidException) ex;
     FieldError fieldError = exception.getBindingResult().getFieldError();
-    String message = fieldError == null ? exception.getMessage() : fieldError.getDefaultMessage();
+    String message = ValidateUtils.isEmpty(fieldError)
+        ? exception.getMessage()
+        : fieldError.getDefaultMessage();
     return messageResponse(message, 400);
   }
 }

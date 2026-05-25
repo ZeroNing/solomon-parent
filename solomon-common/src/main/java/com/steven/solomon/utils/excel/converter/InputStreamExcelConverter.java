@@ -29,7 +29,7 @@ public class InputStreamExcelConverter implements Converter<InputStream> {
         }catch (Exception e) {
             return new WriteCellData<>("InputStream异常");
         } finally {
-            if (value != null) {
+            if (ValidateUtils.isNotEmpty(value)) {
                 value.close();
             }
         }

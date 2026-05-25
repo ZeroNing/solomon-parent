@@ -1,6 +1,7 @@
 package com.steven.solomon.config.component;
 
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
 import org.springframework.context.ApplicationListener;
@@ -27,7 +28,7 @@ public abstract class AutoConfigurationExclusionListener implements ApplicationL
     public void onApplicationEvent(ApplicationEnvironmentPreparedEvent event) {
         String enabledKey = getEnabledKey();
         String enabledValue = event.getEnvironment().getProperty(enabledKey);
-        if (null == enabledValue || enabledValue.isEmpty()) {
+        if (ValidateUtils.isEmpty(enabledValue)) {
             enabledValue = "true";
         }
         enabledValue = enabledValue.trim();

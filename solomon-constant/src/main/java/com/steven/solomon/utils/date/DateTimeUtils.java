@@ -1,6 +1,7 @@
 package com.steven.solomon.utils.date;
 
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -251,7 +252,7 @@ public class DateTimeUtils {
 	}
 
 	public static Date localDate2Date(LocalDate localDate) {
-		if (localDate == null) {
+		if (ValidateUtils.isEmpty(localDate)) {
 			return null;
 		}
 		ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());

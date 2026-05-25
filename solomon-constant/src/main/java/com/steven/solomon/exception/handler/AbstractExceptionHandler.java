@@ -1,6 +1,7 @@
 package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
+import com.steven.solomon.verification.ValidateUtils;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +33,7 @@ public abstract class AbstractExceptionHandler {
    * @param handlers Spring 容器中所有异常处理器
    */
   public static void refreshExceptionHandlers(Map<String, AbstractExceptionHandler> handlers) {
-    if (handlers == null || handlers.isEmpty()) {
+    if (ValidateUtils.isEmpty(handlers)) {
       exceptionHandlerMap = Collections.emptyMap();
       return;
     }

@@ -1,5 +1,6 @@
 package com.steven.solomon.holder;
 
+import cn.hutool.core.util.StrUtil;
 import java.time.ZoneId;
 
 /**
@@ -23,7 +24,7 @@ public class RequestHeaderHolder {
    */
   public static String getTimeZone() {
     String timeZone = THREAD_LOCAL.get().getTimezone();
-    if (timeZone == null || timeZone.isBlank()) {
+    if (StrUtil.isBlank(timeZone)) {
       return ZoneId.systemDefault().getId();
     }
     try {
@@ -78,6 +79,6 @@ public class RequestHeaderHolder {
   }
 
   private static String defaultString(String value) {
-    return value == null || value.isEmpty() ? "" : value;
+    return StrUtil.emptyToDefault(value, "");
   }
 }

@@ -1,5 +1,6 @@
 package com.steven.solomon.utils.userAgent;
 
+import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import nl.basjes.parse.useragent.UserAgent;
 import nl.basjes.parse.useragent.UserAgentAnalyzer;
@@ -37,7 +38,7 @@ public class UserAgentUtils {
    * 获取请求中的原始 User-Agent 字符串。
    */
   public String getAgentString(HttpServletRequest request) {
-    return request == null ? null : request.getHeader(USER_AGENT_HEADER);
+    return ValidateUtils.isEmpty(request) ? null : request.getHeader(USER_AGENT_HEADER);
   }
 
   /**

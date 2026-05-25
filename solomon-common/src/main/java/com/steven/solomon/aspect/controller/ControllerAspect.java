@@ -79,7 +79,7 @@ public class ControllerAspect {
       String requestId, Object result, String startTime) {
     ServletRequestAttributes attributes =
         (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-    if (attributes == null) {
+    if (ValidateUtils.isEmpty(attributes)) {
       stopWatch.stop();
       return;
     }

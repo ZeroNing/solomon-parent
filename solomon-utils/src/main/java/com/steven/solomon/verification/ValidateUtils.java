@@ -1,6 +1,7 @@
 package com.steven.solomon.verification;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.util.regex.Matcher;
@@ -213,7 +214,7 @@ public final class ValidateUtils {
    * 正则完全匹配校验。
    */
   public static boolean regular(Pattern pattern, Object object) {
-    if (pattern == null || isEmpty(object)) {
+    if (ObjectUtil.isEmpty(pattern) || isEmpty(object)) {
       return false;
     }
     try {
@@ -228,7 +229,7 @@ public final class ValidateUtils {
    * 下划线命名转小驼峰命名。
    */
   public static String camelName(String name) {
-    if (name == null || name.isEmpty()) {
+    if (StrUtil.isEmpty(name)) {
       return "";
     }
     if (!name.contains("_")) {
@@ -236,7 +237,7 @@ public final class ValidateUtils {
     }
     StringBuilder result = new StringBuilder();
     for (String part : name.split("_")) {
-      if (part.isEmpty()) {
+      if (StrUtil.isEmpty(part)) {
         continue;
       }
       if (result.length() == 0) {
@@ -294,7 +295,7 @@ public final class ValidateUtils {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static boolean checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz) {
-    if (isEmpty(value) || clazz == null) {
+    if (isEmpty(value) || ObjectUtil.isEmpty(clazz)) {
       return true;
     }
     try {
@@ -344,14 +345,14 @@ public final class ValidateUtils {
    * 判断字符串是否为 Spring 占位符表达式。
    */
   public static boolean isELExpression(String expression) {
-    return expression != null && EL_PATTERN.matcher(expression).matches();
+    return StrUtil.isNotEmpty(expression) && EL_PATTERN.matcher(expression).matches();
   }
 
   /**
    * 从 ${name:default} 中提取 name。
    */
   public static String extractPropertyName(String expression) {
-    if (expression == null) {
+    if (StrUtil.isEmpty(expression)) {
       return null;
     }
     Matcher matcher = EL_PROPERTY_PATTERN.matcher(expression);
@@ -362,7 +363,7 @@ public final class ValidateUtils {
    * 从 ${name:default} 中提取 default。
    */
   public static String getElDefaultValue(String expression) {
-    if (expression == null || !expression.contains(":")) {
+    if (StrUtil.isEmpty(expression) || !expression.contains(":")) {
       return null;
     }
     return expression.substring(expression.indexOf(":") + 1, expression.indexOf("}"));

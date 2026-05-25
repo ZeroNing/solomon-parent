@@ -1,7 +1,7 @@
 package com.steven.solomon.context;
 
+import com.steven.solomon.verification.ValidateUtils;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public abstract class TenantContext<F> {
    */
   public void setFactory(String tenantId) {
     F factory = factoryMap.get(tenantId);
-    if (factory == null) {
+    if (ValidateUtils.isEmpty(factory)) {
       throw new IllegalStateException("未找到租户[" + tenantId + "]对应的工厂，请先注册");
     }
     threadLocal.set(factory);
@@ -63,7 +63,7 @@ public abstract class TenantContext<F> {
    * @param task 需要在租户上下文中执行的任务
    */
   public void trySetFactory(String tenantId, Runnable task) {
-    Objects.requireNonNull(task, "task不能为null");
+    requireNotEmpty(task, "task不能为null");
     try {
       setFactory(tenantId);
       task.run();
@@ -94,7 +94,7 @@ public abstract class TenantContext<F> {
    * @param factories 租户工厂映射
    */
   public synchronized void registerFactories(Map<String, F> factories) {
-    Objects.requireNonNull(factories, "factories不能为null");
+    requireNotEmpty(factories, "factories不能为null");
     factoryMap.putAll(factories);
     logger.info("[TenantContext] 批量注册租户工厂: count={}", factories.size());
   }
@@ -106,8 +106,8 @@ public abstract class TenantContext<F> {
    * @param factory 工厂对象
    */
   public void registerFactory(String tenantId, F factory) {
-    Objects.requireNonNull(tenantId, "tenantId不能为null");
-    Objects.requireNonNull(factory, "factory不能为null");
+    requireNotEmpty(tenantId, "tenantId不能为null");
+    requireNotEmpty(factory, "factory不能为null");
     factoryMap.put(tenantId, factory);
     logger.debug("[TenantContext] 已注册租户工厂: tenantId={}", tenantId);
   }
@@ -121,7 +121,7 @@ public abstract class TenantContext<F> {
   public F unregisterFactory(String tenantId) {
     F removed = factoryMap.remove(tenantId);
     logger.debug("[TenantContext] 已注销租户工厂: tenantId={}, removed={}",
-        tenantId, removed != null);
+        tenantId, ValidateUtils.isNotEmpty(removed));
     return removed;
   }
 
@@ -133,5 +133,14 @@ public abstract class TenantContext<F> {
    */
   public boolean isRegistered(String tenantId) {
     return factoryMap.containsKey(tenantId);
+  }
+
+  /**
+   * 严格校验必填参数，统一使用 ValidateUtils 判空，同时保留原有 NullPointerException 语义。
+   */
+  private void requireNotEmpty(Object value, String message) {
+    if (ValidateUtils.isEmpty(value)) {
+      throw new NullPointerException(message);
+    }
   }
 }
