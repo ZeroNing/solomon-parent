@@ -1,89 +1,52 @@
 package com.steven.solomon.sort;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 
 /**
- * 归并排序
+ * 归并排序实现。
+ *
+ * <p>递归拆分集合，再合并两个有序子序列。合并逻辑集中在一个方法里，
+ * 避免维护两套几乎相同的 merge 实现。</p>
  */
 public class MergeSortService implements SortService {
 
-    @Override
-    public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
-        if (list.size() <= 1) {
-            return list;
-        }
-        List<T> data = new ArrayList<>(list);
-        // 分割列表
-        int middle = list.size() / 2;
-        Collection<T> left = new ArrayList<>(data.subList(0, middle));
-        Collection<T> right = new ArrayList<>(data.subList(middle, list.size()));
-
-        // 递归排序左右两部分
-        left = sort(left, comparator);
-        right = sort(right, comparator);
-
-        // 合并排序后的左右两部分
-        return merge((List<T>) left, (List<T>) right, comparator);
+  @Override
+  public <T> Collection<T> sort(Collection<T> list, Comparator<? super T> comparator) {
+    List<T> data = copyToList(list);
+    if (data.size() <= 1) {
+      return data;
     }
 
-    private static <T> Collection<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator) {
-        List<T> result = new ArrayList<>();
-        int leftIndex = 0;
-        int rightIndex = 0;
+    int middle = data.size() / 2;
+    List<T> left = copyToList(data.subList(0, middle));
+    List<T> right = copyToList(data.subList(middle, data.size()));
 
-        // 合并两个有序列表
-        while (leftIndex < left.size() && rightIndex < right.size()) {
-            if (comparator.compare(left.get(leftIndex), right.get(rightIndex)) <= 0) {
-                result.add(left.get(leftIndex));
-                leftIndex++;
-            } else {
-                result.add(right.get(rightIndex));
-                rightIndex++;
-            }
-        }
+    return merge(
+        copyToList(sort(left, comparator)),
+        copyToList(sort(right, comparator)),
+        comparator);
+  }
 
-        // 添加剩余的元素
-        while (leftIndex < left.size()) {
-            result.add(left.get(leftIndex));
-            leftIndex++;
-        }
+  /**
+   * 合并两个已排序列表。
+   */
+  private <T> List<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator) {
+    List<T> result = new ArrayList<>(left.size() + right.size());
+    int leftIndex = 0;
+    int rightIndex = 0;
 
-        while (rightIndex < right.size()) {
-            result.add(right.get(rightIndex));
-            rightIndex++;
-        }
-
-        return result;
+    while (leftIndex < left.size() && rightIndex < right.size()) {
+      if (comparator.compare(left.get(leftIndex), right.get(rightIndex)) <= 0) {
+        result.add(left.get(leftIndex++));
+      } else {
+        result.add(right.get(rightIndex++));
+      }
     }
-
-    private static <T> Collection<T> merge(List<T> left, List<T> right, Comparator<? super T> comparator, boolean ascending) {
-        List<T> result = new ArrayList<>();
-        int leftIndex = 0;
-        int rightIndex = 0;
-
-        // 合并两个有序列表
-        while (leftIndex < left.size() && rightIndex < right.size()) {
-            int comparison = comparator.compare(left.get(leftIndex), right.get(rightIndex));
-            if (ascending ? comparison <= 0 : comparison >= 0) {
-                result.add(left.get(leftIndex));
-                leftIndex++;
-            } else {
-                result.add(right.get(rightIndex));
-                rightIndex++;
-            }
-        }
-
-        // 添加剩余的元素
-        while (leftIndex < left.size()) {
-            result.add(left.get(leftIndex));
-            leftIndex++;
-        }
-
-        while (rightIndex < right.size()) {
-            result.add(right.get(rightIndex));
-            rightIndex++;
-        }
-
-        return result;
-    }
+    result.addAll(left.subList(leftIndex, left.size()));
+    result.addAll(right.subList(rightIndex, right.size()));
+    return result;
+  }
 }

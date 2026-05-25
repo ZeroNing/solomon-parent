@@ -12,7 +12,6 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.eclipse.paho.client.mqttv3.*;
 import org.slf4j.Logger;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMqttInitService implements MqttInitService {
@@ -80,6 +79,6 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
-        this.initMqttClient(tenantCode,mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values()));
+        this.initMqttClient(tenantCode, mqttProfile, SpringUtil.getBeanListWithAnnotation(MessageListener.class));
     }
 }

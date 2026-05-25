@@ -38,11 +38,15 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * Excel工具类
+ * Excel 工具类。
+ *
+ * <p>统一处理导出响应头、表头国际化、默认样式和图片/集合转换器注册。</p>
  */
-public class ExcelUtils {
+public final class ExcelUtils {
 
 	private static final Logger logger = LoggerUtils.logger(ExcelUtils.class);
+
+	private ExcelUtils() {}
 
 	/**
 	 * 导出
@@ -53,25 +57,15 @@ public class ExcelUtils {
 	 */
 	public static void export(HttpServletResponse response, String excelName, String sheetName, Class<?> clazz, List<?> data, HorizontalCellStyleStrategy cellStyleStrategy, AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		setHead(response, excelName);
-		//更新Class注解值
-		StopWatch stopWatch = new StopWatch();
-		stopWatch.start();
-		logger.info("开始更新Class注解值国际化");
-		updateClassExcelPropertyValue(clazz);
-		stopWatch.stop();
-		logger.info("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
-		//开始导出
-		stopWatch = new StopWatch();
-		stopWatch.start();
-		logger.info("开始导出Excel");
+		updateExcelHeaderI18n(clazz);
+		StopWatch stopWatch = startLog("开始导出Excel");
 		FastExcel.write(response.getOutputStream(), clazz)
 				.registerConverter(new ListExcelConverter()).registerWriteHandler(new ImageCellWriteHandler())
 				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
 				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
 				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
 				.doWrite(data);
-		stopWatch.stop();
-		logger.info("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+		stopLog(stopWatch, "结束导出Excel");
 	}
 
 	/**
@@ -96,32 +90,19 @@ public class ExcelUtils {
 	 */
 	public static MultipartFile export(String excelName, String sheetName, Class<?> clazz,List<?> data,HorizontalCellStyleStrategy cellStyleStrategy,AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) throws Exception {
 		try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
-			//更新Class注解值
-			StopWatch stopWatch = new StopWatch();
-			stopWatch.start();
-			logger.info("开始更新Class注解值国际化");
-			updateClassExcelPropertyValue(clazz);
-			stopWatch.stop();
-			logger.info("结束更新Class注解值国际化,耗时:{}秒",stopWatch.getTotalTimeSeconds());
-			//开始导出
-			stopWatch = new StopWatch();
-			stopWatch.start();
-			logger.info("开始导出Excel");
-			ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz).registerConverter(new ListExcelConverter()).registerWriteHandler(new ImageCellWriteHandler()).registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel())).registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
-			ExcelWriter excelWriter = excelWriterBuilder.build();
-			ExcelWriterSheetBuilder excelWriterSheetBuilder;
-			WriteSheet writeSheet;
-			excelWriterSheetBuilder = new ExcelWriterSheetBuilder(excelWriter);
-			excelWriterSheetBuilder.sheetNo(0).sheetName(sheetName);
-			writeSheet = excelWriterSheetBuilder.build();
-			excelWriter.write(data, writeSheet);
-			// 必须要finish才会写入，不finish只会创建empty的文件
-			excelWriter.finish();
-			stopWatch.stop();
-			logger.info("结束导出Excel,耗时:{}秒",stopWatch.getTotalTimeSeconds());
+			updateExcelHeaderI18n(clazz);
+			StopWatch stopWatch = startLog("开始导出Excel");
+			ExcelWriter excelWriter = buildWriter(os, clazz, cellStyleStrategy, columnWidthStyleStrategy);
+			try {
+				excelWriter.write(data, buildSheet(excelWriter, sheetName));
+			} finally {
+				// 必须 finish 才会写入内容；放在 finally 中避免异常时资源未释放。
+				excelWriter.finish();
+			}
+			stopLog(stopWatch, "结束导出Excel");
 			byte[] content = os.toByteArray();
-			//生成文件
-			try (InputStream is = new ByteArrayInputStream(content);) {
+			// 生成内存文件，便于后续复用上传或转发逻辑。
+			try (InputStream is = new ByteArrayInputStream(content)) {
 				return new MockMultipartFile(excelName,excelName, MediaType.MULTIPART_FORM_DATA_VALUE, is);
 			}
 		}
@@ -139,16 +120,52 @@ public class ExcelUtils {
 		return export(excelName, sheetName, clazz, data, null, null);
 	}
 
+	/**
+	 * 更新 Excel 表头国际化文案，并记录耗时。
+	 */
+	private static void updateExcelHeaderI18n(Class<?> clazz) throws Exception {
+		StopWatch stopWatch = startLog("开始更新Class注解值国际化");
+		updateClassExcelPropertyValue(clazz);
+		stopLog(stopWatch, "结束更新Class注解值国际化");
+	}
+
 	private static void updateClassExcelPropertyValue(Class<?> clazz) throws Exception {
 		for (Field field : clazz.getDeclaredFields()) {
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
 			String value = I18nUtils.getMessage(i18nKey,(String)null);
 			if (ValidateUtils.isNotEmpty(value)) {
-				annotationNameAndValueMap.put("value", I18nUtils.getMessage(i18nKey,(String)null));
+				annotationNameAndValueMap.put("value", value);
 				ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
 			}
 		}
+	}
+
+	private static ExcelWriter buildWriter(ByteArrayOutputStream os, Class<?> clazz, HorizontalCellStyleStrategy cellStyleStrategy, AbstractColumnWidthStyleStrategy columnWidthStyleStrategy) {
+		ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz)
+				.registerConverter(new ListExcelConverter())
+				.registerWriteHandler(new ImageCellWriteHandler())
+				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
+				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
+		return excelWriterBuilder.build();
+	}
+
+	private static WriteSheet buildSheet(ExcelWriter excelWriter, String sheetName) {
+		ExcelWriterSheetBuilder excelWriterSheetBuilder = new ExcelWriterSheetBuilder(excelWriter);
+		excelWriterSheetBuilder.sheetNo(0).sheetName(ValidateUtils.getOrDefault(sheetName, "sheet"));
+		return excelWriterSheetBuilder.build();
+	}
+
+	private static StopWatch startLog(String message) {
+		StopWatch stopWatch = new StopWatch();
+		stopWatch.start();
+		logger.info(message);
+		return stopWatch;
+	}
+
+	private static void stopLog(StopWatch stopWatch, String message) {
+		stopWatch.stop();
+		logger.info("{},耗时:{}秒", message, stopWatch.getTotalTimeSeconds());
 	}
 
 	/**

@@ -11,7 +11,6 @@ import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.vertx.core.Vertx;
@@ -91,6 +90,6 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
-        this.initMqttClient(tenantCode, mqttProfile, new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values()));
+        this.initMqttClient(tenantCode, mqttProfile, SpringUtil.getBeanListWithAnnotation(MessageListener.class));
     }
 }

@@ -135,7 +135,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
      * @param tenantCode 租户编码
      */
     public void subscribe(MqttClient client, String tenantCode) throws Exception {
-        List<Object> clazzList = new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values());
+        List<Object> clazzList = SpringUtil.getBeanListWithAnnotation(MessageListener.class);
         this.subscribe(client, clazzList, tenantCode);
     }
 

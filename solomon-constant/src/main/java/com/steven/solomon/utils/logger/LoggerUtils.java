@@ -4,14 +4,20 @@ package com.steven.solomon.utils.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LoggerUtils {
+/**
+ * 日志工具类。
+ */
+public final class LoggerUtils {
+
+  private LoggerUtils() {}
+
   /**
-   * 默认日志记录类
+   * 根据类创建日志记录器。
    *
-   * @param clazz
-   * @return
+   * @param clazz 日志所属类
+   * @return slf4j 日志记录器
    */
-  public static final Logger logger(Class<?> clazz) {
+  public static Logger logger(Class<?> clazz) {
     return LoggerFactory.getLogger(clazz);
   }
 

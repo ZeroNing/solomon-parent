@@ -2,12 +2,15 @@ package com.steven.solomon.sort;
 
 import com.steven.solomon.sort.enums.SortTypeEnum;
 import com.steven.solomon.verification.ValidateUtils;
-
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 
-public class SortUtil {
+/**
+ * 排序工具类。
+ */
+public final class SortUtil {
+
+    private SortUtil() {}
 
     /**
      * 对给定的列表进行排序，支持升序和降序排序。

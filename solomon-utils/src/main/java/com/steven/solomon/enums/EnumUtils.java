@@ -1,55 +1,64 @@
 package com.steven.solomon.enums;
 
-
 import com.steven.solomon.pojo.enums.BaseEnum;
 import com.steven.solomon.verification.ValidateUtils;
-
 import java.util.Collection;
 
-public class EnumUtils {
+/**
+ * 枚举工具类。
+ *
+ * <p>项目内业务枚举统一实现 {@link BaseEnum}，这里集中提供按编码查找和存在性校验，
+ * 避免各处重复遍历枚举常量。</p>
+ */
+public final class EnumUtils {
 
-    /**
-     * 判断枚举是否存在
-     *
-     * @param enumClass 枚举类
-     * @param object    枚举值
-     * @return true 有枚举值 false 没有枚举值
-     */
-    public static boolean exist(Class<? extends Enum<?>> enumClass, Object object) {
-        if (ValidateUtils.isEmpty(object)) {
-            return false;
-        }
-        if (object instanceof Collection) {
-            Collection<Object> collections = (Collection<Object>) object;
-            for (Object o : collections) {
-                Object enums = codeOf(enumClass, o);
-                if (ValidateUtils.isEmpty(enums)) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return !ValidateUtils.isEmpty(codeOf(enumClass, object));
-        }
-    }
+  private EnumUtils() {}
 
-    /**
-     * 获取枚举类
-     *
-     * @param enumClass 枚举对象类
-     * @param value     枚举值
-     * @return 返回枚举类
-     */
-    public static <E extends Enum<?> & BaseEnum<?>> E codeOf(Class<? extends Enum<?>> enumClass, Object value) {
-        if (ValidateUtils.isEmpty(value)) {
-            return null;
-        }
-        E[] enumConstants = (E[]) enumClass.getEnumConstants();
-        for (E e : enumConstants) {
-            if (e.label().equals(String.valueOf(value)) || e.name().equals(String.valueOf(value))) {
-                return e;
-            }
-        }
-        return null;
+  /**
+   * 判断一个值或一组值是否都存在于指定枚举中。
+   *
+   * @param enumClass 枚举类
+   * @param object 单个枚举编码、枚举名称，或编码集合
+   * @return true 表示全部存在；false 表示有任意值不存在
+   */
+  @SuppressWarnings("unchecked")
+  public static boolean exist(Class<? extends Enum<?>> enumClass, Object object) {
+    if (ValidateUtils.isEmpty(object)) {
+      return false;
     }
+    if (object instanceof Collection<?> collection) {
+      for (Object value : collection) {
+        if (ValidateUtils.isEmpty(codeOf(enumClass, value))) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return ValidateUtils.isNotEmpty(codeOf(enumClass, object));
+  }
+
+  /**
+   * 根据枚举编码或枚举名称查找枚举实例。
+   *
+   * <p>先匹配 {@link BaseEnum#label()}，再匹配枚举 {@code name()}，兼容接口入参传编码或枚举名。</p>
+   *
+   * @param enumClass 枚举类
+   * @param value 枚举编码或枚举名称
+   * @return 匹配的枚举；未匹配时返回 null
+   */
+  @SuppressWarnings("unchecked")
+  public static <E extends Enum<?> & BaseEnum<?>> E codeOf(
+      Class<? extends Enum<?>> enumClass, Object value) {
+    if (ValidateUtils.isEmpty(value)) {
+      return null;
+    }
+    String targetValue = String.valueOf(value);
+    E[] enumConstants = (E[]) enumClass.getEnumConstants();
+    for (E item : enumConstants) {
+      if (item.label().equals(targetValue) || item.name().equals(targetValue)) {
+        return item;
+      }
+    }
+    return null;
+  }
 }

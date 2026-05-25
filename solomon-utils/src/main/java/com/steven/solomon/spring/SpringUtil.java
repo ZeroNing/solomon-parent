@@ -19,8 +19,8 @@ import org.springframework.core.annotation.Order;
 /**
  * Spring 容器工具类。
  *
- * <p>该工具用于少量无法直接注入 Bean 的静态工具场景。优先推荐构造器注入；
- * 只有在统一异常、枚举工具等静态入口中确实需要访问容器时，再使用本类。</p>
+ * <p>该工具只用于少量无法直接注入 Bean 的静态入口，例如统一异常、枚举工具和消息初始化流程。
+ * 业务代码优先使用构造器注入，避免隐藏依赖。</p>
  */
 @AutoConfiguration
 @Order(1)
@@ -34,7 +34,9 @@ public class SpringUtil implements ApplicationContextAware {
   }
 
   /**
-   * 设置 Spring 上下文。只允许第一次赋值，避免运行期被意外替换。
+   * 设置 Spring 上下文。
+   *
+   * <p>只允许首次赋值，避免运行期被其他上下文覆盖后出现不可预期的 Bean 解析结果。</p>
    */
   public static void setContext(ApplicationContext applicationContext) {
     if (context == null) {
@@ -62,6 +64,17 @@ public class SpringUtil implements ApplicationContextAware {
     return requireContext().getBeansWithAnnotation(annotationType);
   }
 
+  /**
+   * 根据注解类型查找 Bean，并按容器返回顺序转为列表。
+   *
+   * <p>多个消息组件只关心 Bean 实例本身，统一在这里转换可以减少重复的
+   * {@code new ArrayList<>(map.values())} 写法。</p>
+   */
+  public static List<Object> getBeanListWithAnnotation(
+      Class<? extends Annotation> annotationType) {
+    return new ArrayList<>(getBeansWithAnnotation(annotationType).values());
+  }
+
   public static <T> Map<String, T> getBeansOfType(Class<T> type) {
     return requireContext().getBeansOfType(type);
   }
@@ -75,7 +88,7 @@ public class SpringUtil implements ApplicationContextAware {
   }
 
   /**
-   * 按 ResolvableType 查找 Bean，适用于带泛型的接口。
+   * 按 {@link ResolvableType} 查找 Bean，适用于带泛型的接口。
    */
   @SuppressWarnings("unchecked")
   public static <T> T getBeansOfType(ResolvableType type, T defaultVal) {

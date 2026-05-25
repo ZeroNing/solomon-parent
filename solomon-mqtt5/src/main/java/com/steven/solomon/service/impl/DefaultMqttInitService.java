@@ -17,7 +17,6 @@ import org.eclipse.paho.mqttv5.common.MqttSubscription;
 import org.eclipse.paho.mqttv5.common.packet.MqttProperties;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class DefaultMqttInitService implements MqttInitService {
@@ -32,7 +31,7 @@ public class DefaultMqttInitService implements MqttInitService {
 
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
-        initMqttClient(tenantCode, mqttProfile,new ArrayList<>(SpringUtil.getBeansWithAnnotation(MessageListener.class).values()));
+        initMqttClient(tenantCode, mqttProfile, SpringUtil.getBeanListWithAnnotation(MessageListener.class));
     }
 
     @Override
