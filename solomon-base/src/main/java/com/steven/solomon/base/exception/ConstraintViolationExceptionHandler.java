@@ -20,6 +20,6 @@ public class ConstraintViolationExceptionHandler extends AbstractExceptionHandle
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     ConstraintViolationException exception = (ConstraintViolationException) ex;
-    return new BaseExceptionVO(null, exception.getMessage(), 400);
+    return messageResponse(exception.getMessage(), 400);
   }
 }

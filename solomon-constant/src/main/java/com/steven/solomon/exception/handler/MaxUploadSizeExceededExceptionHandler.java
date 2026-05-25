@@ -14,6 +14,6 @@ public class MaxUploadSizeExceededExceptionHandler extends AbstractExceptionHand
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    return new BaseExceptionVO(BaseExceptionCode.FILE_UPLOAD_MAX_SIZE, 413);
+    return codeResponse(BaseExceptionCode.FILE_UPLOAD_MAX_SIZE, 413);
   }
 }

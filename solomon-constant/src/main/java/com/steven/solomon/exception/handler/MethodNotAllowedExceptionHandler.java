@@ -14,6 +14,6 @@ public class MethodNotAllowedExceptionHandler extends AbstractExceptionHandler {
 
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    return new BaseExceptionVO(BaseExceptionCode.REQUEST_METHOD_ERROR, 405);
+    return codeResponse(BaseExceptionCode.REQUEST_METHOD_ERROR, 405);
   }
 }

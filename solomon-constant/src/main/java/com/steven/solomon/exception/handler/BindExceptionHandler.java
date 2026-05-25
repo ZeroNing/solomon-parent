@@ -20,6 +20,6 @@ public class BindExceptionHandler extends AbstractExceptionHandler {
     BindException exception = (BindException) ex;
     FieldError fieldError = exception.getFieldError();
     String message = fieldError == null ? exception.getMessage() : fieldError.getDefaultMessage();
-    return new BaseExceptionVO(null, message, 400);
+    return messageResponse(message, 400);
   }
 }

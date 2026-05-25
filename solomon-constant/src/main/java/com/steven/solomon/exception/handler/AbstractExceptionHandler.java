@@ -46,4 +46,31 @@ public abstract class AbstractExceptionHandler {
    * @return 统一异常响应对象
    */
   public abstract BaseExceptionVO handleBaseException(Throwable ex);
+
+  /**
+   * 根据错误码构建异常响应。
+   *
+   * <p>适合可以通过国际化 key 再解析出消息的场景。</p>
+   */
+  protected BaseExceptionVO codeResponse(String code, int statusCode) {
+    return new BaseExceptionVO(code, statusCode);
+  }
+
+  /**
+   * 根据错误码和已解析消息构建异常响应。
+   *
+   * <p>适合业务异常这种已经带有明确消息的场景。</p>
+   */
+  protected BaseExceptionVO codeResponse(String code, String message, int statusCode) {
+    return new BaseExceptionVO(code, message, statusCode);
+  }
+
+  /**
+   * 根据原始错误消息构建异常响应。
+   *
+   * <p>适合参数校验异常；这类异常的消息通常来自注解，不需要再走国际化 key 查找。</p>
+   */
+  protected BaseExceptionVO messageResponse(String message, int statusCode) {
+    return new BaseExceptionVO(null, message, statusCode);
+  }
 }

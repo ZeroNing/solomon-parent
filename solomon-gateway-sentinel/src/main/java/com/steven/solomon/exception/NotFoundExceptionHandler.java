@@ -1,48 +1,43 @@
 package com.steven.solomon.exception;
 
 import com.steven.solomon.code.BaseExceptionCode;
-import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
+import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import org.springframework.cloud.gateway.support.NotFoundException;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 服务不存在异常处理器
- * 当网关路由不到后端服务或服务实例不存在时，统一处理并返回友好响应
+ * 网关服务未找到异常处理器。
  *
- * @author steven
- * @since 1.0.0
+ * <p>当 Gateway 找不到后端服务实例时，优先返回服务调用失败错误码，并把服务路径作为
+ * 国际化参数写入响应对象，方便定位是哪一个下游服务不可用。</p>
  */
 @Configuration(value = "NotFoundExceptionProcessor", proxyBeanMethods = false)
 public class NotFoundExceptionHandler extends AbstractExceptionHandler {
 
-  /**
-   * 处理服务不存在异常
-   * 解析异常信息，返回404状态码和服务调用失败提示
-   *
-   * @param ex 异常对象
-   * @return 标准化异常响应对象
-   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
-    BaseExceptionVO baseExceptionVO = new BaseExceptionVO(BaseExceptionCode.BASE_EXCEPTION_CODE, 404);
-    
-    // 如果是网关找不到服务的异常
-    if (ex instanceof NotFoundException) {
-      NotFoundException notFoundEx = (NotFoundException) ex;
-      String reason = notFoundEx.getReason();
-      // 提取请求的服务路径信息
-      reason = reason.substring(reason.lastIndexOf("for ") + 4);
-      
-      // 构造服务调用错误响应
-      baseExceptionVO = new BaseExceptionVO(
-          BaseExceptionCode.SERVICE_CALL_ERROR, 
-          notFoundEx.getStatusCode().value()
-      );
-      // 将服务路径作为参数返回，方便定位问题
-      baseExceptionVO.setArg(reason);
+    if (!(ex instanceof NotFoundException notFoundException)) {
+      return codeResponse(BaseExceptionCode.BASE_EXCEPTION_CODE, 404);
     }
-    return baseExceptionVO;
+
+    BaseExceptionVO response = codeResponse(
+        BaseExceptionCode.SERVICE_CALL_ERROR,
+        notFoundException.getStatusCode().value());
+    response.setArg(resolveServiceName(notFoundException.getReason()));
+    return response;
   }
 
+  /**
+   * 从 Gateway 的异常 reason 中提取服务标识。
+   *
+   * <p>常见 reason 格式包含 “for xxx”，没有匹配到时直接返回原始 reason。</p>
+   */
+  private String resolveServiceName(String reason) {
+    if (reason == null || reason.isEmpty()) {
+      return "";
+    }
+    int index = reason.lastIndexOf("for ");
+    return index < 0 ? reason : reason.substring(index + 4);
+  }
 }

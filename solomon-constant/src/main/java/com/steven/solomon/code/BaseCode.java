@@ -18,8 +18,6 @@ public interface BaseCode {
 
   String HTTP_ACCEPT_LANGUAGE = "Accept-Language";
 
-  String BASE_EXCEPTION_CODE = "ERROR_CODE_";
-
   String BASE_ENUM_CODE = "ENUM_CODE_";
 
   String HEADER_PREFIX = "Bearer ";

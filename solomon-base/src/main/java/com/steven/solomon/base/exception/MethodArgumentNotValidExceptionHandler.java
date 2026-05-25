@@ -22,6 +22,6 @@ public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHan
     MethodArgumentNotValidException exception = (MethodArgumentNotValidException) ex;
     FieldError fieldError = exception.getBindingResult().getFieldError();
     String message = fieldError == null ? exception.getMessage() : fieldError.getDefaultMessage();
-    return new BaseExceptionVO(null, message, 400);
+    return messageResponse(message, 400);
   }
 }

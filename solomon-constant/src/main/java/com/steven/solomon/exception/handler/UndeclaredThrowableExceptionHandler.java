@@ -21,8 +21,8 @@ public class UndeclaredThrowableExceptionHandler extends AbstractExceptionHandle
   public BaseExceptionVO handleBaseException(Throwable ex) {
     Throwable target = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();
     if (target instanceof BaseException baseException) {
-      return new BaseExceptionVO(baseException.getCode(), baseException.getMessage(), 500);
+      return codeResponse(baseException.getCode(), baseException.getMessage(), 500);
     }
-    return new BaseExceptionVO(BaseExceptionCode.BASE_EXCEPTION_CODE, 500);
+    return codeResponse(BaseExceptionCode.BASE_EXCEPTION_CODE, 500);
   }
 }

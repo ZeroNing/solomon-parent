@@ -23,6 +23,6 @@ public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
     WebExchangeBindException exception = (WebExchangeBindException) ex;
     List<ObjectError> errors = exception.getAllErrors();
     String message = errors.isEmpty() ? exception.getMessage() : errors.get(0).getDefaultMessage();
-    return new BaseExceptionVO(null, message, 400);
+    return messageResponse(message, 400);
   }
 }

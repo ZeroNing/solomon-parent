@@ -18,6 +18,6 @@ public class BaseExceptionHandler extends AbstractExceptionHandler {
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     BaseException exception = (BaseException) ex;
-    return new BaseExceptionVO(exception.getCode(), exception.getMessage(), 500);
+    return codeResponse(exception.getCode(), exception.getMessage(), 500);
   }
 }
