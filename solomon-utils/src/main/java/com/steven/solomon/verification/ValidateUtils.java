@@ -3,459 +3,348 @@ package com.steven.solomon.verification;
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.utils.logger.LoggerUtils;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.slf4j.Logger;
 
+/**
+ * 通用校验工具。
+ *
+ * <p>历史代码中大量使用本类的静态方法，因此这里保留原有方法签名。
+ * 带 {@code errorCode} 的方法会在条件命中时抛出 {@link BaseException}，
+ * 调用方可以通过统一异常处理返回标准错误响应。</p>
+ */
 public class ValidateUtils {
 
-    private static final Pattern IS_NUMBER_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
+  private static final Pattern IS_NUMBER_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
+  private static final Pattern EL_PATTERN = Pattern.compile("\\$\\{[^}]+}|#\\{[^}]+}");
+  private static final Pattern EL_PROPERTY_PATTERN = Pattern.compile("\\$\\{([^:}]+)(?::[^}]+)?}");
+  private static final Logger logger = LoggerUtils.logger(ValidateUtils.class);
 
-    private static final Logger logger = LoggerUtils.logger(ValidateUtils.class);
+  public String valueOf(Number target, String def) {
+    return isEmpty(target) ? def : String.valueOf(target);
+  }
 
-    public String valueOf(Number target, String def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return String.valueOf(target);
+  public Long valueOf(String target, Long def) {
+    return isEmpty(target) ? def : Long.valueOf(target);
+  }
+
+  public Integer valueOf(String target, Integer def) {
+    return isEmpty(target) ? def : Integer.valueOf(target);
+  }
+
+  public Double valueOf(String target, Double def) {
+    return isEmpty(target) ? def : Double.valueOf(target);
+  }
+
+  public Short valueOf(String target, Short def) {
+    return isEmpty(target) ? def : Short.valueOf(target);
+  }
+
+  public Float valueOf(String target, Float def) {
+    return isEmpty(target) ? def : Float.valueOf(target);
+  }
+
+  /**
+   * 对象为空时返回默认值。
+   */
+  public static <T> T getOrDefault(T obj, T def) {
+    return isEmpty(obj) ? def : obj;
+  }
+
+  public static boolean equals(String contrast, String var) {
+    return ObjectUtil.equals(contrast, var);
+  }
+
+  /**
+   * 两个字符串相等时抛出异常。
+   */
+  public static void equals(String contrast, String var, String errorCode) throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void equals(String contrast, String var, String errorCode, Object... args)
+      throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean notEquals(String contrast, String var) {
+    return !equals(contrast, var);
+  }
+
+  /**
+   * 两个字符串不相等时抛出异常。
+   */
+  public static void notEquals(String contrast, String var, String errorCode) throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void notEquals(String contrast, String var, String errorCode, Object... args)
+      throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean equalsIgnoreCase(String contrast, String var) {
+    if (isEmpty(contrast) || isEmpty(var)) {
+      return false;
     }
+    return contrast.equalsIgnoreCase(var);
+  }
 
-    public Long valueOf(String target, Long def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return Long.valueOf(target);
+  public static void equalsIgnoreCase(String contrast, String var, String errorCode)
+      throws BaseException {
+    check(equalsIgnoreCase(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void equalsIgnoreCase(String contrast, String var, String errorCode, Object... args)
+      throws BaseException {
+    check(equalsIgnoreCase(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean notEqualsIgnoreCase(String contrast, String var) {
+    return !equalsIgnoreCase(contrast, var);
+  }
+
+  public static void notEqualsIgnoreCase(String contrast, String var, String errorCode)
+      throws BaseException {
+    check(notEqualsIgnoreCase(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void notEqualsIgnoreCase(String contrast, String var, String errorCode,
+      Object... args) throws BaseException {
+    check(notEqualsIgnoreCase(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean equals(Number contrast, Number var) {
+    return ObjectUtil.equals(contrast, var);
+  }
+
+  public static void equals(Number contrast, Number var, String errorCode) throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void equals(Number contrast, Number var, String errorCode, Object... args)
+      throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean notEquals(Number contrast, Number var) {
+    return !equals(contrast, var);
+  }
+
+  public static void notEquals(Number contrast, Number var, String errorCode) throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void notEquals(Number contrast, Number var, String errorCode, Object... args)
+      throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean equals(Boolean contrast, Boolean var) {
+    return ObjectUtil.equals(contrast, var);
+  }
+
+  public static void equals(Boolean contrast, Boolean var, String errorCode) throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void equals(Boolean contrast, Boolean var, String errorCode, Object... args)
+      throws BaseException {
+    check(equals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  public static boolean notEquals(Boolean contrast, Boolean var) {
+    return !equals(contrast, var);
+  }
+
+  public static void notEquals(Boolean contrast, Boolean var, String errorCode)
+      throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode));
+  }
+
+  public static void notEquals(Boolean contrast, Boolean var, String errorCode, Object... args)
+      throws BaseException {
+    check(notEquals(contrast, var), new BaseException(errorCode, args));
+  }
+
+  /**
+   * 判断数字是否为空或等于 0。
+   */
+  public static boolean isZero(Object number) {
+    if (isEmpty(number)) {
+      return true;
     }
+    String str = String.valueOf(number);
+    return "0".equals(str) || "0.0".equals(str);
+  }
 
-    public Integer valueOf(String target, Integer def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return Integer.valueOf(target);
+  public static boolean isNumber(String str) {
+    return regular(IS_NUMBER_PATTERN, str);
+  }
+
+  private static void check(boolean flag, BaseException ex) throws BaseException {
+    if (flag) {
+      throw ex;
     }
+  }
 
-    public Double valueOf(String target, Double def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return Double.valueOf(target);
+  /**
+   * 正则完全匹配校验。
+   */
+  public static boolean regular(Pattern pattern, Object object) {
+    if (pattern == null || isEmpty(object)) {
+      return false;
     }
-
-    public Short valueOf(String target, Short def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return Short.valueOf(target);
+    try {
+      return pattern.matcher(object.toString()).matches();
+    } catch (Throwable ex) {
+      logger.error("正则校验失败: value={}", object, ex);
+      return false;
     }
+  }
 
-    public Float valueOf(String target, Float def) {
-        if (isEmpty(target)) {
-            return def;
-        }
-        return Float.valueOf(target);
+  /**
+   * 下划线命名转小驼峰命名。
+   */
+  public static String camelName(String name) {
+    if (name == null || name.isEmpty()) {
+      return "";
     }
-
-    /**
-     * 获取默认值
-     *
-     * @param obj 参数
-     * @param def 默认值
-     */
-    public static <T> T getOrDefault(T obj, T def) {
-        return isEmpty(obj) ? def : obj;
+    if (!name.contains("_")) {
+      return name.substring(0, 1).toLowerCase() + name.substring(1).toLowerCase();
     }
-
-    public static boolean equals(String contrast, String var) {
-        return ObjectUtil.equals(contrast, var);
+    StringBuilder result = new StringBuilder();
+    for (String part : name.split("_")) {
+      if (part.isEmpty()) {
+        continue;
+      }
+      if (result.length() == 0) {
+        result.append(part.toLowerCase());
+      } else {
+        result.append(part.substring(0, 1).toUpperCase())
+            .append(part.substring(1).toLowerCase());
+      }
     }
+    return result.toString();
+  }
 
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(String contrast, String var, String errorCode) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode));
+  public static Boolean isEmpty(Object obj) {
+    return ObjectUtil.isEmpty(obj);
+  }
+
+  /**
+   * 对象为空时抛出异常。
+   */
+  public static <T> T isEmpty(T obj, String errorCode) throws BaseException {
+    return isEmpty(obj, errorCode, (Object) null);
+  }
+
+  public static <T> T isEmpty(T obj, String errorCode, Object... args) throws BaseException {
+    if (isEmpty(obj)) {
+      throw new BaseException(errorCode, args);
     }
+    return obj;
+  }
 
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(String contrast, String var, String errorCode, Object... args) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode, args));
+  public static boolean isNotEmpty(Object obj) {
+    return !isEmpty(obj);
+  }
+
+  /**
+   * 对象非空时抛出异常。
+   */
+  public static <T> T isNotEmpty(T obj, String errorCode) throws BaseException {
+    return isNotEmpty(obj, errorCode, (Object) null);
+  }
+
+  public static <T> T isNotEmpty(T obj, String code, Object... args) throws BaseException {
+    if (!isEmpty(obj)) {
+      throw new BaseException(code, args);
     }
+    return obj;
+  }
 
-    /**
-     * 判断值不相等报错
-     */
-    public static boolean notEquals(String contrast, String var) {
-        return !equals(contrast, var);
+  /**
+   * 判断枚举值是否无效。
+   *
+   * @param value 枚举名称，大小写敏感
+   * @param clazz 枚举类型
+   * @return true 表示为空或不存在于枚举中
+   */
+  @SuppressWarnings({"unchecked", "rawtypes"})
+  public static boolean checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz) {
+    if (isEmpty(value) || clazz == null) {
+      return true;
     }
-
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(String contrast, String var, String errorCode) throws BaseException {
-        check(notEquals(contrast, var), new BaseException(errorCode));
+    try {
+      Enum.valueOf(clazz, value);
+      return false;
+    } catch (IllegalArgumentException ex) {
+      return true;
     }
+  }
 
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(String contrast, String var, String errorCode, Object... args) throws BaseException {
-        check(notEquals(contrast, var), new BaseException(errorCode, args));
+  public static void checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz,
+      String errorCode, Object[] args) throws BaseException {
+    if (checkEnumValueIsEmpty(value, clazz)) {
+      throw new BaseException(errorCode, args);
     }
+  }
 
-    public static boolean equalsIgnoreCase(String contrast, String var) {
-        if (isEmpty(contrast) || isEmpty(var)) {
-            return false;
-        }
-        return contrast.equalsIgnoreCase(var);
+  public static void checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz,
+      String errorCode) throws BaseException {
+    if (checkEnumValueIsEmpty(value, clazz)) {
+      throw new BaseException(errorCode, (String) null);
     }
+  }
 
-    /**
-     * 判断值相等报错（忽略大小写）
-     */
-    public static void equalsIgnoreCase(String contrast, String var, String errorCode) throws BaseException {
-        check(equalsIgnoreCase(contrast, var), new BaseException(errorCode));
+  /**
+   * 判断枚举值是否有效。
+   */
+  public static boolean checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz) {
+    return !checkEnumValueIsEmpty(value, clazz);
+  }
+
+  public static void checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz,
+      String errorCode, Object[] args) throws BaseException {
+    if (checkEnumValueIsNotEmpty(value, clazz)) {
+      throw new BaseException(errorCode, args);
     }
+  }
 
-    /**
-     * 判断值相等报错（忽略大小写）
-     */
-    public static void equalsIgnoreCase(String contrast, String var, String errorCode, Object... args)
-            throws BaseException {
-        check(equalsIgnoreCase(contrast, var), new BaseException(errorCode, args));
+  public static void checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz,
+      String errorCode) throws BaseException {
+    if (checkEnumValueIsNotEmpty(value, clazz)) {
+      throw new BaseException(errorCode, (String) null);
     }
+  }
 
-    public static boolean notEqualsIgnoreCase(String contrast, String var) {
-        return !equalsIgnoreCase(contrast, var);
+  /**
+   * 判断字符串是否为 Spring 占位符表达式。
+   */
+  public static boolean isELExpression(String expression) {
+    return expression != null && EL_PATTERN.matcher(expression).matches();
+  }
+
+  /**
+   * 从 ${name:default} 中提取 name。
+   */
+  public static String extractPropertyName(String expression) {
+    if (expression == null) {
+      return null;
     }
+    Matcher matcher = EL_PROPERTY_PATTERN.matcher(expression);
+    return matcher.find() ? matcher.group(1) : null;
+  }
 
-    /**
-     * 判断值不相等报错（忽略大小写）
-     */
-    public static void notEqualsIgnoreCase(String contrast, String var, String errorCode) throws BaseException {
-        check(notEqualsIgnoreCase(contrast, var), new BaseException(errorCode));
+  /**
+   * 从 ${name:default} 中提取 default。
+   */
+  public static String getElDefaultValue(String expression) {
+    if (expression == null || !expression.contains(":")) {
+      return null;
     }
-
-    /**
-     * 判断值不相等报错（忽略大小写）
-     */
-    public static void notEqualsIgnoreCase(String contrast, String var, String errorCode, Object... args) throws BaseException {
-        check(notEqualsIgnoreCase(contrast, var), new BaseException(errorCode, args));
-    }
-
-    public static boolean equals(Number contrast, Number var) {
-        return ObjectUtil.equals(contrast, var);
-    }
-
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(Number contrast, Number var, String errorCode) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode));
-    }
-
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(Number contrast, Number var, String errorCode, Object... args) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode, args));
-    }
-
-    public static boolean notEquals(Number contrast, Number var) {
-        return !equals(contrast, var);
-    }
-
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(Number contrast, Number var, String errorCode) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode));
-    }
-
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(Number contrast, Number var, String errorCode, Object... args) throws BaseException {
-        if (notEquals(contrast, var)) {
-            throw new BaseException(errorCode, args);
-        }
-    }
-
-    public static boolean equals(Boolean contrast, Boolean var) {
-        return ObjectUtil.equals(contrast, var);
-    }
-
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(Boolean contrast, Boolean var, String errorCode) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode));
-    }
-
-    /**
-     * 判断值相等报错
-     */
-    public static void equals(Boolean contrast, Boolean var, String errorCode, Object... args) throws BaseException {
-        check(equals(contrast, var), new BaseException(errorCode, args));
-    }
-
-    public static boolean notEquals(Boolean contrast, Boolean var) {
-        return !equals(contrast, var);
-    }
-
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(Boolean contrast, Boolean var, String errorCode) throws BaseException {
-        check(notEquals(contrast, var), new BaseException(errorCode));
-    }
-
-    /**
-     * 判断值不相等报错
-     */
-    public static void notEquals(Boolean contrast, Boolean var, String errorCode, Object... args) throws BaseException {
-        check(notEquals(contrast, var), new BaseException(errorCode, args));
-    }
-
-    /**
-     * 判断传入的数字类型的值是否等于0或者是否为空，如果等于0或者等于空都会返回一个true
-     */
-    public static boolean isZero(Object number) {
-        if (isEmpty(number)) {
-            return true;
-        }
-        String str = String.valueOf(number);
-        return "0".equals(str) || "0.0".equals(str);
-    }
-
-    /**
-     * 判断是否为数字
-     */
-    public static boolean isNumber(String str) {
-        return regular(IS_NUMBER_PATTERN, str);
-    }
-
-    private static void check(boolean flag, BaseException e) throws BaseException {
-        if (flag) {
-            throw e;
-        }
-    }
-
-    public static boolean regular(Pattern pattern, Object object) {
-        if (ValidateUtils.isEmpty(object)) {
-            return false;
-        }
-        String bigStr;
-        try {
-            bigStr = object.toString();
-        } catch (Throwable e) {
-            logger.error("正则校验报错异常,传入的值为:{},异常为:", object, e);
-            return false;
-        }
-        Matcher matcher = pattern.matcher(bigStr);
-        return matcher.matches();
-    }
-
-    public static String camelName(String name) {
-        StringBuilder result = new StringBuilder();
-        // 快速检查
-        if (name == null || name.isEmpty()) {
-            // 没必要转换
-            return "";
-        } else if (!name.contains("_")) {
-            // 不含下划线，仅将首字母小写
-            return name.substring(0, 1).toLowerCase() + name.substring(1).toLowerCase();
-        }
-        // 用下划线将原始字符串分割
-        String[] camels = name.split("_");
-        for (String camel : camels) {
-            // 跳过原始字符串中开头、结尾的下换线或双重下划线
-            if (camel.isEmpty()) {
-                continue;
-            }
-            // 处理真正的驼峰片段
-            if (result.length() == 0) {
-                // 第一个驼峰片段，全部字母都小写
-                result.append(camel.toLowerCase());
-            } else {
-                // 其他的驼峰片段，首字母大写
-                result.append(camel.substring(0, 1).toUpperCase());
-                result.append(camel.substring(1).toLowerCase());
-            }
-        }
-        return result.toString();
-    }
-
-    /**
-     * 判断是否为空
-     */
-    public static Boolean isEmpty(Object obj) {
-        return ObjectUtil.isEmpty(obj);
-    }
-
-    /**
-     * 判断是否为空
-     *
-     * @param obj       对象
-     * @param errorCode 报错异常
-     */
-    public static <T> T isEmpty(T obj, String errorCode) throws BaseException {
-        return isEmpty(obj, errorCode, (Object) null);
-    }
-
-    /**
-     * 判断是否为空
-     *
-     * @param obj       对象
-     * @param errorCode 报错异常
-     * @param args      可替换的信息
-     */
-    public static <T> T isEmpty(T obj, String errorCode, Object... args) throws BaseException {
-        if (isEmpty(obj)) {
-            throw new BaseException(errorCode, args);
-        }
-        return obj;
-    }
-
-    /**
-     * 判断对象是否非空
-     *
-     * @param obj 对象
-     * @return {@code true}: 非空<br>
-     * {@code false}: 空
-     */
-    public static boolean isNotEmpty(Object obj) {
-        return !isEmpty(obj);
-    }
-
-    /**
-     * 判断对象是否非空
-     *
-     * @param obj       对象
-     * @param errorCode 报错异常
-     */
-    public static <T> T isNotEmpty(T obj, String errorCode) throws BaseException {
-        return isNotEmpty(obj, errorCode, (Object) null);
-    }
-
-    /**
-     * 判断对象是否非空
-     *
-     * @param obj  对象
-     * @param code 报错异常
-     * @param args 可替换的信息
-     */
-    public static <T> T isNotEmpty(T obj, String code, Object... args) throws BaseException {
-        if (!isEmpty(obj)) {
-            throw new BaseException(code, args);
-        }
-        return obj;
-    }
-
-    /**
-     * 检查枚举值是否无效（不存在于枚举类中）
-     *
-     * <p>该方法通过捕获{@link IllegalArgumentException}来判断枚举值是否存在。</p>
-     * <p>⚠️ 注意：枚举名称是大小写敏感的。</p>
-     *
-     * <h3>使用示例：</h3>
-     * <pre>{@code
-     * enum Status { ACTIVE, INACTIVE }
-     *
-     * // 有效枚举值
-     * checkEnumValueIsEmpty("ACTIVE", Status.class);  // 返回 false
-     *
-     * // 无效枚举值
-     * checkEnumValueIsEmpty("UNKNOWN", Status.class); // 返回 true
-     * checkEnumValueIsEmpty("active", Status.class);  // 返回 true（大小写敏感）
-     * checkEnumValueIsEmpty(null, Status.class);      // 返回 true
-     * }</pre>
-     *
-     * @param value 枚举名称（大小写敏感）
-     * @param clazz 枚举class
-     * @return {@code true}: 枚举值无效（不存在）<br>{@code false}: 枚举值有效（存在）
-     * @see Enum#valueOf(Class, String)
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static boolean checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz) {
-        if (isEmpty(value) || isEmpty(clazz)) {
-            return true;
-        }
-        try {
-            Enum.valueOf(clazz, value);
-            return false;  // 找到了，说明有效
-        } catch (IllegalArgumentException e) {
-            return true;   // 找不到，说明无效
-        }
-    }
-
-    /**
-     * 检查枚举是否不符合
-     *
-     * @param value 枚举名称
-     * @param clazz 枚举class
-     */
-    public static void checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz, String errorCode, Object[] args) throws BaseException {
-        if (checkEnumValueIsEmpty(value, clazz)) {
-            throw new BaseException(errorCode, args);
-        }
-    }
-
-    public static void checkEnumValueIsEmpty(String value, Class<? extends Enum> clazz, String errorCode) throws BaseException {
-        if (checkEnumValueIsEmpty(value, clazz)) {
-            throw new BaseException(errorCode, (String) null);
-        }
-    }
-
-    /**
-     * 检查枚举是否符合
-     *
-     * @param value 枚举名称
-     * @param clazz 枚举class
-     */
-    public static boolean checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz) {
-        return !checkEnumValueIsEmpty(value, clazz);
-    }
-
-    public static void checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz, String errorCode, Object[] args) throws BaseException {
-        if (checkEnumValueIsNotEmpty(value, clazz)) {
-            throw new BaseException(errorCode, args);
-        }
-    }
-
-    public static void checkEnumValueIsNotEmpty(String value, Class<? extends Enum> clazz, String errorCode) throws BaseException {
-        if (checkEnumValueIsNotEmpty(value, clazz)) {
-            throw new BaseException(errorCode, (String) null);
-        }
-    }
-    public static boolean isELExpression(String expression) {
-        // 正则表达式来检查是否符合 `${...}` 或 `#{...}` 的模式
-        String elRegex = "\\$\\{[^}]+\\}|#\\{[^}]+\\}";
-        return expression.matches(elRegex);
-    }
-
-    public static String extractPropertyName(String expression) {
-        // 定义正则表达式，匹配 ${...} 格式的字符串中的属性名，忽略冒号及其后的默认值
-        Pattern pattern = Pattern.compile("\\$\\{([^:}]+)(?::[^}]+)?\\}");
-        Matcher matcher = pattern.matcher(expression);
-
-        // 提取匹配到的内容
-        if (matcher.find()) {
-            return matcher.group(1); // group(1) 返回第一个捕获组，即属性名
-        }
-
-        return null; // 如果没有匹配到，返回null
-    }
-
-    public static String getElDefaultValue(String expression) {
-        String defaultValue = null;
-
-        if (expression.contains(":")) {
-            defaultValue = expression.substring(expression.indexOf(":") + 1, expression.indexOf("}"));
-        }
-        return defaultValue;
-    }
+    return expression.substring(expression.indexOf(":") + 1, expression.indexOf("}"));
+  }
 }

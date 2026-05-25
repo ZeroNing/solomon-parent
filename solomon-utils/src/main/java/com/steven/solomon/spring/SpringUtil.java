@@ -1,121 +1,132 @@
 package com.steven.solomon.spring;
 
-import java.lang.annotation.Annotation;
-import java.util.*;
-
 import com.steven.solomon.verification.ValidateUtils;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.annotation.Order;
 
 /**
- * Spring上下文工具类
+ * Spring 容器工具类。
+ *
+ * <p>该工具用于少量无法直接注入 Bean 的静态工具场景。优先推荐构造器注入；
+ * 只有在统一异常、枚举工具等静态入口中确实需要访问容器时，再使用本类。</p>
  */
-@Configuration
+@AutoConfiguration
 @Order(1)
 public class SpringUtil implements ApplicationContextAware {
 
-    private static ApplicationContext context;
+  private static volatile ApplicationContext context;
 
-    public SpringUtil(ApplicationContext applicationContext) {
-        SpringUtil.context = applicationContext;
+  @Override
+  public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    setContext(applicationContext);
+  }
+
+  /**
+   * 设置 Spring 上下文。只允许第一次赋值，避免运行期被意外替换。
+   */
+  public static void setContext(ApplicationContext applicationContext) {
+    if (context == null) {
+      context = applicationContext;
     }
+  }
 
-    /**
-     * Spring在bean初始化后会判断是不是ApplicationContextAware的子类
-     * 如果该类是,setApplicationContext()方法,会将容器中ApplicationContext作为参数传入进去
-     */
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        if (SpringUtil.context == null) {
-            SpringUtil.context = applicationContext;
-        }
+  public static ApplicationContext getApplicationContext() {
+    return requireContext();
+  }
+
+  public static <T> T getBean(Class<T> beanClass) {
+    return requireContext().getBean(beanClass);
+  }
+
+  public static <T> T getBean(String name, Class<T> beanClass) {
+    return requireContext().getBean(name, beanClass);
+  }
+
+  /**
+   * 根据注解类型查找 Bean。
+   */
+  public static Map<String, Object> getBeansWithAnnotation(
+      Class<? extends Annotation> annotationType) {
+    return requireContext().getBeansWithAnnotation(annotationType);
+  }
+
+  public static <T> Map<String, T> getBeansOfType(Class<T> type) {
+    return requireContext().getBeansOfType(type);
+  }
+
+  /**
+   * 获取指定类型的第一个 Bean；不存在时返回默认值。
+   */
+  public static <T> T getBeansOfType(Class<T> type, T defaultVal) {
+    List<T> list = new ArrayList<>(getBeansOfType(type).values());
+    return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
+  }
+
+  /**
+   * 按 ResolvableType 查找 Bean，适用于带泛型的接口。
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T getBeansOfType(ResolvableType type, T defaultVal) {
+    ConfigurableApplicationContext configurableContext =
+        (ConfigurableApplicationContext) requireContext();
+    DefaultListableBeanFactory beanFactory =
+        (DefaultListableBeanFactory) configurableContext.getBeanFactory();
+
+    String[] beanNames = beanFactory.getBeanNamesForType(type);
+    Map<String, T> beans = new LinkedHashMap<>();
+    for (String beanName : beanNames) {
+      beans.put(beanName, (T) beanFactory.getBean(beanName));
     }
+    List<T> list = new ArrayList<>(beans.values());
+    return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
+  }
 
-    public static void setContext(ApplicationContext applicationContext) {
-        if (SpringUtil.context == null) {
-            SpringUtil.context = applicationContext;
-        }
+  /**
+   * 解析 Spring 占位符表达式，例如 {@code ${server.port:8080}}。
+   */
+  public static String getElValue(String elKey, String defaultValue) {
+    return ValidateUtils.getOrDefault(getElValue(elKey), defaultValue);
+  }
+
+  /**
+   * 解析 Spring 占位符表达式；非表达式会原样返回。
+   */
+  public static String getElValue(String elKey) {
+    if (ValidateUtils.isNotEmpty(elKey) && ValidateUtils.isELExpression(elKey)) {
+      return requireContext().getEnvironment().resolveRequiredPlaceholders(elKey);
     }
+    return elKey;
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        return context;
+  /**
+   * 获取服务 Bean 的泛型引用映射。
+   */
+  public static <T> Map<String, ParameterizedTypeReference<?>> getAllServicesWithGenerics(
+      Class<T> clazz) {
+    Map<String, ParameterizedTypeReference<?>> result = new LinkedHashMap<>();
+    Map<String, T> beans = getBeansOfType(clazz);
+    for (String beanName : beans.keySet()) {
+      result.put(beanName, new ParameterizedTypeReference<T>() {});
     }
+    return result;
+  }
 
-    /**
-     * 通过Name返回指定的Bean
-     */
-    public static <T> T getBean(Class<T> beanClass) {
-        return context.getBean(beanClass);
+  private static ApplicationContext requireContext() {
+    if (context == null) {
+      throw new IllegalStateException("Spring ApplicationContext 尚未初始化");
     }
-
-    public static <T> T getBean(String name, Class<T> beanClass) {
-        return context.getBean(name, beanClass);
-    }
-
-    /**
-     * 根据注解找到使用注解的类
-     *
-     * @param annotationType 注解class
-     */
-    public static Map<String, Object> getBeansWithAnnotation(Class<? extends Annotation> annotationType) {
-        return context.getBeansWithAnnotation(annotationType);
-    }
-
-    public static <T> Map<String, T> getBeansOfType(Class<T> type) {
-        return context.getBeansOfType(type);
-    }
-
-    public static <T> T getBeansOfType(Class<T> type,T defaultVal) {
-        List<T> list =  new ArrayList<T>(context.getBeansOfType(type).values());
-        return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
-    }
-
-    public static <T> T getBeansOfType(ResolvableType type,T defaultVal) {
-        DefaultListableBeanFactory beanFactory =
-                (DefaultListableBeanFactory) ((ConfigurableApplicationContext) context).getBeanFactory();
-
-        String[] beanNames = beanFactory.getBeanNamesForType(type);
-        Map<String, T> beans = new LinkedHashMap<>();
-        for (String beanName : beanNames) {
-            beans.put(beanName, (T) beanFactory.getBean(beanName));
-        }
-        List<T> list =  new ArrayList<T>(beans.values());
-        return ValidateUtils.isEmpty(list) ? defaultVal : list.get(0);
-    }
-
-
-    /**
-     * 读取#{}和${}值
-     */
-    public static String getElValue(String elKey,String defaultValue) {
-        return ValidateUtils.getOrDefault(getElValue(elKey),defaultValue);
-    }
-
-    /**
-     * 读取#{}和${}值
-     */
-    public static String getElValue(String elKey) {
-        if (ValidateUtils.isNotEmpty(elKey) && ValidateUtils.isELExpression(elKey)) {
-            return context.getEnvironment().resolveRequiredPlaceholders(elKey);
-        }
-        return elKey;
-    }
-
-    public static <T> Map<String, ParameterizedTypeReference<?>> getAllServicesWithGenerics(Class<T> clazz) {
-        Map<String, ParameterizedTypeReference<?>> result = new HashMap<>();
-        Map<String, T> beans = context.getBeansOfType(clazz);
-
-        for (Map.Entry<String, T> entry : beans.entrySet()) {
-            ParameterizedTypeReference<?> typeRef = new ParameterizedTypeReference<T>() {};
-            result.put(entry.getKey(), typeRef);
-        }
-        return result;
-    }
+    return context;
+  }
 }

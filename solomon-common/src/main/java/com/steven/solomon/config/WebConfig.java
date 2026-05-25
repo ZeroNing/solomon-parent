@@ -1,14 +1,11 @@
 package com.steven.solomon.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.steven.solomon.json.config.JsonConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-
-import com.steven.solomon.json.config.JsonConfig;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -17,31 +14,50 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
-@Import(value = {JsonConfig.class})
-@ConditionalOnMissingBean(WebMvcConfigurer.class)
+/**
+ * Spring MVC 基础配置。
+ *
+ * <p>该配置只做通用、低侵入的 Web 增强：</p>
+ * <ul>
+ *   <li>统一 StringHttpMessageConverter 的默认编码为 UTF-8。</li>
+ *   <li>让已有 Jackson 转换器复用 Solomon 的 ObjectMapper。</li>
+ *   <li>使用 AntPathMatcher，兼容旧项目中的 Ant 风格路径匹配。</li>
+ * </ul>
+ *
+ * <p>不再使用 {@code @ConditionalOnMissingBean(WebMvcConfigurer.class)}，
+ * 避免业务项目只要声明自己的 WebMvcConfigurer，就导致 Solomon 的基础配置整体失效。</p>
+ */
+@AutoConfiguration
+@Import(JsonConfig.class)
+@ConditionalOnProperty(prefix = "solomon.web", name = "enabled", havingValue = "true",
+    matchIfMissing = true)
 public class WebConfig implements WebMvcConfigurer {
 
   private final ObjectMapper mapper;
 
-  public WebConfig(ObjectMapper mapper) {this.mapper = mapper;}
+  public WebConfig(ObjectMapper mapper) {
+    this.mapper = mapper;
+  }
 
+  /**
+   * 扩展 Spring MVC 消息转换器。
+   */
   @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
     converters.stream()
-        // 过滤出StringHttpMessageConverter类型实例
         .filter(StringHttpMessageConverter.class::isInstance)
-        .map(c -> (StringHttpMessageConverter) c)
-        // 这里将转换器的默认编码设置为utf-8
-        .forEach(c -> c.setDefaultCharset(StandardCharsets.UTF_8));
-    //创建消息转换器对象
-    MappingJackson2HttpMessageConverter messageConverter = new MappingJackson2HttpMessageConverter();
-    //设置对象转换器，底层使用Jackson将Java对象转为json
-    messageConverter.setObjectMapper(mapper);
-    //将上面的消息转换器对象追加到mvc框架的转换器集合中
-    converters.add(0, messageConverter);
+        .map(StringHttpMessageConverter.class::cast)
+        .forEach(converter -> converter.setDefaultCharset(StandardCharsets.UTF_8));
+
+    converters.stream()
+        .filter(MappingJackson2HttpMessageConverter.class::isInstance)
+        .map(MappingJackson2HttpMessageConverter.class::cast)
+        .forEach(converter -> converter.setObjectMapper(mapper));
   }
 
+  /**
+   * 配置路径匹配策略。
+   */
   @Override
   public void configurePathMatch(PathMatchConfigurer configurer) {
     configurer.setPathMatcher(new AntPathMatcher());

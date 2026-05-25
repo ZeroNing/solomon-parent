@@ -15,11 +15,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.util.StringUtils;
 
 /**
- * Swagger/OpenAPI自动配置。
+ * Solomon 的 OpenAPI 自动配置。
  *
- * <p>基于Spring Boot 3和Springdoc OpenAPI实现，替代旧版Springfox配置。
- * 业务模块只需要在配置文件中设置 {@code solomon.swagger.*} 和 {@code springdoc.*}
- * 即可启用接口文档。</p>
+ * <p>这里不负责扫描接口包，也不负责 Swagger UI / Knife4j 页面路径，这些仍然交给
+ * {@code springdoc.*} 和 {@code knife4j.*}。本类只做两件事：</p>
+ *
+ * <ul>
+ *   <li>提供默认的 OpenAPI 基础信息，例如标题、版本、描述。</li>
+ *   <li>把业务配置的全局请求参数追加到每个接口上，例如 token、tenantCode。</li>
+ * </ul>
+ *
+ * <p>所有 Bean 都允许业务项目覆盖，starter 不强行接管最终行为。</p>
  */
 @AutoConfiguration
 @ConditionalOnClass(OpenAPI.class)
@@ -29,10 +35,10 @@ import org.springframework.util.StringUtils;
 public class SwaggerConfig {
 
   /**
-   * 创建OpenAPI基础信息。
+   * OpenAPI 文档基础信息。
    *
-   * @param profile Swagger配置属性，包含标题、版本和描述
-   * @return OpenAPI基础信息Bean
+   * @param profile Solomon 文档配置
+   * @return OpenAPI 根对象
    */
   @Bean
   @ConditionalOnMissingBean
@@ -44,13 +50,12 @@ public class SwaggerConfig {
   }
 
   /**
-   * 创建全局请求参数自定义器。
+   * 为所有接口追加全局请求参数。
    *
-   * <p>会把 {@code solomon.swagger.global-request-parameters} 中配置的参数追加到所有接口。
-   * 常见用途是添加token、tenantCode等Header。</p>
+   * <p>隐藏参数不会写入 OpenAPI，空名称参数会被跳过，避免生成不可用的接口文档。</p>
    *
-   * @param profile Swagger配置属性
-   * @return OpenAPI自定义器
+   * @param profile Solomon 文档配置
+   * @return Springdoc 自定义器
    */
   @Bean
   @ConditionalOnMissingBean(name = "solomonOpenApiCustomizer")
@@ -65,14 +70,20 @@ public class SwaggerConfig {
                   .filter(parameter -> parameter != null
                       && StringUtils.hasText(parameter.getName())
                       && !parameter.isHidden())
-                  .forEach(parameter -> operation.addParametersItem(new Parameter()
-                      .name(parameter.getName())
-                      .in(StringUtils.hasText(parameter.getIn())
-                          ? parameter.getIn().toLowerCase()
-                          : "header")
-                      .description(parameter.getDescription())
-                      .required(parameter.isRequired())
-                      .schema(new StringSchema())))));
+                  .map(this::toOpenApiParameter)
+                  .forEach(operation::addParametersItem)));
     };
+  }
+
+  private Parameter toOpenApiParameter(SwaggerProfile.DocRequestParameter parameter) {
+    String position = StringUtils.hasText(parameter.getIn())
+        ? parameter.getIn().toLowerCase()
+        : "header";
+    return new Parameter()
+        .name(parameter.getName())
+        .in(position)
+        .description(parameter.getDescription())
+        .required(parameter.isRequired())
+        .schema(new StringSchema());
   }
 }

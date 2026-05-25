@@ -6,36 +6,36 @@ import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Swagger/OpenAPI文档配置。
+ * Solomon 接口文档配置项。
  *
- * <p>配置前缀为 {@code solomon.swagger}，用于设置接口文档标题、版本和全局请求参数。
- * Springdoc自身的页面路径、分组扫描仍然使用 {@code springdoc.*} 配置。</p>
+ * <p>配置前缀为 {@code solomon.swagger}。Springdoc 自身的接口扫描、分组和页面路径
+ * 仍然使用 {@code springdoc.*}，这里仅保存 Solomon 对接口文档做增强时需要的配置。</p>
  */
 @ConfigurationProperties("solomon.swagger")
 public class SwaggerProfile {
 
   /**
-   * 是否启用Solomon文档增强配置。
+   * 是否启用 Solomon 的 OpenAPI 增强配置。
    */
   private boolean enabled = true;
 
   /**
-   * OpenAPI文档标题。
+   * OpenAPI 文档标题。
    */
   private String title = "Solomon API";
 
   /**
-   * OpenAPI文档版本。
+   * OpenAPI 文档版本。
    */
   private String version = "1.0.0";
 
   /**
-   * OpenAPI文档描述。
+   * OpenAPI 文档描述。
    */
   private String description = "";
 
   /**
-   * 全局请求参数列表，常用于token、tenantCode等请求头。
+   * 需要写入每个接口的全局请求参数，例如 token、tenantCode、language。
    */
   private List<DocRequestParameter> globalRequestParameters = new ArrayList<>();
 
@@ -80,24 +80,24 @@ public class SwaggerProfile {
   }
 
   /**
-   * Swagger全局请求参数配置。
+   * OpenAPI 全局请求参数配置。
    */
   public static class DocRequestParameter implements Serializable {
 
     private static final long serialVersionUID = -5307736496899117806L;
 
     /**
-     * 参数名称。
+     * 参数名称，例如 token。
      */
     private String name;
 
     /**
-     * 参数位置，支持header、query、path、cookie。
+     * 参数位置，支持 header、query、path、cookie。
      */
     private String in = "header";
 
     /**
-     * 参数说明。
+     * 参数说明，会展示在 Swagger UI / Knife4j 页面中。
      */
     private String description;
 
@@ -107,7 +107,7 @@ public class SwaggerProfile {
     private boolean required;
 
     /**
-     * 是否隐藏；隐藏后不会写入OpenAPI文档。
+     * 是否隐藏；隐藏后不会写入 OpenAPI 文档。
      */
     private boolean hidden;
 

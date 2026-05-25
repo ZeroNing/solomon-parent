@@ -1,65 +1,63 @@
 package com.steven.solomon.pojo.vo;
 
-
 import java.io.Serializable;
 import java.util.Locale;
 
+/**
+ * 统一异常响应对象。
+ *
+ * <p>该对象是异常处理器内部的标准模型，最终会被转换成 Map 返回给前端。
+ * 保留 locale、arg 等字段，是为了在统一异常处理阶段可以继续补全国际化文案。</p>
+ */
 public class BaseExceptionVO implements Serializable {
 
-  /**
-   * 异常编码
-   */
-  String code;
-  /**
-   * 异常语句
-   */
-  String message;
+  private static final long serialVersionUID = 712433877274412890L;
 
   /**
-   * 状态编码
+   * 业务错误码。
    */
-  Integer statusCode;
+  private String code;
 
   /**
-   * 服务id
+   * 可展示的错误消息。
    */
-  String serverId;
-  /**
-   * 国际化语言
-   */
-  Locale locale;
+  private String message;
 
   /**
-   * 国家化参数
+   * HTTP 状态码。
    */
-  String arg;
+  private Integer statusCode;
 
   /**
-   * 请求id
+   * 服务标识。
+   */
+  private String serverId;
+
+  /**
+   * 当前请求语言环境。
+   */
+  private Locale locale;
+
+  /**
+   * 国际化消息参数。
+   */
+  private String arg;
+
+  /**
+   * 请求链路 ID。
    */
   private String requestId;
 
-  public String getRequestId() {
-    return requestId;
-  }
-
-  public void setRequestId(String requestId) {
-    this.requestId = requestId;
-  }
-
   public BaseExceptionVO() {
-    super();
   }
 
-  public BaseExceptionVO(String code, String message,int statusCode) {
-    super();
+  public BaseExceptionVO(String code, String message, int statusCode) {
     this.code = code;
     this.message = message;
     this.statusCode = statusCode;
   }
 
-  public BaseExceptionVO(String code,int statusCode) {
-    super();
+  public BaseExceptionVO(String code, int statusCode) {
     this.code = code;
     this.statusCode = statusCode;
   }
@@ -81,7 +79,7 @@ public class BaseExceptionVO implements Serializable {
   }
 
   public Integer getStatusCode() {
-    return this.statusCode;
+    return statusCode;
   }
 
   public void setStatusCode(Integer statusCode) {
@@ -96,19 +94,27 @@ public class BaseExceptionVO implements Serializable {
     this.serverId = serverId;
   }
 
+  public Locale getLocale() {
+    return locale;
+  }
+
   public void setLocale(Locale locale) {
     this.locale = locale;
+  }
+
+  public String getArg() {
+    return arg;
   }
 
   public void setArg(String arg) {
     this.arg = arg;
   }
 
-  public Locale getLocale() {
-    return locale;
+  public String getRequestId() {
+    return requestId;
   }
 
-  public String getArg() {
-    return arg;
+  public void setRequestId(String requestId) {
+    this.requestId = requestId;
   }
 }

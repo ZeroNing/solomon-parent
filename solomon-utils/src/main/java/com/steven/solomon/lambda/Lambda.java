@@ -1,13 +1,17 @@
 package com.steven.solomon.lambda;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.StopWatch;
 import cn.hutool.core.map.MapUtil;
-import com.steven.solomon.sort.SortUtil;
-import com.steven.solomon.sort.enums.SortTypeEnum;
 import com.steven.solomon.verification.ValidateUtils;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.DoubleSummaryStatistics;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.LongSummaryStatistics;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -1082,43 +1086,4 @@ public class Lambda {
         return camelCaseString.toString();
     }
 
-
-    public static void main(String[] args) {
-        List<Person> b = CollUtil.newArrayList();
-        for (Integer i = 0; i < 10000000; i++) {
-            b.add(new Person(String.valueOf(i*21), i*13));
-        }
-        for (SortTypeEnum typeEnum : SortTypeEnum.values()) {
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-            SortUtil.sort(typeEnum,b, Comparator.comparing(Person::getAge).thenComparing(Person::getName).reversed());
-            stopWatch.stop();
-        }
-    }
-
-    static class Person {
-        private String name;
-        private int age;
-
-        public Person(String name, int age) {
-            this.name = name;
-            this.age = age;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public int getAge() {
-            return age;
-        }
-
-        @Override
-        public String toString() {
-            return "Person{" +
-                    "name='" + name + '\'' +
-                    ", age=" + age +
-                    '}';
-        }
-    }
 }

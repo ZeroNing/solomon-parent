@@ -1,46 +1,53 @@
 package com.steven.solomon.verification;
 
-import cn.hutool.core.util.StrUtil;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 双色球号码生成工具。
+ *
+ * <p>该工具只负责生成不重复的随机号码，不包含任何业务投注逻辑。
+ * 生成过程不做 sleep，保证工具方法可以在接口或批处理场景中安全复用。</p>
+ */
 public class DoubleColorBallGenerator {
 
-    private static final int RED_BALL_COUNT = 6; // 红球数量
-    private static final int BLUE_BALL_COUNT = 1; // 蓝球数量
-    private static final int MAX_RED_BALL_NUMBER = 33; // 红球最大号码
-    private static final int MAX_BLUE_BALL_NUMBER = 16; // 蓝球最大号码
+  private static final int RED_BALL_COUNT = 6;
+  private static final int BLUE_BALL_COUNT = 1;
+  private static final int MAX_RED_BALL_NUMBER = 33;
+  private static final int MAX_BLUE_BALL_NUMBER = 16;
 
-    public static List<Integer> generateRedBalls(Integer ballSize) throws InterruptedException {
-        List<Integer> redBalls = new ArrayList<>();
-        for (int i = 1; i <= MAX_RED_BALL_NUMBER; i++) {
-            Thread.sleep(28L);
-            redBalls.add(i);
-        }
-        Collections.shuffle(redBalls); // 随机排序
-        return redBalls.subList(0, ValidateUtils.getOrDefault(ballSize,RED_BALL_COUNT)); // 取前6个
+  private DoubleColorBallGenerator() {
+  }
+
+  /**
+   * 生成红球号码。
+   *
+   * @param ballSize 需要生成的数量，为空时默认 6 个
+   * @return 随机红球号码列表
+   */
+  public static List<Integer> generateRedBalls(Integer ballSize) {
+    return randomNumbers(MAX_RED_BALL_NUMBER, ValidateUtils.getOrDefault(ballSize, RED_BALL_COUNT));
+  }
+
+  /**
+   * 生成蓝球号码。
+   *
+   * @param ballSize 需要生成的数量，为空时默认 1 个
+   * @return 随机蓝球号码列表
+   */
+  public static List<Integer> generateBlueBall(Integer ballSize) {
+    return randomNumbers(MAX_BLUE_BALL_NUMBER,
+        ValidateUtils.getOrDefault(ballSize, BLUE_BALL_COUNT));
+  }
+
+  private static List<Integer> randomNumbers(int maxNumber, int size) {
+    int limit = Math.max(0, Math.min(size, maxNumber));
+    List<Integer> numbers = new ArrayList<>(maxNumber);
+    for (int i = 1; i <= maxNumber; i++) {
+      numbers.add(i);
     }
-
-    public static List<Integer> generateBlueBall(Integer ballSize) throws InterruptedException {
-        Thread.sleep(28L);
-        List<Integer> result = new ArrayList<>();
-        ballSize = ValidateUtils.getOrDefault(ballSize,BLUE_BALL_COUNT);
-        while (result.size() < (ballSize)) {
-            Integer blue = (int) (Math.random() * MAX_BLUE_BALL_NUMBER) + 1;
-            if (!result.contains(blue)) {
-                result.add(blue);
-            }
-        }
-        return result; // 随机生成1-16的整数
-    }
-
-    public static void main(String[] args) throws InterruptedException {
-        for (int i = 1; i <= 5; i++) {
-            List<Integer> redBalls = generateRedBalls(8);
-            List<Integer> blueBall = generateBlueBall(4);
-        }
-    }
-
+    Collections.shuffle(numbers);
+    return new ArrayList<>(numbers.subList(0, limit));
+  }
 }

@@ -1,5 +1,6 @@
 package com.steven.solomon;
 
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
 import com.steven.solomon.model.Gs1BarcodeResult;
@@ -20,9 +21,9 @@ public class EpcCoderMainTest {
     EpcService epcService = new EpcService();
 
     testSgtin96(epcService);
-    testSgtin198(epcService);
-    testGiai96(epcService);
-    testGiai202(epcService);
+//    testSgtin198(epcService);
+//    testGiai96(epcService);
+//    testGiai202(epcService);
   }
 
   /**
@@ -41,11 +42,9 @@ public class EpcCoderMainTest {
             .companyPrefixLength(6)
             .tagSize(96)
             .encode();
-    EpcResult decodeResult = epcService.decodeEpc(encodeResult.getHex());
-
     printGs1("SGTIN-96 GS1译码", gs1Result);
-    printEpc("SGTIN-96 EPC生成", encodeResult);
-    printEpc("SGTIN-96 EPC反译", decodeResult);
+    System.out.println("SGTIN-96 EPC生成标签:"+encodeResult.getHex());
+    System.out.println("SGTIN-96 EPC反译:"+ JSONUtil.toJsonStr(epcService.decodeEpc(encodeResult.getHex())));
   }
 
   /**
