@@ -1,6 +1,6 @@
 package com.steven.solomon.config.i18n;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -46,7 +46,7 @@ public class I18nControl extends ResourceBundle.Control {
     while (urls.hasMoreElements()) {
       URL url = urls.nextElement();
       try (InputStream stream = openStreamWithReload(url, reload)) {
-        if (ValidateUtils.isNotEmpty(stream)) {
+        if (ObjectUtil.isNotEmpty(stream)) {
           combinedBundle.combine(newBundle(stream));
         }
       }
@@ -57,11 +57,11 @@ public class I18nControl extends ResourceBundle.Control {
   private I18nPropertyResourceBundle getBundleFromClasspath(String resourceName,
       ClassLoader classLoader, boolean reload) throws IOException {
     URL url = classLoader.getResource(resourceName);
-    if (ValidateUtils.isEmpty(url)) {
+    if (ObjectUtil.isEmpty(url)) {
       return null;
     }
     try (InputStream stream = openStreamWithReload(url, reload)) {
-      return ValidateUtils.isEmpty(stream) ? null : newBundle(stream);
+      return ObjectUtil.isEmpty(stream) ? null : newBundle(stream);
     }
   }
 

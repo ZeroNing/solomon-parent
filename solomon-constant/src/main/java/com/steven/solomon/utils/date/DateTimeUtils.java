@@ -1,7 +1,7 @@
 package com.steven.solomon.utils.date;
 
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -252,7 +252,7 @@ public class DateTimeUtils {
 	}
 
 	public static Date localDate2Date(LocalDate localDate) {
-		if (ValidateUtils.isEmpty(localDate)) {
+		if (ObjectUtil.isEmpty(localDate)) {
 			return null;
 		}
 		ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());

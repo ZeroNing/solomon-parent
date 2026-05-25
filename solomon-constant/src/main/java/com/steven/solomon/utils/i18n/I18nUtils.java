@@ -1,6 +1,6 @@
 package com.steven.solomon.utils.i18n;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.util.Locale;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +49,7 @@ public class I18nUtils {
    * 根据枚举类和枚举值获取国际化文案。
    */
   public static String getEnumMessage(String code, Class<?> enumClazz) {
-    if (ValidateUtils.isEmpty(code) || ValidateUtils.isEmpty(enumClazz)) {
+    if (ObjectUtil.isEmpty(code) || ObjectUtil.isEmpty(enumClazz)) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName() + "." + code);
@@ -59,7 +59,7 @@ public class I18nUtils {
    * 根据枚举对象和枚举类获取国际化文案。
    */
   public static String getEnumMessage(Enum<?> enumCode, Class<?> enumClazz) {
-    if (ValidateUtils.isEmpty(enumCode) || ValidateUtils.isEmpty(enumClazz)) {
+    if (ObjectUtil.isEmpty(enumCode) || ObjectUtil.isEmpty(enumClazz)) {
       return null;
     }
     return getEnumMessage(enumClazz.getSimpleName() + "." + enumCode.name());
@@ -80,7 +80,7 @@ public class I18nUtils {
   }
 
   private static String getMessage(String code, Locale locale, Object... args) {
-    if (ValidateUtils.isEmpty(code) || ValidateUtils.isEmpty(messageSource)) {
+    if (ObjectUtil.isEmpty(code) || ObjectUtil.isEmpty(messageSource)) {
       return null;
     }
     try {

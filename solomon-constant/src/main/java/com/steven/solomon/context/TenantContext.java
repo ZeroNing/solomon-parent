@@ -1,6 +1,6 @@
 package com.steven.solomon.context;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public abstract class TenantContext<F> {
    */
   public void setFactory(String tenantId) {
     F factory = factoryMap.get(tenantId);
-    if (ValidateUtils.isEmpty(factory)) {
+    if (ObjectUtil.isEmpty(factory)) {
       throw new IllegalStateException("未找到租户[" + tenantId + "]对应的工厂，请先注册");
     }
     threadLocal.set(factory);
@@ -121,7 +121,7 @@ public abstract class TenantContext<F> {
   public F unregisterFactory(String tenantId) {
     F removed = factoryMap.remove(tenantId);
     logger.debug("[TenantContext] 已注销租户工厂: tenantId={}, removed={}",
-        tenantId, ValidateUtils.isNotEmpty(removed));
+        tenantId, ObjectUtil.isNotEmpty(removed));
     return removed;
   }
 
@@ -136,10 +136,10 @@ public abstract class TenantContext<F> {
   }
 
   /**
-   * 严格校验必填参数，统一使用 ValidateUtils 判空，同时保留原有 NullPointerException 语义。
+   * 严格校验必填参数，统一使用 Hutool 判空，同时保留原有 NullPointerException 语义。
    */
   private void requireNotEmpty(Object value, String message) {
-    if (ValidateUtils.isEmpty(value)) {
+    if (ObjectUtil.isEmpty(value)) {
       throw new NullPointerException(message);
     }
   }

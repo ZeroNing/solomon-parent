@@ -1,7 +1,7 @@
 package com.steven.solomon.config.i18n;
 
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -36,7 +36,7 @@ public class I18nPropertyResourceBundle extends ResourceBundle {
 
   @Override
   public Object handleGetObject(String key) {
-    if (ValidateUtils.isEmpty(key)) {
+    if (ObjectUtil.isEmpty(key)) {
       throw new NullPointerException();
     }
     return lookup.get(key);
@@ -46,7 +46,7 @@ public class I18nPropertyResourceBundle extends ResourceBundle {
   public Enumeration<String> getKeys() {
     ResourceBundle parent = this.parent;
     return new ResourceBundleEnumeration(lookup.keySet(),
-        ValidateUtils.isNotEmpty(parent) ? parent.getKeys() : null);
+        ObjectUtil.isNotEmpty(parent) ? parent.getKeys() : null);
   }
 
   @Override
@@ -58,13 +58,13 @@ public class I18nPropertyResourceBundle extends ResourceBundle {
    * 合并其他 Bundle，已有 key 优先保留，避免后加载资源覆盖先加载资源。
    */
   public void combine(I18nPropertyResourceBundle other) {
-    if (ValidateUtils.isNotEmpty(other)) {
+    if (ObjectUtil.isNotEmpty(other)) {
       other.lookup.forEach(lookup::putIfAbsent);
     }
   }
 
   public boolean isEmpty() {
-    return ValidateUtils.isEmpty(lookup);
+    return ObjectUtil.isEmpty(lookup);
   }
 
   private Map<String, Object> loadProperties(InputStream stream) throws IOException {

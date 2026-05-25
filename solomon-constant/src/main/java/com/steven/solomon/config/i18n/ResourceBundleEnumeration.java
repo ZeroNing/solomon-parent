@@ -1,6 +1,6 @@
 package com.steven.solomon.config.i18n;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -28,11 +28,11 @@ public class ResourceBundleEnumeration implements Enumeration<String> {
 
   @Override
   public boolean hasMoreElements() {
-    if (ValidateUtils.isEmpty(next)) {
+    if (ObjectUtil.isEmpty(next)) {
       if (iterator.hasNext()) {
         next = iterator.next();
-      } else if (ValidateUtils.isNotEmpty(enumeration)) {
-        while (ValidateUtils.isEmpty(next) && enumeration.hasMoreElements()) {
+      } else if (ObjectUtil.isNotEmpty(enumeration)) {
+        while (ObjectUtil.isEmpty(next) && enumeration.hasMoreElements()) {
           next = enumeration.nextElement();
           if (set.contains(next)) {
             next = null;
@@ -40,7 +40,7 @@ public class ResourceBundleEnumeration implements Enumeration<String> {
         }
       }
     }
-    return ValidateUtils.isNotEmpty(next);
+    return ObjectUtil.isNotEmpty(next);
   }
 
   @Override

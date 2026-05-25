@@ -1,7 +1,7 @@
 package com.steven.solomon.exception.handler;
 
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.BindException;
@@ -20,7 +20,7 @@ public class BindExceptionHandler extends AbstractExceptionHandler {
   public BaseExceptionVO handleBaseException(Throwable ex) {
     BindException exception = (BindException) ex;
     FieldError fieldError = exception.getFieldError();
-    String message = ValidateUtils.isEmpty(fieldError)
+    String message = ObjectUtil.isEmpty(fieldError)
         ? exception.getMessage()
         : fieldError.getDefaultMessage();
     return messageResponse(message, 400);

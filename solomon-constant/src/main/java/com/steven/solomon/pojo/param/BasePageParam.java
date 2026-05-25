@@ -1,7 +1,7 @@
 package com.steven.solomon.pojo.param;
 
 import com.steven.solomon.pojo.enums.OrderByEnum;
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
 import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,14 +54,14 @@ public class BasePageParam implements Serializable {
 
         public Sort(String orderByField, OrderByEnum orderByMethod) {
             this.orderByField = orderByField;
-            this.orderByMethod = ValidateUtils.getOrDefault(orderByMethod, OrderByEnum.DESCEND);
+            this.orderByMethod = ObjectUtil.defaultIfNull(orderByMethod, OrderByEnum.DESCEND);
         }
 
         public String getSort() {
-            if (ValidateUtils.isEmpty(orderByField)) {
+            if (ObjectUtil.isEmpty(orderByField)) {
                 return "";
             }
-            return orderByField + " " + ValidateUtils.getOrDefault(orderByMethod, OrderByEnum.DESCEND).label();
+            return orderByField + " " + ObjectUtil.defaultIfNull(orderByMethod, OrderByEnum.DESCEND).label();
         }
 
         public String getOrderByField() {
@@ -77,7 +77,7 @@ public class BasePageParam implements Serializable {
         }
 
         public void setOrderByMethod(OrderByEnum orderByMethod) {
-            this.orderByMethod = ValidateUtils.getOrDefault(orderByMethod, OrderByEnum.DESCEND);
+            this.orderByMethod = ObjectUtil.defaultIfNull(orderByMethod, OrderByEnum.DESCEND);
         }
     }
 
@@ -119,13 +119,13 @@ public class BasePageParam implements Serializable {
      * <p>空排序规则会被过滤，避免历史实现中全部为空时 substring 越界。</p>
      */
     public String getSort() {
-        if (ValidateUtils.isEmpty(sorted)) {
+        if (ObjectUtil.isEmpty(sorted)) {
             return "";
         }
         return sorted.stream()
-            .filter(ValidateUtils::isNotEmpty)
+            .filter(ObjectUtil::isNotEmpty)
             .map(Sort::getSort)
-            .filter(ValidateUtils::isNotEmpty)
+            .filter(ObjectUtil::isNotEmpty)
             .collect(Collectors.joining(","));
     }
 }
