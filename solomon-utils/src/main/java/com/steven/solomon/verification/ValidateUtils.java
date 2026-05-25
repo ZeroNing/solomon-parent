@@ -14,34 +14,54 @@ import org.slf4j.Logger;
  * 带 {@code errorCode} 的方法会在条件命中时抛出 {@link BaseException}，
  * 调用方可以通过统一异常处理返回标准错误响应。</p>
  */
-public class ValidateUtils {
+public final class ValidateUtils {
 
   private static final Pattern IS_NUMBER_PATTERN = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
   private static final Pattern EL_PATTERN = Pattern.compile("\\$\\{[^}]+}|#\\{[^}]+}");
   private static final Pattern EL_PROPERTY_PATTERN = Pattern.compile("\\$\\{([^:}]+)(?::[^}]+)?}");
   private static final Logger logger = LoggerUtils.logger(ValidateUtils.class);
 
-  public String valueOf(Number target, String def) {
+  private ValidateUtils() {}
+
+  /**
+   * 数字为空时返回默认字符串。
+   */
+  public static String valueOf(Number target, String def) {
     return isEmpty(target) ? def : String.valueOf(target);
   }
 
-  public Long valueOf(String target, Long def) {
+  /**
+   * 字符串为空时返回默认 Long，否则转换为 Long。
+   */
+  public static Long valueOf(String target, Long def) {
     return isEmpty(target) ? def : Long.valueOf(target);
   }
 
-  public Integer valueOf(String target, Integer def) {
+  /**
+   * 字符串为空时返回默认 Integer，否则转换为 Integer。
+   */
+  public static Integer valueOf(String target, Integer def) {
     return isEmpty(target) ? def : Integer.valueOf(target);
   }
 
-  public Double valueOf(String target, Double def) {
+  /**
+   * 字符串为空时返回默认 Double，否则转换为 Double。
+   */
+  public static Double valueOf(String target, Double def) {
     return isEmpty(target) ? def : Double.valueOf(target);
   }
 
-  public Short valueOf(String target, Short def) {
+  /**
+   * 字符串为空时返回默认 Short，否则转换为 Short。
+   */
+  public static Short valueOf(String target, Short def) {
     return isEmpty(target) ? def : Short.valueOf(target);
   }
 
-  public Float valueOf(String target, Float def) {
+  /**
+   * 字符串为空时返回默认 Float，否则转换为 Float。
+   */
+  public static Float valueOf(String target, Float def) {
     return isEmpty(target) ? def : Float.valueOf(target);
   }
 

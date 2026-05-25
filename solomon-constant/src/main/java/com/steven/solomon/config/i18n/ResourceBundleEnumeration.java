@@ -7,23 +7,22 @@ import java.util.Set;
 
 public class ResourceBundleEnumeration implements Enumeration<String> {
 
-  Set<String>         set;
-  Iterator<String>    iterator;
-  Enumeration<String> enumeration; // may remain null
+  private final Set<String> set;
+  private final Iterator<String> iterator;
+  private final Enumeration<String> enumeration;
+  private String next;
 
   /**
-   * Constructs a resource bundle enumeration.
-   * @param set an set providing some elements of the enumeration
-   * @param enumeration an enumeration providing more elements of the enumeration.
-   *        enumeration may be null.
+   * 创建资源 key 枚举器。
+   *
+   * @param set 当前 Bundle 的 key 集合
+   * @param enumeration 父 Bundle 的 key 枚举，可为空
    */
   public ResourceBundleEnumeration(Set<String> set, Enumeration<String> enumeration) {
     this.set = set;
     this.iterator = set.iterator();
     this.enumeration = enumeration;
   }
-
-  String next = null;
 
 
   @Override

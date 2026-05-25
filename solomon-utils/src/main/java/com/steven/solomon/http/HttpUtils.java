@@ -11,7 +11,7 @@ import com.steven.solomon.verification.ValidateUtils;
  *
  * <p>在 Hutool {@link HttpUtil} 基础上补充项目常用的请求初始化方法。</p>
  */
-public class HttpUtils extends HttpUtil {
+public final class HttpUtils extends HttpUtil {
 
   private HttpUtils() {}
 

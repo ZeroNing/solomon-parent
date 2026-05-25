@@ -3,76 +3,89 @@ package com.steven.solomon.pojo.vo;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * 分页返回对象。
+ *
+ * <p>由列表数据、总数和当前分页参数计算是否存在下一页。</p>
+ */
 public class PageVO<T> implements Serializable {
-    /**
-     * 总页数
-     */
-    private long total;
 
-    /**
-     * 第几页
-     */
-    private int pageNo;
+  private static final long serialVersionUID = 1L;
 
-    /**
-     * 页数
-     */
-    private int pageSize;
+  /**
+   * 总记录数。
+   */
+  private long total;
 
-    /**
-     * 是否有下一页
-     */
-    private boolean isNext;
-    /**
-     * 数据
-     */
-    private List<T> data;
+  /**
+   * 当前页码。
+   */
+  private int pageNo;
 
-    public PageVO(List<T> data, long total, int pageNo, int pageSize) {
-        this.total = total;
-        this.pageNo = pageNo;
-        this.pageSize = pageSize;
-        this.data = data;
-        this.isNext = (pageNo * pageSize) < total;
-    }
+  /**
+   * 每页条数。
+   */
+  private int pageSize;
 
-    public long getTotal() {
-        return total;
-    }
+  /**
+   * 是否还有下一页。
+   */
+  private boolean next;
 
-    public void setTotal(long total) {
-        this.total = total;
-    }
+  /**
+   * 当前页数据。
+   */
+  private List<T> data;
 
-    public int getPageNo() {
-        return pageNo;
-    }
+  public PageVO(List<T> data, long total, int pageNo, int pageSize) {
+    this.total = total;
+    this.pageNo = pageNo;
+    this.pageSize = pageSize;
+    this.data = data;
+    this.next = hasNext(pageNo, pageSize, total);
+  }
 
-    public void setPageNo(int pageNo) {
-        this.pageNo = pageNo;
-    }
+  private boolean hasNext(int pageNo, int pageSize, long total) {
+    return (long) pageNo * pageSize < total;
+  }
 
-    public int getPageSize() {
-        return pageSize;
-    }
+  public long getTotal() {
+    return total;
+  }
 
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
+  public void setTotal(long total) {
+    this.total = total;
+  }
 
-    public boolean isNext() {
-        return isNext;
-    }
+  public int getPageNo() {
+    return pageNo;
+  }
 
-    public void setNext(boolean next) {
-        isNext = next;
-    }
+  public void setPageNo(int pageNo) {
+    this.pageNo = pageNo;
+  }
 
-    public List<T> getData() {
-        return data;
-    }
+  public int getPageSize() {
+    return pageSize;
+  }
 
-    public void setData(List<T> data) {
-        this.data = data;
-    }
+  public void setPageSize(int pageSize) {
+    this.pageSize = pageSize;
+  }
+
+  public boolean isNext() {
+    return next;
+  }
+
+  public void setNext(boolean next) {
+    this.next = next;
+  }
+
+  public List<T> getData() {
+    return data;
+  }
+
+  public void setData(List<T> data) {
+    this.data = data;
+  }
 }

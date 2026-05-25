@@ -6,9 +6,17 @@ import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEven
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
-
+/**
+ * 自动配置排除监听器。
+ *
+ * <p>子类提供开关配置和需要排除的自动配置项；当开关关闭时，统一写入
+ * {@code spring.autoconfigure.exclude} 相关配置。</p>
+ */
 public abstract class AutoConfigurationExclusionListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent> {
 
     private static final Set<String> TRUE_SET = new HashSet<>(List.of("true", "yes", "y", "t", "ok", "1", "on", "是", "对", "真", "對", "√"));

@@ -2,149 +2,167 @@ package com.steven.solomon.rmb;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.verification.ValidateUtils;
+
 /**
- * @Title: ConvertUpMoney
- * @Description: 将数字金额转为大写汉字金额
- * @date: 2019年6月18日 下午10:52:27
+ * 人民币金额大写转换工具。
+ *
+ * <p>保留历史输出格式，只优化校验、字符串构建和注释可读性。</p>
  */
-public class ConvertUpMoney {
+public final class ConvertUpMoney {
 
-    //大写数字
-    private static final String[] NUMBERS = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
-    // 整数部分的单位
-    private static final String[] IUNIT = {"元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟"};
-    //小数部分的单位
-    private static final String[] DUNIT = {"角", "分", "厘"};
+  /**
+   * 大写数字。
+   */
+  private static final String[] NUMBERS = {"零", "壹", "贰", "叁", "肆", "伍", "陆", "柒", "捌", "玖"};
 
-    public static String toChineseNum(String str) {
-        return toChinese(str) + "整    ￥" + str + "/";
+  /**
+   * 整数部分单位，最大支持到万亿级。
+   */
+  private static final String[] INTEGER_UNITS = {
+      "元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万", "拾", "佰", "仟"
+  };
+
+  /**
+   * 小数部分单位：角、分、厘。
+   */
+  private static final String[] DECIMAL_UNITS = {"角", "分", "厘"};
+
+  private static final String NUMBER_PATTERN = "(-)?\\d*(\\.\\d*)?";
+
+  private ConvertUpMoney() {}
+
+  public static String toChineseNum(String str) {
+    return toChinese(str) + "整    ￥" + str + "/";
+  }
+
+  public static String toChina(String str) {
+    return toChinese(str) + "整";
+  }
+
+  /**
+   * 将数字金额转换成中文大写金额。
+   */
+  private static String toChinese(String str) {
+    if (ValidateUtils.isEmpty(str) || !str.matches(NUMBER_PATTERN)) {
+      return str;
+    }
+    if ("0".equals(str) || "0.00".equals(str) || "0.0".equals(str)) {
+      return "零元";
     }
 
-    public static String toChina(String str) {
-        return toChinese(str) + "整";
+    boolean negative = str.startsWith("-");
+    String amount = removeSignAndSeparator(str);
+    String integerStr = resolveIntegerPart(amount);
+    String decimalStr = resolveDecimalPart(amount);
+    if (integerStr.length() > INTEGER_UNITS.length || hasInvalidLeadingZero(integerStr)) {
+      return negative ? "-" + amount : amount;
     }
 
-    //转成中文的大写金额
-    private static String toChinese(String str) {
-        //判断输入的金额字符串是否符合要求
-        if (ValidateUtils.isEmpty(str) || !str.matches("(-)?[\\d]*(.)?[\\d]*")) {
-            return str;
-        }
+    String result =
+        getChineseInteger(toIntArray(integerStr), isReachWanUnit(integerStr))
+            + getChineseDecimal(toIntArray(decimalStr));
+    return negative ? "负" + result : result;
+  }
 
-        if ("0".equals(str) || "0.00".equals(str) || "0.0".equals(str)) {
-            return "零元";
-        }
-
-        //判断是否存在负号"-"
-        boolean flag = false;
-        if (str.startsWith("-")) {
-            flag = true;
-            str = str.replaceAll("-", StrUtil.EMPTY);
-        }
-
-        str = str.replaceAll(",", StrUtil.EMPTY);//去掉","
-        String integerStr;//整数部分数字
-        String decimalStr;//小数部分数字
-
-
-        //初始化：分离整数部分和小数部分
-        if (str.indexOf(".") > 0) {
-            integerStr = str.substring(0, str.indexOf("."));
-            decimalStr = str.substring(str.indexOf(".") + 1);
-        } else if (str.indexOf(".") == 0) {
-            integerStr = StrUtil.EMPTY;
-            decimalStr = str.substring(1);
-        } else {
-            integerStr = str;
-            decimalStr = StrUtil.EMPTY;
-        }
-
-        //beyond超出计算能力，直接返回
-        if (integerStr.length() > IUNIT.length) {
-            return str;
-        }
-
-        int[] integers = toIntArray(integerStr);//整数部分数字
-        //判断整数部分是否存在输入012的情况
-        if (integers.length > 1 && integers[0] == 0) {
-            if (flag) {
-                str = "-" + str;
-            }
-            return str;
-        }
-        boolean isWan = isWan5(integerStr);//设置万单位
-        int[] decimals = toIntArray(decimalStr);//小数部分数字
-        String result = getChineseInteger(integers, isWan) + getChineseDecimal(decimals);//返回最终的大写金额
-        if (flag) {
-            return "负" + result;//如果是负数，加上"负"
-        } else {
-            return result;
-        }
+  /**
+   * 将数字字符串转为 int 数组，便于按位匹配单位。
+   */
+  private static int[] toIntArray(String number) {
+    int[] array = new int[number.length()];
+    for (int i = 0; i < number.length(); i++) {
+      array[i] = number.charAt(i) - '0';
     }
+    return array;
+  }
 
-    //将字符串转为int数组
-    private static int[] toIntArray(String number) {
-        int[] array = new int[number.length()];
-        for (int i = 0; i < number.length(); i++) {
-            array[i] = Integer.parseInt(number.substring(i, i + 1));
-        }
-        return array;
+  /**
+   * 将整数部分转换为大写金额。
+   */
+  public static String getChineseInteger(int[] integers, boolean isWan) {
+    StringBuilder chineseInteger = new StringBuilder();
+    int length = integers.length;
+    if (length == 1 && integers[0] == 0) {
+      return StrUtil.EMPTY;
     }
-
-    //将整数部分转为大写的金额
-    public static String getChineseInteger(int[] integers, boolean isWan) {
-        StringBuffer chineseInteger = new StringBuffer(StrUtil.EMPTY);
-        int length = integers.length;
-        if (length == 1 && integers[0] == 0) {
-            return StrUtil.EMPTY;
-        }
-        for (int i = 0; i < length; i++) {
-            String key = StrUtil.EMPTY;
-            if (integers[i] == 0) {
-                if ((length - i) == 13) {//万（亿）
-                    key = IUNIT[4];
-                } else if ((length - i) == 9) {//亿
-                    key = IUNIT[8];
-                } else if ((length - i) == 5 && isWan) {//万
-                    key = IUNIT[4];
-                } else if ((length - i) == 1) {//元
-                    key = IUNIT[0];
-                }
-                if ((length - i) > 1 && integers[i + 1] != 0) {
-                    key += NUMBERS[0];
-                }
-            }
-            chineseInteger.append(integers[i] == 0 ? key : (NUMBERS[integers[i]] + IUNIT[length - i - 1]));
-        }
-        return chineseInteger.toString();
+    for (int i = 0; i < length; i++) {
+      chineseInteger.append(resolveIntegerText(integers, length, i, isWan));
     }
+    return chineseInteger.toString();
+  }
 
-    //将小数部分转为大写的金额
-    private static String getChineseDecimal(int[] decimals) {
-        StringBuffer chineseDecimal = new StringBuffer(StrUtil.EMPTY);
-        for (int i = 0; i < decimals.length; i++) {
-            if (i == 3) {
-                break;
-            }
-            chineseDecimal.append(decimals[i] == 0 ? StrUtil.EMPTY : (NUMBERS[decimals[i]] + DUNIT[i]));
-        }
-        return chineseDecimal.toString();
+  /**
+   * 将小数部分转换为大写金额，最多保留到厘。
+   */
+  private static String getChineseDecimal(int[] decimals) {
+    StringBuilder chineseDecimal = new StringBuilder();
+    int length = Math.min(decimals.length, DECIMAL_UNITS.length);
+    for (int i = 0; i < length; i++) {
+      if (decimals[i] != 0) {
+        chineseDecimal.append(NUMBERS[decimals[i]]).append(DECIMAL_UNITS[i]);
+      }
     }
+    return chineseDecimal.toString();
+  }
 
-    //判断当前整数部分是否已经是达到【万】
-    private static boolean isWan5(String integerStr) {
-        int length = integerStr.length();
-        if (length > 4) {
-            String subInteger = StrUtil.EMPTY;
-            if (length > 8) {
-                subInteger = integerStr.substring(length - 8, length - 4);
-            } else {
-                subInteger = integerStr.substring(0, length - 4);
-            }
-            return Integer.parseInt(subInteger) > 0;
-        } else {
-            return false;
-        }
+  private static String resolveIntegerText(int[] integers, int length, int index, boolean isWan) {
+    int value = integers[index];
+    if (value != 0) {
+      return NUMBERS[value] + INTEGER_UNITS[length - index - 1];
     }
+    String key = resolveZeroUnit(integers, length, index, isWan);
+    if ((length - index) > 1 && integers[index + 1] != 0) {
+      key += NUMBERS[0];
+    }
+    return key;
+  }
 
+  private static String resolveZeroUnit(int[] integers, int length, int index, boolean isWan) {
+    int leftLength = length - index;
+    if (leftLength == 13) {
+      return INTEGER_UNITS[4];
+    }
+    if (leftLength == 9) {
+      return INTEGER_UNITS[8];
+    }
+    if (leftLength == 5 && isWan) {
+      return INTEGER_UNITS[4];
+    }
+    if (leftLength == 1) {
+      return INTEGER_UNITS[0];
+    }
+    return StrUtil.EMPTY;
+  }
+
+  private static boolean isReachWanUnit(String integerStr) {
+    int length = integerStr.length();
+    if (length <= 4) {
+      return false;
+    }
+    String subInteger = length > 8
+        ? integerStr.substring(length - 8, length - 4)
+        : integerStr.substring(0, length - 4);
+    return Integer.parseInt(subInteger) > 0;
+  }
+
+  private static String removeSignAndSeparator(String str) {
+    return str.replace("-", StrUtil.EMPTY).replace(",", StrUtil.EMPTY);
+  }
+
+  private static String resolveIntegerPart(String amount) {
+    int pointIndex = amount.indexOf(".");
+    if (pointIndex > 0) {
+      return amount.substring(0, pointIndex);
+    }
+    return pointIndex == 0 ? StrUtil.EMPTY : amount;
+  }
+
+  private static String resolveDecimalPart(String amount) {
+    int pointIndex = amount.indexOf(".");
+    return pointIndex >= 0 ? amount.substring(pointIndex + 1) : StrUtil.EMPTY;
+  }
+
+  private static boolean hasInvalidLeadingZero(String integerStr) {
+    int[] integers = toIntArray(integerStr);
+    return integers.length > 1 && integers[0] == 0;
+  }
 }
