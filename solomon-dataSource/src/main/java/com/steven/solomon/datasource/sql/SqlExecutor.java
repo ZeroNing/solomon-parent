@@ -217,7 +217,7 @@ public class SqlExecutor {
       throws DataSourceException {
     param = normalizePageParam(param);
     Sql pageSql = applyOrderBy(sql, param);
-    if (!param.isPage()) {
+    if (!param.getPage()) {
       List<T> records = query(pageSql, resultType);
       return new PageResult<>(records, records.size(), 1, Math.max(records.size(), 1));
     }
@@ -258,7 +258,7 @@ public class SqlExecutor {
       throws DataSourceException {
     param = normalizePageParam(param);
     Sql pageSql = applyOrderBy(sql, param);
-    if (!param.isPage()) {
+    if (!param.getPage()) {
       List<Map<String, Object>> records = queryForList(pageSql);
       return new PageResult<>(records, records.size(), 1, Math.max(records.size(), 1));
     }
@@ -281,7 +281,7 @@ public class SqlExecutor {
     if (currentPageNo > 1 && lastValue == null) {
       return new PageResult<>(List.of(), total, currentPageNo, currentPageSize, true, null);
     }
-    Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.isAsc(),
+    Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.getAsc(),
         currentPageSize + 1);
     List<T> records = new ArrayList<>(query(seekSql, resultType));
     boolean hasNext = records.size() > currentPageSize;
@@ -304,7 +304,7 @@ public class SqlExecutor {
     if (currentPageNo > 1 && lastValue == null) {
       return new PageResult<>(List.of(), total, currentPageNo, currentPageSize, true, null);
     }
-    Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.isAsc(),
+    Sql seekSql = sql.buildSeekPage(resolveDialect(), seekColumn, lastValue, param.getAsc(),
         currentPageSize + 1);
     List<Map<String, Object>> records = new ArrayList<>(queryForList(seekSql));
     boolean hasNext = records.size() > currentPageSize;
@@ -601,7 +601,7 @@ public class SqlExecutor {
 
   private boolean shouldUseSeekPage(DataSourcePageParam param) {
     SolomonDataSourceProperties.Page page = properties.getPage();
-    if (page == null || !page.isAutoSeekEnabled() || param == null || !param.isSeek()) {
+    if (page == null || !page.isAutoSeekEnabled() || param == null || !param.getSeek()) {
       return false;
     }
     int currentPageNo = normalizePageNo(param.getPageNo());
@@ -636,7 +636,7 @@ public class SqlExecutor {
     SqlInjectionGuard.validateQualifiedIdentifier(seekColumnName, "seekColumn");
     String orderedSql = "SELECT t." + seekColumnName + " FROM ("
         + sql.withoutOrderBy().getText() + ") t ORDER BY t." + seekColumnName
-        + (param.isAsc() ? " ASC" : " DESC");
+        + (param.getAsc() ? " ASC" : " DESC");
     Sql anchorSql = Sql.of(resolveDialect().pageSql(orderedSql, (int) anchorPageNo, 1),
         sql.getParams());
     List<Map<String, Object>> rows = queryForList(anchorSql);

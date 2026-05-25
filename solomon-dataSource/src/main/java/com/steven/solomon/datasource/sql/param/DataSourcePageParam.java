@@ -100,7 +100,7 @@ public class DataSourcePageParam implements Serializable {
    *
    * @return true表示分页，false表示不分页
    */
-  public boolean isPage() {
+  public boolean getPage() {
     return page;
   }
 
@@ -258,7 +258,7 @@ public class DataSourcePageParam implements Serializable {
    *
    * @return true表示升序，false表示降序
    */
-  public boolean isAsc() {
+  public boolean getAsc() {
     return asc;
   }
 
@@ -296,7 +296,7 @@ public class DataSourcePageParam implements Serializable {
    *
    * @return true表示允许，false表示始终使用普通OFFSET分页
    */
-  public boolean isSeek() {
+  public boolean getSeek() {
     return seek;
   }
 
