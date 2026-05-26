@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.service;
+package com.steven.solomon.service;
 
 import com.steven.solomon.mqtt.annotation.MessageListener;
 import com.steven.solomon.mqtt.service.MqttClientInitService;

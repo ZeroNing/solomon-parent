@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.annotation;
+package com.steven.solomon.mqtt.annotation;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.mqtt.condition.MqttEnabledCondition;

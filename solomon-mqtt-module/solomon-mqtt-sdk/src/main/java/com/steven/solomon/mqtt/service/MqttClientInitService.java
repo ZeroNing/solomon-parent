@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.service;
+package com.steven.solomon.mqtt.service;
 
 import java.util.List;
 

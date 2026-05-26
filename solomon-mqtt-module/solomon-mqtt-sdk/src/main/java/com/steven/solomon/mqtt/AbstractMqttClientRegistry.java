@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt;
+package com.steven.solomon.mqtt;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.verification.ValidateUtils;

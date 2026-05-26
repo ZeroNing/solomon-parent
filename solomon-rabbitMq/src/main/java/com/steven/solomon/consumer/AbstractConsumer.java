@@ -8,7 +8,7 @@ import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
-import com.steven.solomon.mq.CommonMqttMessageListener;
+import com.steven.solomon.mqtt.CommonMqttMessageListener;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;

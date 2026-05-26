@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.code;
+package com.steven.solomon.mqtt.code;
 
 import com.steven.solomon.code.BaseExceptionCode;
 

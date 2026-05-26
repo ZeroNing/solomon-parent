@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.condition;
+package com.steven.solomon.mqtt.condition;
 
 import cn.hutool.core.util.BooleanUtil;
 import com.steven.solomon.verification.ValidateUtils;

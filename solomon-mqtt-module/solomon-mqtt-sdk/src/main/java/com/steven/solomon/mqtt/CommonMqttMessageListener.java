@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt;
+package com.steven.solomon.mqtt;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;

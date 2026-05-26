@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.config;
+package com.steven.solomon.mqtt.config;
 
 import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.mqtt.annotation.MessageListener;

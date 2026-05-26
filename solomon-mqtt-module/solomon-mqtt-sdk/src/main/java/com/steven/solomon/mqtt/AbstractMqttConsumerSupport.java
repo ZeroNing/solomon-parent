@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt;
+package com.steven.solomon.mqtt;
 
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
@@ -46,9 +46,8 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
    *
    * @param topic 订阅主题
    * @param payload MQTT 消息体
-   * @param messageId 客户端消息 ID
    */
-  protected void consumeMessage(String topic, byte[] payload, int messageId) throws Exception {
+  protected void consumeMessage(String topic, byte[] payload) throws Exception {
     this.topic = topic;
 
     String json = new String(payload, StandardCharsets.UTF_8);
@@ -62,7 +61,7 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
           "线程名:{}, 租户编码:{}, 消息ID:{}, topic主题:{}, MQTT消费者消息:{}",
           Thread.currentThread().getName(),
           tenantCode,
-          messageId,
+          model.getMsgId(),
           topic,
           json);
       if (checkMessageKey(model)) {

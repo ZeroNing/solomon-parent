@@ -24,5 +24,10 @@
             <artifactId>solomon-utils</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-mqtt-sdk</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

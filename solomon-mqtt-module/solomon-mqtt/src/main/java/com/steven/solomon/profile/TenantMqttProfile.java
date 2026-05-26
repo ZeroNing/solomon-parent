@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.profile;
+package com.steven.solomon.profile;
 
 import com.steven.solomon.mqtt.model.AbstractTenantMqttProfile;
 import org.springframework.boot.context.properties.ConfigurationProperties;

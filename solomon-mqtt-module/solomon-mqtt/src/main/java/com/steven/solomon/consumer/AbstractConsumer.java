@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.consumer;
+package com.steven.solomon.consumer;
 
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 import com.steven.solomon.mqtt.AbstractMqttConsumerSupport;
@@ -25,6 +25,6 @@ public abstract class AbstractConsumer<T, R>
   @Override
   public void messageArrived(String topic, MqttMessage message) throws Exception {
     this.mqttMessage = message;
-    consumeMessage(topic, message.getPayload(), message.getId());
+    consumeMessage(topic, message.getPayload());
   }
 }

@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.consumer;
+package com.steven.solomon.consumer;
 
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 import com.steven.solomon.mqtt.AbstractMqttConsumerSupport;
@@ -24,7 +24,7 @@ public abstract class AbstractConsumer<T, R>
   @Override
   public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
     try {
-      consumeMessage(topic, payload, 0);
+      consumeMessage(topic, payload);
     } catch (Exception e) {
       logger.error("Mica MQTT 消费失败, topic:{}", topic, e);
     }

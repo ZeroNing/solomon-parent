@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.condition;
+package com.steven.solomon.mqtt.condition;
 
 /**
  * MQTT 模块启用条件。

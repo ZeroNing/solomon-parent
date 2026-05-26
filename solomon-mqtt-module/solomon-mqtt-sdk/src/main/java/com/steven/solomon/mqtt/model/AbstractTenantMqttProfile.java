@@ -1,4 +1,4 @@
-﻿package com.steven.solomon.mqtt.model;
+package com.steven.solomon.mqtt.model;
 
 import java.util.Map;
 
