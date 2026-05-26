@@ -41,11 +41,8 @@
     <module>solomon-datasource</module>
 
     <!-- 消息队列模块 -->
-    <module>solomon-mqtt</module>
-    <module>solomon-mqtt5</module>
-    <module>solomon-vertx-mqtt</module>
     <module>solomon-rabbitMq</module>
-    <module>solomon-mica-mqtt</module>
+    <module>solomon-mqtt-module</module>
     <!-- 云存储模块 -->
     <module>solomon-s3</module>
 
@@ -250,6 +247,11 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-mongodb</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mqtt-sdk</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

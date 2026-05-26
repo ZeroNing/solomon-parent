@@ -1,6 +1,6 @@
-package steven.controller;
+﻿package steven.controller;
 
-import com.steven.solomon.entity.MqttModel;
+import com.steven.solomon.mqtt.model.MqttMessageModel;
 import com.steven.solomon.utils.MqttUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +16,7 @@ public class TestSendMqController {
 
     @GetMapping("/test")
     public Object test() throws Exception {
-        utils.send(new MqttModel<String>("test","top/test/123","123"));
+        utils.send(new MqttMessageModel<String>("test","top/test/123","123"));
         return null;
     }
 }

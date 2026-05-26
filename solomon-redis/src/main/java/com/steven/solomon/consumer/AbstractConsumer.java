@@ -10,7 +10,7 @@ import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.entiy.RedisQueueModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
-import com.steven.solomon.mq.CommonMqttMessageListener;
+import com.steven.solomon.mqtt.CommonMqttMessageListener;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;

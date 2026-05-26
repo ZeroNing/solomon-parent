@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mqtt-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>solomon-mica-mqtt</artifactId>
+    <description>基于 Mica-MQTT 的 MQTT 客户端封装。</description>
+
+
+    <dependencies>
+
+        <!-- Mica MQTT Client -->
+        <dependency>
+            <groupId>org.dromara.mica-mqtt</groupId>
+            <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-mqtt-sdk</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

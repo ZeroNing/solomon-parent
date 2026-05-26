@@ -1,8 +1,8 @@
-package com.steven.handler;
+﻿package com.steven.handler;
 
-import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.mqtt.annotation.MessageListener;
 import com.steven.solomon.consumer.AbstractConsumer;
-import com.steven.solomon.entity.MqttModel;
+import com.steven.solomon.mqtt.model.MqttMessageModel;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 @MessageListener(topics = "top/+/123",tenantRange = "test12")
@@ -15,7 +15,7 @@ public class TestHandler extends AbstractConsumer<String,String> {
     }
 
     @Override
-    public void saveLog(String result, Throwable throwable, MqttModel<String> model) {
+    public void saveLog(String result, Throwable throwable, MqttMessageModel<String> model) {
 
     }
 }

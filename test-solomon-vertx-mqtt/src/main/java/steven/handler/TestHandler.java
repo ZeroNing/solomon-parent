@@ -1,8 +1,8 @@
-package steven.handler;
+﻿package steven.handler;
 
-import com.steven.solomon.annotation.MessageListener;
+import com.steven.solomon.mqtt.annotation.MessageListener;
 import com.steven.solomon.consumer.AbstractConsumer;
-import com.steven.solomon.entity.MqttModel;
+import com.steven.solomon.mqtt.model.MqttMessageModel;
 
 @MessageListener(topics = "top/+/123")
 public class TestHandler extends AbstractConsumer<String,String> {
@@ -13,7 +13,7 @@ public class TestHandler extends AbstractConsumer<String,String> {
     }
 
     @Override
-    public void saveLog(String result, Throwable throwable, MqttModel<String> model) {
+    public void saveLog(String result, Throwable throwable, MqttMessageModel<String> model) {
 
     }
 }

@@ -1,9 +1,9 @@
 package com.steven.solomon.config;
 
 import com.steven.solomon.service.NoticeService;
-import com.steven.solomon.service.impl.DingTalkServiceImpl;
-import com.steven.solomon.service.impl.FeishuServiceImpl;
-import com.steven.solomon.service.impl.WechatWorkServiceImpl;
+import com.steven.solomon.service.DingTalkServiceImpl;
+import com.steven.solomon.service.FeishuServiceImpl;
+import com.steven.solomon.service.WechatWorkServiceImpl;
 import com.steven.solomon.utils.NoticeUtils;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
