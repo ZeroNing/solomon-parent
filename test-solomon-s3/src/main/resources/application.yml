@@ -44,7 +44,7 @@ spring:
       max-request-size: 20MB
 file:
   bucket-name: default
-  choice: DEFAULT
+  choice: MINIO
   endpoint: http://127.0.0.1:9000
   access-key: admin
   secret-key: admin12345678

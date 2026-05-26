@@ -44,7 +44,7 @@
     <module>solomon-rabbitMq</module>
     <module>solomon-mqtt-module</module>
     <!-- 云存储模块 -->
-    <module>solomon-s3</module>
+    <module>solomon-s3-module</module>
 
     <!-- 任务调度模块 -->
     <module>solomon-xxlJob</module>
@@ -279,11 +279,47 @@
         <artifactId>solomon-mica-mqtt</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>com.steven</groupId>
-        <artifactId>solomon-s3</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-s3-sdk</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-minio</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-oss</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-obs</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-cos</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-bos</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-s3</artifactId>
+            <version>${project.version}</version>
+        </dependency>
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-xxlJob</artifactId>

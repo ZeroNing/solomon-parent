@@ -18,7 +18,12 @@
     <dependencies>
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-s3</artifactId>
+            <artifactId>solomon-s3-sdk</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-minio</artifactId>
         </dependency>
 
         <dependency>
