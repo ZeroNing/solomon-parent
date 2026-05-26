@@ -1,64 +1,44 @@
 package com.steven.solomon.enums;
 
 /**
- * 通知消息类型枚举
- * 不同平台支持的类型不同，不支持的类型会自动降级为Markdown
+ * 通知消息类型枚举。
+ *
+ * <p>各平台能力不完全一致，不支持的类型由服务实现降级为 Markdown 或平台卡片。</p>
  */
 public enum NoticeMsgTypeEnum {
 
-    /** 纯文本消息，所有平台支持
-     * 支持@功能
-     */
+    /** 纯文本消息，支持 @。 */
     TEXT("text", "纯文本"),
 
-    /**
-     * Markdown富文本消息，所有平台支持
-     * 支持@功能，支持Markdown语法
-     */
-    MARKDOWN("markdown", "Markdown格式"),
+    /** Markdown 富文本消息，支持 @。 */
+    MARKDOWN("markdown", "Markdown"),
 
-    /**
-     * 链接卡片消息，所有平台支持
-     * 需要设置linkUrl（跳转地址）和linkPicUrl（封面图）
-     */
+    /** 链接卡片消息。 */
     LINK("link", "链接消息"),
 
-    /**
-     * 文件消息，所有平台支持
-     * 需要先上传文件获取media_id
-     */
+    /** 文件消息，需要平台媒体资源标识。 */
     FILE("file", "文件消息"),
 
-    /**
-     * 图片消息，所有平台支持
-     * 需要先上传图片获取media_id
-     */
+    /** 图片消息，需要平台媒体资源标识。 */
     IMAGE("image", "图片消息"),
 
-    /**
-     * 语音消息，企业微信/钉钉支持，飞书不支持
-     * 需要先上传语音文件获取media_id
-     */
+    /** 语音消息，需要平台媒体资源标识。 */
     VOICE("voice", "语音消息"),
 
-    /**
-     * 通用卡片消息
-     */
+    /** 通用卡片消息。 */
     CARD("card", "卡片消息"),
 
-    /**
-     * 交互卡片消息，所有平台支持
-     * 支持添加按钮，点击跳转指定链接
-     */
+    /** 交互卡片消息。 */
     ACTION_CARD("actionCard", "交互卡片"),
 
-    /**
-     * Feed流多图文消息，仅钉钉支持
-     * 支持多个图文条目
-     */
-    FEED_CARD("feedCard", "Feed流卡片");
+    /** Feed 流卡片，主要用于钉钉。 */
+    FEED_CARD("feedCard", "Feed 流卡片"),
+
+    /** 群名片，主要用于飞书。 */
+    SHARE_CHAT("share_chat", "群名片");
 
     private final String code;
+
     private final String desc;
 
     NoticeMsgTypeEnum(String code, String desc) {

@@ -1,36 +1,26 @@
 package com.steven.solomon.service;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
-import cn.hutool.http.HttpUtil;
 import com.steven.solomon.config.NoticeProperties;
 import com.steven.solomon.entity.NoticeMessage;
 import com.steven.solomon.enums.NoticeChannelEnum;
 import com.steven.solomon.enums.NoticeMsgTypeEnum;
-import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 企业微信通知服务实现
+ * 企业微信机器人通知服务。
  */
 @Service
-public class WechatWorkServiceImpl implements NoticeService {
-
-    private final Logger logger = LoggerUtils.logger(getClass());
-
-    private final NoticeProperties properties;
+public class WechatWorkServiceImpl extends AbstractRobotNoticeService {
 
     public WechatWorkServiceImpl(NoticeProperties properties) {
-        this.properties = properties;
+        super(properties);
     }
 
     @Override
@@ -39,230 +29,193 @@ public class WechatWorkServiceImpl implements NoticeService {
     }
 
     @Override
-    public boolean send(NoticeMessage message) throws Exception {
+    protected String webhookUrl(NoticeMessage message) throws Exception {
         NoticeProperties.WechatWork config = properties.getWechatWork();
-        if (ValidateUtils.isEmpty(config) || StrUtil.isBlank(config.getWebhookUrl())) {
-            logger.warn("企业微信未配置，跳过发送");
-            return false;
+        if (config == null || StrUtil.isBlank(config.getWebhookUrl())) {
+            return null;
         }
-
-        // 构建请求URL（带签名）
-        String url = buildUrl(config);
-
-        // 构建请求体
-        Map<String, Object> body = buildRequestBody(message);
-
-        // 发送请求
-        String response = HttpUtil.post(url, JSONUtil.toJsonStr(body));
-        logger.info("企业微信发送报文:{} 结果: {}",JSONUtil.toJsonStr(body), response);
-
-        return true;
-    }
-
-    /**
-     * 构建带签名的URL
-     */
-    private String buildUrl(NoticeProperties.WechatWork config) throws Exception {
-        String url = config.getWebhookUrl();
         if (StrUtil.isBlank(config.getSecret())) {
-            return url;
+            return config.getWebhookUrl();
         }
 
         long timestamp = System.currentTimeMillis() / 1000;
-        String stringToSign = timestamp + "\n" + config.getSecret();
+        String content = timestamp + "\n" + config.getSecret();
         String sign = URLEncoder.encode(
-                NoticePayloadUtils.hmacSha256Base64(stringToSign, config.getSecret()),
+                NoticePayloadUtils.hmacSha256Base64(content, config.getSecret()),
                 StandardCharsets.UTF_8
         );
-
-        return url + "&timestamp=" + timestamp + "&sign=" + sign;
+        return config.getWebhookUrl() + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
-    /**
-     * 构建请求体
-     */
-    private Map<String, Object> buildRequestBody(NoticeMessage message) {
-        Map<String, Object> body = new HashMap<>();
-        NoticeMsgTypeEnum msgType = message.getMsgType();
-        body.put("msgtype", msgType.getCode());
+    @Override
+    protected Map<String, Object> buildRequestBody(NoticeMessage message) {
+        NoticeMsgTypeEnum msgType = message.getMsgType() == null ? NoticeMsgTypeEnum.MARKDOWN : message.getMsgType();
+        Map<String, Object> body = NoticePayloadUtils.map("msgtype", msgType.getCode()).build();
 
-        // 根据消息类型构建不同的内容
         switch (msgType) {
             case TEXT:
-                body.put("text", buildTextContent(message));
-                break;
-            case MARKDOWN:
-                Map<String, Object> markdown = new HashMap<>();
-                markdown.put("content", buildMarkdownContent(message));
-                body.put("markdown", markdown);
+                body.put("text", textContent(message));
                 break;
             case IMAGE:
-                body.put("image", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
-                break;
             case FILE:
-                body.put("file", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
+                body.put(msgType.getCode(), NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case VOICE:
-                body.put("voice", buildVoiceContent(message));
+                body.put("voice", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case LINK:
                 body.put("msgtype", "news");
-                body.put("news", buildNewsContent(message));
+                body.put("news", newsContent(message));
                 break;
-            case ACTION_CARD,CARD:
+            case ACTION_CARD:
+            case CARD:
                 body.put("msgtype", "template_card");
-                body.put("template_card", buildTemplateCardContent(message));
+                body.put("template_card", templateCardContent(message));
+                break;
+            case MARKDOWN:
+                body.put("markdown", markdownContent(message));
                 break;
             default:
-                // 默认使用Markdown
                 body.put("msgtype", "markdown");
-                Map<String, Object> defaultMarkdown = new HashMap<>();
-                defaultMarkdown.put("content", buildMarkdownContent(message));
-                body.put("markdown", defaultMarkdown);
+                body.put("markdown", markdownContent(message));
+                break;
         }
 
-        // 处理@用户（仅文本和Markdown支持@）
         if (msgType == NoticeMsgTypeEnum.TEXT || msgType == NoticeMsgTypeEnum.MARKDOWN) {
-            // 完全使用消息中传入的atAll配置
-            if (Boolean.TRUE.equals(message.getAtAll())) {
-                body.put("mentioned_list", List.of("@all"));
-            }
-            // 完全使用消息中传入的atUsers配置（企业微信atUsers为用户ID列表）
-            else if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
-                body.put("mentioned_list", message.getAtUsers());
-            }
+            fillMention(body, message);
         }
-
         return body;
     }
 
-    /**
-     * 构建文本消息
-     */
-    private Map<String, Object> buildTextContent(NoticeMessage message) {
-        Map<String, Object> text = new HashMap<>();
-        text.put("content", NoticePayloadUtils.appendSignature(
-                message.getContent(), properties.isGlobalSignature(), properties.getSignature(), "\n"
-        ));
-        return text;
+    private Map<String, Object> textContent(NoticeMessage message) {
+        return NoticePayloadUtils.map("content", signature(message.getContent(), "\n")).build();
     }
 
-    /**
-     * 构建语音消息
-     */
-    private Map<String, Object> buildVoiceContent(NoticeMessage message) {
-        Map<String, Object> voice = new HashMap<>();
-        voice.put("media_id", message.getMediaId());
-        return voice;
+    private Map<String, Object> markdownContent(NoticeMessage message) {
+        return NoticePayloadUtils.map("content", buildMarkdown(message)).build();
     }
 
-    /**
-     * 构建图文消息
-     */
-    private Map<String, Object> buildNewsContent(NoticeMessage message) {
-        Map<String, Object> news = new HashMap<>();
-        Map<String, Object> article = new HashMap<>();
-        article.put("title", message.getTitle());
-        article.put("description", message.getContent());
-        article.put("url", message.getLinkUrl());
-        article.put("picurl", message.getLinkPicUrl());
-        news.put("articles", List.of(article));
-        return news;
+    private Map<String, Object> newsContent(NoticeMessage message) {
+        Map<String, Object> article = NoticePayloadUtils.map()
+                .put("title", message.getTitle())
+                .put("description", message.getContent())
+                .put("url", message.getLinkUrl())
+                .put("picurl", message.getLinkPicUrl())
+                .build();
+        return NoticePayloadUtils.map("articles", List.of(article)).build();
     }
 
-    /**
-     * 构建模板卡片消息
-     * 严格按照官方文档实现，自动选择卡片类型：
-     * - 有图片时用 news_notice（图文展示）
-     * - 无图片时用 text_notice（文本通知）
-     * 文档参考：https://developer.work.weixin.qq.com/document/path/99110
-     */
-    private Map<String, Object> buildTemplateCardContent(NoticeMessage message) {
-        Map<String, Object> card = new HashMap<>();
-        
-        // 自动选择卡片类型
-        boolean hasImage = StrUtil.isNotEmpty(message.getLinkPicUrl());
-        String cardType = hasImage ? "news_notice" : "text_notice";
-        card.put("card_type", cardType);
-        
-        // ========== 公共必填字段 ==========
-        // 1. 主标题，必填
-        Map<String, Object> mainTitle = new HashMap<>();
-        mainTitle.put("title", message.getTitle());
-        if (StrUtil.isNotEmpty(message.getContent()) && message.getContent().length() <= 30) {
-            mainTitle.put("desc", message.getContent());
-        }
-        card.put("main_title", mainTitle);
-        
-        // 2. 卡片点击动作，必填
-        String defaultUrl = StrUtil.isBlank(message.getLinkUrl()) ? "https://www.qq.com" : message.getLinkUrl();
-        String clickUrl = NoticePayloadUtils.firstButtonUrlOrDefault(message, defaultUrl);
-        card.put("card_action", Map.of(
-                "type", 1, // 1：跳转链接，必填
-                "url", clickUrl // 跳转链接，必填
-        ));
-        
-        // ========== news_notice 专属必填字段 ==========
-        if (hasImage) {
-            // 卡片图片，必填
-            card.put("card_image", Map.of(
-                    "url", message.getLinkPicUrl(),
-                    "aspect_ratio", 1.78 // 16:9 宽高比，可选
-            ));
-        }
-        
-        // ========== 公共可选字段 ==========
-        // 可选：二级正文内容（text_notice 必填至少有main_title.title或sub_title_text）
-        if (StrUtil.isNotEmpty(message.getContent()) && message.getContent().length() > 30) {
-            card.put("sub_title_text", message.getContent());
-        }
-        
-        // 可选：跳转按钮列表（最多3个）
-        if (NoticePayloadUtils.hasItems(message.getButtons())) {
-            List<Map<String, Object>> jumpList = new ArrayList<>();
-            for (NoticeMessage.Button button : message.getButtons()) {
-                Map<String, Object> jump = new HashMap<>();
-                jump.put("type", 1); // 1：跳转链接
-                jump.put("title", button.getTitle()); // 按钮文字，必填
-                jump.put("url", button.getActionUrl()); // 跳转链接，必填
-                jumpList.add(jump);
-                if (jumpList.size() >= 3) break; // 最多3个按钮
-            }
+    private Map<String, Object> templateCardContent(NoticeMessage message) {
+        boolean hasImage = StrUtil.isNotBlank(message.getLinkPicUrl());
+        Map<String, Object> card = NoticePayloadUtils.map()
+                .put("card_type", hasImage ? "news_notice" : "text_notice")
+                .put("main_title", mainTitle(message))
+                .put("card_action", cardAction(message))
+                .put("source", source(message))
+                .putIf(hasImage, "card_image", cardImage(message))
+                .putIf(StrUtil.isNotBlank(message.getContent()) && message.getContent().length() > 30,
+                        "sub_title_text", message.getContent())
+                .build();
+
+        List<Map<String, Object>> jumpList = jumpList(message);
+        if (!jumpList.isEmpty()) {
             card.put("jump_list", jumpList);
         }
-        
-        // 可选：卡片来源信息（显示消息等级）
-        card.put("source", Map.of(
-                "desc", message.getLevel().getName(),
-                "desc_color", getLevelColor(message.getLevel().getName())
-        ));
-
         return card;
     }
-    
-    /**
-     * 根据消息等级获取对应颜色
-     * 0：灰色，1：黑色，2：红色，3：绿色
-     */
-    private int getLevelColor(String levelName) {
-        return switch (levelName.toUpperCase()) {
-            case "SUCCESS", "INFO" -> 3; // 成功/普通 → 绿色
-            case "WARN", "WARNING" -> 1; // 警告 → 黑色
-            case "ERROR", "FATAL" -> 2; // 错误 → 红色
-            default -> 0; // 其他 → 灰色
-        };
+
+    private Map<String, Object> mainTitle(NoticeMessage message) {
+        return NoticePayloadUtils.map()
+                .put("title", message.getTitle())
+                .putIf(StrUtil.isNotBlank(message.getContent()) && message.getContent().length() <= 30,
+                        "desc", message.getContent())
+                .build();
+    }
+
+    private Map<String, Object> cardAction(NoticeMessage message) {
+        String defaultUrl = StrUtil.blankToDefault(message.getLinkUrl(), "https://www.qq.com");
+        return NoticePayloadUtils.map()
+                .put("type", 1)
+                .put("url", NoticePayloadUtils.firstButtonUrlOrDefault(message, defaultUrl))
+                .build();
+    }
+
+    private Map<String, Object> cardImage(NoticeMessage message) {
+        return NoticePayloadUtils.map()
+                .put("url", message.getLinkPicUrl())
+                .put("aspect_ratio", 1.78)
+                .build();
+    }
+
+    private Map<String, Object> source(NoticeMessage message) {
+        return NoticePayloadUtils.map()
+                .put("desc", message.getLevel().getName())
+                .put("desc_color", levelColor(message.getLevel().getName()))
+                .build();
+    }
+
+    private List<Map<String, Object>> jumpList(NoticeMessage message) {
+        List<Map<String, Object>> jumps = new ArrayList<>();
+        if (!NoticePayloadUtils.hasItems(message.getButtons())) {
+            return jumps;
+        }
+
+        for (NoticeMessage.Button button : message.getButtons()) {
+            jumps.add(NoticePayloadUtils.map()
+                    .put("type", 1)
+                    .put("title", button.getTitle())
+                    .put("url", button.getActionUrl())
+                    .build());
+            if (jumps.size() >= 3) {
+                break;
+            }
+        }
+        return jumps;
+    }
+
+    private void fillMention(Map<String, Object> body, NoticeMessage message) {
+        if (Boolean.TRUE.equals(message.getAtAll())) {
+            body.put("mentioned_list", List.of("@all"));
+            return;
+        }
+        if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
+            body.put("mentioned_list", message.getAtUsers());
+        }
     }
 
     /**
-     * 构建Markdown内容
+     * 企业微信卡片色值：0 灰色，1 黑色，2 红色，3 绿色。
      */
-    private String buildMarkdownContent(NoticeMessage message) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(message.getLevel().getEmoji()).append(" **").append(message.getTitle()).append("**\n\n");
-        sb.append(message.getContent()).append("\n\n");
+    private int levelColor(String levelName) {
+        String level = StrUtil.nullToEmpty(levelName).toUpperCase();
+        switch (level) {
+            case "SUCCESS":
+            case "INFO":
+                return 3;
+            case "WARN":
+            case "WARNING":
+                return 1;
+            case "ERROR":
+            case "FATAL":
+            case "CRITICAL":
+                return 2;
+            default:
+                return 0;
+        }
+    }
 
+    private String buildMarkdown(NoticeMessage message) {
+        String content = message.getLevel().getEmoji() + " **" + message.getTitle() + "**\n\n"
+                + message.getContent() + "\n\n";
+        return signature(content, "");
+    }
+
+    private String signature(String content, String prefix) {
         return NoticePayloadUtils.appendSignature(
-                sb.toString(), properties.isGlobalSignature(), properties.getSignature(), ""
+                content,
+                properties.isGlobalSignature(),
+                properties.getSignature(),
+                prefix
         );
     }
 }

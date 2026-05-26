@@ -9,132 +9,85 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 统一通知消息模型
- * 所有平台的消息都使用这个模型，内部自动适配不同平台的格式
+ * 统一通知消息模型。
+ *
+ * <p>业务侧只需要描述“发给谁、发什么、用什么类型发”，具体平台报文由各机器人服务适配。</p>
  */
 public class NoticeMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 通知渠道列表（必传）
-     * 支持同时发送到多个渠道：List.of(WECHAT_WORK, DING_TALK, FEISHU)
-     */
+    /** 通知渠道，支持一次投递到多个机器人。 */
     private List<NoticeChannelEnum> channels;
 
-    /**
-     * 通知级别，默认：INFO
-     * 可选值：INFO(普通)/WARN(警告)/ERROR(错误)/SUCCESS(成功)
-     * 不同级别会显示不同的图标和颜色
-     */
+    /** 通知级别，默认普通消息。 */
     private NoticeLevelEnum level = NoticeLevelEnum.INFO;
 
-    /**
-     * 消息类型，默认：MARKDOWN
-     * 可选值：TEXT/MARKDOWN/LINK/IMAGE/FILE/ACTION_CARD/FEED_CARD
-     */
+    /** 消息类型，默认 Markdown。 */
     private NoticeMsgTypeEnum msgType = NoticeMsgTypeEnum.MARKDOWN;
 
-    /**
-     * 消息标题（必传）
-     * 所有消息类型都需要标题
-     */
+    /** 消息标题。 */
     private String title;
 
-    /**
-     * 消息内容（必传）
-     * 支持Markdown格式（MARKDOWN类型自动解析）
-     */
+    /** 消息正文。 */
     private String content;
 
-    /**
-     * 模板代码（可选，预留字段）
-     */
+    /** 模板编码，预留给业务侧模板引擎扩展。 */
     private String templateCode;
 
-    /**
-     * 模板参数（可选，预留字段）
-     */
+    /** 模板参数，预留给业务侧模板引擎扩展。 */
     private Map<String, Object> templateParams;
 
-    /**
-     * 接收人列表（可选，预留字段）
-     */
+    /** 接收人列表，预留给业务侧精准投递扩展。 */
     private List<String> receivers;
 
-    /**
-     * 是否异步发送，默认：true
-     * 异步发送不会阻塞业务线程，发送结果会打印日志
-     * 同步发送会等待发送完成后返回
-     */
+    /** 是否异步发送。 */
     private boolean async = true;
 
-    /**
-     * 失败重试次数，默认：3次
-     * 发送失败时自动重试的次数
-     */
+    /** 异步发送失败重试次数。 */
     private int retryCount = 3;
 
-    /**
-     * 租户标识（可选，多租户场景使用）
-     */
+    /** 租户编码，预留给多租户场景。 */
     private String tenantCode;
 
-    /**
-     * 是否@所有人（可选，优先级高于全局配置）
-     * null：使用全局配置的atAll值
-     * true：本次消息@所有人
-     * false：本次消息不@所有人
-     */
+    /** 是否提醒所有人，优先级高于全局配置。 */
     private Boolean atAll;
 
-    /**
-     * @用户列表（可选，优先级高于全局配置）
-     * 企业微信：填写用户userid
-     * 钉钉：填写用户手机号或userid
-     * 飞书：填写用户open_id（ou_xxxxxx）
-     */
+    /** 被提醒用户列表，各平台按自己的用户标识解释。 */
     private List<String> atUsers;
 
-    // ==================== 各类型消息专属字段 ====================
-    /**
-     * 链接跳转URL（LINK类型必传）
-     * 用户点击消息时跳转到的地址
-     */
+    /** 链接消息跳转地址。 */
     private String linkUrl;
 
-    /**
-     * 链接封面图URL（LINK类型可选）
-     * 链接消息显示的封面图片
-     */
+    /** 链接消息封面图地址或平台图片标识。 */
     private String linkPicUrl;
 
-    /**
-     * 媒体资源ID（IMAGE/FILE类型必传）
-     * 企业微信/钉钉：上传文件后得到的media_id
-     * 飞书：上传文件后得到的image_key/file_key
-     */
+    /** 图片、文件、语音等媒体消息的平台资源标识。 */
     private String mediaId;
 
-    /**
-     * 卡片按钮列表（ACTION_CARD类型可选）
-     * 交互卡片的按钮配置，支持多个按钮
-     */
+    /** 图片 Base64 内容，企业微信群机器人图片消息使用。 */
+    private String imageBase64;
+
+    /** 图片 MD5，企业微信群机器人图片消息使用。 */
+    private String imageMd5;
+
+    /** 文件名，文件类消息或降级展示时使用。 */
+    private String fileName;
+
+    /** 语音时长，单位秒。 */
+    private Integer duration;
+
+    /** 群名片 ID，飞书 share_chat 消息使用。 */
+    private String shareChatId;
+
+    /** 交互卡片按钮。 */
     private List<Button> buttons;
 
-    /**
-     * Feed流条目列表（FEED_CARD类型必传，钉钉专属）
-     * 多图文消息的条目配置
-     */
+    /** Feed 流卡片条目。 */
     private List<FeedItem> feedItems;
 
-    /**
-     * 扩展参数（可选）
-     * 用于传递平台特殊参数
-     */
+    /** 平台扩展参数。 */
     private Map<String, Object> extParams;
-
-    // ==================== 构造方法 ====================
 
     public NoticeMessage() {
     }
@@ -154,230 +107,458 @@ public class NoticeMessage implements Serializable {
         this.atUsers = atUsers;
     }
 
-    // ==================== 内部类 ====================
+    public static NoticeMessage create() {
+        return new NoticeMessage();
+    }
+
+    public static NoticeMessage of(NoticeChannelEnum channel, String title, String content) {
+        return create().channel(channel).title(title).content(content);
+    }
+
+    public NoticeMessage channel(NoticeChannelEnum channel) {
+        this.channels = List.of(channel);
+        return this;
+    }
+
+    public NoticeMessage channels(List<NoticeChannelEnum> channels) {
+        this.channels = channels;
+        return this;
+    }
+
+    public NoticeMessage level(NoticeLevelEnum level) {
+        if (level != null) {
+            this.level = level;
+        }
+        return this;
+    }
+
+    public NoticeMessage msgType(NoticeMsgTypeEnum msgType) {
+        if (msgType != null) {
+            this.msgType = msgType;
+        }
+        return this;
+    }
+
+    public NoticeMessage title(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public NoticeMessage content(String content) {
+        this.content = content;
+        return this;
+    }
+
+    public NoticeMessage template(String templateCode, Map<String, Object> templateParams) {
+        this.templateCode = templateCode;
+        this.templateParams = templateParams;
+        return this;
+    }
+
+    public NoticeMessage receivers(List<String> receivers) {
+        this.receivers = receivers;
+        return this;
+    }
+
+    public NoticeMessage async(boolean async) {
+        this.async = async;
+        return this;
+    }
+
+    public NoticeMessage retryCount(int retryCount) {
+        this.retryCount = retryCount;
+        return this;
+    }
+
+    public NoticeMessage tenantCode(String tenantCode) {
+        this.tenantCode = tenantCode;
+        return this;
+    }
+
+    public NoticeMessage at(Boolean atAll, List<String> atUsers) {
+        this.atAll = atAll;
+        this.atUsers = atUsers;
+        return this;
+    }
+
+    public NoticeMessage link(String linkUrl, String linkPicUrl) {
+        this.linkUrl = linkUrl;
+        this.linkPicUrl = linkPicUrl;
+        return this;
+    }
+
+    public NoticeMessage mediaId(String mediaId) {
+        this.mediaId = mediaId;
+        return this;
+    }
+
+    public NoticeMessage image(String mediaId) {
+        return msgType(NoticeMsgTypeEnum.IMAGE).mediaId(mediaId);
+    }
+
+    public NoticeMessage image(String imageBase64, String imageMd5) {
+        this.msgType = NoticeMsgTypeEnum.IMAGE;
+        this.imageBase64 = imageBase64;
+        this.imageMd5 = imageMd5;
+        return this;
+    }
+
+    public NoticeMessage file(String mediaId, String fileName) {
+        this.msgType = NoticeMsgTypeEnum.FILE;
+        this.mediaId = mediaId;
+        this.fileName = fileName;
+        return this;
+    }
+
+    public NoticeMessage voice(String mediaId, Integer duration) {
+        this.msgType = NoticeMsgTypeEnum.VOICE;
+        this.mediaId = mediaId;
+        this.duration = duration;
+        return this;
+    }
+
+    public NoticeMessage shareChat(String shareChatId) {
+        this.msgType = NoticeMsgTypeEnum.SHARE_CHAT;
+        this.shareChatId = shareChatId;
+        return this;
+    }
+
+    public NoticeMessage buttons(List<Button> buttons) {
+        this.buttons = buttons;
+        return this;
+    }
+
+    public NoticeMessage feedItems(List<FeedItem> feedItems) {
+        this.feedItems = feedItems;
+        return this;
+    }
+
+    public NoticeMessage extParams(Map<String, Object> extParams) {
+        this.extParams = extParams;
+        return this;
+    }
+
     /**
-     * 交互卡片按钮配置
-     * 用于ACTION_CARD类型消息
+     * 交互卡片按钮配置。
      */
-    public static class Button {
-        /**
-         * 按钮显示文字
-         */
+    public static class Button implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
         private String title;
-        /**
-         * 按钮点击跳转URL
-         */
+
         private String actionUrl;
 
-        public Button() {}
+        public Button() {
+        }
 
-        /**
-         * 构造方法
-         * @param title 按钮文字
-         * @param actionUrl 跳转链接
-         */
         public Button(String title, String actionUrl) {
             this.title = title;
             this.actionUrl = actionUrl;
         }
 
-        public String getTitle() { return title; }
-        public void setTitle(String title) { this.title = title; }
-        public String getActionUrl() { return actionUrl; }
-        public void setActionUrl(String actionUrl) { this.actionUrl = actionUrl; }
+        public static Button of(String title, String actionUrl) {
+            return new Button().title(title).actionUrl(actionUrl);
+        }
+
+        public Button title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Button actionUrl(String actionUrl) {
+            this.actionUrl = actionUrl;
+            return this;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public Button setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public String getActionUrl() {
+            return actionUrl;
+        }
+
+        public Button setActionUrl(String actionUrl) {
+            this.actionUrl = actionUrl;
+            return this;
+        }
     }
 
     /**
-     * Feed流条目配置
-     * 用于FEED_CARD类型消息（钉钉专属）
+     * Feed 流卡片条目配置。
      */
-    public static class FeedItem {
-        /**
-         * 条目标题
-         */
+    public static class FeedItem implements Serializable {
+
+        private static final long serialVersionUID = 1L;
+
         private String title;
-        /**
-         * 条目点击跳转URL
-         */
+
         private String messageUrl;
-        /**
-         * 条目封面图片URL
-         */
+
         private String picUrl;
 
-        public FeedItem() {}
+        public FeedItem() {
+        }
 
-        /**
-         * 构造方法
-         * @param title 条目标题
-         * @param messageUrl 跳转链接
-         * @param picUrl 封面图片
-         */
         public FeedItem(String title, String messageUrl, String picUrl) {
             this.title = title;
             this.messageUrl = messageUrl;
             this.picUrl = picUrl;
         }
 
-        public String getTitle() { return title; }
-        public void setTitle(String title) { this.title = title; }
-        public String getMessageUrl() { return messageUrl; }
-        public void setMessageUrl(String messageUrl) { this.messageUrl = messageUrl; }
-        public String getPicUrl() { return picUrl; }
-        public void setPicUrl(String picUrl) { this.picUrl = picUrl; }
-    }
+        public static FeedItem of(String title, String messageUrl, String picUrl) {
+            return new FeedItem().title(title).messageUrl(messageUrl).picUrl(picUrl);
+        }
 
-    // ==================== Getter & Setter ====================
+        public FeedItem title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public FeedItem messageUrl(String messageUrl) {
+            this.messageUrl = messageUrl;
+            return this;
+        }
+
+        public FeedItem picUrl(String picUrl) {
+            this.picUrl = picUrl;
+            return this;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public FeedItem setTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public String getMessageUrl() {
+            return messageUrl;
+        }
+
+        public FeedItem setMessageUrl(String messageUrl) {
+            this.messageUrl = messageUrl;
+            return this;
+        }
+
+        public String getPicUrl() {
+            return picUrl;
+        }
+
+        public FeedItem setPicUrl(String picUrl) {
+            this.picUrl = picUrl;
+            return this;
+        }
+    }
 
     public List<NoticeChannelEnum> getChannels() {
         return channels;
     }
 
-    public void setChannels(List<NoticeChannelEnum> channels) {
-        this.channels = channels;
+    public NoticeMessage setChannels(List<NoticeChannelEnum> channels) {
+        return channels(channels);
     }
 
     public NoticeLevelEnum getLevel() {
         return level;
     }
 
-    public void setLevel(NoticeLevelEnum level) {
-        this.level = level;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public String getTemplateCode() {
-        return templateCode;
-    }
-
-    public void setTemplateCode(String templateCode) {
-        this.templateCode = templateCode;
-    }
-
-    public Map<String, Object> getTemplateParams() {
-        return templateParams;
-    }
-
-    public void setTemplateParams(Map<String, Object> templateParams) {
-        this.templateParams = templateParams;
-    }
-
-    public List<String> getReceivers() {
-        return receivers;
-    }
-
-    public void setReceivers(List<String> receivers) {
-        this.receivers = receivers;
-    }
-
-    public boolean isAsync() {
-        return async;
-    }
-
-    public void setAsync(boolean async) {
-        this.async = async;
-    }
-
-    public int getRetryCount() {
-        return retryCount;
-    }
-
-    public void setRetryCount(int retryCount) {
-        this.retryCount = retryCount;
-    }
-
-    public String getTenantCode() {
-        return tenantCode;
-    }
-
-    public void setTenantCode(String tenantCode) {
-        this.tenantCode = tenantCode;
-    }
-
-    public Map<String, Object> getExtParams() {
-        return extParams;
-    }
-
-    public void setExtParams(Map<String, Object> extParams) {
-        this.extParams = extParams;
+    public NoticeMessage setLevel(NoticeLevelEnum level) {
+        return level(level);
     }
 
     public NoticeMsgTypeEnum getMsgType() {
         return msgType;
     }
 
-    public void setMsgType(NoticeMsgTypeEnum msgType) {
-        this.msgType = msgType;
+    public NoticeMessage setMsgType(NoticeMsgTypeEnum msgType) {
+        return msgType(msgType);
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public NoticeMessage setTitle(String title) {
+        return title(title);
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public NoticeMessage setContent(String content) {
+        return content(content);
+    }
+
+    public String getTemplateCode() {
+        return templateCode;
+    }
+
+    public NoticeMessage setTemplateCode(String templateCode) {
+        this.templateCode = templateCode;
+        return this;
+    }
+
+    public Map<String, Object> getTemplateParams() {
+        return templateParams;
+    }
+
+    public NoticeMessage setTemplateParams(Map<String, Object> templateParams) {
+        this.templateParams = templateParams;
+        return this;
+    }
+
+    public List<String> getReceivers() {
+        return receivers;
+    }
+
+    public NoticeMessage setReceivers(List<String> receivers) {
+        return receivers(receivers);
+    }
+
+    public boolean isAsync() {
+        return async;
+    }
+
+    public NoticeMessage setAsync(boolean async) {
+        return async(async);
+    }
+
+    public int getRetryCount() {
+        return retryCount;
+    }
+
+    public NoticeMessage setRetryCount(int retryCount) {
+        return retryCount(retryCount);
+    }
+
+    public String getTenantCode() {
+        return tenantCode;
+    }
+
+    public NoticeMessage setTenantCode(String tenantCode) {
+        return tenantCode(tenantCode);
     }
 
     public Boolean getAtAll() {
         return atAll;
     }
 
-    public void setAtAll(Boolean atAll) {
+    public NoticeMessage setAtAll(Boolean atAll) {
         this.atAll = atAll;
+        return this;
     }
 
     public List<String> getAtUsers() {
         return atUsers;
     }
 
-    public void setAtUsers(List<String> atUsers) {
+    public NoticeMessage setAtUsers(List<String> atUsers) {
         this.atUsers = atUsers;
+        return this;
     }
 
     public String getLinkUrl() {
         return linkUrl;
     }
 
-    public void setLinkUrl(String linkUrl) {
+    public NoticeMessage setLinkUrl(String linkUrl) {
         this.linkUrl = linkUrl;
+        return this;
     }
 
     public String getLinkPicUrl() {
         return linkPicUrl;
     }
 
-    public void setLinkPicUrl(String linkPicUrl) {
+    public NoticeMessage setLinkPicUrl(String linkPicUrl) {
         this.linkPicUrl = linkPicUrl;
+        return this;
     }
 
     public String getMediaId() {
         return mediaId;
     }
 
-    public void setMediaId(String mediaId) {
-        this.mediaId = mediaId;
+    public NoticeMessage setMediaId(String mediaId) {
+        return mediaId(mediaId);
+    }
+
+    public String getImageBase64() {
+        return imageBase64;
+    }
+
+    public NoticeMessage setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
+        return this;
+    }
+
+    public String getImageMd5() {
+        return imageMd5;
+    }
+
+    public NoticeMessage setImageMd5(String imageMd5) {
+        this.imageMd5 = imageMd5;
+        return this;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public NoticeMessage setFileName(String fileName) {
+        this.fileName = fileName;
+        return this;
+    }
+
+    public Integer getDuration() {
+        return duration;
+    }
+
+    public NoticeMessage setDuration(Integer duration) {
+        this.duration = duration;
+        return this;
+    }
+
+    public String getShareChatId() {
+        return shareChatId;
+    }
+
+    public NoticeMessage setShareChatId(String shareChatId) {
+        this.shareChatId = shareChatId;
+        return this;
     }
 
     public List<Button> getButtons() {
         return buttons;
     }
 
-    public void setButtons(List<Button> buttons) {
-        this.buttons = buttons;
+    public NoticeMessage setButtons(List<Button> buttons) {
+        return buttons(buttons);
     }
 
     public List<FeedItem> getFeedItems() {
         return feedItems;
     }
 
-    public void setFeedItems(List<FeedItem> feedItems) {
-        this.feedItems = feedItems;
+    public NoticeMessage setFeedItems(List<FeedItem> feedItems) {
+        return feedItems(feedItems);
+    }
+
+    public Map<String, Object> getExtParams() {
+        return extParams;
+    }
+
+    public NoticeMessage setExtParams(Map<String, Object> extParams) {
+        return extParams(extParams);
     }
 }

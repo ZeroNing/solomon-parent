@@ -1,19 +1,20 @@
 package com.steven.solomon.config;
 
-import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.service.DingTalkServiceImpl;
 import com.steven.solomon.service.FeishuServiceImpl;
+import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.service.WechatWorkServiceImpl;
 import com.steven.solomon.utils.NoticeUtils;
-import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
- * 通知服务自动配置
+ * 机器人通知自动配置。
  */
 @Configuration
 @EnableConfigurationProperties(NoticeProperties.class)
