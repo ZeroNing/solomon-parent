@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import com.steven.solomon.verification.ValidateUtils;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +35,7 @@ public class MqttTopicFilterMatcher {
      * @return 所有匹配成功的过滤器列表（保持原顺序）
      */
     public static List<String> findAllMatchingFilters(String topic, List<String> filters) {
-        if (topic == null || filters == null) {
+        if (ValidateUtils.isEmpty(topic) || ValidateUtils.isEmpty(filters)) {
             return Collections.emptyList();
         }
 
@@ -56,8 +58,7 @@ public class MqttTopicFilterMatcher {
      */
     public static boolean matches(String filter, String topic) {
         // 空检查（MQTT规范禁止空主题）
-        if (filter == null || topic == null ||
-                filter.isEmpty() || topic.isEmpty()) {
+        if (ValidateUtils.isEmpty(filter) || ValidateUtils.isEmpty(topic)) {
             return false;
         }
 

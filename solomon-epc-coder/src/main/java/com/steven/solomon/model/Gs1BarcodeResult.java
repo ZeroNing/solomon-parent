@@ -1,5 +1,7 @@
 package com.steven.solomon.model;
 
+import com.steven.solomon.verification.ValidateUtils;
+
 public class Gs1BarcodeResult {
 
   /** 原始 GS1 条码内容。 */
@@ -92,7 +94,7 @@ public class Gs1BarcodeResult {
    * @return 是否包含 GTIN 和序列号
    */
   public boolean hasGtinSerial() {
-    return ai01 != null && ai21 != null;
+    return ValidateUtils.isNotEmpty(ai01) && ValidateUtils.isNotEmpty(ai21);
   }
 
   /**
@@ -101,6 +103,6 @@ public class Gs1BarcodeResult {
    * @return 是否包含 GIAI
    */
   public boolean hasGiai() {
-    return ai8004 != null;
+    return ValidateUtils.isNotEmpty(ai8004);
   }
 }

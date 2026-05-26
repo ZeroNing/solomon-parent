@@ -3,8 +3,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>solomon-parent</artifactId>
     <groupId>com.steven</groupId>
+    <artifactId>solomon-parent</artifactId>
     <version>1.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
@@ -13,24 +13,26 @@
   <artifactId>solomon-s3</artifactId>
 
   <dependencies>
-    <!-- AWS S3 SDK，用于与 Amazon S3 进行交互 -->
+    <!-- AWS S3 SDK，用于对接 Amazon S3 及兼容 S3 协议的对象存储。 -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>s3</artifactId>
     </dependency>
 
+    <!-- 显式使用 Apache HTTP 客户端，便于统一连接池、超时和代理配置。 -->
     <dependency>
       <groupId>software.amazon.awssdk</groupId>
       <artifactId>apache-client</artifactId>
     </dependency>
 
+    <!-- 百度 BOS SDK 旧版本会传递 jdk.tools；Java 9+ 已无 tools.jar，必须排除。 -->
     <dependency>
       <groupId>com.baidubce</groupId>
       <artifactId>bce-java-sdk</artifactId>
       <exclusions>
         <exclusion>
-          <artifactId>jdk.tools</artifactId>
           <groupId>jdk.tools</groupId>
+          <artifactId>jdk.tools</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -70,7 +72,7 @@
       <artifactId>spring-boot-autoconfigure</artifactId>
     </dependency>
 
-    <!--解析图片exif 开始-->
+    <!-- 图片 EXIF 解析依赖：读取图片元数据、拍摄信息和扩展属性。 -->
     <dependency>
       <groupId>com.drewnoakes</groupId>
       <artifactId>metadata-extractor</artifactId>
@@ -80,6 +82,5 @@
       <groupId>com.adobe.xmp</groupId>
       <artifactId>xmpcore</artifactId>
     </dependency>
-    <!--解析图片exif 结束-->
   </dependencies>
 </project>

@@ -2,8 +2,6 @@ package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.UUID;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.MessageListener;
@@ -48,7 +46,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         return optionsMap;
     }
 
-    public static Map<String,AbstractConsumer<?,?>> consumerMap = new HashMap<>();
+    private static final Map<String, AbstractConsumer<?, ?>> CONSUMER_MAP = new HashMap<>();
 
     public void putOptionsMap(String tenantCode, MqttClientOptions options) {
         this.optionsMap.put(tenantCode, options);
@@ -160,13 +158,13 @@ public class MqttUtils implements SendService<MqttModel<?>> {
                         AbstractConsumer<?, ?> consumer = (AbstractConsumer<?, ?>) BeanUtil.copyProperties(abstractConsumer, abstractConsumer.getClass(), (String) null);
                         // 订阅主题
                         client.subscribe(topic, messageListener.qos());
-                        consumerMap.put(topic, consumer);
+                        CONSUMER_MAP.put(topic, consumer);
                     }
                     client.publishHandler(message -> {
                         try {
-                            String topic = MqttTopicFilterMatcher.findFirstMatchingFilter(message.topicName(), new ArrayList<>(consumerMap.keySet()));
-                            AbstractConsumer<?, ?> consumer = consumerMap.get(topic);
-                            if(ObjectUtil.isNull(consumer)){
+                            String topic = MqttTopicFilterMatcher.findFirstMatchingFilter(message.topicName(), new ArrayList<>(CONSUMER_MAP.keySet()));
+                            AbstractConsumer<?, ?> consumer = CONSUMER_MAP.get(topic);
+                            if (ValidateUtils.isEmpty(consumer)) {
                                 logger.error("主题:{},不存在消费者,消费内容为:{}",message.topicName(),String.valueOf(message.payload()));
                                 return;
                             }
@@ -204,7 +202,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         MqttClient client = getClient(tenantCode);
         client.disconnect();
         Vertx vertx = vertxMap.get(tenantCode);
-        if (vertx != null) {
+        if (ValidateUtils.isNotEmpty(vertx)) {
             vertx.close();
         }
     }
@@ -268,7 +266,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
         }
 
         // SSL/TLS 配置
-        if (mqttProfile.getUrl() != null && mqttProfile.getUrl().startsWith("ssl://")) {
+        if (StrUtil.startWith(mqttProfile.getUrl(), "ssl://")) {
             options.setSsl(true);
         }
         if (!mqttProfile.isVerifyCertificate()) {
@@ -279,7 +277,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
     }
 
     public Vertx initVertx(MqttProfile.VertxConfig vertxConfig) {
-        if (vertxConfig == null) {
+        if (ValidateUtils.isEmpty(vertxConfig)) {
             return Vertx.vertx();
         }
         VertxOptions options = new VertxOptions()
@@ -296,7 +294,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
                 .setPreferNativeTransport(vertxConfig.isPreferNativeTransport())
                 .setDisableTCCL(vertxConfig.isDisableTCCL());
 
-        if (vertxConfig.getUseDaemonThread() != null) {
+        if (ValidateUtils.isNotEmpty(vertxConfig.getUseDaemonThread())) {
             options.setUseDaemonThread(vertxConfig.getUseDaemonThread());
         }
 

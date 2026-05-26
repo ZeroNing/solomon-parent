@@ -9,15 +9,13 @@ import com.steven.solomon.enums.NoticeChannelEnum;
 import com.steven.solomon.enums.NoticeMsgTypeEnum;
 import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +42,7 @@ public class WechatWorkServiceImpl implements NoticeService {
     @Override
     public boolean send(NoticeMessage message) throws Exception {
         NoticeProperties.WechatWork config = properties.getWechatWork();
-        if (config == null || StrUtil.isEmpty(config.getWebhookUrl())) {
+        if (ValidateUtils.isEmpty(config) || StrUtil.isBlank(config.getWebhookUrl())) {
             logger.warn("企业微信未配置，跳过发送");
             return false;
         }
@@ -53,7 +51,7 @@ public class WechatWorkServiceImpl implements NoticeService {
         String url = buildUrl(config);
 
         // 构建请求体
-        Map<String, Object> body = buildRequestBody(message, config);
+        Map<String, Object> body = buildRequestBody(message);
 
         // 发送请求
         String response = HttpUtil.post(url, JSONUtil.toJsonStr(body));
@@ -67,16 +65,16 @@ public class WechatWorkServiceImpl implements NoticeService {
      */
     private String buildUrl(NoticeProperties.WechatWork config) throws Exception {
         String url = config.getWebhookUrl();
-        if (StrUtil.isEmpty(config.getSecret())) {
+        if (StrUtil.isBlank(config.getSecret())) {
             return url;
         }
 
         long timestamp = System.currentTimeMillis() / 1000;
         String stringToSign = timestamp + "\n" + config.getSecret();
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(config.getSecret().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-        byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
-        String sign = URLEncoder.encode(Base64.getEncoder().encodeToString(signData), StandardCharsets.UTF_8);
+        String sign = URLEncoder.encode(
+                NoticePayloadUtils.hmacSha256Base64(stringToSign, config.getSecret()),
+                StandardCharsets.UTF_8
+        );
 
         return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
@@ -84,7 +82,7 @@ public class WechatWorkServiceImpl implements NoticeService {
     /**
      * 构建请求体
      */
-    private Map<String, Object> buildRequestBody(NoticeMessage message, NoticeProperties.WechatWork config) {
+    private Map<String, Object> buildRequestBody(NoticeMessage message) {
         Map<String, Object> body = new HashMap<>();
         NoticeMsgTypeEnum msgType = message.getMsgType();
         body.put("msgtype", msgType.getCode());
@@ -100,10 +98,10 @@ public class WechatWorkServiceImpl implements NoticeService {
                 body.put("markdown", markdown);
                 break;
             case IMAGE:
-                body.put("image", buildImageContent(message));
+                body.put("image", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case FILE:
-                body.put("file", buildFileContent(message));
+                body.put("file", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case VOICE:
                 body.put("voice", buildVoiceContent(message));
@@ -131,7 +129,7 @@ public class WechatWorkServiceImpl implements NoticeService {
                 body.put("mentioned_list", List.of("@all"));
             }
             // 完全使用消息中传入的atUsers配置（企业微信atUsers为用户ID列表）
-            else if (message.getAtUsers() != null && !message.getAtUsers().isEmpty()) {
+            else if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
                 body.put("mentioned_list", message.getAtUsers());
             }
         }
@@ -144,31 +142,10 @@ public class WechatWorkServiceImpl implements NoticeService {
      */
     private Map<String, Object> buildTextContent(NoticeMessage message) {
         Map<String, Object> text = new HashMap<>();
-        StringBuilder content = new StringBuilder(message.getContent());
-        // 添加全局签名
-        if (properties.isGlobalSignature()) {
-            content.append("\n").append(properties.getSignature());
-        }
-        text.put("content", content.toString());
+        text.put("content", NoticePayloadUtils.appendSignature(
+                message.getContent(), properties.isGlobalSignature(), properties.getSignature(), "\n"
+        ));
         return text;
-    }
-
-    /**
-     * 构建图片消息
-     */
-    private Map<String, Object> buildImageContent(NoticeMessage message) {
-        Map<String, Object> image = new HashMap<>();
-        image.put("media_id", message.getMediaId());
-        return image;
-    }
-
-    /**
-     * 构建文件消息
-     */
-    private Map<String, Object> buildFileContent(NoticeMessage message) {
-        Map<String, Object> file = new HashMap<>();
-        file.put("media_id", message.getMediaId());
-        return file;
     }
 
     /**
@@ -219,10 +196,8 @@ public class WechatWorkServiceImpl implements NoticeService {
         card.put("main_title", mainTitle);
         
         // 2. 卡片点击动作，必填
-        String clickUrl = StrUtil.isEmpty(message.getLinkUrl()) ? "https://www.qq.com" : message.getLinkUrl();
-        if (message.getButtons() != null && !message.getButtons().isEmpty()) {
-            clickUrl = message.getButtons().get(0).getActionUrl();
-        }
+        String defaultUrl = StrUtil.isBlank(message.getLinkUrl()) ? "https://www.qq.com" : message.getLinkUrl();
+        String clickUrl = NoticePayloadUtils.firstButtonUrlOrDefault(message, defaultUrl);
         card.put("card_action", Map.of(
                 "type", 1, // 1：跳转链接，必填
                 "url", clickUrl // 跳转链接，必填
@@ -244,7 +219,7 @@ public class WechatWorkServiceImpl implements NoticeService {
         }
         
         // 可选：跳转按钮列表（最多3个）
-        if (message.getButtons() != null && !message.getButtons().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getButtons())) {
             List<Map<String, Object>> jumpList = new ArrayList<>();
             for (NoticeMessage.Button button : message.getButtons()) {
                 Map<String, Object> jump = new HashMap<>();
@@ -287,11 +262,8 @@ public class WechatWorkServiceImpl implements NoticeService {
         sb.append(message.getLevel().getEmoji()).append(" **").append(message.getTitle()).append("**\n\n");
         sb.append(message.getContent()).append("\n\n");
 
-        // 添加全局签名
-        if (properties.isGlobalSignature()) {
-            sb.append(properties.getSignature());
-        }
-
-        return sb.toString();
+        return NoticePayloadUtils.appendSignature(
+                sb.toString(), properties.isGlobalSignature(), properties.getSignature(), ""
+        );
     }
 }

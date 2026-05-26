@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql.converter;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import java.math.BigDecimal;
@@ -69,7 +71,7 @@ public final class SqlTypeConverter {
    */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static <T> T convertForJava(Object value, Class<T> targetType) throws DataSourceException {
-    if (value == null) {
+    if (ObjectUtil.isNull(value)) {
       return null;
     }
     Class<?> wrappedType = wrapPrimitive(targetType);
@@ -109,7 +111,7 @@ public final class SqlTypeConverter {
       }
       if (Character.class == wrappedType) {
         String str = String.valueOf(value);
-        return str.isEmpty() ? null : (T) Character.valueOf(str.charAt(0));
+        return StrUtil.isEmpty(str) ? null : (T) Character.valueOf(str.charAt(0));
       }
       if (LocalDateTime.class == wrappedType) {
         return (T) toLocalDateTime(value);
@@ -156,7 +158,7 @@ public final class SqlTypeConverter {
    * @return 转换后的JDBC参数；集合会逐项转换
    */
   public static Object convertForJdbc(Object value) {
-    if (value == null) {
+    if (ObjectUtil.isNull(value)) {
       return null;
     }
     if (value instanceof LocalDateTime localDateTime) {
@@ -334,7 +336,7 @@ public final class SqlTypeConverter {
   }
 
   private static Class<?> wrapPrimitive(Class<?> type) {
-    if (type == null || !type.isPrimitive()) {
+    if (ObjectUtil.isNull(type) || !type.isPrimitive()) {
       return type;
     }
     if (long.class == type) {

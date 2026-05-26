@@ -15,9 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 @Aspect
 @Configuration
 public class PowerJobAspect {
@@ -28,13 +25,13 @@ public class PowerJobAspect {
     private boolean enabled;
 
     //任务ID
-    private String jobId = null;
+    private String jobId = "";
     //任务实例ID
-    private String instanceId = null;
+    private String instanceId = "";
     //子任务实例ID
-    private String subInstanceId = null;
+    private String subInstanceId = "";
     //任务参数
-    private String jobParams = null;
+    private String jobParams = "";
 
     @Pointcut("execution(* tech.powerjob.worker.core.processor.sdk.BasicProcessor.process(..))")
     void cutPoint() {}
@@ -63,15 +60,12 @@ public class PowerJobAspect {
             jobParams = taskContext.getJobParams();
             logger.info("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{}",jobId,instanceId,subInstanceId,jobParams);
         }
-        Object result = null;
+        Object result;
         try{
             result = point.proceed();
         } catch (Throwable e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            logger.info("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{},出现了异常:",jobId,instanceId,subInstanceId,jobParams,e);
-            return new ProcessResult(false,"出现异常:"+sw.toString());
+            logger.error("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{},出现了异常", jobId, instanceId, subInstanceId, jobParams, e);
+            return new ProcessResult(false, "出现异常:" + e.getMessage());
         }
         return result;
     }

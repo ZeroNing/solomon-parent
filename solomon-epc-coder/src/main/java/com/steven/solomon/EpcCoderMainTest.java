@@ -5,11 +5,15 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
 import com.steven.solomon.model.Gs1BarcodeResult;
 import com.steven.solomon.service.EpcService;
+import com.steven.solomon.utils.logger.LoggerUtils;
+import org.slf4j.Logger;
 
 /**
  * EPC 编解码 main 方法测试。
  */
 public class EpcCoderMainTest {
+
+  private static final Logger LOGGER = LoggerUtils.logger(EpcCoderMainTest.class);
 
   /**
    * 运行全部 EPC 编解码示例。
@@ -21,9 +25,6 @@ public class EpcCoderMainTest {
     EpcService epcService = new EpcService();
 
     testSgtin96(epcService);
-//    testSgtin198(epcService);
-//    testGiai96(epcService);
-//    testGiai202(epcService);
   }
 
   /**
@@ -43,8 +44,8 @@ public class EpcCoderMainTest {
             .tagSize(96)
             .encode();
     printGs1("SGTIN-96 GS1译码", gs1Result);
-    System.out.println("SGTIN-96 EPC生成标签:"+encodeResult.getHex());
-    System.out.println("SGTIN-96 EPC反译:"+ JSONUtil.toJsonStr(epcService.decodeEpc(encodeResult.getHex())));
+    LOGGER.info("SGTIN-96 EPC生成标签: {}", encodeResult.getHex());
+    LOGGER.info("SGTIN-96 EPC反译: {}", JSONUtil.toJsonStr(epcService.decodeEpc(encodeResult.getHex())));
   }
 
   /**
@@ -119,11 +120,11 @@ public class EpcCoderMainTest {
    * @param result GS1 译码结果
    */
   private static void printGs1(String title, Gs1BarcodeResult result) {
-    System.out.println("\n========== " + title + " ==========");
-    System.out.println("content=" + result.getContent());
-    System.out.println("AI 01=" + result.getAi01());
-    System.out.println("AI 21=" + result.getAi21());
-    System.out.println("AI 8004=" + result.getAi8004());
+    LOGGER.info("========== {} ==========", title);
+    LOGGER.info("content={}", result.getContent());
+    LOGGER.info("AI 01={}", result.getAi01());
+    LOGGER.info("AI 21={}", result.getAi21());
+    LOGGER.info("AI 8004={}", result.getAi8004());
   }
 
   /**
@@ -133,17 +134,17 @@ public class EpcCoderMainTest {
    * @param result EPC 结果
    */
   private static void printEpc(String title, EpcResult result) {
-    System.out.println("\n========== " + title + " ==========");
-    System.out.println("type=" + result.getType());
-    System.out.println("bitLength=" + result.getBitLength());
-    System.out.println("hex=" + result.getHex());
-    System.out.println("uri=" + result.getUri());
-    System.out.println("AI 01=" + result.getAi01());
-    System.out.println("AI 21=" + result.getAi21());
-    System.out.println("AI 8004=" + result.getAi8004());
-    System.out.println("companyPrefix=" + result.getCompanyPrefix());
-    System.out.println("itemReference=" + result.getItemReference());
-    System.out.println("assetReference=" + result.getAssetReference());
-    System.out.println("serial=" + result.getSerial());
+    LOGGER.info("========== {} ==========", title);
+    LOGGER.info("type={}", result.getType());
+    LOGGER.info("bitLength={}", result.getBitLength());
+    LOGGER.info("hex={}", result.getHex());
+    LOGGER.info("uri={}", result.getUri());
+    LOGGER.info("AI 01={}", result.getAi01());
+    LOGGER.info("AI 21={}", result.getAi21());
+    LOGGER.info("AI 8004={}", result.getAi8004());
+    LOGGER.info("companyPrefix={}", result.getCompanyPrefix());
+    LOGGER.info("itemReference={}", result.getItemReference());
+    LOGGER.info("assetReference={}", result.getAssetReference());
+    LOGGER.info("serial={}", result.getSerial());
   }
 }

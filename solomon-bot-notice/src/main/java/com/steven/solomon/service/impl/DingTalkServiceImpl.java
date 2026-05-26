@@ -1,23 +1,21 @@
 package com.steven.solomon.service.impl;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.config.NoticeProperties;
 import com.steven.solomon.entity.NoticeMessage;
 import com.steven.solomon.enums.NoticeChannelEnum;
 import com.steven.solomon.enums.NoticeMsgTypeEnum;
 import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +42,7 @@ public class DingTalkServiceImpl implements NoticeService {
     @Override
     public boolean send(NoticeMessage message) throws Exception {
         NoticeProperties.DingTalk config = properties.getDingTalk();
-        if (config == null || StrUtil.isEmpty(config.getWebhookUrl())) {
+        if (ValidateUtils.isEmpty(config) || StrUtil.isBlank(config.getWebhookUrl())) {
             logger.warn("钉钉未配置，跳过发送");
             return false;
         }
@@ -53,7 +51,7 @@ public class DingTalkServiceImpl implements NoticeService {
         String url = buildSignedUrl(config);
 
         // 构建请求体
-        Map<String, Object> body = buildRequestBody(message, config);
+        Map<String, Object> body = buildRequestBody(message);
 
         // 发送请求
         String response = HttpUtil.post(url, JSONUtil.toJsonStr(body));
@@ -67,16 +65,16 @@ public class DingTalkServiceImpl implements NoticeService {
      */
     private String buildSignedUrl(NoticeProperties.DingTalk config) throws Exception {
         String url = config.getWebhookUrl();
-        if (StrUtil.isEmpty(config.getSecret())) {
+        if (StrUtil.isBlank(config.getSecret())) {
             return url;
         }
 
         long timestamp = System.currentTimeMillis();
         String stringToSign = timestamp + "\n" + config.getSecret();
-        Mac mac = Mac.getInstance("HmacSHA256");
-        mac.init(new SecretKeySpec(config.getSecret().getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-        byte[] signData = mac.doFinal(stringToSign.getBytes(StandardCharsets.UTF_8));
-        String sign = URLEncoder.encode(Base64.getEncoder().encodeToString(signData), StandardCharsets.UTF_8);
+        String sign = URLEncoder.encode(
+                NoticePayloadUtils.hmacSha256Base64(stringToSign, config.getSecret()),
+                StandardCharsets.UTF_8
+        );
 
         return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
@@ -84,10 +82,12 @@ public class DingTalkServiceImpl implements NoticeService {
     /**
      * 构建请求体
      */
-    private Map<String, Object> buildRequestBody(NoticeMessage message, NoticeProperties.DingTalk config) {
+    private Map<String, Object> buildRequestBody(NoticeMessage message) {
         Map<String, Object> body = new HashMap<>();
         NoticeMsgTypeEnum msgType = message.getMsgType();
-        body.put("msgtype", StrUtil.equalsAnyIgnoreCase(msgType.getCode(),NoticeMsgTypeEnum.CARD.getCode()) ? NoticeMsgTypeEnum.ACTION_CARD.getCode() : msgType.getCode());
+        body.put("msgtype", StrUtil.equalsAnyIgnoreCase(msgType.getCode(), NoticeMsgTypeEnum.CARD.getCode())
+                ? NoticeMsgTypeEnum.ACTION_CARD.getCode()
+                : msgType.getCode());
 
         // 根据消息类型构建不同的内容
         switch (msgType) {
@@ -101,10 +101,10 @@ public class DingTalkServiceImpl implements NoticeService {
                 body.put("markdown", markdown);
                 break;
             case IMAGE:
-                body.put("image", buildImageContent(message));
+                body.put("image", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case FILE:
-                body.put("file", buildFileContent(message));
+                body.put("file", NoticePayloadUtils.mediaIdBody(message.getMediaId()));
                 break;
             case VOICE:
                 body.put("voice", buildVoiceContent(message));
@@ -135,7 +135,7 @@ public class DingTalkServiceImpl implements NoticeService {
                 at.put("isAtAll", true);
             }
             // 完全使用消息中传入的atUsers配置（钉钉atUsers为手机号列表）
-            if (message.getAtUsers() != null && !message.getAtUsers().isEmpty()) {
+            if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
                 at.put("atMobiles", message.getAtUsers());
             }
             body.put("at", at);
@@ -149,31 +149,11 @@ public class DingTalkServiceImpl implements NoticeService {
      */
     private Map<String, Object> buildTextContent(NoticeMessage message) {
         Map<String, Object> text = new HashMap<>();
-        StringBuilder content = new StringBuilder(message.getContent());
-        // 添加全局签名
-        if (properties.isGlobalSignature()) {
-            content.append("\n> ").append(properties.getSignature());
-        }
-        text.put("content", content.toString());
+        // 钉钉文本消息保留 Markdown 风格签名前缀，便于与 Markdown 消息展示一致。
+        text.put("content", NoticePayloadUtils.appendSignature(
+                message.getContent(), properties.isGlobalSignature(), properties.getSignature(), "\n> "
+        ));
         return text;
-    }
-
-    /**
-     * 构建图片消息
-     */
-    private Map<String, Object> buildImageContent(NoticeMessage message) {
-        Map<String, Object> image = new HashMap<>();
-        image.put("media_id", message.getMediaId());
-        return image;
-    }
-
-    /**
-     * 构建文件消息
-     */
-    private Map<String, Object> buildFileContent(NoticeMessage message) {
-        Map<String, Object> file = new HashMap<>();
-        file.put("media_id", message.getMediaId());
-        return file;
     }
 
     /**
@@ -208,7 +188,7 @@ public class DingTalkServiceImpl implements NoticeService {
         card.put("btn_orientation", "0"); // 0-按钮垂直排列 1-横向
 
         // 添加按钮
-        if (message.getButtons() != null && !message.getButtons().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getButtons())) {
             if (message.getButtons().size() == 1) {
                 // 单个按钮
                 NoticeMessage.Button button = message.getButtons().get(0);
@@ -235,7 +215,7 @@ public class DingTalkServiceImpl implements NoticeService {
      */
     private Map<String, Object> buildFeedCardContent(NoticeMessage message) {
         Map<String, Object> feedCard = new HashMap<>();
-        if (message.getFeedItems() != null && !message.getFeedItems().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getFeedItems())) {
             List<Map<String, Object>> links = new ArrayList<>();
             for (NoticeMessage.FeedItem item : message.getFeedItems()) {
                 Map<String, Object> link = new HashMap<>();
@@ -257,11 +237,8 @@ public class DingTalkServiceImpl implements NoticeService {
         sb.append(message.getLevel().getEmoji()).append(" **").append(message.getTitle()).append("**\n\n");
         sb.append(message.getContent()).append("\n\n");
 
-        // 添加全局签名
-        if (properties.isGlobalSignature()) {
-            sb.append("\n> ").append(properties.getSignature());
-        }
-
-        return sb.toString();
+        return NoticePayloadUtils.appendSignature(
+                sb.toString(), properties.isGlobalSignature(), properties.getSignature(), "\n> "
+        );
     }
 }

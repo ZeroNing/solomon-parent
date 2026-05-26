@@ -2,7 +2,7 @@ package com.steven.solomon.utils;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.MqttErrorCode;
@@ -16,19 +16,17 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.codec.message.builder.MqttTopicSubscription;
-import org.dromara.mica.mqtt.core.client.IMqttClientConnectListener;
 import org.dromara.mica.mqtt.core.client.MqttClient;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
-import org.dromara.mica.mqtt.core.client.MqttWillMessage;
 import org.dromara.mica.mqtt.spring.client.config.MqttClientProperties;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.util.StringUtils;
-import org.tio.core.ChannelContext;
-import org.tio.core.ssl.SslConfig;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class MqttUtils implements SendService<MqttModel<?>> {
@@ -158,7 +156,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
      */
     public void disconnect(String tenantCode) throws BaseException {
         MqttClient client = getClient(tenantCode);
-        if (client != null) {
+        if (ValidateUtils.isNotEmpty(client)) {
             client.disconnect();
         }
     }
@@ -168,9 +166,9 @@ public class MqttUtils implements SendService<MqttModel<?>> {
      */
     public void reconnect(String tenantCode) throws BaseException {
         MqttClient client = getClient(tenantCode);
-        if (client != null && !client.isConnected()) {
+        if (ValidateUtils.isNotEmpty(client) && !client.isConnected()) {
             MqttClientProperties profile = getProfileMap().get(tenantCode);
-            if (profile != null) {
+            if (ValidateUtils.isNotEmpty(profile)) {
                 client.reconnect();
                 subscribe(client, tenantCode);
             }
@@ -179,7 +177,7 @@ public class MqttUtils implements SendService<MqttModel<?>> {
 
     public void reconnect(String tenantCode, MqttClientProperties mqttProfile) throws BaseException {
         MqttClient client = getClient(tenantCode);
-        if (client != null && !client.isConnected()) {
+        if (ValidateUtils.isNotEmpty(client) && !client.isConnected()) {
             client.reconnect();
             subscribe(client, tenantCode);
         }
@@ -229,12 +227,12 @@ public class MqttUtils implements SendService<MqttModel<?>> {
                 .debug(properties.isDebug())
                 .disconnectBeforeStop(properties.isDisconnectBeforeStop());
         Integer timeout = properties.getTimeout();
-        if (timeout != null && timeout > 0) {
+        if (ValidateUtils.isNotEmpty(timeout) && timeout > 0) {
             clientCreator.timeout(timeout);
         }
         // mqtt 业务线程数
         Integer bizThreadPoolSize = properties.getBizThreadPoolSize();
-        if (bizThreadPoolSize != null && bizThreadPoolSize > 0) {
+        if (ValidateUtils.isNotEmpty(bizThreadPoolSize) && bizThreadPoolSize > 0) {
             clientCreator.bizThreadPoolSize(bizThreadPoolSize);
         }
         // 开启 ssl
@@ -246,19 +244,19 @@ public class MqttUtils implements SendService<MqttModel<?>> {
 //        }
         // 构造遗嘱消息
         MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
-        if (willMessage != null && StringUtils.hasText(willMessage.getTopic())) {
+        if (ValidateUtils.isNotEmpty(willMessage) && StrUtil.isNotBlank(willMessage.getTopic())) {
             clientCreator.willMessage(builder -> {
                 builder.topic(willMessage.getTopic())
                         .qos(willMessage.getQos())
                         .retain(willMessage.isRetain());
-                if (StringUtils.hasText(willMessage.getMessage())) {
+                if (StrUtil.isNotBlank(willMessage.getMessage())) {
                     builder.messageText(willMessage.getMessage());
                 }
             });
         }
         // 全局订阅
         List<MqttTopicSubscription> globalSubscribe = properties.getGlobalSubscribe();
-        if (globalSubscribe != null && !globalSubscribe.isEmpty()) {
+        if (ValidateUtils.isNotEmpty(globalSubscribe)) {
             clientCreator.globalSubscribe(globalSubscribe);
         }
         MqttClient client = clientCreator.connect();

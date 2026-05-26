@@ -9,14 +9,11 @@ import com.steven.solomon.enums.NoticeChannelEnum;
 import com.steven.solomon.enums.NoticeMsgTypeEnum;
 import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +40,7 @@ public class FeishuServiceImpl implements NoticeService {
     @Override
     public boolean send(NoticeMessage message) throws Exception {
         NoticeProperties.Feishu config = properties.getFeishu();
-        if (config == null || StrUtil.isEmpty(config.getWebhookUrl())) {
+        if (ValidateUtils.isEmpty(config) || StrUtil.isBlank(config.getWebhookUrl())) {
             logger.warn("飞书未配置，跳过发送");
             return false;
         }
@@ -66,7 +63,7 @@ public class FeishuServiceImpl implements NoticeService {
         NoticeMsgTypeEnum msgType = message.getMsgType();
 
         // 处理签名（如果配置了secret）
-        if (StrUtil.isNotEmpty(config.getSecret())) {
+        if (StrUtil.isNotBlank(config.getSecret())) {
             long timestamp = System.currentTimeMillis() / 1000;
             body.put("timestamp", String.valueOf(timestamp));
             body.put("sign", generateSign(timestamp, config.getSecret()));
@@ -120,18 +117,15 @@ public class FeishuServiceImpl implements NoticeService {
         if (Boolean.TRUE.equals(message.getAtAll())) {
             content.append(" <at user_id=\"all\">所有人</at>");
         }
-        if (message.getAtUsers() != null && !message.getAtUsers().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
             for (String userId : message.getAtUsers()) {
                 content.append(" <at user_id=\"").append(userId).append("\"></at>");
             }
         }
         
-        // 添加全局签名
-        if (properties.isGlobalSignature()) {
-            content.append("\n").append(properties.getSignature());
-        }
-        
-        return content.toString();
+        return NoticePayloadUtils.appendSignature(
+                content.toString(), properties.isGlobalSignature(), properties.getSignature(), "\n"
+        );
     }
 
     /**
@@ -160,7 +154,7 @@ public class FeishuServiceImpl implements NoticeService {
             atAll.put("user_name", "所有人");
             line.add(atAll);
         }
-        if (message.getAtUsers() != null && !message.getAtUsers().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getAtUsers())) {
             for (String userId : message.getAtUsers()) {
                 Map<String, Object> at = new HashMap<>();
                 at.put("tag", "at");
@@ -169,8 +163,8 @@ public class FeishuServiceImpl implements NoticeService {
             }
         }
 
-        // 添加签名
-        if (properties.isGlobalSignature()) {
+        // 富文本签名必须作为独立 text 节点，避免破坏飞书 post 消息结构。
+        if (properties.isGlobalSignature() && StrUtil.isNotBlank(properties.getSignature())) {
             Map<String, Object> sign = new HashMap<>();
             sign.put("tag", "text");
             sign.put("text", "\n" + properties.getSignature());
@@ -254,7 +248,7 @@ public class FeishuServiceImpl implements NoticeService {
         elements.add(content);
 
         // 添加按钮
-        if (message.getButtons() != null && !message.getButtons().isEmpty()) {
+        if (NoticePayloadUtils.hasItems(message.getButtons())) {
             Map<String, Object> action = new HashMap<>();
             action.put("tag", "action");
             List<Map<String, Object>> actions = new ArrayList<>();
@@ -285,10 +279,7 @@ public class FeishuServiceImpl implements NoticeService {
     private String generateSign(long timestamp, String secret) {
         try {
             String stringToSign = timestamp + "\n" + secret;
-            Mac mac = Mac.getInstance("HmacSHA256");
-            mac.init(new SecretKeySpec(stringToSign.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
-            byte[] signData = mac.doFinal();
-            return Base64.getEncoder().encodeToString(signData);
+            return NoticePayloadUtils.hmacSha256Base64("", stringToSign);
         } catch (Exception e) {
             logger.error("生成飞书签名失败", e);
             return "";

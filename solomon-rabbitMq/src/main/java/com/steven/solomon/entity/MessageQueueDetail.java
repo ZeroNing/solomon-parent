@@ -1,10 +1,15 @@
 package com.steven.solomon.entity;
 
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
-import org.springframework.util.ObjectUtils;
 
 import java.io.Serializable;
 
+/**
+ * RabbitMQ 队列监听容器快照。
+ *
+ * <p>该对象只承载管理端展示所需的队列名称、容器状态和容器标识，不暴露 Spring
+ * 容器对象本身，避免序列化时把运行时资源带出去。</p>
+ */
 public class MessageQueueDetail implements Serializable {
 
     private static final long serialVersionUID = 7292656135434186436L;
@@ -28,16 +33,12 @@ public class MessageQueueDetail implements Serializable {
      */
     private boolean running;
 
-    /**
-     * 活动消费者数量
-     */
-//	private int activeConsumerCount;
     public MessageQueueDetail(String queueName, AbstractMessageListenerContainer container) {
         this.queueName = queueName;
         this.running = container.isRunning();
         this.activeContainer = container.isActive();
-//		this.activeConsumerCount = container.;
-        this.containerIdentity = "Container@" + ObjectUtils.getIdentityHexString(container);
+        // 使用 JVM 对象身份哈希生成轻量标识，避免引入 Spring 工具类做简单字符串拼接。
+        this.containerIdentity = "Container@" + Integer.toHexString(System.identityHashCode(container));
     }
 
     public String getQueueName() {

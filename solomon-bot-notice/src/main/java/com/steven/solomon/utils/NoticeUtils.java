@@ -15,7 +15,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
- * 通知工具类（统一入口）
+ * 通知工具类，作为业务侧发送机器人消息的统一入口。
+ *
+ * <p>这里负责渠道路由、启停开关、模板预处理和异步重试；各平台的报文组装逻辑由
+ * 对应 {@link NoticeService} 实现，避免工具入口承担过多平台细节。</p>
  */
 @Component
 public class NoticeUtils {
@@ -66,7 +69,7 @@ public class NoticeUtils {
         // 按渠道发送
         for (NoticeChannelEnum channel : message.getChannels()) {
             NoticeService service = serviceMap.get(channel);
-            if (service == null) {
+            if (ValidateUtils.isEmpty(service)) {
                 logger.warn("渠道 {} 未实现，跳过发送", channel.getName());
                 continue;
             }
@@ -185,18 +188,16 @@ public class NoticeUtils {
      * 解析模板
      */
     private void resolveTemplate(NoticeMessage message) {
-        // TODO 模板解析逻辑，使用FreeMarker渲染
-        // String template = templateManager.getTemplate(message.getTemplateCode());
-        // String content = FreeMarkerTemplateUtils.processTemplateIntoString(template, message.getTemplateParams());
-        // message.setContent(content);
+        // 当前模块未内置模板引擎，保留该扩展点给业务系统接入 FreeMarker、Thymeleaf 等渲染器。
+        // 这里不修改 message，保证未配置模板解析器时发送逻辑仍按原始内容执行。
     }
 
     /**
      * 获取默认渠道
      */
     private List<NoticeChannelEnum> getDefaultChannels() {
-        // 可配置默认渠道，这里默认企业微信+邮件
-        return List.of(NoticeChannelEnum.WECHAT_WORK, NoticeChannelEnum.WECHAT_WORK);
+        // 默认只发送企业微信，避免同一渠道重复投递导致告警噪音。
+        return List.of(NoticeChannelEnum.WECHAT_WORK);
     }
 
     /**

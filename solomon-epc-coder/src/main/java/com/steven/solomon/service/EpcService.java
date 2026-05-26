@@ -4,6 +4,7 @@ import com.steven.solomon.code.EpcErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
 import com.steven.solomon.model.Gs1BarcodeResult;
+import com.steven.solomon.verification.ValidateUtils;
 
 import java.math.BigInteger;
 import java.util.Locale;
@@ -123,7 +124,7 @@ public class EpcService {
    * @throws BaseException 参数无效或编码失败
    */
   public EpcResult ean13ToSgtin96(String ean13, int companyPrefixLength, String serial) throws BaseException {
-    if (ean13 == null || ean13.length() != 13) {
+    if (ValidateUtils.isEmpty(ean13) || ean13.length() != 13) {
       throw new BaseException(EpcErrorCode.BARCODE_LENGTH_ERROR, ean13, 13);
     }
     return sgtin(ean13, companyPrefixLength, serial, 96, 0);
@@ -224,7 +225,7 @@ public class EpcService {
   public EpcResult giaiToEpc(String companyPrefix, String assetReference, int tagSize, int filter)
       throws BaseException {
     validateFilter(filter);
-    Partition partition = partitionByCompanyPrefixLength(companyPrefix == null ? 0 : companyPrefix.length());
+    Partition partition = partitionByCompanyPrefixLength(ValidateUtils.isEmpty(companyPrefix) ? 0 : companyPrefix.length());
     validateCompanyPrefix(companyPrefix, partition);
     requireNotBlank(assetReference, EpcErrorCode.EPC_ASSET_REFERENCE_ERROR);
 
@@ -276,7 +277,7 @@ public class EpcService {
    * @throws BaseException 参数无效或编码失败
    */
   public EpcResult ssccToSscc96(String sscc, int companyPrefixLength) throws BaseException {
-    if (sscc == null || sscc.length() != 18 || !isNumeric(sscc)) {
+    if (ValidateUtils.isEmpty(sscc) || sscc.length() != 18 || !isNumeric(sscc)) {
       throw new BaseException(EpcErrorCode.BARCODE_LENGTH_ERROR, sscc, 18);
     }
     String companyPrefix = sscc.substring(1, 1 + companyPrefixLength);
@@ -300,7 +301,7 @@ public class EpcService {
    * @throws BaseException 参数无效或反译失败
    */
   public EpcResult decodeEpc(String hex) throws BaseException {
-    if (hex == null || !hex.matches("(?i)[0-9a-f]+")) {
+    if (ValidateUtils.isEmpty(hex) || !hex.matches("(?i)[0-9a-f]+")) {
       throw new BaseException(EpcErrorCode.EPC_INVALID_FORMAT, hex);
     }
     String bits = hexToBinary(hex.toUpperCase(Locale.ROOT));
@@ -492,13 +493,13 @@ public class EpcService {
     String ai = null;
     int valueStart = -1;
     while (matcher.find()) {
-      if (ai != null) {
+      if (ValidateUtils.isNotEmpty(ai)) {
         putAi(result, ai, barcode.substring(valueStart, matcher.start()));
       }
       ai = matcher.group(1);
       valueStart = matcher.end();
     }
-    if (ai != null) {
+    if (ValidateUtils.isNotEmpty(ai)) {
       putAi(result, ai, barcode.substring(valueStart));
     }
   }
@@ -646,7 +647,7 @@ public class EpcService {
    * @throws BaseException 公司前缀无效
    */
   private void validateCompanyPrefix(String companyPrefix, Partition partition) throws BaseException {
-    if (companyPrefix == null || companyPrefix.length() != partition.companyPrefixDigits || !isNumeric(companyPrefix)) {
+    if (ValidateUtils.isEmpty(companyPrefix) || companyPrefix.length() != partition.companyPrefixDigits || !isNumeric(companyPrefix)) {
       throw new BaseException(EpcErrorCode.EPC_COMPANY_PREFIX_LENGTH_ERROR, companyPrefix);
     }
   }
@@ -659,7 +660,7 @@ public class EpcService {
    * @throws BaseException 字符串为空
    */
   private void requireNotBlank(String value, String code) throws BaseException {
-    if (value == null || value.isEmpty()) {
+    if (ValidateUtils.isEmpty(value)) {
       throw new BaseException(code);
     }
   }
@@ -701,7 +702,7 @@ public class EpcService {
    * @return 是否为纯数字
    */
   private static boolean isNumeric(String value) {
-    return value != null && value.matches("\\d+");
+    return ValidateUtils.isNotEmpty(value) && value.matches("\\d+");
   }
 
   /**

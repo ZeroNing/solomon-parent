@@ -1,5 +1,6 @@
 package com.steven.solomon.exception;
 
+import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
@@ -34,7 +35,7 @@ public class NotFoundExceptionHandler extends AbstractExceptionHandler {
    * <p>常见 reason 格式包含 “for xxx”，没有匹配到时直接返回原始 reason。</p>
    */
   private String resolveServiceName(String reason) {
-    if (reason == null || reason.isEmpty()) {
+    if (StrUtil.isBlank(reason)) {
       return "";
     }
     int index = reason.lastIndexOf("for ");

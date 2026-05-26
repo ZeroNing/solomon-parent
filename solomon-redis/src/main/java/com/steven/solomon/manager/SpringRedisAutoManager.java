@@ -13,9 +13,9 @@ import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.cache.RedisCacheWriter;
-import org.springframework.util.StringUtils;
 
 import java.time.Duration;
+import java.util.regex.Pattern;
 
 public class SpringRedisAutoManager extends RedisCacheManager {
 
@@ -30,7 +30,7 @@ public class SpringRedisAutoManager extends RedisCacheManager {
    * 数组元素1=缓存过期时间TTL
    * 数组元素2=缓存在多少秒开始主动失效来强制刷新
    */
-  public static final String separator = "@@";
+  public static final String SEPARATOR = "@@";
 
   public SpringRedisAutoManager(RedisCacheWriter cacheWriter,
       RedisCacheConfiguration defaultCacheConfiguration) {
@@ -53,7 +53,8 @@ public class SpringRedisAutoManager extends RedisCacheManager {
 
   @Override
   protected RedisCache createRedisCache(String name, RedisCacheConfiguration cacheConfig) {
-    String[] array = StringUtils.delimitedListToStringArray(name, separator);
+    // 使用精确分隔符拆分缓存名称，避免依赖 Spring StringUtils 带来的工具类混用。
+    String[] array = name.split(Pattern.quote(SEPARATOR), -1);
     name = array[0];
     // 解析TTL
     if (array.length > 1) {

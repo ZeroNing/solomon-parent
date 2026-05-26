@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>solomon-mica-mqtt</artifactId>
-    <description>基于 Mica-MQTT 的 MQTT 客户端封装</description>
+    <description>基于 Mica-MQTT 的 MQTT 客户端封装。</description>
 
 
     <dependencies>

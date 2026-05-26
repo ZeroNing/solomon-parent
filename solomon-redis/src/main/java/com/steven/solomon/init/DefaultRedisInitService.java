@@ -128,7 +128,7 @@ public class DefaultRedisInitService extends AbstractDataSourceInitService<Redis
         
         log.debug("[Redis] Redis配置: host={}:{}, database={}, password={}", 
             properties.getHost(), properties.getPort(), properties.getDatabase(), 
-            properties.getPassword() != null ? "已设置" : "未设置");
+            ValidateUtils.isNotEmpty(properties.getPassword()) ? "已设置" : "未设置");
         
         // ========== Step 3: 创建Lettuce客户端配置 ==========
         LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()

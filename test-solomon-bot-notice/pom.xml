@@ -13,13 +13,11 @@
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-bot-notice</artifactId>
-            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-common</artifactId>
-            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>

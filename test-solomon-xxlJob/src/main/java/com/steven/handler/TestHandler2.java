@@ -3,7 +3,7 @@ package com.steven.handler;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.csv.*;
 import cn.hutool.core.util.CharsetUtil;
-import cn.hutool.json.JSONUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.consumer.AbstractJobConsumer;
 import com.steven.solomon.enums.ScheduleTypeEnum;
@@ -37,7 +37,7 @@ public class TestHandler2 extends AbstractJobConsumer {
         CsvData csvData = CsvUtil.getReader(config).read(csvFile, CharsetUtil.CHARSET_UTF_8);
         List<CsvRow> rows = csvData.getRows();
         for (CsvRow row: rows) {
-            if (headersRef.get() == null) {
+            if (ObjectUtil.isEmpty(headersRef.get())) {
                 // 第一行：保存标题头
                 headersRef.set(row.getRawList());
             } else {

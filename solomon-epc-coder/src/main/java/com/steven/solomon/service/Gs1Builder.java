@@ -2,6 +2,7 @@ package com.steven.solomon.service;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
+import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * GS1 AI 条码链式构建器。
@@ -117,11 +118,11 @@ public class Gs1Builder {
    * @throws BaseException 参数无效或编码失败
    */
   public EpcResult encode() throws BaseException {
-    if (ai01 != null || ai21 != null) {
+    if (ValidateUtils.isNotEmpty(ai01) || ValidateUtils.isNotEmpty(ai21)) {
       return service.gtinSerialToEpc(ai01, ai21, companyPrefixLength, tagSize, filter)
           .setBarcode("(01)" + ai01 + "(21)" + ai21);
     }
-    if (ai8004 != null) {
+    if (ValidateUtils.isNotEmpty(ai8004)) {
       return service.gs1ToEpc("(8004)" + ai8004, companyPrefixLength, tagSize, filter);
     }
     return service.gs1ToEpc(barcode, companyPrefixLength, tagSize, filter);

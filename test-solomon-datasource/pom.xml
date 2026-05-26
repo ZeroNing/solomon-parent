@@ -19,19 +19,16 @@
     <dependency>
       <groupId>com.steven</groupId>
       <artifactId>solomon-datasource</artifactId>
-      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.steven</groupId>
       <artifactId>solomon-common</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>
       <groupId>com.steven</groupId>
       <artifactId>solomon-utils</artifactId>
-      <version>1.0</version>
     </dependency>
 
     <dependency>

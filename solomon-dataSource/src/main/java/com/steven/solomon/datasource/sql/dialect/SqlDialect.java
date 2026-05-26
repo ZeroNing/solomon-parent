@@ -1,5 +1,7 @@
 package com.steven.solomon.datasource.sql.dialect;
 
+import cn.hutool.core.util.StrUtil;
+
 /**
  * SQL分页方言。
  */
@@ -41,7 +43,7 @@ public interface SqlDialect {
    * @return 去掉末尾分号后的SQL文本
    */
   default String trimEndSemicolon(String sql) {
-    String value = sql == null ? "" : sql.trim();
+    String value = StrUtil.nullToEmpty(sql).trim();
     if (value.endsWith(";")) {
       return value.substring(0, value.length() - 1);
     }

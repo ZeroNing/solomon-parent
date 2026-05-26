@@ -98,7 +98,7 @@ public class MinioService extends AbstractFileService {
   @Override
   protected InputStream getObject(String bucketName, String filePath) throws Exception {
     StatObjectResponse statObject =client.statObject(StatObjectArgs.builder().bucket(bucketName).object(filePath).build());
-    if (statObject != null && statObject.size() > 0) {
+    if (ValidateUtils.isNotEmpty(statObject) && statObject.size() > 0) {
       return client.getObject(GetObjectArgs.builder().bucket(bucketName).object(filePath).build());
     } else {
       return null;

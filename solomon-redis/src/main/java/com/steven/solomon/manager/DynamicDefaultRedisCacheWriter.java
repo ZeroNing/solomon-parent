@@ -1,5 +1,6 @@
 package com.steven.solomon.manager;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.verification.ValidateUtils;
@@ -120,7 +121,8 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
 
     statistics.incGets(name);
 
-    if (result != null) {
+    // Redis 允许缓存空 byte[]，命中判断只看返回值是否为 null，不能按数组长度判空。
+    if (ObjectUtil.isNotNull(result)) {
       statistics.incHits(name);
     } else {
       statistics.incMisses(name);
@@ -341,7 +343,7 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
   }
 
   private static boolean shouldExpireWithin(@Nullable Duration ttl) {
-    return ttl != null && !ttl.isZero() && !ttl.isNegative();
+    return ValidateUtils.isNotEmpty(ttl) && !ttl.isZero() && !ttl.isNegative();
   }
 
   private static byte[] createCacheLockKey(String name) {

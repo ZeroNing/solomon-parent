@@ -9,7 +9,7 @@
   <version>1.0</version>
   <packaging>pom</packaging>
   <name>Solomon Parent</name>
-  <description>Solomon 微服务基础设施组件库 - 统一版本管理与模块聚合</description>
+  <description>Solomon 微服务基础设施组件库，统一管理模块、依赖版本和构建插件。</description>
 
   <developers>
     <developer>
@@ -235,6 +235,76 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-common</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-datasource</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-redis</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mongodb</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mqtt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mqtt5</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-vertx-mqtt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-rabbitMq</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mica-mqtt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-s3</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-xxlJob</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-powerjob</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-gateway-sentinel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-bot-notice</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-epc-coder</artifactId>
         <version>${project.version}</version>
       </dependency>
 

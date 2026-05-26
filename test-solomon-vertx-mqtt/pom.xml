@@ -18,13 +18,11 @@
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-vertx-mqtt</artifactId>
-            <version>1.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-common</artifactId>
-            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>
