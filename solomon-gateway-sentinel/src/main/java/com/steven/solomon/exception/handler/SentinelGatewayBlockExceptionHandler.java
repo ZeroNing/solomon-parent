@@ -1,11 +1,11 @@
 package com.steven.solomon.exception.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.alibaba.csp.sentinel.adapter.gateway.sc.callback.GatewayCallbackManager;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.util.function.Supplier;
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -91,7 +91,7 @@ public class SentinelGatewayBlockExceptionHandler implements WebExceptionHandler
     resp.setStatusCode(HttpStatus.valueOf(httpStatus));
     
     // 序列化响应为JSON并写入返回
-    String json = JackJsonUtils.formatJsonByFilter(responseMap);
+    String json = JSONUtil.toJsonStr(responseMap);
     DataBuffer buffer = resp.bufferFactory().wrap(json.getBytes(StandardCharsets.UTF_8));
     return resp.writeWith(Mono.just(buffer));
   }

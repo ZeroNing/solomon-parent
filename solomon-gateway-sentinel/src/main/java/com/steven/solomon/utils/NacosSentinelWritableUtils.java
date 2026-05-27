@@ -17,7 +17,6 @@ import com.alibaba.nacos.api.config.ConfigType;
 import com.alibaba.nacos.api.exception.NacosException;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.core.lang.TypeReference;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import java.util.Properties;
@@ -112,7 +111,7 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelFlowRule(String dataId, String groupId, List<FlowRule> obj, ConfigType type) throws Exception {
     // 将规则序列化为JSON并发布到Nacos
-    configService.publishConfig(dataId, groupId, JackJsonUtils.formatJsonByFilter(obj), type.getType());
+    configService.publishConfig(dataId, groupId, JSONUtil.toJsonStr(obj), type.getType());
 
     // 创建Nacos数据源并注册到Sentinel规则管理器，实现动态更新
     SentinelProperty<List<FlowRule>> sentinelProperty = getSentinelFlowRuleDataSource(groupId, dataId).getProperty();
@@ -131,7 +130,7 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelDegradeRule(String dataId, String groupId, List<DegradeRule> obj, ConfigType type) throws Exception {
     // 将规则序列化为JSON并发布到Nacos
-    configService.publishConfig(dataId, groupId, JackJsonUtils.formatJsonByFilter(obj), type.getType());
+    configService.publishConfig(dataId, groupId, JSONUtil.toJsonStr(obj), type.getType());
 
     // 创建Nacos数据源并注册到Sentinel规则管理器，实现动态更新
     SentinelProperty<List<DegradeRule>> sentinelProperty = getSentinelDegradeRuleDataSource(groupId, dataId).getProperty();
@@ -150,7 +149,7 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelParamFlowRule(String dataId, String groupId, List<ParamFlowRule> obj, ConfigType type) throws Exception {
     // 将规则序列化为JSON并发布到Nacos
-    configService.publishConfig(dataId, groupId, JackJsonUtils.formatJsonByFilter(obj), type.getType());
+    configService.publishConfig(dataId, groupId, JSONUtil.toJsonStr(obj), type.getType());
 
     // 创建Nacos数据源并注册到Sentinel规则管理器，实现动态更新
     SentinelProperty<List<ParamFlowRule>> sentinelProperty = getSentinelParamFlowRuleDataSource(groupId, dataId).getProperty();
@@ -169,7 +168,7 @@ public class NacosSentinelWritableUtils {
    */
   public void publishSentinelSystemRule(String dataId, String groupId, List<SystemRule> obj, ConfigType type) throws Exception {
     // 将规则序列化为JSON并发布到Nacos
-    configService.publishConfig(dataId, groupId, JackJsonUtils.formatJsonByFilter(obj), type.getType());
+    configService.publishConfig(dataId, groupId, JSONUtil.toJsonStr(obj), type.getType());
 
     // 创建Nacos数据源并注册到Sentinel规则管理器，实现动态更新
     SentinelProperty<List<SystemRule>> sentinelProperty = getSentinelSystemRuleDataSource(groupId, dataId).getProperty();

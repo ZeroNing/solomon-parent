@@ -1,8 +1,8 @@
 package com.steven.solomon.exception.handler;
 
+import cn.hutool.json.JSONUtil;
 import com.steven.solomon.base.exception.BaseGlobalExceptionHandler;
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.json.JackJsonUtils;
 import com.steven.solomon.utils.LocaleUtils;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,7 +101,7 @@ public class GlobalExceptionConfiguration extends DefaultErrorWebExceptionHandle
     );
     
     // 将响应对象序列化为JSON字符串
-    String json = JackJsonUtils.formatJsonByFilter(responseMap);
+    String json = JSONUtil.toJsonStr(responseMap);
     
     // 构建HTTP响应，设置状态码、Content-Type和响应体
     Integer httpStatus = (Integer) responseMap.getOrDefault(BaseCode.HTTP_STATUS, 500);
