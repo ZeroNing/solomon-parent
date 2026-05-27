@@ -9,7 +9,7 @@
   <version>1.0</version>
   <packaging>pom</packaging>
   <name>Solomon Parent</name>
-  <description>Solomon 微服务基础设施组件库，统一管理模块、依赖版本和构建插件。</description>
+  <description>Solomon infrastructure components parent project.</description>
 
   <developers>
     <developer>
@@ -36,28 +36,31 @@
     <module>solomon-common</module>
 
     <!-- 数据存储模块 -->
-    <module>solomon-redis</module>
-    <module>solomon-mongodb</module>
     <module>solomon-datasource</module>
+    <module>solomon-mongodb</module>
+    <module>solomon-redis</module>
+
+    <!-- 缓存模块 -->
+    <module>solomon-cache-module</module>
 
     <!-- 消息队列模块 -->
     <module>solomon-rabbitMq</module>
     <module>solomon-mqtt-module</module>
-    <!-- 云存储模块 -->
+
+    <!-- 对象存储模块 -->
     <module>solomon-s3-module</module>
 
     <!-- 任务调度模块 -->
     <module>solomon-job-module</module>
 
-    <!-- 网关与通知模块 -->
+    <!-- 网关与工具模块 -->
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
     <module>solomon-epc-coder</module>
-    <module>solomon-cache-module</module>
   </modules>
 
   <profiles>
-    <!-- 测试模块Profile，默认不启用 -->
+    <!-- 测试聚合模块默认不启用，避免默认构建拉起大量中间件测试依赖。 -->
     <profile>
       <id>test-modules</id>
       <modules>
@@ -289,47 +292,41 @@
         <artifactId>solomon-redis-mqtt</artifactId>
         <version>${project.version}</version>
       </dependency>
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-s3-sdk</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-minio</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-oss</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-obs</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-cos</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-bos</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-amazon-s3</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-s3-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-minio</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-oss</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-obs</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cos</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-bos</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-amazon-s3</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-job-sdk</artifactId>

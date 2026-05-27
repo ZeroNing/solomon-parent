@@ -7,10 +7,13 @@
         <groupId>com.steven</groupId>
         <artifactId>solomon-parent</artifactId>
         <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>solomon-cache-module</artifactId>
+    <name>Solomon Cache Module</name>
     <packaging>pom</packaging>
+    <description>Solomon cache aggregation module.</description>
 
     <modules>
         <module>solomon-cache-sdk</module>

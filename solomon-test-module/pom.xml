@@ -12,8 +12,9 @@
     </parent>
 
     <artifactId>solomon-test-module</artifactId>
+    <name>Solomon Test Module</name>
     <packaging>pom</packaging>
-    <description>Solomon 测试用例聚合模块。</description>
+    <description>Solomon test aggregation module.</description>
 
     <modules>
         <module>test-solomon-datasource</module>
