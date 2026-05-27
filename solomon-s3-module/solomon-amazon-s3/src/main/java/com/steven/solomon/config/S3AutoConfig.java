@@ -5,7 +5,7 @@ import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.service.AbstractFileService;
 import com.steven.solomon.service.FileServiceInterface;
-import com.steven.solomon.service.S3Service;
+import com.steven.solomon.service.AmazonS3Service;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ public class S3AutoConfig {
       FileNamingRulesGenerationService fileNamingRule,
       ClamAvUtils clamAvUtils) throws Exception {
     FileStorageConfigValidator.requireProviderConfig(properties, "Amazon S3");
-    AbstractFileService service = new S3Service(properties, fileNamingRule, clamAvUtils);
+    AbstractFileService service = new AmazonS3Service(properties, fileNamingRule, clamAvUtils);
     service.checkDefaultBucketOnStartup();
     return service;
   }

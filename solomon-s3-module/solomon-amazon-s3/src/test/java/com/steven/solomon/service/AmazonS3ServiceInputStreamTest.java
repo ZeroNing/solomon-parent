@@ -16,7 +16,7 @@ import java.io.InputStream;
  * S3Service单元测试
  * 主要测试multipartUpload方法的InputStream处理逻辑
  */
-class S3ServiceInputStreamTest {
+class AmazonS3ServiceInputStreamTest {
 
     // ========== InputStream处理逻辑测试 ==========
 

@@ -29,17 +29,17 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
  *
  * <p>Amazon S3、Cloudflare R2、火山 TOS、七牛 KODO 等兼容 S3 协议的供应商，都可以复用该实现。</p>
  */
-public class S3Service extends AbstractFileService {
+public class AmazonS3Service extends AbstractFileService {
 
   protected S3Client client;
 
   private S3Presigner presigner;
 
-  public S3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService) {
+  public AmazonS3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService) {
     super(fileNamingRulesGenerationService);
   }
 
-  public S3Service(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
+  public AmazonS3Service(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
     client = AmazonS3ClientFactory.createClient(properties);
     presigner = AmazonS3ClientFactory.createPresigner(properties);
