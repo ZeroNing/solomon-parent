@@ -45,10 +45,11 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的基础设施组�
 | `solomon-mqtt5` | Eclipse Paho MQTT v5 实现 |
 | `solomon-vertx-mqtt` | Vert.x MQTT 实现 |
 | `solomon-mica-mqtt` | Mica MQTT 实现 |
+| `solomon-redis-mqtt` | Redis Pub/Sub MQTT 风格实现 |
 
 MQTT 公共能力已收敛到 `solomon-mqtt-sdk`：客户端注册表使用并发 Map，监听器扫描统一处理 `enabled`、租户范围和 topic 表达式，消费者结束后会清理租户上下文。业务侧只引入一个实现模块，避免多个 MQTT 客户端自动配置互相覆盖。
 
-四个 MQTT 实现均支持 SSL：Paho MQTT3/5 和 Vert.x 使用 `ssl://host:8883`，Mica 会识别自身 `ssl.enabled` 配置或 8883 端口。
+四个 MQTT Broker 实现均支持 SSL：Paho MQTT3/5 和 Vert.x 使用 `ssl://host:8883`，Mica 会识别自身 `ssl.enabled` 配置或 8883 端口。`solomon-redis-mqtt` 支持多租户 Redis 配置，每个租户独立创建 Redis 连接，Redis SSL 通过租户配置 `ssl=true` 开启。
 
 ### S3 / 对象存储
 

@@ -18,5 +18,6 @@
         <module>solomon-mqtt5</module>
         <module>solomon-vertx-mqtt</module>
         <module>solomon-mica-mqtt</module>
+        <module>solomon-redis-mqtt</module>
     </modules>
 </project>

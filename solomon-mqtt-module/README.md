@@ -11,6 +11,7 @@
 | `solomon-mqtt5` | Eclipse Paho MQTT 5 实现 |
 | `solomon-vertx-mqtt` | Vert.x MQTT 实现 |
 | `solomon-mica-mqtt` | Mica MQTT 实现 |
+| `solomon-redis-mqtt` | Redis Pub/Sub MQTT 风格实现 |
 
 ## 依赖
 
@@ -30,6 +31,22 @@
 </dependency>
 ```
 
+Redis 实现使用 Redis Pub/Sub，不需要 MQTT Broker：
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-mqtt-sdk</artifactId>
+  <version>1.0</version>
+</dependency>
+
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-redis-mqtt</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
 ## 多租户配置
 
 ```yaml
@@ -45,7 +62,21 @@ mqtt:
       automatic-reconnect: true
       keep-alive-interval: 20
       verify-certificate: true
+
+    redis-local:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      username:
+      password:
+      ssl: false
+      timeout: 60000
+      channel-prefix: demo
+      use-tenant-prefix: true
+      pattern-topic: false
 ```
+
+`solomon-redis-mqtt` 的 `mqtt.tenant.*` 就是多租户 Redis 配置，每个租户会创建独立的 Redis 连接、监听容器和发送模板。不同租户可以连接不同 Redis 实例，也可以连接同一实例的不同 database。
 
 ## SSL / TLS
 
@@ -54,6 +85,7 @@ mqtt:
 - `solomon-mqtt` 和 `solomon-mqtt5`：把 `url` 配成 `ssl://host:8883` 即可；`verify-certificate=false` 时会使用 SDK 的 `MqttSslFactory` 信任所有证书。
 - `solomon-vertx-mqtt`：把 `url` 配成 `ssl://host:8883` 会自动开启 SSL；未写端口时默认使用 `8883`。
 - `solomon-mica-mqtt`：优先读取 Mica 自身的 `ssl.enabled` 和证书配置；如果端口是 `8883`，也会自动启用 `useSsl()`。
+- `solomon-redis-mqtt`：不涉及 MQTT SSL；Redis SSL 通过当前租户的 `ssl=true` 开启。
 
 ```yaml
 mqtt:
@@ -77,6 +109,19 @@ public class DeviceStatusConsumer extends AbstractConsumer<DeviceStatusMessage, 
   @Override
   public Void handleMessage(DeviceStatusMessage body) {
     // 中文注释：这里只处理业务消息，租户上下文和重复消费检查由 SDK 公共模板完成。
+    return null;
+  }
+}
+```
+
+Redis MQTT 为避免和 `solomon-redis` 的消费者基类重名，消费者继承独立基类：
+
+```java
+@MessageListener(topics = {"device/+/status"}, qos = 1, tenantRange = {"redis-local"})
+public class RedisDeviceStatusConsumer extends AbstractRedisMqttConsumer<DeviceStatusMessage, Void> {
+
+  @Override
+  public Void handleMessage(DeviceStatusMessage body) {
     return null;
   }
 }
@@ -106,6 +151,7 @@ sendService.send(message);
 - 消费者公共模板 `AbstractMqttConsumerSupport` 会在消费结束后清理 `RequestHeaderHolder`，避免线程池复用导致租户上下文串用。
 - 关闭证书校验时统一使用 `MqttSslFactory` 创建信任所有证书的 SocketFactory；生产环境建议保持 `verify-certificate=true`。
 - Vert.x MQTT 按租户维护消费者映射，避免多个租户订阅相同 topic 时串消费者。
+- Redis MQTT 将 MQTT topic 映射为 Redis channel；`+` 和 `#` 会转换成 Redis PatternTopic 的 `*`。
 
 ## 构建
 

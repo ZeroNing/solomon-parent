@@ -278,6 +278,11 @@
         <artifactId>solomon-mica-mqtt</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-redis-mqtt</artifactId>
+        <version>${project.version}</version>
+      </dependency>
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-s3-sdk</artifactId>
