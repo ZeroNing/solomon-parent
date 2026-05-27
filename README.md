@@ -150,7 +150,8 @@ solomon-parent/
 │   ├── solomon-job-sdk/
 │   ├── solomon-powerjob/
 │   └── solomon-xxlJob/
-└── test-*/
+└── solomon-test-module/
+    └── test-*/
 ```
 
 ## 构建
@@ -171,10 +172,16 @@ mvn -pl solomon-job-module -am clean install
 mvn -pl solomon-s3-module -am clean install
 ```
 
-启用示例模块：
+启用测试聚合模块：
 
 ```bash
 mvn -Ptest-modules clean test
+```
+
+只构建测试聚合模块：
+
+```bash
+mvn -Ptest-modules -pl solomon-test-module -am clean test
 ```
 
 ## 依赖接入

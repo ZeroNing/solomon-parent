@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-parent</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-test-module</artifactId>
+    <packaging>pom</packaging>
+    <description>Solomon 测试用例聚合模块。</description>
+
+    <modules>
+        <module>test-solomon-datasource</module>
+        <module>test-solomon-mongo</module>
+        <module>test-solomon-mqtt</module>
+        <module>test-solomon-mqtt5</module>
+        <module>test-solomon-rabbitmq</module>
+        <module>test-solomon-s3</module>
+        <module>test-solomon-xxlJob</module>
+        <module>test-solomon-powerjob</module>
+        <module>test-solomon-bot-notice</module>
+        <module>test-solomon-vertx-mqtt</module>
+        <module>test-solonmon-mica-mqtt</module>
+    </modules>
+</project>
