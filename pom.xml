@@ -53,6 +53,7 @@
     <module>solomon-gateway-sentinel</module>
     <module>solomon-bot-notice</module>
     <module>solomon-epc-coder</module>
+    <module>solomon-cache-module</module>
   </modules>
 
   <profiles>
@@ -241,6 +242,21 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-redis</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cache-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cache-redis</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cache-caffeine</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

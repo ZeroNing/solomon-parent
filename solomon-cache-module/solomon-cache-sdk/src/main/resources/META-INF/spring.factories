@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.steven.solomon.cache.config.CacheAutoConfiguration

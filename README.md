@@ -30,6 +30,7 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的基础设施组�
 | `solomon-mqtt-module` | MQTT 聚合模块 |
 | `solomon-s3-module` | 对象存储聚合模块 |
 | `solomon-job-module` | 任务调度聚合模块 |
+| `solomon-cache-module` | 缓存聚合模块，提供基础缓存 SDK 与 Redis 实现 |
 | `solomon-gateway-sentinel` | Spring Cloud Gateway + Sentinel 限流熔断 |
 | `solomon-bot-notice` | 企业微信、钉钉、飞书机器人通知 |
 | `solomon-epc-coder` | GS1 EPC 编码、解码、反译 |
@@ -49,7 +50,7 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的基础设施组�
 
 MQTT 公共能力已收敛到 `solomon-mqtt-sdk`：客户端注册表使用并发 Map，监听器扫描统一处理 `enabled`、租户范围和 topic 表达式，消费者结束后会清理租户上下文。业务侧只引入一个实现模块，避免多个 MQTT 客户端自动配置互相覆盖。
 
-四个 MQTT Broker 实现均支持 SSL：Paho MQTT3/5 和 Vert.x 使用 `ssl://host:8883`，Mica 会识别自身 `ssl.enabled` 配置或 8883 端口。`solomon-redis-mqtt` 支持多租户 Redis 配置，每个租户独立创建 Redis 连接，Redis SSL 通过租户配置 `ssl=true` 开启。
+四个 MQTT Broker 实现均支持 SSL：Paho MQTT3/5 和 Vert.x 使用 `ssl://host:8883`，Mica 会识别自身 `ssl.enabled` 配置或 8883 端口。`solomon-redis-mqtt` 支持多租户 Redis 配置，底层连接创建复用 `solomon-cache-redis`，Redis SSL 通过租户配置 `ssl=true` 开启。
 
 ### S3 / 对象存储
 
@@ -103,6 +104,16 @@ public class OrderTimeoutCloseHandler extends AbstractJobConsumer {
     }
 }
 ```
+
+### Cache / 缓存
+
+| 子模块 | 职责 |
+| --- | --- |
+| `solomon-cache-sdk` | 缓存接口、多租户切换上下文、缓存注解、重复请求限制注解、缓存 key 构建工具 |
+| `solomon-cache-redis` | 基于 `cache.redis` 的 Redis 单机/多租户注册、RedisTemplate、CacheService 自动装配 |
+| `solomon-cache-caffeine` | 基于 `cache.caffeine` 的本地缓存实现，复用 SDK 通用缓存注解 |
+
+缓存模块支持 `NONE`、`PREFIX`、`TENANT_PREFIX`、`TENANT_SWITCH` 四种 key 模式。`solomon-cache-sdk` 提供通用注解和 AOP，Redis、Caffeine 等实现只需要提供 `CacheService`。
 
 PowerJob 自动注册对历史版本做了路径兜底：登录、应用列表、应用保存会优先使用新版接口，失败后自动尝试旧版路径；鉴权同时写入 `PowerJwt` 与 `Cookie`，兼容新旧管理端。保存和更新模型使用 PowerJob 官方 jar 内的 `tech.powerjob.common.request.http.SaveJobInfoRequest`，Solomon 只保留注解转换和历史字段补齐逻辑。
 

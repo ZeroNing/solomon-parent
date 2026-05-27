@@ -2,6 +2,8 @@ package com.steven.solomon.utils;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
+import com.steven.solomon.cache.redis.factory.RedisConnectionFactoryBuilder;
+import com.steven.solomon.cache.redis.context.RedisCacheTenantContext;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.mqtt.AbstractMqttClientRegistry;
 import com.steven.solomon.mqtt.MqttOperations;
@@ -20,11 +22,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisPassword;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -36,14 +37,27 @@ public class MqttUtils
     extends AbstractMqttClientRegistry<RedisMessageListenerContainer, RedisMqttProfile>
     implements SendService<MqttMessageModel<?>>, MqttOperations {
 
+  private static final String CACHE_TENANT_PREFIX = "mqtt:";
+
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
   private final Map<String, StringRedisTemplate> redisTemplateMap = new ConcurrentHashMap<>();
 
-  private final Map<String, LettuceConnectionFactory> connectionFactoryMap = new ConcurrentHashMap<>();
+  private final Map<String, RedisConnectionFactory> connectionFactoryMap = new ConcurrentHashMap<>();
 
   private final Map<String, Map<String, org.springframework.data.redis.connection.MessageListener>> listenerMap =
       new ConcurrentHashMap<>();
+
+  private final RedisConnectionFactoryBuilder connectionFactoryBuilder;
+
+  private final RedisCacheTenantContext redisCacheTenantContext;
+
+  public MqttUtils(
+      RedisConnectionFactoryBuilder connectionFactoryBuilder,
+      RedisCacheTenantContext redisCacheTenantContext) {
+    this.connectionFactoryBuilder = connectionFactoryBuilder;
+    this.redisCacheTenantContext = redisCacheTenantContext;
+  }
 
   @Override
   public void send(MqttMessageModel<?> data) throws BaseException {
@@ -127,10 +141,11 @@ public class MqttUtils
     container.destroy();
     listenerMap.remove(tenantCode);
     redisTemplateMap.remove(tenantCode);
-    LettuceConnectionFactory factory = connectionFactoryMap.remove(tenantCode);
+    RedisConnectionFactory factory = connectionFactoryMap.remove(tenantCode);
     if (ValidateUtils.isNotEmpty(factory)) {
-      factory.destroy();
+      destroyConnectionFactory(factory);
     }
+    redisCacheTenantContext.unregister(cacheTenantCode(tenantCode));
     removeClient(tenantCode);
   }
 
@@ -143,7 +158,7 @@ public class MqttUtils
   }
 
   public RedisMessageListenerContainer createContainer(String tenantCode, RedisMqttProfile profile) {
-    LettuceConnectionFactory factory = createConnectionFactory(profile);
+    RedisConnectionFactory factory = createConnectionFactory(tenantCode, profile);
     StringRedisTemplate redisTemplate = new StringRedisTemplate(factory);
     redisTemplate.afterPropertiesSet();
 
@@ -161,28 +176,38 @@ public class MqttUtils
     return container;
   }
 
-  private LettuceConnectionFactory createConnectionFactory(RedisMqttProfile profile) {
-    RedisStandaloneConfiguration standalone = new RedisStandaloneConfiguration();
-    standalone.setHostName(profile.getHost());
-    standalone.setPort(profile.getPort());
-    standalone.setDatabase(profile.getDatabase());
+  private RedisConnectionFactory createConnectionFactory(String tenantCode, RedisMqttProfile profile) {
+    RedisProperties redisProperties = new RedisProperties();
+    redisProperties.setHost(profile.getHost());
+    redisProperties.setPort(profile.getPort());
+    redisProperties.setDatabase(profile.getDatabase());
     if (ValidateUtils.isNotEmpty(profile.getUsername())) {
-      standalone.setUsername(profile.getUsername());
+      redisProperties.setUsername(profile.getUsername());
     }
     if (ValidateUtils.isNotEmpty(profile.getPassword())) {
-      standalone.setPassword(RedisPassword.of(profile.getPassword()));
+      redisProperties.setPassword(profile.getPassword());
     }
-
-    LettuceClientConfiguration.LettuceClientConfigurationBuilder builder =
-        LettuceClientConfiguration.builder()
-            .commandTimeout(Duration.ofMillis(profile.getTimeout()));
-    if (profile.isSsl()) {
-      builder.useSsl();
+    if (profile.getTimeout() > 0) {
+      redisProperties.setTimeout(Duration.ofMillis(profile.getTimeout()));
     }
-
-    LettuceConnectionFactory factory = new LettuceConnectionFactory(standalone, builder.build());
-    factory.afterPropertiesSet();
+    redisProperties.getSsl().setEnabled(profile.isSsl());
+    RedisConnectionFactory factory = connectionFactoryBuilder.build(redisProperties);
+    redisCacheTenantContext.register(cacheTenantCode(tenantCode), factory);
     return factory;
+  }
+
+  private String cacheTenantCode(String tenantCode) {
+    return CACHE_TENANT_PREFIX + tenantCode;
+  }
+
+  private void destroyConnectionFactory(RedisConnectionFactory factory) {
+    if (factory instanceof DisposableBean disposableBean) {
+      try {
+        disposableBean.destroy();
+      } catch (Exception ex) {
+        logger.warn("Redis MQTT 连接工厂关闭失败", ex);
+      }
+    }
   }
 
   private RedisMessageListenerContainer getClient(String tenantCode) throws BaseException {

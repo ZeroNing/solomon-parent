@@ -6,23 +6,26 @@
 
     <parent>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-mqtt-module</artifactId>
+        <artifactId>solomon-cache-module</artifactId>
         <version>1.0</version>
     </parent>
 
-    <artifactId>solomon-redis-mqtt</artifactId>
-    <description>Redis Pub/Sub MQTT 风格实现。</description>
+    <artifactId>solomon-cache-redis</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-mqtt-sdk</artifactId>
+            <artifactId>solomon-cache-sdk</artifactId>
         </dependency>
 
         <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-cache-redis</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
     </dependencies>
 </project>

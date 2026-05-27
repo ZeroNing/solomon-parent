@@ -76,7 +76,9 @@ mqtt:
       pattern-topic: false
 ```
 
-`solomon-redis-mqtt` 的 `mqtt.tenant.*` 就是多租户 Redis 配置，每个租户会创建独立的 Redis 连接、监听容器和发送模板。不同租户可以连接不同 Redis 实例，也可以连接同一实例的不同 database。
+`solomon-redis-mqtt` 的 `mqtt.tenant.*` 就是多租户 Redis 配置，每个租户会通过 `solomon-cache-redis` 的连接工厂构建器创建独立 Redis 连接、监听容器和发送模板。不同租户可以连接不同 Redis 实例，也可以连接同一实例的不同 database。
+
+Redis MQTT 会把连接注册到 `RedisCacheTenantContext`，租户编码使用 `mqtt:{tenantCode}` 命名空间，避免覆盖普通缓存租户连接。
 
 ## SSL / TLS
 
@@ -85,7 +87,7 @@ mqtt:
 - `solomon-mqtt` 和 `solomon-mqtt5`：把 `url` 配成 `ssl://host:8883` 即可；`verify-certificate=false` 时会使用 SDK 的 `MqttSslFactory` 信任所有证书。
 - `solomon-vertx-mqtt`：把 `url` 配成 `ssl://host:8883` 会自动开启 SSL；未写端口时默认使用 `8883`。
 - `solomon-mica-mqtt`：优先读取 Mica 自身的 `ssl.enabled` 和证书配置；如果端口是 `8883`，也会自动启用 `useSsl()`。
-- `solomon-redis-mqtt`：不涉及 MQTT SSL；Redis SSL 通过当前租户的 `ssl=true` 开启。
+- `solomon-redis-mqtt`：不涉及 MQTT SSL；Redis SSL 通过当前租户的 `ssl=true` 开启，底层连接创建复用 `solomon-cache-redis`。
 
 ```yaml
 mqtt:
