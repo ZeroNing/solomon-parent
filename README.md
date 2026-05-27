@@ -1,15 +1,12 @@
 # Solomon Parent
 
-Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的微服务基础设施组件库。项目把常用基础能力拆成独立模块，统一管理依赖版本、自动配置、工具能力和中间件接入方式。
-
-这个仓库不是单体应用。业务系统应按需引入模块，例如只接入 Redis、只接入 MinIO，或者只接入 MQTT 5，避免把所有中间件 SDK 一次性带入运行时。
+Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的基础设施组件库。项目按能力拆分模块，业务系统只引入自己需要的组件，避免把对象存储、MQTT、任务调度等第三方 SDK 一次性带入运行时。
 
 ## 快速信息
 
 | 项目 | 内容 |
 | --- | --- |
 | GroupId | `com.steven` |
-| Parent ArtifactId | `solomon-parent` |
 | Version | `1.0` |
 | JDK | `21` |
 | Spring Boot | `3.4.4` |
@@ -32,8 +29,7 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的微服务基础�
 | `solomon-rabbitMq` | RabbitMQ 发送、交换机队列声明、消费者封装 |
 | `solomon-mqtt-module` | MQTT 聚合模块 |
 | `solomon-s3-module` | 对象存储聚合模块 |
-| `solomon-xxlJob` | XXL-Job 执行器与任务创建封装 |
-| `solomon-powerjob` | PowerJob Worker 与任务创建封装 |
+| `solomon-job-module` | 任务调度聚合模块 |
 | `solomon-gateway-sentinel` | Spring Cloud Gateway + Sentinel 限流熔断 |
 | `solomon-bot-notice` | 企业微信、钉钉、飞书机器人通知 |
 | `solomon-epc-coder` | GS1 EPC 编码、解码、反译 |
@@ -52,8 +48,6 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的微服务基础�
 
 ### S3 / 对象存储
 
-`solomon-s3-module` 借鉴 MQTT 聚合结构，拆成公共 SDK 与供应商实现模块。命名规则为 `solomon-供应商`：
-
 | 子模块 | 职责 |
 | --- | --- |
 | `solomon-s3-sdk` | 公共接口、配置属性、上传模型、命名规则、抽象文件服务、图片工具 |
@@ -64,21 +58,53 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的微服务基础�
 | `solomon-bos` | 百度云 BOS 实现 |
 | `solomon-s3` | Amazon S3 及 S3 协议兼容实现，如 R2、TOS、KODO 等 |
 
-业务项目通常引入 `solomon-s3-sdk` 加一个供应商模块即可。
+业务项目通常引入 `solomon-s3-sdk` 加一个供应商模块，通过 `file.choice` 选择供应商。
+
+### Job / 任务调度
+
+| 子模块 | 职责 |
+| --- | --- |
+| `solomon-job-sdk` | 统一 `JobTask` 注解、平台枚举、PowerJob/XXL-JOB 公共枚举 |
+| `solomon-powerjob` | PowerJob Worker、自动注册、任务启停、管理端接口适配 |
+| `solomon-xxlJob` | XXL-JOB 执行器、自动注册、任务启停、Handler 注册 |
+
+`JobTask` 同时支持 PowerJob 与 XXL-JOB 字段。默认按任务类型自动识别平台，也可以通过 `platforms` 精确指定平台或同时注册到多个平台。
+
+```java
+@JobTask(
+    platforms = {JobPlatform.POWERJOB},
+    taskName = "库存同步",
+    timeExpressionType = TimeExpressionType.CRON,
+    timeExpression = "0 0/5 * * * ?"
+)
+public class StockSyncProcessor implements BasicProcessor {
+    // 中文注释：业务代码只关注任务处理，注册参数由注解统一维护。
+}
+```
+
+```java
+@JobTask(
+    platforms = {JobPlatform.XXL_JOB},
+    taskName = "订单超时关闭",
+    scheduleType = ScheduleTypeEnum.CRON,
+    scheduleConf = "0 0/1 * * * ?",
+    executorHandler = "orderTimeoutCloseJob",
+    start = true
+)
+public class OrderTimeoutCloseHandler extends AbstractJobConsumer {
+    @Override
+    public void handle(String jobParam) {
+        // 中文注释：XXL-JOB 任务参数由调度中心传入。
+    }
+}
+```
+
+PowerJob 自动注册对历史版本做了路径兜底：登录、应用列表、应用保存会优先使用新版接口，失败后自动尝试旧版路径；鉴权同时写入 `PowerJwt` 与 `Cookie`，兼容新旧管理端。保存和更新模型使用 PowerJob 官方 jar 内的 `tech.powerjob.common.request.http.SaveJobInfoRequest`，Solomon 只保留注解转换和历史字段补齐逻辑。
 
 ## 目录结构
 
 ```text
 solomon-parent/
-├── docker/
-├── solomon-constant/
-├── solomon-utils/
-├── solomon-base/
-├── solomon-common/
-├── solomon-datasource/
-├── solomon-redis/
-├── solomon-mongodb/
-├── solomon-rabbitMq/
 ├── solomon-mqtt-module/
 ├── solomon-s3-module/
 │   ├── solomon-s3-sdk/
@@ -88,40 +114,29 @@ solomon-parent/
 │   ├── solomon-cos/
 │   ├── solomon-bos/
 │   └── solomon-s3/
-├── solomon-xxlJob/
-├── solomon-powerjob/
-├── solomon-gateway-sentinel/
-├── solomon-bot-notice/
-├── solomon-epc-coder/
+├── solomon-job-module/
+│   ├── solomon-job-sdk/
+│   ├── solomon-powerjob/
+│   └── solomon-xxlJob/
 └── test-*/
 ```
 
-## 环境要求
-
-| 环境 | 要求 |
-| --- | --- |
-| JDK | 21 |
-| Maven | 3.9+ 推荐 |
-| Spring Boot 业务项目 | 3.x |
-
 ## 构建
-
-完整构建：
 
 ```bash
 mvn clean install
+```
+
+构建任务调度聚合模块：
+
+```bash
+mvn -pl solomon-job-module -am clean install
 ```
 
 构建对象存储聚合模块：
 
 ```bash
 mvn -pl solomon-s3-module -am clean install
-```
-
-构建某个供应商模块：
-
-```bash
-mvn -pl solomon-s3-module/solomon-minio -am clean install
 ```
 
 启用示例模块：
@@ -131,6 +146,52 @@ mvn -Ptest-modules clean test
 ```
 
 ## 依赖接入
+
+### PowerJob
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-powerjob</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+```yaml
+powerjob:
+  worker:
+    enabled: true
+    app-name: demo-service
+    server-address: 127.0.0.1:7700
+
+job:
+  auto-register: true
+  namespace: default
+  user-name: admin
+  password: 123456
+```
+
+### XXL-JOB
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-xxlJob</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+```yaml
+xxl:
+  enabled: true
+  auto-register: true
+  admin-addresses: http://127.0.0.1:8080/xxl-job-admin
+  app-name: demo-service
+  user-name: admin
+  password: 123456
+```
+
+XXL-JOB 自动注册使用 Admin 后台 HTTP 接口完成。`xxl-job-core` jar 内的 `AdminBizClient` 只支持执行器回调、注册和注销，不提供登录、保存、更新任务的管理端 Client；因此 Solomon 保留 `XxlJobInfo` 作为 Admin 表单模型，并对 `login/auth/doLogin`、`jobinfo/add/save/update/pageList/start/stop/remove` 做候选路径兼容。
 
 ### MinIO
 
@@ -156,76 +217,11 @@ file:
   secret-key: minioadmin
   bucket-name: default-bucket
   file-naming-method: UUID
-  part-size: 5
-```
-
-### 阿里云 OSS
-
-```xml
-<dependency>
-  <groupId>com.steven</groupId>
-  <artifactId>solomon-s3-sdk</artifactId>
-  <version>1.0</version>
-</dependency>
-
-<dependency>
-  <groupId>com.steven</groupId>
-  <artifactId>solomon-oss</artifactId>
-  <version>1.0</version>
-</dependency>
-```
-
-```yaml
-file:
-  choice: OSS
-  endpoint: https://oss-cn-hangzhou.aliyuncs.com
-  access-key: your-access-key
-  secret-key: your-secret-key
-  bucket-name: your-bucket
-```
-
-### 华为云 OBS / 腾讯云 COS / 百度云 BOS
-
-按供应商引入对应模块：
-
-```xml
-<artifactId>solomon-obs</artifactId>
-<artifactId>solomon-cos</artifactId>
-<artifactId>solomon-bos</artifactId>
-```
-
-配置项仍使用统一前缀 `file.*`，通过 `file.choice` 选择供应商：`OBS`、`COS`、`BOS`。
-
-### S3 协议兼容存储
-
-```xml
-<dependency>
-  <groupId>com.steven</groupId>
-  <artifactId>solomon-s3-sdk</artifactId>
-  <version>1.0</version>
-</dependency>
-
-<dependency>
-  <groupId>com.steven</groupId>
-  <artifactId>solomon-s3</artifactId>
-  <version>1.0</version>
-</dependency>
-```
-
-```yaml
-file:
-  choice: S3
-  endpoint: https://s3.example.com
-  access-key: your-access-key
-  secret-key: your-secret-key
-  region-name: us-east-1
-  bucket-name: default-bucket
-  path-style-access-enabled: true
 ```
 
 ## 对象存储调用
 
-`FileServiceInterface` 是统一入口。旧的重载方法继续可用，推荐新代码使用 `FileUploadRequest` 做链式调用。
+推荐使用 `FileUploadRequest` 链式调用。
 
 ```java
 FileUpload upload = fileService.upload(
@@ -235,154 +231,19 @@ FileUpload upload = fileService.upload(
 );
 ```
 
-上传输入流：
-
-```java
-FileUpload upload = fileService.upload(
-    FileUploadRequest.stream(inputStream, "demo.txt")
-        .bucketName("default-bucket")
-);
-```
-
-下载、分享、删除：
-
 ```java
 InputStream stream = fileService.download("demo.txt", "default-bucket");
 String url = fileService.share("demo.txt", "default-bucket", 3600);
 fileService.deleteFile("demo.txt", "default-bucket");
 ```
 
-生成缩略图：
-
-```java
-InputStream thumbnail = fileService.generateThumbnail(
-    "default-bucket",
-    "demo.jpg",
-    "thumbnail/",
-    true,
-    200,
-    200
-);
-```
-
-## 自动配置约定
-
-- 公共 SDK 自动配置：`S3SdkAutoConfig`。
-- 供应商自动配置：`MinioAutoConfig`、`OssAutoConfig`、`ObsAutoConfig`、`CosAutoConfig`、`BosAutoConfig`、`S3AutoConfig`。
-- 所有自动配置通过 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports` 加载。
-- 供应商模块通过 `file.choice` 精确启用。
-- `FileServiceInterface` 使用 `@ConditionalOnMissingBean`，业务项目可以覆盖默认实现。
-
-## 其他核心能力
-
-### OpenAPI / Knife4j
-
-```yaml
-springdoc:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
-knife4j:
-  enable: true
-```
-
-### Redis
-
-```yaml
-spring:
-  redis:
-    enabled: true
-    host: localhost
-    port: 6379
-```
-
-### MongoDB
-
-```yaml
-spring:
-  data:
-    mongodb:
-      enabled: true
-      host: localhost
-      port: 27017
-      database: demo
-```
-
-### RabbitMQ
-
-```yaml
-spring:
-  rabbitmq:
-    enabled: true
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-```
-
-### MQTT
-
-```yaml
-mqtt:
-  enabled: true
-```
-
-### 机器人通知
-
-```yaml
-solomon:
-  notice:
-    enabled: true
-    wechat-work:
-      webhook-url:
-      secret:
-    ding-talk:
-      webhook-url:
-      secret:
-    feishu:
-      webhook-url:
-      secret:
-```
-
-### GS1 EPC 编解码
-
-```java
-EpcResult result = epcService.gs1()
-    .ai01("06901234567892")
-    .ai21("1234567890")
-    .companyPrefixLength(6)
-    .tagSize(96)
-    .encode();
-```
-
-## 配置速查
-
-| 配置项 | 说明 |
-| --- | --- |
-| `file.choice` | 对象存储供应商，如 `MINIO`、`OSS`、`OBS`、`COS`、`BOS`、`S3` |
-| `file.endpoint` | 对象存储服务地址 |
-| `file.access-key` | 访问密钥 |
-| `file.secret-key` | 私密密钥 |
-| `file.bucket-name` | 默认 Bucket |
-| `file.root-directory` | 对象名前缀 |
-| `file.region-name` | 区域 |
-| `file.file-naming-method` | 文件命名规则 |
-| `file.part-size` | 分片大小，单位 MB |
-| `file.connection-timeout` | 连接超时，单位毫秒 |
-| `file.socket-timeout` | 读取超时，单位毫秒 |
-| `file.path-style-access-enabled` | S3 是否使用 path-style 访问 |
-
 ## 开发规范
 
-- 公共接口、模型、抽象服务、命名规则放在 `solomon-s3-sdk`。
-- 供应商实现按 `solomon-供应商` 命名，禁止把所有 SDK 混在一个模块里。
-- 供应商模块只处理平台差异，不重复实现上传调度、命名、缩略图等公共逻辑。
-- 新增供应商时必须补充自动配置和 `AutoConfiguration.imports`。
-- 中文注释用于解释设计意图和复杂逻辑。
-- 不提交真实密码、token、Webhook、AccessKey、SecretKey。
+- 公共注解、枚举、模型优先放入 `*-sdk` 模块。
+- 实现模块只处理平台差异，不重复定义公共契约。
+- 自动配置统一使用 `META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`。
+- 复杂逻辑必须有中文注释，注释解释设计意图，不重复代码含义。
+- 禁止提交真实密码、token、Webhook、AccessKey、SecretKey。
 - 提交前使用 JDK 21 完整构建。
 
 ## 常见问题
@@ -390,10 +251,10 @@ EpcResult result = epcService.gs1()
 | 问题 | 常见原因 | 处理方式 |
 | --- | --- | --- |
 | 编译失败 | JDK 版本低于 21 | 切换到 JDK 21 |
-| 没有 `FileServiceInterface` Bean | 只引入了 SDK，未引入供应商模块，或 `file.choice` 不匹配 | 引入对应 `solomon-供应商` 模块并检查配置 |
-| 供应商 SDK 冲突 | 一次性引入多个供应商模块 | 业务项目只引入当前需要的供应商模块 |
-| 上传失败 | endpoint、region、密钥、bucket 配置错误 | 先用供应商控制台验证配置 |
-| ClamAV 扫描失败 | ClamAV 未部署或连接配置错误 | 检查 `clamav.*` 配置 |
+| 找不到任务注解 | 只引入了实现模块旧缓存，或未刷新 Maven | 清理本地构建并重新导入 `solomon-job-module` |
+| PowerJob 自动注册失败 | 管理端版本接口不一致、账号密码错误、地址错误 | 先确认 `job.*` 与 `powerjob.worker.*` 配置，再查看兜底路径日志 |
+| XXL-JOB 未启动任务 | `scheduleType=NONE` 或 `start=false` | 配置调度类型和 `start=true` |
+| 没有对象存储 Bean | 只引入了 SDK，未引入供应商模块，或 `file.choice` 不匹配 | 引入对应 `solomon-供应商` 模块并检查配置 |
 
 ## License
 

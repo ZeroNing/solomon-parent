@@ -47,8 +47,7 @@
     <module>solomon-s3-module</module>
 
     <!-- 任务调度模块 -->
-    <module>solomon-xxlJob</module>
-    <module>solomon-powerjob</module>
+    <module>solomon-job-module</module>
 
     <!-- 网关与通知模块 -->
     <module>solomon-gateway-sentinel</module>
@@ -320,6 +319,11 @@
             <artifactId>solomon-s3</artifactId>
             <version>${project.version}</version>
         </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-job-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-xxlJob</artifactId>
