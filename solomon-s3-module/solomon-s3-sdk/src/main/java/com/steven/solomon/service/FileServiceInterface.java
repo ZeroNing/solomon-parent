@@ -1,14 +1,18 @@
 package com.steven.solomon.service;
 
 import cn.hutool.crypto.digest.DigestUtil;
+import com.steven.solomon.enums.StorageCapability;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.model.FileUploadRequest;
+import com.steven.solomon.model.ShareFileRequest;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -75,6 +79,13 @@ public interface FileServiceInterface {
   String share(String fileName,String bucketName,long expiry) throws Exception;
 
   /**
+   * 使用统一请求对象生成分享链接。
+   */
+  default String share(ShareFileRequest request) throws Exception {
+    return share(request.getFileName(), request.getBucketName(), request.getExpirySeconds());
+  }
+
+  /**
    * 下载
    */
   InputStream download(String fileName,String bucketName) throws Exception;
@@ -133,6 +144,23 @@ public interface FileServiceInterface {
    * 获取所有桶名
    */
   List<String> getBucketList() throws Exception;
+
+  /**
+   * 当前供应商支持的能力。
+   */
+  default Set<StorageCapability> capabilities() {
+    return EnumSet.of(
+        StorageCapability.UPLOAD,
+        StorageCapability.DOWNLOAD,
+        StorageCapability.DELETE,
+        StorageCapability.SHARE_URL,
+        StorageCapability.CREATE_BUCKET,
+        StorageCapability.DELETE_BUCKET,
+        StorageCapability.COPY_OBJECT,
+        StorageCapability.LIST_OBJECTS,
+        StorageCapability.THUMBNAIL
+    );
+  }
 
   /**
    * 获取文件MD5

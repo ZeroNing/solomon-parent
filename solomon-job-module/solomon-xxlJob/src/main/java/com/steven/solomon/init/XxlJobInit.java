@@ -3,6 +3,8 @@ package com.steven.solomon.init;
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.entity.XxlJobInfo;
+import com.steven.solomon.enums.JobRegisterFailureStrategy;
+import com.steven.solomon.enums.JobRegisterMode;
 import com.steven.solomon.enums.JobPlatform;
 import com.steven.solomon.enums.ScheduleTypeEnum;
 import com.steven.solomon.config.XxlJobCondition;
@@ -61,32 +63,69 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             }
             String className = obj.getClass().getSimpleName();
             String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),className);
+            int jobGroup = service.resolveJobGroup(cookie, jobTask.jobGroup());
 
-            Map<String,XxlJobInfo> xxlJobInfoMap = service.findMapByExecutorHandler(cookie, executorHandler, jobTask.jobGroup());
+            Map<String,XxlJobInfo> xxlJobInfoMap = service.findMapByExecutorHandler(cookie, executorHandler, jobGroup);
             XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
 
-            boolean isCreate = ValidateUtils.isEmpty(xxlJobInfo);
-            xxlJobInfo = isCreate ? new XxlJobInfo(jobTask,className) : xxlJobInfo.update(jobTask,className);
+            register(cookie, jobTask, className, executorHandler, jobGroup, xxlJobInfo);
+            XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
+        }
+    }
+
+    /**
+     * 按配置的写入模式执行自动注册，避免启动时无条件覆盖线上任务。
+     */
+    private void register(String cookie, JobTask jobTask, String className, String executorHandler, int jobGroup, XxlJobInfo existsJob) throws Exception {
+        try {
+            boolean isCreate = ValidateUtils.isEmpty(existsJob);
+            if (isCreate && JobRegisterMode.UPDATE_ONLY.equals(profile.getRegisterMode())) {
+                logger.info("{}不存在，当前XXL-JOB注册模式为UPDATE_ONLY，跳过创建", executorHandler);
+                return;
+            }
+            if (!isCreate && JobRegisterMode.CREATE_ONLY.equals(profile.getRegisterMode())) {
+                logger.info("{}已存在，当前XXL-JOB注册模式为CREATE_ONLY，跳过更新", executorHandler);
+                return;
+            }
+            XxlJobInfo xxlJobInfo = new XxlJobInfo(jobTask,className);
+            xxlJobInfo.setJobGroup(jobGroup);
             xxlJobInfo.setExecutorHandler(executorHandler);
-            // 发送 POST 请求
             if (isCreate) {
                 service.saveJob(cookie, xxlJobInfo);
             } else {
+                xxlJobInfo.setId(existsJob.getId());
+                if (service.sameJob(existsJob, xxlJobInfo)) {
+                    logger.info("{}任务配置未变化，跳过XXL-JOB更新", executorHandler);
+                    syncStatus(cookie, jobTask, xxlJobInfo, false, className, jobGroup);
+                    return;
+                }
                 service.updateJob(cookie, xxlJobInfo);
             }
-            //启用或禁止任务，调度类型必须不是不调度才可以
-            if (!ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())) {
-                if (isCreate) {
-                    if (jobTask.start()) {
-                        service.startJob(cookie, xxlJobInfo.getExecutorHandler(), jobTask.jobGroup());
-                    } else {
-                        service.stopJob(cookie, xxlJobInfo.getExecutorHandler(), jobTask.jobGroup());
-                    }
-                }
-            } else {
-                logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
+            syncStatus(cookie, jobTask, xxlJobInfo, isCreate, className, jobGroup);
+        } catch (Exception exception) {
+            if (JobRegisterFailureStrategy.WARN_ONLY.equals(profile.getFailureStrategy())) {
+                logger.warn("{}自动注册XXL-JOB失败，已按WARN_ONLY策略忽略", executorHandler, exception);
+                return;
             }
-            XxlJobSpringExecutor.registJobHandler(executorHandler, (IJobHandler) obj);
+            throw exception;
+        }
+    }
+
+    /**
+     * 创建任务后按注解同步启停状态，NONE 调度类型不执行启停。
+     */
+    private void syncStatus(String cookie, JobTask jobTask, XxlJobInfo xxlJobInfo, boolean isCreate, String className, int jobGroup) throws Exception {
+        if (ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())) {
+            logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
+            return;
+        }
+        if (!isCreate && !profile.getSyncStatusOnUpdate()) {
+            return;
+        }
+        if (jobTask.start()) {
+            service.startJob(cookie, xxlJobInfo.getExecutorHandler(), jobGroup);
+        } else {
+            service.stopJob(cookie, xxlJobInfo.getExecutorHandler(), jobGroup);
         }
     }
 

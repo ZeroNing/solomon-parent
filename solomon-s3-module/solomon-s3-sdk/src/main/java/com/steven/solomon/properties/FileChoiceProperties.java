@@ -68,6 +68,32 @@ public class FileChoiceProperties {
    */
   private boolean pathStyleAccessEnabled = false;
 
+  /**
+   * 启动时检查默认桶是否存在
+   */
+  private boolean checkBucketOnStartup = false;
+
+  /**
+   * 默认桶不存在时是否自动创建
+   */
+  private boolean autoCreateBucket = true;
+
+  public boolean getCheckBucketOnStartup() {
+    return checkBucketOnStartup;
+  }
+
+  public void setCheckBucketOnStartup(boolean checkBucketOnStartup) {
+    this.checkBucketOnStartup = checkBucketOnStartup;
+  }
+
+  public boolean getAutoCreateBucket() {
+    return autoCreateBucket;
+  }
+
+  public void setAutoCreateBucket(boolean autoCreateBucket) {
+    this.autoCreateBucket = autoCreateBucket;
+  }
+
   public boolean getPathStyleAccessEnabled() {
     return pathStyleAccessEnabled;
   }

@@ -20,6 +20,6 @@
         <module>solomon-obs</module>
         <module>solomon-cos</module>
         <module>solomon-bos</module>
-        <module>solomon-s3</module>
+        <module>solomon-amazon-s3</module>
     </modules>
 </project>

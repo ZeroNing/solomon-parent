@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.code.BaseExceptionCode;
 import com.steven.solomon.code.FileErrorCode;
+import com.steven.solomon.enums.StorageCapability;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.file.MockMultipartFile;
 import com.steven.solomon.graphics2D.entity.FileUpload;
@@ -18,6 +19,8 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.EnumSet;
+import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.slf4j.Logger;
@@ -60,14 +63,16 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public FileUpload upload(FileUploadRequest request) throws Exception {
+    requireCapability(StorageCapability.UPLOAD);
     if (ValidateUtils.isEmpty(request)) {
       throw new BaseException(FileErrorCode.INVALID_UPLOAD_REQUEST);
     }
     if (ValidateUtils.isNotEmpty(request.getFile())) {
-      return upload(request.getFile(), request.getBucketName(), request.isUseOriginalName());
+      return uploadFileRequest(request, request.getFile());
     }
     if (ValidateUtils.isNotEmpty(request.getInputStream())) {
-      return upload(request.getInputStream(), request.getBucketName(), request.getFileName(), request.isUseOriginalName());
+      MockMultipartFile file = new MockMultipartFile(request.getFileName(), request.getFileName(), MediaType.MULTIPART_FORM_DATA_VALUE, request.getInputStream());
+      return uploadFileRequest(request, file);
     }
     if (ValidateUtils.isNotEmpty(request.getImage())) {
       return upload(request.getBucketName(), request.getImage(), request.getFileName());
@@ -92,23 +97,39 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public FileUpload upload(MultipartFile file,String bucketName,boolean isUseOriginalName) throws Exception{
+    return uploadFileRequest(FileUploadRequest.multipart(file).bucketName(bucketName).useOriginalName(isUseOriginalName), file);
+  }
+
+  /**
+   * 使用统一请求对象执行上传，保留 contentType、metadata、tags 等高级参数。
+   */
+  protected FileUpload uploadFileRequest(FileUploadRequest request, MultipartFile file) throws Exception {
+    requireCapability(StorageCapability.UPLOAD);
     clamAvUtils.scanFile(file.getInputStream(), BaseExceptionCode.FILE_HIGH_RISK);
     // 上传前保证存储桶存在，减少业务侧重复判断。
-    makeBucket(bucketName);
-    String       filePath = getFilePath(!isUseOriginalName ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);
+    makeBucket(request.getBucketName());
+    String       filePath = getFilePath(!request.isUseOriginalName() ? fileNamingRulesGenerationService.getFileName(file): file.getOriginalFilename(),properties);
+    if (!request.isOverwrite() && checkObjectExist(request.getBucketName(), filePath)) {
+      throw new IllegalStateException("文件已存在且当前上传请求不允许覆盖: " + filePath);
+    }
     long fileSize = file.getSize();
     if (isMultipartUpload()) {
       if (fileSize >= partSize) {
-        return multipartUpload(file,bucketName,isUseOriginalName);
+        return multipartUpload(file,request.getBucketName(),request.isUseOriginalName());
       } else {
-        this.upload(file,bucketName,filePath);
-        return new FileUpload(bucketName,filePath,file.getInputStream());
+        return uploadPreparedFile(request, file, filePath);
       }
     } else {
-      this.upload(file,bucketName,filePath);
-      return new FileUpload(bucketName,filePath,file.getInputStream());
+      return uploadPreparedFile(request, file, filePath);
     }
+  }
 
+  /**
+   * 供应商可覆盖该方法读取高级上传参数，默认走老的上传实现。
+   */
+  protected FileUpload uploadPreparedFile(FileUploadRequest request, MultipartFile file, String filePath) throws Exception {
+    this.upload(file, request.getBucketName(), filePath);
+    return new FileUpload(request.getBucketName(),filePath,file.getInputStream());
   }
 
   @Override
@@ -131,6 +152,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
+    requireCapability(StorageCapability.DELETE);
     if (!bucketExists(bucketName) || ValidateUtils.isEmpty(fileName)) {
       return;
     }
@@ -139,11 +161,13 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public String share(String fileName, String bucketName, long expiry) throws Exception {
+    requireCapability(StorageCapability.SHARE_URL);
     return shareUrl(bucketName,getFilePath(fileName,properties),expiry);
   }
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
+    requireCapability(StorageCapability.DOWNLOAD);
     String filePath = getFilePath(fileName,properties);
     if (!objectExist(bucketName,filePath)) {
       throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
@@ -153,14 +177,19 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void makeBucket(String bucketName) throws Exception {
+    requireCapability(StorageCapability.CREATE_BUCKET);
     if (bucketExists(bucketName)) {
       return;
+    }
+    if (!properties.getAutoCreateBucket()) {
+      throw new IllegalStateException("桶不存在且当前配置不允许自动创建: " + bucketName);
     }
     this.createBucket(bucketName);
   }
 
   @Override
   public boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception{
+    requireCapability(StorageCapability.COPY_OBJECT);
     if (!objectExist(sourceBucket,sourceObjectName)) {
       throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
     }
@@ -180,6 +209,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public InputStream generateThumbnail(String bucketName,String objectName,String filePath,boolean isUpload,int width,int height)throws Exception{
+    requireCapability(StorageCapability.THUMBNAIL);
     makeBucket(bucketName);
     String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
     objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
@@ -304,5 +334,32 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   public boolean isMultipartUpload() {
     return true;
+  }
+
+  @Override
+  public Set<StorageCapability> capabilities() {
+    Set<StorageCapability> capabilities = EnumSet.copyOf(FileServiceInterface.super.capabilities());
+    if (isMultipartUpload()) {
+      capabilities.add(StorageCapability.MULTIPART_UPLOAD);
+    }
+    return capabilities;
+  }
+
+  /**
+   * 启动时按配置检查默认桶，降低第一次上传时才暴露配置问题的概率。
+   */
+  public void checkDefaultBucketOnStartup() throws Exception {
+    if (properties.getCheckBucketOnStartup() && ValidateUtils.isNotEmpty(properties.getBucketName())) {
+      makeBucket(properties.getBucketName());
+    }
+  }
+
+  /**
+   * 调用供应商能力前先校验，避免不支持能力时进入更深层异常。
+   */
+  protected void requireCapability(StorageCapability capability) {
+    if (!capabilities().contains(capability)) {
+      throw new UnsupportedOperationException("当前对象存储实现不支持能力: " + capability);
+    }
   }
 }

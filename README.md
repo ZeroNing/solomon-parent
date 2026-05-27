@@ -56,7 +56,7 @@ Solomon Parent 是基于 **Java 21**、**Spring Boot 3.4.4** 的基础设施组�
 | `solomon-obs` | 华为云 OBS 实现 |
 | `solomon-cos` | 腾讯云 COS 实现 |
 | `solomon-bos` | 百度云 BOS 实现 |
-| `solomon-s3` | Amazon S3 及 S3 协议兼容实现，如 R2、TOS、KODO 等 |
+| `solomon-amazon-s3` | Amazon S3 及 S3 协议兼容实现，如 R2、TOS、KODO 等 |
 
 业务项目通常引入 `solomon-s3-sdk` 加一个供应商模块，通过 `file.choice` 选择供应商。
 
@@ -101,6 +101,22 @@ public class OrderTimeoutCloseHandler extends AbstractJobConsumer {
 
 PowerJob 自动注册对历史版本做了路径兜底：登录、应用列表、应用保存会优先使用新版接口，失败后自动尝试旧版路径；鉴权同时写入 `PowerJwt` 与 `Cookie`，兼容新旧管理端。保存和更新模型使用 PowerJob 官方 jar 内的 `tech.powerjob.common.request.http.SaveJobInfoRequest`，Solomon 只保留注解转换和历史字段补齐逻辑。
 
+自动注册支持 `register-mode` 和 `failure-strategy`：
+
+```yaml
+powerjob:
+  worker:
+    register-mode: UPSERT
+    failure-strategy: FAIL_FAST
+    auto-create-namespace-app: true
+
+xxl:
+  register-mode: UPSERT
+  failure-strategy: FAIL_FAST
+  auto-resolve-job-group: true
+  sync-status-on-update: false
+```
+
 ## 目录结构
 
 ```text
@@ -113,7 +129,7 @@ solomon-parent/
 │   ├── solomon-obs/
 │   ├── solomon-cos/
 │   ├── solomon-bos/
-│   └── solomon-s3/
+│   └── solomon-amazon-s3/
 ├── solomon-job-module/
 │   ├── solomon-job-sdk/
 │   ├── solomon-powerjob/
@@ -219,6 +235,33 @@ file:
   file-naming-method: UUID
 ```
 
+### Amazon S3 / S3 兼容协议
+
+```xml
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-s3-sdk</artifactId>
+  <version>1.0</version>
+</dependency>
+
+<dependency>
+  <groupId>com.steven</groupId>
+  <artifactId>solomon-amazon-s3</artifactId>
+  <version>1.0</version>
+</dependency>
+```
+
+```yaml
+file:
+  choice: AMAZON
+  endpoint: https://s3.amazonaws.com
+  access-key: your-access-key
+  secret-key: your-secret-key
+  region-name: us-east-1
+  bucket-name: default-bucket
+  path-style-access-enabled: false
+```
+
 ## 对象存储调用
 
 推荐使用 `FileUploadRequest` 链式调用。
@@ -227,13 +270,20 @@ file:
 FileUpload upload = fileService.upload(
     FileUploadRequest.multipart(file)
         .bucketName("default-bucket")
+        .contentType("image/png")
+        .metadata("bizId", "10001")
+        .tag("source", "order")
+        .overwrite(false)
         .useOriginalName(false)
 );
 ```
 
 ```java
 InputStream stream = fileService.download("demo.txt", "default-bucket");
-String url = fileService.share("demo.txt", "default-bucket", 3600);
+String url = fileService.share(
+    ShareFileRequest.file("default-bucket", "demo.txt")
+        .expirySeconds(3600)
+);
 fileService.deleteFile("demo.txt", "default-bucket");
 ```
 

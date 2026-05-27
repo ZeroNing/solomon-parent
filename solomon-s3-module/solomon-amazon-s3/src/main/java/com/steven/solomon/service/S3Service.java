@@ -1,23 +1,25 @@
 package com.steven.solomon.service;
 
 import com.steven.solomon.clamav.utils.ClamAvUtils;
+import com.steven.solomon.client.AmazonS3ClientFactory;
+import com.steven.solomon.enums.StorageCapability;
 import com.steven.solomon.lambda.Lambda;
+import com.steven.solomon.graphics2D.entity.FileUpload;
+import com.steven.solomon.model.FileUploadRequest;
+import com.steven.solomon.model.ShareFileRequest;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
-import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.http.apache.ApacheHttpClient;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -39,35 +41,57 @@ public class S3Service extends AbstractFileService {
 
   public S3Service(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
-    AwsBasicCredentials credentials = AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey());
-    client = S3Client.builder()
-            .endpointOverride(URI.create(properties.getEndpoint()))
-            .region(Region.of(properties.getRegionName()))
-            .credentialsProvider(StaticCredentialsProvider.create(credentials))
-            .serviceConfiguration(S3Configuration.builder().pathStyleAccessEnabled(properties.getPathStyleAccessEnabled()).chunkedEncodingEnabled(false).build())
-            .httpClient(ApacheHttpClient.builder()
-                    .connectionTimeout(Duration.ofMillis(properties.getConnectionTimeout()))
-                    .socketTimeout(Duration.ofMillis(properties.getSocketTimeout()))
-                    .build())
-            .build();
-
-    presigner = S3Presigner.builder()
-            .endpointOverride(URI.create(properties.getEndpoint()))
-            .region(Region.of(properties.getRegionName()))
-            .credentialsProvider(StaticCredentialsProvider.create(credentials))
-            .build();
+    client = AmazonS3ClientFactory.createClient(properties);
+    presigner = AmazonS3ClientFactory.createPresigner(properties);
   }
 
   @Override
   protected void upload(MultipartFile file, String bucketName, String filePath) throws Exception {
+    uploadPreparedFile(FileUploadRequest.multipart(file).bucketName(bucketName), file, filePath);
+  }
+
+  @Override
+  protected FileUpload uploadPreparedFile(FileUploadRequest request, MultipartFile file, String filePath) throws Exception {
     byte[] fileBytes = file.getBytes();
 
-    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-            .bucket(bucketName)
+    PutObjectRequest.Builder builder = PutObjectRequest.builder()
+            .bucket(request.getBucketName())
             .key(filePath)
-            .contentLength((long) fileBytes.length)
-            .build();
+            .contentLength((long) fileBytes.length);
+    if (ValidateUtils.isNotEmpty(request.getContentType())) {
+      builder.contentType(request.getContentType());
+    }
+    if (ValidateUtils.isNotEmpty(request.getMetadata())) {
+      builder.metadata(request.getMetadata());
+    }
+    if (ValidateUtils.isNotEmpty(request.getTags())) {
+      builder.tagging(toTagging(request));
+    }
+    PutObjectRequest putObjectRequest = builder.build();
     client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
+    return new FileUpload(request.getBucketName(),filePath,file.getInputStream());
+  }
+
+  @Override
+  public String share(ShareFileRequest request) throws Exception {
+    requireCapability(StorageCapability.SHARE_URL);
+    if (ValidateUtils.isEmpty(request)) {
+      throw new IllegalArgumentException("分享请求不能为空");
+    }
+    GetObjectRequest.Builder objectRequest = GetObjectRequest.builder()
+        .bucket(request.getBucketName())
+        .key(getFilePath(request.getFileName(), properties));
+    if (ValidateUtils.isNotEmpty(request.getDownloadFileName())) {
+      objectRequest.responseContentDisposition("attachment; filename=\"" + request.getDownloadFileName() + "\"");
+    }
+    if (ValidateUtils.isNotEmpty(request.getContentType())) {
+      objectRequest.responseContentType(request.getContentType());
+    }
+    GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+        .getObjectRequest(objectRequest.build())
+        .signatureDuration(Duration.ofSeconds(request.getExpirySeconds()))
+        .build();
+    return presigner.presignGetObject(presignRequest).url().toString();
   }
 
   @Override
@@ -92,6 +116,16 @@ public class S3Service extends AbstractFileService {
   @Override
   protected InputStream getObject(String bucketName, String filePath) throws Exception {
     return client.getObject(GetObjectRequest.builder().bucket(bucketName).key(filePath).build());
+  }
+
+  private String toTagging(FileUploadRequest request) {
+    return request.getTags().entrySet().stream()
+        .map(entry -> encodeTag(entry.getKey()) + "=" + encodeTag(entry.getValue()))
+        .collect(Collectors.joining("&"));
+  }
+
+  private String encodeTag(String value) {
+    return URLEncoder.encode(value, StandardCharsets.UTF_8);
   }
 
   @Override

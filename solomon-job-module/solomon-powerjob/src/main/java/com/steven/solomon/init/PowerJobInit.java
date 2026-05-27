@@ -4,6 +4,8 @@ import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.config.PowerJobCondition;
 import com.steven.solomon.entity.PowerJobRequestFactory;
+import com.steven.solomon.enums.JobRegisterFailureStrategy;
+import com.steven.solomon.enums.JobRegisterMode;
 import com.steven.solomon.enums.JobPlatform;
 import com.steven.solomon.properties.JobProperties;
 import com.steven.solomon.service.PowerJobService;
@@ -71,14 +73,39 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
                 continue;
             }
             String className = clazz.getName();
+            register(cookie, taskMap, jobTask, appId, className);
+        }
+    }
+
+    /**
+     * 按配置的写入模式执行自动注册，避免启动时无条件覆盖线上任务。
+     */
+    private void register(String cookie, Map<String, SaveJobInfoRequest> taskMap, JobTask jobTask, Integer appId, String className) throws Exception {
+        try {
             SaveJobInfoRequest saveRequest = taskMap.get(className);
             if (ValidateUtils.isEmpty(saveRequest)) {
-                saveRequest = PowerJobRequestFactory.create(jobTask,appId,className);
-                service.saveJob(cookie,saveRequest);
-            } else {
-                saveRequest = PowerJobRequestFactory.update(saveRequest,jobTask,className);
-                service.updateJob(cookie,saveRequest);
+                if (JobRegisterMode.UPDATE_ONLY.equals(jobProperties.getRegisterMode())) {
+                    logger.info("{}不存在，当前PowerJob注册模式为UPDATE_ONLY，跳过创建", className);
+                    return;
+                }
+                service.saveJob(cookie, PowerJobRequestFactory.create(jobTask, appId, className));
+                return;
             }
+            if (JobRegisterMode.CREATE_ONLY.equals(jobProperties.getRegisterMode())) {
+                logger.info("{}已存在，当前PowerJob注册模式为CREATE_ONLY，跳过更新", className);
+                return;
+            }
+            if (PowerJobRequestFactory.samePayload(saveRequest, jobTask, className)) {
+                logger.info("{}任务配置未变化，跳过PowerJob更新", className);
+                return;
+            }
+            service.updateJob(cookie, PowerJobRequestFactory.update(saveRequest, jobTask, className));
+        } catch (Exception exception) {
+            if (JobRegisterFailureStrategy.WARN_ONLY.equals(jobProperties.getFailureStrategy())) {
+                logger.warn("{}自动注册PowerJob失败，已按WARN_ONLY策略忽略", className, exception);
+                return;
+            }
+            throw exception;
         }
     }
 

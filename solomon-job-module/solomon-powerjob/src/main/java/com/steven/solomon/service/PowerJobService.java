@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.steven.solomon.code.PowerJobErrorCode.*;
 
@@ -87,7 +88,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         ));
         String token = resolveToken(body);
         if (ValidateUtils.isEmpty(token)) {
-            throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR, adminAddresses, JSONUtil.toJsonStr(passwordParam), "登录成功但未返回token");
+            throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR, adminAddresses, JobLogSanitizer.sanitize(passwordParam), "登录成功但未返回token");
         }
         return token;
     }
@@ -166,7 +167,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
             return new HashMap<>();
         }
         List<JobInfoDTO> list = JSONUtil.toList(data, JobInfoDTO.class);
-        return Lambda.toMap(list.stream().map(PowerJobRequestFactory::from).toList(),SaveJobInfoRequest :: getProcessorInfo);
+        return Lambda.toMap(list.stream().map(PowerJobRequestFactory::from).collect(Collectors.toList()),SaveJobInfoRequest :: getProcessorInfo);
     }
 
     /**
@@ -195,6 +196,9 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         Integer appId = appIdMap.get(appName);
         if (ValidateUtils.isNotEmpty(appId)) {
             return appId;
+        }
+        if (!jobProperties.getAutoCreateNamespaceApp()) {
+            throw new BaseException(POWER_JOB_APP_NOT_FOUND, appName);
         }
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("appName",appName);
@@ -227,6 +231,9 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         JobNamespace jobNamespace =  namespaceMap.get(code);
         if (ValidateUtils.isNotEmpty(jobNamespace)) {
             return jobNamespace.getId();
+        }
+        if (!jobProperties.getAutoCreateNamespaceApp()) {
+            throw new BaseException(POWER_JOB_NAMESPACE_NOT_FOUND, code);
         }
         Map<String,Object> params = new HashMap<>();
         params.put("code", code);
@@ -384,7 +391,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         }
 
         if (!response.isOk() || Boolean.FALSE.equals(success)) {
-            throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR,url,JSONUtil.toJsonStr(paramMap),message);
+            throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR,url, JobLogSanitizer.sanitize(paramMap),message);
         }
         return response;
     }

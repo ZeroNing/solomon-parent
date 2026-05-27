@@ -4,6 +4,7 @@ import com.baidubce.services.bos.BosClient;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.service.AbstractFileService;
 import com.steven.solomon.service.BOSService;
 import com.steven.solomon.service.FileServiceInterface;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -25,7 +26,10 @@ public class BosAutoConfig {
   public FileServiceInterface bosFileService(
       FileChoiceProperties properties,
       FileNamingRulesGenerationService fileNamingRule,
-      ClamAvUtils clamAvUtils) {
-    return new BOSService(properties, fileNamingRule, clamAvUtils);
+      ClamAvUtils clamAvUtils) throws Exception {
+    FileStorageConfigValidator.requireProviderConfig(properties, "BOS");
+    AbstractFileService service = new BOSService(properties, fileNamingRule, clamAvUtils);
+    service.checkDefaultBucketOnStartup();
+    return service;
   }
 }

@@ -316,7 +316,7 @@
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-s3</artifactId>
+            <artifactId>solomon-amazon-s3</artifactId>
             <version>${project.version}</version>
         </dependency>
       <dependency>

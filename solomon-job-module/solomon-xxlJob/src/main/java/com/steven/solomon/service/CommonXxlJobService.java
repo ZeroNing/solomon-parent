@@ -181,6 +181,43 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     }
 
     /**
+     * 判断任务核心参数是否一致，一致时跳过无意义更新。
+     */
+    public boolean sameJob(XxlJobInfo source, XxlJobInfo target) {
+        return toPayload(source).equals(toPayload(target));
+    }
+
+    /**
+     * 根据执行器 appName 自动解析执行器组 ID，减少业务侧手写 jobGroup 的配置成本。
+     */
+    public int resolveJobGroup(String cookie, int defaultJobGroup) {
+        if (!profile.getAutoResolveJobGroup() || ValidateUtils.isEmpty(profile.getAppName())) {
+            return defaultJobGroup;
+        }
+        try {
+            Map<String,Object> paramMap = new HashMap<>();
+            paramMap.put("start", "0");
+            paramMap.put("length", "10000");
+            paramMap.put("appname", profile.getAppName());
+            paramMap.put("title", "");
+            String body = executeFirst(cookie, Arrays.asList("jobgroup/pageList", "jobgroup/page"), paramMap);
+            Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
+            Object data = firstNotEmpty(resultMap, "data", "rows", "records", "list");
+            List<Map> groups = JSONUtil.toList(JSONUtil.toJsonStr(data), Map.class);
+            for (Map group : groups) {
+                Object appName = firstNotEmpty(group, "appname", "appName");
+                if (ValidateUtils.equalsIgnoreCase(profile.getAppName(), ValidateUtils.isEmpty(appName) ? null : appName.toString())) {
+                    Object id = group.get("id");
+                    return ValidateUtils.isEmpty(id) ? defaultJobGroup : Integer.parseInt(id.toString());
+                }
+            }
+        } catch (Exception exception) {
+            logger.warn("按appName:{}解析XXL-JOB执行器组失败，回退注解jobGroup:{}", profile.getAppName(), defaultJobGroup, exception);
+        }
+        return defaultJobGroup;
+    }
+
+    /**
      * 获取登陆网页的cookie
      */
     protected String getCookie(List<String> paths, Map<String, Object> paramMap) throws BaseException {
@@ -215,7 +252,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
                 lastException = exception;
             }
         }
-        throw ValidateUtils.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR, adminAddresses, JSONUtil.toJsonStr(paramMap), "无可用接口路径") : lastException;
+        throw ValidateUtils.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR, adminAddresses, JobLogSanitizer.sanitize(paramMap), "无可用接口路径") : lastException;
     }
 
     protected String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
@@ -248,7 +285,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         }
 
         if (!response.isOk() || (ValidateUtils.isNotEmpty(code) && ValidateUtils.notEqualsIgnoreCase(code,"200") && ValidateUtils.notEqualsIgnoreCase(code,"0"))) {
-            throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url,JSONUtil.toJsonStr(paramMap),msg);
+            throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url, JobLogSanitizer.sanitize(paramMap),msg);
         }
         return response;
     }
@@ -271,7 +308,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     /**
      * 从返回 Map 中读取第一个非空字段，兼容不同版本命名。
      */
-    private Object firstNotEmpty(Map<String,Object> resultMap, String... keys) {
+    private Object firstNotEmpty(Map resultMap, String... keys) {
         for (String key : keys) {
             Object value = resultMap.get(key);
             if (ValidateUtils.isNotEmpty(value)) {

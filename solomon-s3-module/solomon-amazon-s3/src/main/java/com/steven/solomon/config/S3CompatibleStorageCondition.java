@@ -11,7 +11,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 /**
  * S3 协议兼容存储条件。
  *
- * <p>很多云厂商直接兼容 S3 协议，不需要单独 SDK；这些供应商统一复用 {@code solomon-s3} 模块。</p>
+ * <p>很多云厂商直接兼容 S3 协议，不需要单独 SDK；这些供应商统一复用 {@code solomon-amazon-s3} 模块。</p>
  */
 public class S3CompatibleStorageCondition implements Condition {
 

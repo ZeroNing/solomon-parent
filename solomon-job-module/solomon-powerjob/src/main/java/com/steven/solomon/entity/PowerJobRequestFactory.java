@@ -43,6 +43,15 @@ public final class PowerJobRequestFactory {
     }
 
     /**
+     * 判断注解生成的任务参数与管理端已有任务是否一致。
+     */
+    public static boolean samePayload(SaveJobInfoRequest existsRequest, JobTask jobTask, String className) {
+        SaveJobInfoRequest target = copyIdentity(existsRequest);
+        fill(target, jobTask, className);
+        return toPayload(existsRequest).equals(toPayload(target));
+    }
+
+    /**
      * 将管理端查询结果转换成官方保存请求，方便复用同一套更新逻辑。
      */
     public static SaveJobInfoRequest from(JobInfoDTO jobInfo) {
@@ -87,6 +96,16 @@ public final class PowerJobRequestFactory {
             payload.put("lifecycle", JSONUtil.toJsonStr(request.getLifeCycle()));
         }
         return payload;
+    }
+
+    /**
+     * 仅复制任务身份字段，用于构造待比较的新请求。
+     */
+    private static SaveJobInfoRequest copyIdentity(SaveJobInfoRequest source) {
+        SaveJobInfoRequest target = new SaveJobInfoRequest();
+        target.setId(source.getId());
+        target.setAppId(source.getAppId());
+        return target;
     }
 
     /**

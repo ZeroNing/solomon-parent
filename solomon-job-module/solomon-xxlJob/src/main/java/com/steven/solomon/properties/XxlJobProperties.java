@@ -1,5 +1,7 @@
 package com.steven.solomon.properties;
 
+import com.steven.solomon.enums.JobRegisterFailureStrategy;
+import com.steven.solomon.enums.JobRegisterMode;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties("xxl")
@@ -44,8 +46,52 @@ public class XxlJobProperties {
     //是否自动注册
     private boolean autoRegister = false;
 
+    // 自动注册写入模式
+    private JobRegisterMode registerMode = JobRegisterMode.UPSERT;
+
+    // 自动注册失败策略
+    private JobRegisterFailureStrategy failureStrategy = JobRegisterFailureStrategy.FAIL_FAST;
+
+    // 自动按 appName 解析执行器组 ID
+    private boolean autoResolveJobGroup = true;
+
+    // 更新已存在任务后是否同步启停状态
+    private boolean syncStatusOnUpdate = false;
+
     public boolean getAutoRegister() {
         return autoRegister;
+    }
+
+    public JobRegisterMode getRegisterMode() {
+        return registerMode;
+    }
+
+    public void setRegisterMode(JobRegisterMode registerMode) {
+        this.registerMode = registerMode;
+    }
+
+    public JobRegisterFailureStrategy getFailureStrategy() {
+        return failureStrategy;
+    }
+
+    public void setFailureStrategy(JobRegisterFailureStrategy failureStrategy) {
+        this.failureStrategy = failureStrategy;
+    }
+
+    public boolean getAutoResolveJobGroup() {
+        return autoResolveJobGroup;
+    }
+
+    public void setAutoResolveJobGroup(boolean autoResolveJobGroup) {
+        this.autoResolveJobGroup = autoResolveJobGroup;
+    }
+
+    public boolean getSyncStatusOnUpdate() {
+        return syncStatusOnUpdate;
+    }
+
+    public void setSyncStatusOnUpdate(boolean syncStatusOnUpdate) {
+        this.syncStatusOnUpdate = syncStatusOnUpdate;
     }
 
     public void setAutoRegister(boolean autoRegister) {

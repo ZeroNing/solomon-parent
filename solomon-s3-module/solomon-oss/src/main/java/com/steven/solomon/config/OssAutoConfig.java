@@ -4,6 +4,7 @@ import com.aliyun.oss.OSS;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.service.AbstractFileService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.OSSService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -25,7 +26,10 @@ public class OssAutoConfig {
   public FileServiceInterface ossFileService(
       FileChoiceProperties properties,
       FileNamingRulesGenerationService fileNamingRule,
-      ClamAvUtils clamAvUtils) {
-    return new OSSService(properties, fileNamingRule, clamAvUtils);
+      ClamAvUtils clamAvUtils) throws Exception {
+    FileStorageConfigValidator.requireProviderConfig(properties, "OSS");
+    AbstractFileService service = new OSSService(properties, fileNamingRule, clamAvUtils);
+    service.checkDefaultBucketOnStartup();
+    return service;
   }
 }

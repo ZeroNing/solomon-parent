@@ -3,6 +3,7 @@ package com.steven.solomon.config;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
+import com.steven.solomon.service.AbstractFileService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.service.MinioService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -24,7 +25,10 @@ public class MinioAutoConfig {
   public FileServiceInterface minioFileService(
       FileChoiceProperties properties,
       FileNamingRulesGenerationService fileNamingRule,
-      ClamAvUtils clamAvUtils) {
-    return new MinioService(properties, fileNamingRule, clamAvUtils);
+      ClamAvUtils clamAvUtils) throws Exception {
+    FileStorageConfigValidator.requireProviderConfig(properties, "MinIO");
+    AbstractFileService service = new MinioService(properties, fileNamingRule, clamAvUtils);
+    service.checkDefaultBucketOnStartup();
+    return service;
   }
 }
