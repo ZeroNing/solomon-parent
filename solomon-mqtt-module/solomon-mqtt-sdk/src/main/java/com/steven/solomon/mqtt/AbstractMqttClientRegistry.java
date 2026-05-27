@@ -2,8 +2,8 @@ package com.steven.solomon.mqtt;
 
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.verification.ValidateUtils;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * MQTT 客户端注册表。
@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public abstract class AbstractMqttClientRegistry<C, O> {
 
-  private final Map<String, C> clientMap = new HashMap<>();
+  private final Map<String, C> clientMap = new ConcurrentHashMap<>();
 
-  private final Map<String, O> optionsMap = new HashMap<>();
+  private final Map<String, O> optionsMap = new ConcurrentHashMap<>();
 
   public Map<String, C> getClientMap() {
     return clientMap;
@@ -27,12 +27,30 @@ public abstract class AbstractMqttClientRegistry<C, O> {
     clientMap.put(tenantCode, client);
   }
 
+  public C removeClient(String tenantCode) {
+    optionsMap.remove(tenantCode);
+    return clientMap.remove(tenantCode);
+  }
+
+  public boolean containsClient(String tenantCode) {
+    return clientMap.containsKey(tenantCode);
+  }
+
   public Map<String, O> getOptionsMap() {
     return optionsMap;
   }
 
   public void putOptionsMap(String tenantCode, O options) {
     optionsMap.put(tenantCode, options);
+  }
+
+  public O getOptions(String tenantCode) {
+    return optionsMap.get(tenantCode);
+  }
+
+  public void clearRegistry() {
+    clientMap.clear();
+    optionsMap.clear();
   }
 
   /**

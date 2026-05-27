@@ -1,4 +1,4 @@
-﻿# Solomon Mica-MQTT 模块
+# Solomon Mica-MQTT 模块
 
 基于 Mica-MQTT 的 MQTT 客户端封装模块，提供多租户支持的 MQTT 消息收发功能。
 

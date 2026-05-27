@@ -35,9 +35,10 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
         // 从配置 URL 中获取第一个地址 (支持集群配置，逗号分隔)
         String url = mqttProfile.getUrl().split(",")[0];
         // 解析 host 和 port
+        boolean ssl = url.startsWith("ssl://");
         String[] parts = url.replace("tcp://", "").replace("ssl://", "").split(":");
         String host = parts[0];
-        int port = parts.length > 1 ? Integer.parseInt(parts[1]) : 1883;
+        int port = parts.length > 1 ? Integer.parseInt(parts[1]) : (ssl ? 8883 : 1883);
 
         // 初始化 MQTT 连接配置
         MqttClientOptions options = utils.initMqttConnectOptions(mqttProfile);

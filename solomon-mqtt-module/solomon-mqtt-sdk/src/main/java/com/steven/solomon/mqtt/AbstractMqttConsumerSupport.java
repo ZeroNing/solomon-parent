@@ -77,6 +77,7 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
     } finally {
       deleteCheckMessageKey(model);
       saveLog(result, throwable, model);
+      RequestHeaderHolder.remove();
     }
   }
 }

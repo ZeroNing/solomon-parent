@@ -1,15 +1,16 @@
 package com.steven.solomon.utils;
 
-import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.consumer.AbstractConsumer;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.mqtt.AbstractMqttClientRegistry;
-import com.steven.solomon.mqtt.annotation.MessageListener;
+import com.steven.solomon.mqtt.MqttOperations;
 import com.steven.solomon.mqtt.code.MqttErrorCodes;
 import com.steven.solomon.mqtt.model.MqttMessageModel;
+import com.steven.solomon.mqtt.model.MqttSubscriptionDescriptor;
+import com.steven.solomon.mqtt.support.MqttListenerRegistry;
+import com.steven.solomon.mqtt.support.MqttSslFactory;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.service.SendService;
@@ -17,14 +18,7 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.List;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import org.eclipse.paho.client.mqttv3.IMqttMessageListener;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -34,23 +28,24 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnectOptions>
-    implements SendService<MqttMessageModel<?>> {
+    implements SendService<MqttMessageModel<?>>, MqttOperations {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
   /**
-   *   发送消息
-   *   @param data 消息内容
+   * 发送 MQTT 消息，发送失败时向业务侧抛出异常，避免调用方误判成功。
    */
   @Override
   public void send(MqttMessageModel<?> data) throws Exception {
-    // 获取客户端实例
+    String json = JSONUtil.toJsonStr(data);
     try {
-      // 转换消息为json字符串
-      String json = JSONUtil.toJsonStr(data);
-      getClient(data.getTenantCode()).getTopic(data.getTopic()).publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
+      getClient(data.getTenantCode())
+          .getTopic(data.getTopic())
+          .publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
     } catch (MqttException e) {
-      logger.error(String.format("MQTT: 主题[%s]发送消息失败", data.getTopic()));
+      logger.error("MQTT 消息发送失败, tenant={}, topic={}, payload={}",
+          data.getTenantCode(), data.getTopic(), json, e);
+      throw e;
     }
   }
 
@@ -64,142 +59,101 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnec
     send(data);
   }
 
-  /**
-   * 订阅消息
-   * @param tenantCode 租户编码
-   * @param topic 主题
-   * @param qos 消息质量
-   * @param consumer 消费者
-   */
-  public void subscribe(String tenantCode,String topic,int qos, IMqttMessageListener consumer) throws MqttException, BaseException {
+  @Override
+  public void subscribe(String tenantCode, String topic, int qos, Object consumer)
+      throws MqttException, BaseException {
     if (ValidateUtils.isEmpty(topic)) {
       return;
     }
-    getClient(tenantCode).subscribe(topic, qos,consumer);
+    getClient(tenantCode).subscribe(topic, qos, (IMqttMessageListener) consumer);
   }
 
-  /**
-   * 订阅消息
-   * @param client mqtt连接
-   */
-  public void subscribe(MqttClient client,String tenantCode) throws MqttException {
-    List<Object> clazzList = SpringUtil.getBeanListWithAnnotation(MessageListener.class);
-    this.subscribe(client,clazzList,tenantCode);
+  public void subscribe(String tenantCode, String topic, int qos, IMqttMessageListener consumer)
+      throws MqttException, BaseException {
+    subscribe(tenantCode, topic, qos, (Object) consumer);
   }
 
-  /**
-   * 订阅消息
-   * @param client mqtt连接
-   */
-  public void subscribe(MqttClient client,List<Object> clazzList,String tenantCode) throws MqttException {
-    if (ValidateUtils.isNotEmpty(clazzList)) {
-      for (Object abstractConsumer : clazzList) {
-        MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
-        if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topics())) {
-          continue;
-        }
-        List<String> rangeList = Lambda.toList(Arrays.asList(messageListener.tenantRange()), ValidateUtils::isNotEmpty, key->key);
-        if (ValidateUtils.isEmpty(rangeList) || rangeList.contains(tenantCode)) {
-          for (String topic : messageListener.topics()) {
-            topic = SpringUtil.getElValue(topic);
-            AbstractConsumer<?,?> consumer = (AbstractConsumer<?,?>) BeanUtil.copyProperties(abstractConsumer,abstractConsumer.getClass(), (String) null);
-            client.subscribe(topic, messageListener.qos(), consumer);
-          }
-        } else {
-          logger.info("{}租户,{}只支持{}范围",tenantCode,abstractConsumer.getClass().getSimpleName(),rangeList.toArray());
-        }
-      }
+  public void subscribe(MqttClient client, String tenantCode) throws MqttException {
+    subscribe(client, SpringUtil.getBeanListWithAnnotation(
+        com.steven.solomon.mqtt.annotation.MessageListener.class), tenantCode);
+  }
+
+  public void subscribe(MqttClient client, List<Object> listenerList, String tenantCode)
+      throws MqttException {
+    for (MqttSubscriptionDescriptor descriptor : MqttListenerRegistry.resolve(tenantCode, listenerList)) {
+      AbstractConsumer<?, ?> consumer = copyConsumer(descriptor.getListener());
+      client.subscribe(descriptor.getTopic(), descriptor.getQos(), consumer);
+      logger.info("租户:{} 订阅 MQTT3 主题:{}", tenantCode, descriptor.getTopic());
     }
   }
 
-  /**
-   * 取消订阅
-   * @param topic 主题
-   */
-  public void unsubscribe(String tenantCode,String[] topic) throws MqttException, BaseException {
-    if (ValidateUtils.isEmpty(topic)) {
+  @Override
+  public void unsubscribe(String tenantCode, String[] topics) throws MqttException, BaseException {
+    if (ValidateUtils.isEmpty(topics)) {
       return;
     }
-    getClient(tenantCode).unsubscribe(topic);
+    getClient(tenantCode).unsubscribe(topics);
   }
 
-  /**
-   * 关闭连接
-   */
+  @Override
   public void disconnect(String tenantCode) throws MqttException, BaseException {
-    getClient(tenantCode).disconnect();
+    MqttClient client = getClient(tenantCode);
+    if (client.isConnected()) {
+      client.disconnect();
+    }
+    removeClient(tenantCode);
   }
 
-  /**
-   * 重新连接
-   */
+  @Override
   public void reconnect(String tenantCode) throws MqttException, BaseException {
-
     MqttClient client = getClient(tenantCode);
     if (!client.isConnected()) {
-      client.connect(getOptionsMap().get(tenantCode));
-      subscribe(client,tenantCode);
+      client.connect(getOptions(tenantCode));
+      subscribe(client, tenantCode);
     }
   }
 
-  public void reconnect(String tenantCode,MqttProfile mqttProfile) throws MqttException, BaseException {
+  public void reconnect(String tenantCode, MqttProfile mqttProfile) throws MqttException, BaseException {
     MqttClient client = getClient(tenantCode);
     if (!client.isConnected()) {
       client.connect(initMqttConnectOptions(mqttProfile));
-      subscribe(client,tenantCode);
+      subscribe(client, tenantCode);
     }
   }
-  
+
   private MqttClient getClient(String tenantCode) throws BaseException {
     return getRequiredClient(tenantCode, MqttErrorCodes.CLIENT_IS_NULL);
   }
 
   public MqttConnectOptions initMqttConnectOptions(MqttProfile mqttProfile) {
-    MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
-    mqttConnectOptions.setUserName(mqttProfile.getUserName());
-    mqttConnectOptions.setPassword(mqttProfile.getPassword().toCharArray());
-    mqttConnectOptions.setServerURIs(mqttProfile.getUrl().split(","));
-    //设置同一时间可以发送的最大未确认消息数量
-    mqttConnectOptions.setMaxInflight(mqttProfile.getMaxInflight());
-    //设置超时时间
-    mqttConnectOptions.setConnectionTimeout(mqttProfile.getCompletionTimeout());
-    //设置自动重连
-    mqttConnectOptions.setAutomaticReconnect(mqttProfile.getAutomaticReconnect());
-    //cleanSession 设为 true;当客户端掉线时;服务器端会清除 客户端session;重连后 客户端会有一个新的session,cleanSession
-    // 设为false，客户端掉线后 服务器端不会清除session，当重连后可以接收之前订阅主题的消息。当客户端上线后会接受到它离线的这段时间的消息
-    mqttConnectOptions.setCleanSession(mqttProfile.getCleanSession());
-    // 设置会话心跳时间 单位为秒   设置会话心跳时间 单位为秒 服务器会每隔1.5*20秒的时间向客户端发送心跳判断客户端是否在线，但这个方法并没有重连的机制
-    mqttConnectOptions.setKeepAliveInterval(mqttProfile.getKeepAliveInterval());
-    // 设置重新连接之间等待的最长时间
-    mqttConnectOptions.setMaxReconnectDelay(mqttProfile.getMaxReconnectDelay());
-    // 设置连接超时值,该值以秒为单位 0 禁用超时处理,这意味着客户端将等待，直到网络连接成功或失败.
-    mqttConnectOptions.setConnectionTimeout(mqttProfile.getConnectionTimeout());
-    // 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止.不建议更改除非您绝对确定需要，否则该值.
-    mqttConnectOptions.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
-    //设置遗嘱消息
+    MqttConnectOptions options = new MqttConnectOptions();
+    options.setUserName(mqttProfile.getUserName());
+    options.setPassword(mqttProfile.getPassword().toCharArray());
+    options.setServerURIs(mqttProfile.getUrl().split(","));
+    options.setMaxInflight(mqttProfile.getMaxInflight());
+    options.setConnectionTimeout(mqttProfile.getConnectionTimeout());
+    options.setAutomaticReconnect(mqttProfile.getAutomaticReconnect());
+    options.setCleanSession(mqttProfile.getCleanSession());
+    options.setKeepAliveInterval(mqttProfile.getKeepAliveInterval());
+    options.setMaxReconnectDelay(mqttProfile.getMaxReconnectDelay());
+    options.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
+
     MqttWill will = mqttProfile.getWill();
     if (ValidateUtils.isNotEmpty(will)) {
-      mqttConnectOptions.setWill(will.getTopic(), will.getMessage().getBytes(), will.getQos(), will.getRetained());
+      options.setWill(
+          will.getTopic(),
+          will.getMessage().getBytes(StandardCharsets.UTF_8),
+          will.getQos(),
+          will.getRetained());
     }
     if (!mqttProfile.getVerifyCertificate()) {
-      try {
-        // 创建信任所有证书的 SSLContext
-        SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, new TrustManager[]{new X509TrustManager() {
-          public X509Certificate[] getAcceptedIssuers() { return null; }
-          public void checkClientTrusted(X509Certificate[] certs, String authType) {}
-          public void checkServerTrusted(X509Certificate[] certs, String authType) {}
-        }}, new java.security.SecureRandom());
-
-        mqttConnectOptions.setSocketFactory(sslContext.getSocketFactory());
-        // 可选：设置主机名验证为忽略 (Paho 1.2.0+支持)
-        // options.setSSLHostnameVerifier((hostname, session) -> true);
-
-      } catch (NoSuchAlgorithmException | KeyManagementException e) {
-        throw new RuntimeException("Error setting up SSL for MQTT", e);
-      }
+      options.setSocketFactory(MqttSslFactory.trustAllSocketFactory());
     }
+    return options;
+  }
 
-    return mqttConnectOptions;
+  @SuppressWarnings("unchecked")
+  private AbstractConsumer<?, ?> copyConsumer(Object listener) {
+    return (AbstractConsumer<?, ?>) BeanUtil.copyProperties(listener, listener.getClass(), (String) null);
   }
 }
