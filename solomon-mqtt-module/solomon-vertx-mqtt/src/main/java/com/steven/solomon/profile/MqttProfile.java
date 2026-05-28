@@ -8,92 +8,70 @@ import io.vertx.mqtt.MqttClientOptions;
 import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Vert.x MQTT 客户端连接配置模型。
+ *
+ * <p>映射 {@code mqtt.tenant.*} 下的单租户配置，包括认证、超时、遗嘱消息、Vert.x 线程池和 SSL 等参数。</p>
+ */
 public class MqttProfile {
 
-  /**
-   * 用户名
-   */
+  /** 用户名 */
   private String userName;
 
-  /**
-   * 密码
-   */
+  /** 密码 */
   private String password;
 
-  /**
-   * 连接
-   */
+  /** MQTT Broker 连接地址，多个地址以逗号分隔 */
   private String url;
 
-  /**
-   * 客户端的标识(不可重复,为空时侯用uuid)
-   */
+  /** 客户端的标识（不可重复，为空时使用 UUID） */
   private String clientId;
 
-  /**
-   * 连接超时（毫秒）
-   */
+  /** 连接超时（毫秒） */
   private int completionTimeout = 30000;
 
-  /**
-   * 是否自动重连
-   */
+  /** 是否自动重连 */
   private boolean automaticReconnect = true;
 
-  /**
-   * 客户端掉线后,是否自动清除session
-   */
+  /** 客户端掉线后是否自动清除 session */
   private boolean cleanSession = false;
 
-  /**
-   * 心跳时间
-   */
+  /** 心跳时间（秒） */
   private int keepAliveInterval = MqttClientOptions.DEFAULT_KEEP_ALIVE_INTERVAL;
-  /**
-   * 遗嘱消息
-   */
+
+  /** 遗嘱消息配置 */
   private MqttWill will;
-  /**
-   * 最大未确认消息数量
-   */
+
+  /** 最大未确认消息数量 */
   private int maxInflight = MqttClientOptions.DEFAULT_MAX_INFLIGHT_QUEUE;
 
-  /**
-   * 重连次数(-1 无限重连 0 不重连)
-   */
+  /** 重连次数（-1 无限重连，0 不重连） */
   private int reconnectAttempts = -1;
 
-  /**
-   * 重连间隔（毫秒）- 注意：Vert.x 5.x 不支持自动重连
-   */
+  /** 重连间隔（毫秒） */
   private long reconnectInterval = 1000;
 
-
-  /**
-   * ssl连接是否验证证书
-   */
+  /** SSL 连接是否验证证书 */
   private boolean verifyCertificate = false;
 
+  /** Vert.x 实例配置 */
   private VertxConfig vertx;
 
+  /**
+   * MQTT 遗嘱消息配置。
+   */
   public static class MqttWill implements Serializable {
 
-    /**
-     * 遗嘱主题
-     */
+    /** 遗嘱主题 */
     private String topic;
-    /**
-     * 遗嘱消息
-     */
+
+    /** 遗嘱消息内容 */
     private String message;
-    /**
-     * 遗嘱消息质量
-     */
+
+    /** 遗嘱消息 QoS 等级 */
     private int qos;
 
-    /**
-     * 是否保留消息
-     */
+    /** 是否保留消息 */
     private boolean retained;
 
     public boolean getRetained() {

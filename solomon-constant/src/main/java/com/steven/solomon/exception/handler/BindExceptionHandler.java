@@ -16,6 +16,12 @@ import org.springframework.validation.FieldError;
 @ConditionalOnMissingBean(name = "BindExceptionProcessor")
 public class BindExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理表单绑定异常，优先提取第一个字段错误信息。
+   *
+   * @param ex 捕获的 BindException 异常
+   * @return 包含校验错误消息的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     BindException exception = (BindException) ex;

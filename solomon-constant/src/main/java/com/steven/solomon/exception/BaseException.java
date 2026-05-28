@@ -23,23 +23,46 @@ public class BaseException extends Exception {
    */
   protected Object[] args;
 
+  /**
+   * 使用错误码构造异常，自动通过国际化工具解析消息。
+   *
+   * @param code 业务错误码
+   */
   public BaseException(String code) {
     super(I18nUtils.getErrorMessage(code));
     this.code = code;
   }
 
+  /**
+   * 使用错误码和占位参数构造异常，自动通过国际化工具解析消息。
+   *
+   * @param code 业务错误码
+   * @param args 国际化消息占位参数
+   */
   public BaseException(String code, Object... args) {
     super(I18nUtils.getErrorMessage(code, args));
     this.code = code;
     this.args = args;
   }
 
+  /**
+   * 使用错误码、原始异常和占位参数构造异常。
+   *
+   * @param code 业务错误码
+   * @param ex   原始异常，保留异常链
+   * @param args 国际化消息占位参数
+   */
   public BaseException(String code, Throwable ex, Object... args) {
     super(I18nUtils.getErrorMessage(code, args), ex);
     this.code = code;
     this.args = args;
   }
 
+  /**
+   * 直接使用原始异常构造，不指定错误码。
+   *
+   * @param cause 原始异常
+   */
   public BaseException(Throwable cause) {
     super(cause);
   }

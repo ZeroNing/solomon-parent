@@ -19,6 +19,14 @@ import org.springframework.web.bind.support.WebExchangeBindException;
 @ConditionalOnMissingBean(name = "WebExchangeBindExceptionProcessor")
 public class WebExchangeBindExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理 WebFlux 绑定异常，提取第一个校验错误信息。
+   *
+   * <p>若无校验错误，则回退到异常原始消息。</p>
+   *
+   * @param ex 捕获的 WebExchangeBindException 异常
+   * @return 包含校验错误消息和状态码的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     WebExchangeBindException exception = (WebExchangeBindException) ex;

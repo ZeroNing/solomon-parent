@@ -34,6 +34,11 @@ public class RequestHeaderHolder {
     }
   }
 
+  /**
+   * 设置当前请求时区。
+   *
+   * @param timeZone 时区标识，例如 "Asia/Shanghai"
+   */
   public static void setTimeZone(String timeZone) {
     THREAD_LOCAL.get().setTimezone(timeZone);
   }
@@ -59,14 +64,29 @@ public class RequestHeaderHolder {
     return defaultString(THREAD_LOCAL.get().getTenantName());
   }
 
+  /**
+   * 设置当前租户 ID。
+   *
+   * @param tenantId 租户ID
+   */
   public static void setTenantId(String tenantId) {
     THREAD_LOCAL.get().setTenantId(tenantId);
   }
 
+  /**
+   * 设置当前租户编码。
+   *
+   * @param tenantCode 租户编码
+   */
   public static void setTenantCode(String tenantCode) {
     THREAD_LOCAL.get().setTenantCode(tenantCode);
   }
 
+  /**
+   * 设置当前租户名称。
+   *
+   * @param tenantName 租户名称
+   */
   public static void setTenantName(String tenantName) {
     THREAD_LOCAL.get().setTenantName(tenantName);
   }
@@ -78,6 +98,12 @@ public class RequestHeaderHolder {
     THREAD_LOCAL.remove();
   }
 
+  /**
+   * 空值默认处理，将 null 转为空字符串。
+   *
+   * @param value 待处理的字符串
+   * @return 原值或空字符串
+   */
   private static String defaultString(String value) {
     return StrUtil.emptyToDefault(value, "");
   }

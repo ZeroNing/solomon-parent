@@ -2,6 +2,11 @@ package com.steven.solomon.holder;
 
 import java.io.Serializable;
 
+/**
+ * 请求头信息实体类，保存当前请求的租户与时区信息。
+ *
+ * <p>配合 {@link RequestHeaderHolder} 使用，通过 ThreadLocal 在整个调用链中传递请求上下文。</p>
+ */
 public class RequestHeader implements Serializable {
 
   /**

@@ -76,6 +76,12 @@ public class SwaggerConfig {
     };
   }
 
+  /**
+   * 将文档配置中的参数模型转换为 OpenAPI Parameter 对象。
+   *
+   * @param parameter 文档配置中的请求参数模型
+   * @return OpenAPI Parameter 对象
+   */
   private Parameter toOpenApiParameter(SwaggerProfile.DocRequestParameter parameter) {
     String position = ValidateUtils.isNotEmpty(parameter.getIn())
         ? parameter.getIn().toLowerCase()

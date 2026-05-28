@@ -17,14 +17,28 @@ import java.util.Map;
  */
 abstract class AbstractRobotNoticeService implements NoticeService {
 
+    /** 日志记录器。 */
     protected final Logger logger = LoggerUtils.logger(getClass());
 
+    /** 通知配置属性。 */
     protected final NoticeProperties properties;
 
+    /**
+     * 构造函数，注入通知配置属性。
+     *
+     * @param properties 通知配置属性
+     */
     protected AbstractRobotNoticeService(NoticeProperties properties) {
         this.properties = properties;
     }
 
+    /**
+     * 发送通知的模板方法，统一处理 Webhook 校验和 HTTP 投递。
+     *
+     * @param message 通知消息
+     * @return true 表示发送成功
+     * @throws Exception 发送过程中可能抛出的异常
+     */
     @Override
     public final boolean send(NoticeMessage message) throws Exception {
         String webhookUrl = webhookUrl(message);

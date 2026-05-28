@@ -15,6 +15,12 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(name = "BaseExceptionProcessor")
 public class BaseExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理业务异常，直接使用异常的错误码和消息构建响应。
+   *
+   * @param ex 捕获的 BaseException 异常
+   * @return 包含错误码和消息的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     BaseException exception = (BaseException) ex;

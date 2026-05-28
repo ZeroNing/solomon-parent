@@ -3,94 +3,70 @@ package com.steven.solomon.profile;
 import java.io.Serializable;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
+/**
+ * MQTT3 客户端连接配置模型。
+ *
+ * <p>映射 {@code mqtt.tenant.*} 下的单租户配置，包括认证、超时、遗嘱消息和 SSL 等参数。</p>
+ */
 public class MqttProfile {
 
-  /**
-   * 用户名
-   */
+  /** 用户名 */
   private String userName;
 
-  /**
-   * 密码
-   */
+  /** 密码 */
   private String password;
 
-  /**
-   * 连接
-   */
+  /** MQTT Broker 连接地址，多个地址以逗号分隔 */
   private String url;
 
-  /**
-   * 客户端的标识(不可重复,为空时侯用uuid)
-   */
+  /** 客户端的标识（不可重复，为空时使用 UUID） */
   private String clientId;
 
-  /**
-   * 连接超时
-   */
+  /** 连接超时（秒） */
   private int completionTimeout = 30;
 
-  /**
-   * 是否自动重连
-   */
+  /** 是否自动重连 */
   private boolean automaticReconnect = true;
 
-  /**
-   * 客户端掉线后,是否自动清除session
-   */
+  /** 客户端掉线后是否自动清除 session */
   private boolean cleanSession = false;
 
-  /**
-   * 心跳时间
-   */
+  /** 心跳时间（秒） */
   private int keepAliveInterval = 60;
-  /**
-   * 遗嘱消息
-   */
+
+  /** 遗嘱消息配置 */
   private MqttWill will;
-  /**
-   * 最大未确认消息数量
-   */
+
+  /** 最大未确认消息数量 */
   private int maxInflight = 10;
 
-  /**
-   * 重新连接之间等待的最长时间
-   */
+  /** 重新连接之间等待的最长时间（毫秒） */
   private int maxReconnectDelay = 12800;
 
-  /**
-   * 设置连接超时值,该值以秒为单位 0 禁用超时处理,这意味着客户端将等待，直到网络连接成功或失败.
-   */
+  /** 连接超时值（秒），0 表示禁用超时 */
   private int connectionTimeout = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
 
-  /**
-   * 设置执行器服务应等待的时间（以秒为单位）在强制终止之前终止。不建议更改除非您绝对确定需要，否则该值。
-   */
+  /** 执行器服务终止前等待的时间（秒） */
   private int executorServiceTimeout = 1;
 
-  /**
-   * ssl连接是否验证证书
-   */
+  /** SSL 连接是否验证证书 */
   private boolean verifyCertificate = false;
 
+  /**
+   * MQTT 遗嘱消息配置。
+   */
   public static class MqttWill implements Serializable {
 
-    /**
-     * 遗嘱主题
-     */
+    /** 遗嘱主题 */
     private String topic;
-    /**
-     * 遗嘱消息
-     */
+
+    /** 遗嘱消息内容 */
     private String message;
-    /**
-     * 遗嘱消息质量
-     */
+
+    /** 遗嘱消息 QoS 等级 */
     private int qos;
 
-    /**
-     * 是否保留消息
-     */
+    /** 是否保留消息 */
     private boolean retained;
 
     public boolean getRetained() {

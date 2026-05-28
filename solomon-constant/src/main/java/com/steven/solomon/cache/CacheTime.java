@@ -1,5 +1,10 @@
 package com.steven.solomon.cache;
 
+/**
+ * 缓存时效常量接口，定义常用缓存过期时间（单位：秒）。
+ *
+ * <p>0 表示永久缓存，业务代码可直接引用这些常量避免硬编码。</p>
+ */
 public interface CacheTime {
 
 	/**

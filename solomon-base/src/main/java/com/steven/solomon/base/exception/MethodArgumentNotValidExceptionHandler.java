@@ -18,6 +18,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 @ConditionalOnMissingBean(name = "MethodArgumentNotValidExceptionProcessor")
 public class MethodArgumentNotValidExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理 Spring MVC 参数校验异常，优先提取第一个字段错误信息。
+   *
+   * <p>若无字段错误，则回退到异常原始消息。</p>
+   *
+   * @param ex 捕获的 MethodArgumentNotValidException 异常
+   * @return 包含校验错误消息和状态码的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     MethodArgumentNotValidException exception = (MethodArgumentNotValidException) ex;

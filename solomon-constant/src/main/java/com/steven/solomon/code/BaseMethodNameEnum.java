@@ -1,5 +1,11 @@
 package com.steven.solomon.code;
 
+/**
+ * 枚举方法名常量接口，定义枚举国际化与取值的方法名后缀。
+ *
+ * <p>配合枚举工具类使用，通过反射调用 {@code xxxDesc()} 获取国际化描述，
+ * {@code xxxValue()} 获取数据库存储值。</p>
+ */
 public interface BaseMethodNameEnum {
 
   /**

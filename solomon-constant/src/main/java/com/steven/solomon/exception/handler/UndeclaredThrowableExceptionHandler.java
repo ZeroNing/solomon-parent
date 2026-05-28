@@ -17,6 +17,15 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(name = "UndeclaredThrowableExceptionProcessor")
 public class UndeclaredThrowableExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理 JDK 动态代理包装异常，还原内部真实异常的错误信息。
+   *
+   * <p>如果内部异常是 {@link BaseException}，还原业务错误码和消息；
+   * 否则返回通用系统异常编码。</p>
+   *
+   * @param ex 捕获的 UndeclaredThrowableException 异常
+   * @return 包含真实异常信息的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     Throwable target = ((UndeclaredThrowableException) ex).getUndeclaredThrowable();

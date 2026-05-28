@@ -37,6 +37,14 @@ public class PageVO<T> implements Serializable {
    */
   private List<T> data;
 
+  /**
+   * 构造分页响应对象。
+   *
+   * @param data     当前页数据列表
+   * @param total    总记录数
+   * @param pageNo   当前页码
+   * @param pageSize 每页条数
+   */
   public PageVO(List<T> data, long total, int pageNo, int pageSize) {
     this.total = total;
     this.pageNo = pageNo;
@@ -45,6 +53,14 @@ public class PageVO<T> implements Serializable {
     this.next = hasNext(pageNo, pageSize, total);
   }
 
+  /**
+   * 判断是否存在下一页。
+   *
+   * @param pageNo   当前页码
+   * @param pageSize 每页条数
+   * @param total    总记录数
+   * @return true 表示还有下一页
+   */
   private boolean hasNext(int pageNo, int pageSize, long total) {
     return (long) pageNo * pageSize < total;
   }

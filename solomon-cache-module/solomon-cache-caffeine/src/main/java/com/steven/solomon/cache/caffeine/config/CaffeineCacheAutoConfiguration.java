@@ -15,6 +15,9 @@ import org.springframework.context.annotation.Bean;
 
 /**
  * Caffeine 本地缓存自动装配。
+ *
+ * <p>根据配置属性注册 Caffeine Cache 实例、缓存键生成器和缓存服务。
+ * 默认不启用，需设置 {@code cache.caffeine.enabled=true}。</p>
  */
 @AutoConfiguration
 @ConditionalOnProperty(prefix = "cache.caffeine", name = "enabled", havingValue = "true",
@@ -22,6 +25,12 @@ import org.springframework.context.annotation.Bean;
 @EnableConfigurationProperties(CaffeineCacheProperties.class)
 public class CaffeineCacheAutoConfiguration {
 
+  /**
+   * 注册 Caffeine 原生缓存实例。
+   *
+   * @param properties Caffeine 缓存配置属性
+   * @return Caffeine Cache 实例
+   */
   @Bean
   @ConditionalOnMissingBean
   public com.github.benmanes.caffeine.cache.Cache<String, CaffeineCacheValue> caffeineNativeCache(
@@ -32,12 +41,26 @@ public class CaffeineCacheAutoConfiguration {
         .build();
   }
 
+  /**
+   * 注册 Caffeine 缓存键生成器。
+   *
+   * @param properties Caffeine 缓存配置属性
+   * @return 缓存键生成器实例
+   */
   @Bean
   @ConditionalOnMissingBean
   public CacheKeyBuilder caffeineCacheKeyBuilder(CaffeineCacheProperties properties) {
     return new CacheKeyBuilder(properties.getKey());
   }
 
+  /**
+   * 注册 Caffeine 缓存服务。
+   *
+   * @param caffeineNativeCache Caffeine 原生缓存实例
+   * @param cacheKeyBuilder      缓存键生成器
+   * @param properties           Caffeine 缓存配置属性
+   * @return 缓存服务实例
+   */
   @Bean
   @ConditionalOnMissingBean(CacheService.class)
   public CacheService caffeineCacheService(

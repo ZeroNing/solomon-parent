@@ -17,6 +17,12 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnMissingBean(name = "ConstraintViolationExceptionProcessor")
 public class ConstraintViolationExceptionHandler extends AbstractExceptionHandler {
 
+  /**
+   * 处理 Jakarta Validation 校验异常，提取异常消息并以 400 状态码返回。
+   *
+   * @param ex 捕获的 ConstraintViolationException 异常
+   * @return 包含校验错误消息和状态码的异常响应体
+   */
   @Override
   public BaseExceptionVO handleBaseException(Throwable ex) {
     ConstraintViolationException exception = (ConstraintViolationException) ex;

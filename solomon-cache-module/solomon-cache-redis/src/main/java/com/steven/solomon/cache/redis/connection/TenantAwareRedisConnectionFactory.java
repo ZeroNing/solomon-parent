@@ -9,13 +9,23 @@ import org.springframework.data.redis.connection.RedisSentinelConnection;
 
 /**
  * 支持线程级租户切换的 RedisConnectionFactory。
+ *
+ * <p>优先使用租户上下文中绑定的连接工厂，若当前线程未绑定租户，则回退到默认连接工厂。</p>
  */
 public class TenantAwareRedisConnectionFactory implements RedisConnectionFactory {
 
+  /** 租户上下文，用于获取当前线程绑定的连接工厂。 */
   private final RedisCacheTenantContext tenantContext;
 
+  /** 默认连接工厂，线程未绑定租户时使用。 */
   private final RedisConnectionFactory defaultConnectionFactory;
 
+  /**
+   * 构造函数。
+   *
+   * @param tenantContext            租户上下文
+   * @param defaultConnectionFactory 默认连接工厂
+   */
   public TenantAwareRedisConnectionFactory(
       RedisCacheTenantContext tenantContext,
       RedisConnectionFactory defaultConnectionFactory) {

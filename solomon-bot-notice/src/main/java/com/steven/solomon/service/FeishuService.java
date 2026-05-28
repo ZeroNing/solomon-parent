@@ -13,25 +13,50 @@ import java.util.Map;
 
 /**
  * 飞书机器人通知服务。
+ *
+ * <p>支持文本、Markdown、图片、文件、链接、交互卡片等多种消息类型，
+ * 并实现飞书 Webhook 签名验证。</p>
  */
 @Service
-public class FeishuServiceImpl extends AbstractRobotNoticeService {
+public class FeishuService extends AbstractRobotNoticeService {
 
-    public FeishuServiceImpl(NoticeProperties properties) {
+    /**
+     * 构造函数，注入通知配置属性。
+     *
+     * @param properties 通知配置属性
+     */
+    public FeishuService(NoticeProperties properties) {
         super(properties);
     }
 
+    /**
+     * 返回飞书通知渠道标识。
+     *
+     * @return 飞书渠道枚举
+     */
     @Override
     public NoticeChannelEnum getChannel() {
         return NoticeChannelEnum.FEISHU;
     }
 
+    /**
+     * 构造飞书 Webhook 地址。
+     *
+     * @param message 通知消息
+     * @return Webhook URL，未配置时返回 null
+     */
     @Override
     protected String webhookUrl(NoticeMessage message) {
         NoticeProperties.Feishu config = properties.getFeishu();
         return config == null ? null : config.getWebhookUrl();
     }
 
+    /**
+     * 根据消息类型构造飞书请求体。
+     *
+     * @param message 通知消息
+     * @return 飞书 API 请求体 Map
+     */
     @Override
     protected Map<String, Object> buildRequestBody(NoticeMessage message) {
         NoticeProperties.Feishu config = properties.getFeishu();

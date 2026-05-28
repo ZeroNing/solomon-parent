@@ -15,21 +15,42 @@ import java.util.Map;
 
 /**
  * 钉钉机器人通知服务。
+ *
+ * <p>支持文本、Markdown、链接、ActionCard、FeedCard、图片、文件、语音等多种消息类型，
+ * 并实现钉钉 Webhook 签名验证。</p>
  */
 @Service
-public class DingTalkServiceImpl extends AbstractRobotNoticeService {
+public class DingTalkService extends AbstractRobotNoticeService {
 
+    /** Markdown 消息类型标识。 */
     private static final String MARKDOWN = "markdown";
 
-    public DingTalkServiceImpl(NoticeProperties properties) {
+    /**
+     * 构造函数，注入通知配置属性。
+     *
+     * @param properties 通知配置属性
+     */
+    public DingTalkService(NoticeProperties properties) {
         super(properties);
     }
 
+    /**
+     * 返回钉钉通知渠道标识。
+     *
+     * @return 钉钉渠道枚举
+     */
     @Override
     public NoticeChannelEnum getChannel() {
         return NoticeChannelEnum.DING_TALK;
     }
 
+    /**
+     * 构造钉钉 Webhook 地址，包含签名参数。
+     *
+     * @param message 通知消息
+     * @return 带签名的 Webhook URL，未配置时返回 null
+     * @throws Exception 签名算法异常
+     */
     @Override
     protected String webhookUrl(NoticeMessage message) throws Exception {
         NoticeProperties.DingTalk config = properties.getDingTalk();
@@ -49,6 +70,18 @@ public class DingTalkServiceImpl extends AbstractRobotNoticeService {
         return config.getWebhookUrl() + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
+    /**
+     * 根据消息类型构造钉钉请求体。
+     *
+     * @param message 通知消息
+     * @return 钉钉 API 请求体 Map
+     */
+    /**
+     * 根据消息类型构造钉钉请求体。
+     *
+     * @param message 通知消息
+     * @return 钉钉 API 请求体 Map
+     */
     @Override
     protected Map<String, Object> buildRequestBody(NoticeMessage message) {
         NoticeMsgTypeEnum msgType = message.getMsgType() == null ? NoticeMsgTypeEnum.MARKDOWN : message.getMsgType();

@@ -15,19 +15,39 @@ import java.util.Map;
 
 /**
  * 企业微信机器人通知服务。
+ *
+ * <p>支持文本、Markdown、链接、模板卡片、图片、文件、语音等多种消息类型，
+ * 并实现企业微信 Webhook 签名验证。</p>
  */
 @Service
-public class WechatWorkServiceImpl extends AbstractRobotNoticeService {
+public class WechatWorkService extends AbstractRobotNoticeService {
 
-    public WechatWorkServiceImpl(NoticeProperties properties) {
+    /**
+     * 构造函数，注入通知配置属性。
+     *
+     * @param properties 通知配置属性
+     */
+    public WechatWorkService(NoticeProperties properties) {
         super(properties);
     }
 
+    /**
+     * 返回企业微信通知渠道标识。
+     *
+     * @return 企业微信渠道枚举
+     */
     @Override
     public NoticeChannelEnum getChannel() {
         return NoticeChannelEnum.WECHAT_WORK;
     }
 
+    /**
+     * 构造企业微信 Webhook 地址，包含签名参数。
+     *
+     * @param message 通知消息
+     * @return 带签名的 Webhook URL，未配置时返回 null
+     * @throws Exception 签名算法异常
+     */
     @Override
     protected String webhookUrl(NoticeMessage message) throws Exception {
         NoticeProperties.WechatWork config = properties.getWechatWork();
@@ -47,6 +67,12 @@ public class WechatWorkServiceImpl extends AbstractRobotNoticeService {
         return config.getWebhookUrl() + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
+    /**
+     * 根据消息类型构造企业微信请求体。
+     *
+     * @param message 通知消息
+     * @return 企业微信 API 请求体 Map
+     */
     @Override
     protected Map<String, Object> buildRequestBody(NoticeMessage message) {
         NoticeMsgTypeEnum msgType = message.getMsgType() == null ? NoticeMsgTypeEnum.MARKDOWN : message.getMsgType();

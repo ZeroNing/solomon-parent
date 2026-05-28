@@ -33,13 +33,19 @@ import org.springframework.web.context.request.ServletRequestAttributes;
     matchIfMissing = true)
 public class ControllerAspect {
 
+  /** 日志记录器。 */
   private static final Logger logger = LoggerUtils.logger(ControllerAspect.class);
+  /** 日志时间格式化器。 */
   private static final DateTimeFormatter LOG_TIME_FORMATTER =
       DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
 
+  /** 默认语言区域，当请求未指定 Accept-Language 时使用。 */
   @Value("${i18n.language:zh}")
   private Locale defaultLocale;
 
+  /**
+   * 切点定义：匹配所有 Spring MVC 映射注解标注的方法。
+   */
   @Pointcut("@annotation(org.springframework.web.bind.annotation.PostMapping) || "
       + "@annotation(org.springframework.web.bind.annotation.GetMapping) || "
       + "@annotation(org.springframework.web.bind.annotation.PutMapping) || "
@@ -51,6 +57,10 @@ public class ControllerAspect {
 
   /**
    * 包裹 Controller 方法执行过程，用 finally 保证成功和异常场景都能记录日志。
+   *
+   * @param pjp AOP 连接点
+   * @return Controller 方法的原始返回值
+   * @throws Throwable Controller 方法抛出的原始异常
    */
   @Around("pointCutMethodService()")
   public Object doAroundService(ProceedingJoinPoint pjp) throws Throwable {
@@ -74,6 +84,13 @@ public class ControllerAspect {
    * 组装并输出请求日志。
    *
    * <p>异步线程或非 Web 调用可能没有 ServletRequestAttributes，此时直接跳过日志。</p>
+   *
+   * @param pjp        AOP 连接点
+   * @param stopWatch  计时器
+   * @param error      捕获的异常（无异常时为 null）
+   * @param requestId  请求ID
+   * @param result     Controller 返回值
+   * @param startTime  请求开始时间字符串
    */
   protected void saveLog(ProceedingJoinPoint pjp, StopWatch stopWatch, Throwable error,
       String requestId, Object result, String startTime) {
@@ -113,7 +130,10 @@ public class ControllerAspect {
   }
 
   /**
-   * 安全序列化日志对象。
+   * 安全序列化日志对象，容错处理不可序列化的参数。
+   *
+   * @param value 待序列化的对象
+   * @return JSON字符串或 fallback 字符串
    */
   private String safeToJson(Object value) {
     try {

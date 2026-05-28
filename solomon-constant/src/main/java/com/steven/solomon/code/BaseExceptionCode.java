@@ -1,5 +1,11 @@
 package com.steven.solomon.code;
 
+/**
+ * 基础异常错误码接口，定义系统通用的异常编码。
+ *
+ * <p>错误码采用字母编码体系，用于国际化消息的键匹配。
+ * 业务项目可扩展该接口定义自己的异常编码。</p>
+ */
 public interface BaseExceptionCode {
 
   /**
@@ -88,5 +94,8 @@ public interface BaseExceptionCode {
    */
   String FILE_UPLOAD_MAX_SIZE = "FILE_UPLOAD_MAX_SIZE";
 
+  /**
+   * 文件存在高危风险（病毒/恶意内容）
+   */
   String FILE_HIGH_RISK = "FILE_HIGH_RISK";
 }

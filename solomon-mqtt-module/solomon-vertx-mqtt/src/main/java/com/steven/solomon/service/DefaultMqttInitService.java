@@ -16,16 +16,35 @@ import io.vertx.mqtt.MqttClient;
 import io.vertx.mqtt.MqttClientOptions;
 import org.slf4j.Logger;
 
+/**
+ * Vert.x MQTT 默认客户端初始化服务。
+ *
+ * <p>基于 Vert.x MqttClient 实现，负责创建 Vertx 实例、建立 MQTT 连接、注册断开重连回调并自动订阅监听器。</p>
+ */
 public class DefaultMqttInitService implements MqttClientInitService<MqttProfile> {
 
+    /** 日志记录器 */
     private final Logger logger = LoggerUtils.logger(DefaultMqttInitService.class);
 
+    /** MQTT 工具类，负责连接参数构建、客户端注册与消息发送 */
     private final MqttUtils utils;
 
+    /**
+     * 构造方法。
+     *
+     * @param utils MQTT 工具类实例
+     */
     public DefaultMqttInitService(MqttUtils utils) {
         this.utils = utils;
     }
 
+    /**
+     * 初始化指定租户的 Vert.x MQTT 客户端并订阅监听器。
+     *
+     * @param tenantCode 租户编码
+     * @param mqttProfile MQTT 客户端配置
+     * @param clazzList 监听器实例列表
+     */
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> clazzList) throws Exception {
         // 初始化 Vert.x
@@ -87,6 +106,12 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
         utils.putClient(tenantCode, mqttClient);
     }
 
+    /**
+     * 初始化指定租户的 Vert.x MQTT 客户端（自动扫描监听器）。
+     *
+     * @param tenantCode 租户编码
+     * @param mqttProfile MQTT 客户端配置
+     */
     @Override
     public void initMqttClient(String tenantCode, MqttProfile mqttProfile) throws Exception {
         this.initMqttClient(tenantCode, mqttProfile, SpringUtil.getBeanListWithAnnotation(MessageListener.class));
