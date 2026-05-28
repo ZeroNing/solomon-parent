@@ -55,8 +55,7 @@
 
     <!-- 网关与工具模块 -->
     <module>solomon-gateway-sentinel</module>
-    <module>solomon-bot-notice</module>
-    <module>solomon-epc-coder</module>
+    <module>solomon-utils-module</module>
   </modules>
 
   <profiles>
@@ -224,6 +223,11 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
+        <artifactId>solomon-clamav</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
         <artifactId>solomon-common</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -355,6 +359,12 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-epc-coder</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-clamav</artifactId>
         <version>${project.version}</version>
       </dependency>
 

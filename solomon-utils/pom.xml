@@ -14,16 +14,6 @@
 
   <dependencies>
 
-    <dependency>
-      <groupId>xyz.capybara</groupId>
-      <artifactId>clamav-client</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15on</artifactId>
-    </dependency>
-
     <!-- 校验注解所有需要jar包 开始 -->
     <dependency>
       <groupId>jakarta.validation</groupId>
