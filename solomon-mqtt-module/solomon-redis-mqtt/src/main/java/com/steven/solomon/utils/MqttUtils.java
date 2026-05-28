@@ -20,6 +20,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
@@ -32,26 +33,45 @@ import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.Topic;
 
+/**
+ * Redis MQTT 风格工具类。
+ *
+ * <p>基于 Redis Pub/Sub 实现 MQTT 风格的消息发布/订阅，提供消息发送、主题订阅/取消订阅、连接管理和 Redis 连接工厂创建等功能。</p>
+ * <p>同时实现 {@link SendService} 和 {@link MqttOperations} 接口，统一消息发送入口。</p>
+ */
 @Configuration
 public class MqttUtils
     extends AbstractMqttClientRegistry<RedisMessageListenerContainer, RedisMqttProfile>
     implements SendService<MqttMessageModel<?>>, MqttOperations {
 
+  /** Redis 租户缓存前缀 */
   private static final String CACHE_TENANT_PREFIX = "mqtt:";
 
+  /** 日志记录器 */
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
+  /** 租户与 Redis 发送模板的映射 */
   private final Map<String, StringRedisTemplate> redisTemplateMap = new ConcurrentHashMap<>();
 
+  /** 租户与 Redis 连接工厂的映射 */
   private final Map<String, RedisConnectionFactory> connectionFactoryMap = new ConcurrentHashMap<>();
 
+  /** 租户与 Redis 消息监听器的映射 */
   private final Map<String, Map<String, org.springframework.data.redis.connection.MessageListener>> listenerMap =
       new ConcurrentHashMap<>();
 
+  /** Redis 连接工厂构建器 */
   private final RedisConnectionFactoryBuilder connectionFactoryBuilder;
 
+  /** Redis 多租户缓存上下文 */
   private final RedisCacheTenantContext redisCacheTenantContext;
 
+  /**
+   * 构造方法。
+   *
+   * @param connectionFactoryBuilder Redis 连接工厂构建器
+   * @param redisCacheTenantContext Redis 多租户缓存上下文
+   */
   public MqttUtils(
       RedisConnectionFactoryBuilder connectionFactoryBuilder,
       RedisCacheTenantContext redisCacheTenantContext) {
@@ -59,6 +79,11 @@ public class MqttUtils
     this.redisCacheTenantContext = redisCacheTenantContext;
   }
 
+  /**
+   * 通过 Redis Pub/Sub 发送 MQTT 风格消息。
+   *
+   * @param data 消息模型，包含租户编码、主题和消息体
+   */
   @Override
   public void send(MqttMessageModel<?> data) throws BaseException {
     RedisMqttProfile profile = getOptions(data.getTenantCode());
@@ -73,11 +98,22 @@ public class MqttUtils
     send(data);
   }
 
+  /**
+   * 发送过期消息（Redis Pub/Sub 不支持过期，直接发送）。
+   */
   @Override
   public void sendExpiration(MqttMessageModel<?> data, long expiration) throws Exception {
     send(data);
   }
 
+  /**
+   * 订阅指定租户的 Redis MQTT 通道。
+   *
+   * @param tenantCode 租户编码
+   * @param topic 订阅主题
+   * @param qos 消息质量等级（Redis 实现忽略此参数）
+   * @param consumer 消费者实例
+   */
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer) throws Exception {
     if (ValidateUtils.isEmpty(topic)) {
@@ -93,16 +129,25 @@ public class MqttUtils
     logger.info("租户:{} 订阅 Redis MQTT 通道:{}", tenantCode, redisTopic.getTopic());
   }
 
+  /**
+   * 订阅指定租户的 Redis MQTT 通道（AbstractRedisMqttConsumer 重载）。
+   */
   public void subscribe(String tenantCode, String topic, int qos, AbstractRedisMqttConsumer<?, ?> consumer)
       throws Exception {
     subscribe(tenantCode, topic, qos, (Object) consumer);
   }
 
+  /**
+   * 使用自动扫描的监听器订阅指定租户的所有主题。
+   */
   public void subscribe(RedisMessageListenerContainer container, String tenantCode) {
     subscribe(container, SpringUtil.getBeanListWithAnnotation(
         com.steven.solomon.mqtt.annotation.MessageListener.class), tenantCode);
   }
 
+  /**
+   * 根据监听器列表解析订阅描述，逐一订阅 Redis 通道。
+   */
   public void subscribe(
       RedisMessageListenerContainer container, List<Object> listenerList, String tenantCode) {
     RedisMqttProfile profile = getOptions(tenantCode);
@@ -115,6 +160,9 @@ public class MqttUtils
     }
   }
 
+  /**
+   * 取消订阅指定租户的 Redis MQTT 通道。
+   */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws Exception {
     if (ValidateUtils.isEmpty(topics)) {
@@ -134,6 +182,9 @@ public class MqttUtils
     }
   }
 
+  /**
+   * 断开指定租户的 Redis MQTT 连接，销毁连接工厂并清理所有资源。
+   */
   @Override
   public void disconnect(String tenantCode) throws Exception {
     RedisMessageListenerContainer container = getClient(tenantCode);
@@ -149,14 +200,40 @@ public class MqttUtils
     removeClient(tenantCode);
   }
 
+  /**
+   * 重新启动指定租户的 Redis MQTT 监听容器。
+   */
   @Override
   public void reconnect(String tenantCode) throws Exception {
     RedisMessageListenerContainer container = getClient(tenantCode);
     if (!container.isRunning()) {
       container.start();
+      // 重连后恢复所有订阅
+      subscribe(container, tenantCode);
     }
   }
 
+  /**
+   * 使用新的配置重建指定租户的 Redis MQTT 连接并恢复订阅。
+   *
+   * @param tenantCode 租户编码
+   * @param profile 新的 Redis MQTT 配置
+   */
+  public void reconnect(String tenantCode, RedisMqttProfile profile) throws Exception {
+    // 先断开旧连接
+    disconnect(tenantCode);
+    // 用新配置重建连接
+    RedisMessageListenerContainer container = createContainer(tenantCode, profile);
+    subscribe(container, tenantCode);
+  }
+
+  /**
+   * 根据配置创建 Redis 连接工厂、发送模板和监听容器。
+   *
+   * @param tenantCode 租户编码
+   * @param profile Redis MQTT 配置
+   * @return 已启动的 Redis 消息监听容器
+   */
   public RedisMessageListenerContainer createContainer(String tenantCode, RedisMqttProfile profile) {
     RedisConnectionFactory factory = createConnectionFactory(tenantCode, profile);
     StringRedisTemplate redisTemplate = new StringRedisTemplate(factory);
@@ -176,6 +253,9 @@ public class MqttUtils
     return container;
   }
 
+  /**
+   * 根据配置创建 Redis 连接工厂，并注册到多租户缓存上下文。
+   */
   private RedisConnectionFactory createConnectionFactory(String tenantCode, RedisMqttProfile profile) {
     RedisProperties redisProperties = new RedisProperties();
     redisProperties.setHost(profile.getHost());
@@ -196,10 +276,16 @@ public class MqttUtils
     return factory;
   }
 
+  /**
+   * 构造租户缓存编码。
+   */
   private String cacheTenantCode(String tenantCode) {
     return CACHE_TENANT_PREFIX + tenantCode;
   }
 
+  /**
+   * 销毁 Redis 连接工厂。
+   */
   private void destroyConnectionFactory(RedisConnectionFactory factory) {
     if (factory instanceof DisposableBean disposableBean) {
       try {
@@ -210,10 +296,16 @@ public class MqttUtils
     }
   }
 
+  /**
+   * 获取指定租户的 Redis 监听容器，不存在时抛出业务异常。
+   */
   private RedisMessageListenerContainer getClient(String tenantCode) throws BaseException {
     return getRequiredClient(tenantCode, MqttErrorCodes.CLIENT_IS_NULL);
   }
 
+  /**
+   * 获取指定租户的 Redis 发送模板，不存在时抛出业务异常。
+   */
   private StringRedisTemplate getRedisTemplate(String tenantCode) throws BaseException {
     StringRedisTemplate redisTemplate = redisTemplateMap.get(tenantCode);
     if (ValidateUtils.isEmpty(redisTemplate)) {
@@ -222,6 +314,9 @@ public class MqttUtils
     return redisTemplate;
   }
 
+  /**
+   * 将 MQTT 主题转换为 Redis Topic 对象。
+   */
   private Topic toRedisTopic(String tenantCode, String topic, RedisMqttProfile profile) {
     String channel = RedisMqttTopicUtils.channel(tenantCode, topic, profile);
     if (RedisMqttTopicUtils.needPattern(topic, profile)) {
@@ -230,10 +325,16 @@ public class MqttUtils
     return new ChannelTopic(channel);
   }
 
+  /**
+   * 获取或创建指定租户的监听器映射。
+   */
   private Map<String, org.springframework.data.redis.connection.MessageListener> tenantListeners(String tenantCode) {
     return listenerMap.computeIfAbsent(tenantCode, key -> new ConcurrentHashMap<>());
   }
 
+  /**
+   * 复制消费者实例，为每个订阅创建独立的消费者对象。
+   */
   @SuppressWarnings("unchecked")
   private org.springframework.data.redis.connection.MessageListener copyConsumer(Object listener) {
     return (org.springframework.data.redis.connection.MessageListener) BeanUtil.copyProperties(

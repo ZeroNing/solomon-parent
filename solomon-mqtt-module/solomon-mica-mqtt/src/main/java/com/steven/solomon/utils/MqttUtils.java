@@ -18,6 +18,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.codec.message.builder.MqttTopicSubscription;
 import org.dromara.mica.mqtt.core.client.MqttClient;
@@ -26,12 +27,25 @@ import org.dromara.mica.mqtt.spring.client.config.MqttClientProperties;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Mica MQTT 工具类。
+ *
+ * <p>基于 Mica MQTT 客户端，提供消息发送、主题订阅/取消订阅、客户端连接管理和 SSL 配置等功能。</p>
+ * <p>同时实现 {@link SendService} 和 {@link MqttOperations} 接口，统一消息发送入口。</p>
+ */
 @Configuration
 public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClientProperties>
     implements SendService<MqttMessageModel<?>>, MqttOperations {
 
+  /** 日志记录器 */
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
+  /**
+   * 发送 Mica MQTT 消息。
+   *
+   * @param data 消息模型，包含租户编码、主题和消息体
+   * @throws Exception 发送异常
+   */
   @Override
   public void send(MqttMessageModel<?> data) throws Exception {
     String json = JSONUtil.toJsonStr(data);
@@ -48,16 +62,55 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
   }
 
+  /**
+   * 异步发送 Mica MQTT 消息，返回 CompletableFuture。
+   *
+   * <p>Mica MQTT 客户端的 publish 是同步操作，因此使用 CompletableFuture.runAsync 包装。</p>
+   *
+   * @param data 消息模型
+   * @return 异步发送结果
+   */
+  @Override
+  public CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
+    return CompletableFuture.runAsync(() -> {
+      try {
+        send(data);
+      } catch (Exception e) {
+        throw new IllegalStateException("Mica MQTT 异步发送失败", e);
+      }
+    });
+  }
+
+  /**
+   * 发送延时消息（Mica MQTT 不支持延时，直接发送）。
+   *
+   * @param data 消息模型
+   * @param delay 延时时间（毫秒），此处忽略
+   */
   @Override
   public void sendDelay(MqttMessageModel<?> data, long delay) throws Exception {
     send(data);
   }
 
+  /**
+   * 发送过期消息（Mica MQTT 不支持过期，直接发送）。
+   *
+   * @param data 消息模型
+   * @param expiration 过期时间（毫秒），此处忽略
+   */
   @Override
   public void sendExpiration(MqttMessageModel<?> data, long expiration) throws Exception {
     send(data);
   }
 
+  /**
+   * 订阅指定租户的 Mica MQTT 主题。
+   *
+   * @param tenantCode 租户编码
+   * @param topic 订阅主题
+   * @param qos 消息质量等级
+   * @param consumer 消费者实例
+   */
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer) throws BaseException {
     if (ValidateUtils.isEmpty(topic)) {
@@ -66,16 +119,25 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     getClient(tenantCode).subscribe(topic, MqttQoS.valueOf(qos), (AbstractConsumer<?, ?>) consumer);
   }
 
+  /**
+   * 订阅指定租户的 Mica MQTT 主题（AbstractConsumer 重载）。
+   */
   public void subscribe(String tenantCode, String topic, int qos, AbstractConsumer<?, ?> consumer)
       throws BaseException {
     subscribe(tenantCode, topic, qos, (Object) consumer);
   }
 
+  /**
+   * 使用自动扫描的监听器订阅指定租户的所有主题。
+   */
   public void subscribe(MqttClient client, String tenantCode) {
     subscribe(client, SpringUtil.getBeanListWithAnnotation(
         com.steven.solomon.mqtt.annotation.MessageListener.class), tenantCode);
   }
 
+  /**
+   * 根据监听器列表解析订阅描述，逐一订阅主题。
+   */
   public void subscribe(MqttClient client, List<Object> listenerList, String tenantCode) {
     for (MqttSubscriptionDescriptor descriptor : MqttListenerRegistry.resolve(tenantCode, listenerList)) {
       client.subscribe(
@@ -86,6 +148,9 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
   }
 
+  /**
+   * 取消订阅指定租户的主题。
+   */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws BaseException {
     if (ValidateUtils.isEmpty(topics)) {
@@ -97,6 +162,9 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
   }
 
+  /**
+   * 断开指定租户的 Mica MQTT 连接并移除注册。
+   */
   @Override
   public void disconnect(String tenantCode) throws BaseException {
     MqttClient client = getClient(tenantCode);
@@ -106,6 +174,9 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     removeClient(tenantCode);
   }
 
+  /**
+   * 重新连接指定租户的 Mica MQTT 客户端并恢复订阅。
+   */
   @Override
   public void reconnect(String tenantCode) throws BaseException {
     MqttClient client = getClient(tenantCode);
@@ -115,11 +186,21 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
   }
 
+  /**
+   * 使用新的配置重新连接指定租户的 Mica MQTT 客户端并恢复订阅。
+   */
   public void reconnect(String tenantCode, MqttClientProperties mqttProfile) throws BaseException {
     putOptionsMap(tenantCode, mqttProfile);
     reconnect(tenantCode);
   }
 
+  /**
+   * 根据配置创建 Mica MQTT 客户端并注册到当前租户。
+   *
+   * @param tenantCode 租户编码
+   * @param properties Mica MQTT 客户端配置
+   * @return 已连接的 Mica MQTT 客户端
+   */
   public MqttClient createMqttClient(String tenantCode, MqttClientProperties properties) {
     putOptionsMap(tenantCode, properties);
     MqttClientCreator clientCreator = MqttClient.create()
@@ -165,10 +246,16 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     return client;
   }
 
+  /**
+   * 获取指定租户的 Mica MQTT 客户端，不存在时抛出业务异常。
+   */
   private MqttClient getClient(String tenantCode) throws BaseException {
     return getRequiredClient(tenantCode, MqttErrorCodes.MQTT_CLIENT_IS_NULL);
   }
 
+  /**
+   * 设置遗嘱消息。
+   */
   private void applyWill(MqttClientCreator clientCreator, MqttClientProperties properties) {
     MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
     if (ValidateUtils.isEmpty(willMessage) || StrUtil.isBlank(willMessage.getTopic())) {
@@ -296,6 +383,9 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
   }
 
+  /**
+   * 复制消费者实例，为每个订阅创建独立的消费者对象。
+   */
   @SuppressWarnings("unchecked")
   private AbstractConsumer<?, ?> copyConsumer(Object listener) {
     return (AbstractConsumer<?, ?>) BeanUtil.copyProperties(listener, listener.getClass(), (String) null);

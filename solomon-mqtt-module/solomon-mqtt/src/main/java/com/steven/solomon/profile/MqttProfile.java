@@ -53,6 +53,15 @@ public class MqttProfile {
   private boolean verifyCertificate = false;
 
   /**
+   * MQTT 协议版本。
+   *
+   * <p>取值参考 {@link org.eclipse.paho.client.mqttv3.MqttConnectOptions#MQTT_VERSION_3_1}、
+   * {@link org.eclipse.paho.client.mqttv3.MqttConnectOptions#MQTT_VERSION_3_1_1}。
+   * 默认值 0 表示由客户端自动选择。</p>
+   */
+  private int mqttVersion = 0;
+
+  /**
    * MQTT 遗嘱消息配置。
    */
   public static class MqttWill implements Serializable {
@@ -212,5 +221,13 @@ public class MqttProfile {
 
   public void setVerifyCertificate(boolean verifyCertificate) {
     this.verifyCertificate = verifyCertificate;
+  }
+
+  public int getMqttVersion() {
+    return mqttVersion;
+  }
+
+  public void setMqttVersion(int mqttVersion) {
+    this.mqttVersion = mqttVersion;
   }
 }

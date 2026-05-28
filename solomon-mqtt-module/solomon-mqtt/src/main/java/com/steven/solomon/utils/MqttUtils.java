@@ -274,6 +274,11 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttC
     options.setMaxReconnectDelay(mqttProfile.getMaxReconnectDelay());
     options.setExecutorServiceTimeout(mqttProfile.getExecutorServiceTimeout());
 
+    // 设置 MQTT 协议版本
+    if (mqttProfile.getMqttVersion() > 0) {
+      options.setMqttVersion(mqttProfile.getMqttVersion());
+    }
+
     // 设置遗嘱消息
     MqttWill will = mqttProfile.getWill();
     if (ValidateUtils.isNotEmpty(will)) {

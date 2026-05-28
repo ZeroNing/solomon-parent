@@ -28,6 +28,7 @@ import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
 import org.eclipse.paho.mqttv5.common.MqttSubscription;
+import org.eclipse.paho.mqttv5.common.packet.UserProperty;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 
@@ -287,6 +288,18 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttC
         mqttProfile.getAutomaticReconnectMaxDelay());
     options.setSendReasonMessages(mqttProfile.getSendReasonMessages());
     options.setSessionExpiryInterval(mqttProfile.getSessionExpiryInterval());
+
+    // 设置 MQTT5 专有属性
+    if (mqttProfile.getTopicAliasMax() != null && mqttProfile.getTopicAliasMax() > 0) {
+      options.setTopicAliasMaximum(mqttProfile.getTopicAliasMax());
+    }
+
+    if (mqttProfile.getUserProperties() != null && !mqttProfile.getUserProperties().isEmpty()) {
+      UserProperty[] userProps = mqttProfile.getUserProperties().entrySet().stream()
+              .map(entry -> new UserProperty(entry.getKey(), entry.getValue()))
+              .toArray(UserProperty[]::new);
+      options.setUserProperties(List.of(userProps));
+    }
 
     // 设置遗嘱消息
     MqttWill will = mqttProfile.getWill();

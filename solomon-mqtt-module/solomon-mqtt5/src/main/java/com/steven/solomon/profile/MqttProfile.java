@@ -73,6 +73,20 @@ public class MqttProfile {
   private boolean verifyCertificate = false;
 
   /**
+   * 是否支持主题别名。
+   *
+   * <p>值为 0 表示不使用主题别名功能，正值表示客户端愿意使用的最大主题别名数量。</p>
+   */
+  private Integer topicAliasMax = 0;
+
+  /**
+   * 用户属性集合。
+   *
+   * <p>MQTT 5.0 CONNECT 报文可携带键值对形式的用户属性，用于传递自定义元数据。</p>
+   */
+  private java.util.Map<String, String> userProperties;
+
+  /**
    * MQTT5 遗嘱消息配置。
    */
   public static class MqttWill implements Serializable {
@@ -288,5 +302,21 @@ public class MqttProfile {
 
   public void setVerifyCertificate(boolean verifyCertificate) {
     this.verifyCertificate = verifyCertificate;
+  }
+
+  public Integer getTopicAliasMax() {
+    return topicAliasMax;
+  }
+
+  public void setTopicAliasMax(Integer topicAliasMax) {
+    this.topicAliasMax = topicAliasMax;
+  }
+
+  public java.util.Map<String, String> getUserProperties() {
+    return userProperties;
+  }
+
+  public void setUserProperties(java.util.Map<String, String> userProperties) {
+    this.userProperties = userProperties;
   }
 }

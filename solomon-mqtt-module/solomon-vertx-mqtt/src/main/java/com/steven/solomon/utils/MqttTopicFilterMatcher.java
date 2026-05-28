@@ -6,17 +6,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * MQTT 主题通配符匹配器。
+ *
+ * <p>实现 MQTT 规范的主题过滤器匹配逻辑，支持单级通配符 {@code +} 和多级通配符 {@code #}。</p>
+ * <p>主要用于 Vert.x MQTT 实现，因为 Vert.x 不支持 Paho 风格的自动主题路由，需要手动匹配。</p>
+ */
 public class MqttTopicFilterMatcher {
 
     private MqttTopicFilterMatcher() {}
 
     // ====================== 核心API ======================
     /**
-     * 查找匹配主题的第一个通配符过滤器
+     * 查找匹配主题的第一个通配符过滤器。
      *
-     * @param topic 主题 (e.g. "sensor/room1/temperature")
+     * @param topic 实际主题 (e.g. "sensor/room1/temperature")
      * @param filters 通配符主题过滤器集合 (e.g. ["sensor/+/temperature", "alarm/#"])
-     * @return 匹配成功的过滤器，若无匹配返回null
+     * @return 匹配成功的过滤器，若无匹配返回 null
      */
     public static String findFirstMatchingFilter(String topic, List<String> filters) {
         for (String filter : filters) {
@@ -28,9 +34,9 @@ public class MqttTopicFilterMatcher {
     }
 
     /**
-     * 查找所有匹配主题的通配符过滤器
+     * 查找所有匹配主题的通配符过滤器。
      *
-     * @param topic 主题
+     * @param topic 实际主题
      * @param filters 通配符主题过滤器集合
      * @return 所有匹配成功的过滤器列表（保持原顺序）
      */
@@ -50,10 +56,10 @@ public class MqttTopicFilterMatcher {
 
     // ====================== 底层匹配逻辑 ======================
     /**
-     * 判断主题是否匹配单个通配符过滤器
+     * 判断主题是否匹配单个通配符过滤器。
      *
      * @param filter 通配符主题过滤器 (e.g. "sensor/+/temperature")
-     * @param topic  实际主题 (e.g. "sensor/room1/temperature")
+     * @param topic 实际主题 (e.g. "sensor/room1/temperature")
      * @return true 如果匹配成功
      */
     public static boolean matches(String filter, String topic) {
@@ -102,7 +108,12 @@ public class MqttTopicFilterMatcher {
     }
 
     /**
-     * 验证主题过滤器是否符合MQTT规范
+     * 验证主题过滤器是否符合 MQTT 规范。
+     *
+     * <p>检查 {@code #} 只能出现在末尾，且过滤器中不含非法空层级。</p>
+     *
+     * @param levels 按层级分割的过滤器数组
+     * @return 过滤器是否合法
      */
     private static boolean isValidFilter(String[] levels) {
         boolean hasMultiLevelWildcard = false;
