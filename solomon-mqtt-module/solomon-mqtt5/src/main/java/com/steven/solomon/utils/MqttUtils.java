@@ -19,8 +19,11 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.eclipse.paho.mqttv5.client.IMqttMessageListener;
-import org.eclipse.paho.mqttv5.client.MqttClient;
+import org.eclipse.paho.mqttv5.client.IMqttToken;
+import org.eclipse.paho.mqttv5.client.MqttActionListener;
+import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.common.MqttException;
 import org.eclipse.paho.mqttv5.common.MqttMessage;
@@ -29,25 +32,32 @@ import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnectionOptions>
+public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttConnectionOptions>
     implements SendService<MqttMessageModel<?>>, MqttOperations {
 
   private final Logger logger = LoggerUtils.logger(MqttUtils.class);
 
   /**
-   * 发送 MQTT5 消息，失败时抛出异常给调用方。
+   * 发送 MQTT5 消息。
+   *
+   * <p>底层使用 Paho MqttAsyncClient，方法只负责提交发送请求，不等待 Broker ACK。</p>
    */
   @Override
   public void send(MqttMessageModel<?> data) throws Exception {
+    publishAsync(data, JSONUtil.toJsonStr(data));
+  }
+
+  @Override
+  public CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
     String json = JSONUtil.toJsonStr(data);
     try {
-      getClient(data.getTenantCode())
-          .getTopic(data.getTopic())
-          .publish(json.getBytes(StandardCharsets.UTF_8), data.getQos(), data.getRetained());
-    } catch (MqttException e) {
+      return publishAsync(data, json);
+    } catch (Exception e) {
       logger.error("MQTT5 消息发送失败, tenant={}, topic={}, payload={}",
           data.getTenantCode(), data.getTopic(), json, e);
-      throw e;
+      CompletableFuture<Void> future = new CompletableFuture<>();
+      future.completeExceptionally(e);
+      return future;
     }
   }
 
@@ -69,7 +79,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnec
     }
     getClient(tenantCode).subscribe(
         new MqttSubscription[]{new MqttSubscription(topic, qos)},
-        new IMqttMessageListener[]{(IMqttMessageListener) consumer});
+        (IMqttMessageListener) consumer);
   }
 
   public void subscribe(String tenantCode, String topic, int qos, IMqttMessageListener consumer)
@@ -77,18 +87,18 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnec
     subscribe(tenantCode, topic, qos, (Object) consumer);
   }
 
-  public void subscribe(MqttClient client, String tenantCode) throws MqttException {
+  public void subscribe(MqttAsyncClient client, String tenantCode) throws MqttException {
     subscribe(client, SpringUtil.getBeanListWithAnnotation(
         com.steven.solomon.mqtt.annotation.MessageListener.class), tenantCode);
   }
 
-  public void subscribe(MqttClient client, List<Object> listenerList, String tenantCode)
+  public void subscribe(MqttAsyncClient client, List<Object> listenerList, String tenantCode)
       throws MqttException {
     for (MqttSubscriptionDescriptor descriptor : MqttListenerRegistry.resolve(tenantCode, listenerList)) {
       AbstractConsumer<?, ?> consumer = copyConsumer(descriptor.getListener());
       client.subscribe(
           new MqttSubscription[]{new MqttSubscription(descriptor.getTopic(), descriptor.getQos())},
-          new IMqttMessageListener[]{consumer});
+          consumer);
       logger.info("租户:{} 订阅 MQTT5 主题:{}", tenantCode, descriptor.getTopic());
     }
   }
@@ -103,7 +113,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnec
 
   @Override
   public void disconnect(String tenantCode) throws MqttException, BaseException {
-    MqttClient client = getClient(tenantCode);
+    MqttAsyncClient client = getClient(tenantCode);
     if (client.isConnected()) {
       client.disconnect();
     }
@@ -112,23 +122,47 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttConnec
 
   @Override
   public void reconnect(String tenantCode) throws MqttException, BaseException {
-    MqttClient client = getClient(tenantCode);
+    MqttAsyncClient client = getClient(tenantCode);
     if (!client.isConnected()) {
-      client.connect(getOptions(tenantCode));
+      client.connect(getOptions(tenantCode)).waitForCompletion();
       subscribe(client, tenantCode);
     }
   }
 
   public void reconnect(String tenantCode, MqttProfile profile) throws MqttException, BaseException {
-    MqttClient client = getClient(tenantCode);
+    MqttAsyncClient client = getClient(tenantCode);
     if (!client.isConnected()) {
-      client.connect(initMqttConnectOptions(profile));
+      client.connect(initMqttConnectOptions(profile)).waitForCompletion();
       subscribe(client, tenantCode);
     }
   }
 
-  private MqttClient getClient(String tenantCode) throws BaseException {
+  private MqttAsyncClient getClient(String tenantCode) throws BaseException {
     return getRequiredClient(tenantCode, MqttErrorCodes.CLIENT_IS_NULL);
+  }
+
+  private CompletableFuture<Void> publishAsync(MqttMessageModel<?> data, String json) throws Exception {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    getClient(data.getTenantCode()).publish(
+        data.getTopic(),
+        json.getBytes(StandardCharsets.UTF_8),
+        data.getQos(),
+        data.getRetained(),
+        null,
+        new MqttActionListener() {
+          @Override
+          public void onSuccess(IMqttToken asyncActionToken) {
+            future.complete(null);
+          }
+
+          @Override
+          public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
+            logger.error("MQTT5 异步发送失败, tenant={}, topic={}, payload={}",
+                data.getTenantCode(), data.getTopic(), json, exception);
+            future.completeExceptionally(exception);
+          }
+        });
+    return future;
   }
 
   public MqttConnectionOptions initMqttConnectOptions(MqttProfile mqttProfile) {

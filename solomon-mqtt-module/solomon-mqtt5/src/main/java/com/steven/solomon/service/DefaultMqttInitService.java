@@ -10,8 +10,8 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
+import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
 import org.eclipse.paho.mqttv5.client.MqttCallback;
-import org.eclipse.paho.mqttv5.client.MqttClient;
 import org.eclipse.paho.mqttv5.client.MqttConnectionOptions;
 import org.eclipse.paho.mqttv5.client.MqttDisconnectResponse;
 import org.eclipse.paho.mqttv5.common.MqttException;
@@ -36,20 +36,21 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
 
   @Override
   public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> listenerList)
-      throws Exception {
+    throws Exception {
     String url = mqttProfile.getUrl().split(",")[0];
     String clientId = ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString());
-    MqttClient client = new MqttClient(url, clientId);
+    MqttAsyncClient client = new MqttAsyncClient(url, clientId);
     MqttConnectionOptions options = utils.initMqttConnectOptions(mqttProfile);
     client.setCallback(callback(tenantCode, client, listenerList));
-    client.connect(options);
+    // 中文注释：初始化阶段等待连接完成，业务发送使用 MqttAsyncClient 异步 publish。
+    client.connect(options).waitForCompletion();
     utils.putOptionsMap(tenantCode, options);
     utils.putClient(tenantCode, client);
     utils.subscribe(client, listenerList, tenantCode);
     logger.info("租户:{} MQTT5 客户端初始化成功, clientId={}", tenantCode, clientId);
   }
 
-  private MqttCallback callback(String tenantCode, MqttClient client, List<Object> listenerList) {
+  private MqttCallback callback(String tenantCode, MqttAsyncClient client, List<Object> listenerList) {
     return new MqttCallback() {
       @Override
       public void disconnected(MqttDisconnectResponse response) {

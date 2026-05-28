@@ -289,6 +289,21 @@ cache:
     key-prefix: mqtt
 ```
 
+### 异步发送
+
+MQTT 模块提供统一异步发送能力。`solomon-mqtt` 和 `solomon-mqtt5` 已切换为 Paho `MqttAsyncClient`，`send` 只提交发送请求，不等待 Broker ACK；业务需要感知发送结果时调用 `sendAsync`。
+
+```java
+mqttOperations.sendAsync(message)
+    .whenComplete((unused, throwable) -> {
+        if (throwable != null) {
+            // 中文注释：这里可以记录失败日志、告警或触发重试。
+        }
+    });
+```
+
+Vert.x MQTT 会绑定 `publish(...).onComplete(...)` 回调；Mica MQTT 和 Redis MQTT 没有统一的底层发送回调时，会通过统一接口降级为异步任务。
+
 ## S3 对象存储模块
 
 `solomon-s3-module` 按供应商拆分对象存储实现。公共接口、配置模型、上传模型、命名规则、图片工具放在 `solomon-s3-sdk`，供应商 SDK 只存在于具体实现模块中。

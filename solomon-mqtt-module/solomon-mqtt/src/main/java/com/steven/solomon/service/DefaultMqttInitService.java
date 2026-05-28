@@ -11,7 +11,7 @@ import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttAsyncClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
@@ -28,13 +28,14 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
 
   @Override
   public void initMqttClient(String tenantCode, MqttProfile mqttProfile, List<Object> listenerList)
-      throws Exception {
+    throws Exception {
     String url = mqttProfile.getUrl().split(",")[0];
     String clientId = ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString());
-    MqttClient mqttClient = new MqttClient(url, clientId);
+    MqttAsyncClient mqttClient = new MqttAsyncClient(url, clientId);
     MqttConnectOptions options = utils.initMqttConnectOptions(mqttProfile);
     mqttClient.setCallback(callback(tenantCode, mqttClient, listenerList));
-    mqttClient.connect(options);
+    // 中文注释：初始化阶段需要等连接完成，后续发送走 MqttAsyncClient 异步发送，不阻塞业务线程。
+    mqttClient.connect(options).waitForCompletion();
     utils.putOptionsMap(tenantCode, options);
     utils.putClient(tenantCode, mqttClient);
     utils.subscribe(mqttClient, listenerList, tenantCode);
@@ -46,7 +47,7 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
     initMqttClient(tenantCode, mqttProfile, SpringUtil.getBeanListWithAnnotation(MessageListener.class));
   }
 
-  private MqttCallbackExtended callback(String tenantCode, MqttClient client, List<Object> listenerList) {
+  private MqttCallbackExtended callback(String tenantCode, MqttAsyncClient client, List<Object> listenerList) {
     return new MqttCallbackExtended() {
       @Override
       public void connectComplete(boolean reconnect, String serverURI) {

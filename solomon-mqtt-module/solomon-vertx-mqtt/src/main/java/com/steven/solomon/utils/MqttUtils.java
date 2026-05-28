@@ -27,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.springframework.context.annotation.Configuration;
@@ -51,18 +52,20 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
 
   @Override
   public void send(MqttMessageModel<?> data) throws Exception {
+    publishAsync(data, JSONUtil.toJsonStr(data));
+  }
+
+  @Override
+  public CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
     String json = JSONUtil.toJsonStr(data);
     try {
-      getClient(data.getTenantCode()).publish(
-          data.getTopic(),
-          Buffer.buffer(json.getBytes(StandardCharsets.UTF_8)),
-          MqttQoS.valueOf(data.getQos()),
-          data.getRetained(),
-          false);
+      return publishAsync(data, json);
     } catch (Exception e) {
       logger.error("Vert.x MQTT 消息发送失败, tenant={}, topic={}, payload={}",
           data.getTenantCode(), data.getTopic(), json, e);
-      throw e;
+      CompletableFuture<Void> future = new CompletableFuture<>();
+      future.completeExceptionally(e);
+      return future;
     }
   }
 
@@ -146,6 +149,25 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
 
   private MqttClient getClient(String tenantCode) throws BaseException {
     return getRequiredClient(tenantCode, MqttErrorCodes.CLIENT_IS_NULL);
+  }
+
+  private CompletableFuture<Void> publishAsync(MqttMessageModel<?> data, String json) throws Exception {
+    CompletableFuture<Void> future = new CompletableFuture<>();
+    getClient(data.getTenantCode()).publish(
+        data.getTopic(),
+        Buffer.buffer(json.getBytes(StandardCharsets.UTF_8)),
+        MqttQoS.valueOf(data.getQos()),
+        data.getRetained(),
+        false).onComplete(result -> {
+          if (result.succeeded()) {
+            future.complete(null);
+            return;
+          }
+          logger.error("Vert.x MQTT 异步发送失败, tenant={}, topic={}, payload={}",
+              data.getTenantCode(), data.getTopic(), json, result.cause());
+          future.completeExceptionally(result.cause());
+        });
+    return future;
   }
 
   public MqttClientOptions initMqttConnectOptions(MqttProfile mqttProfile) {

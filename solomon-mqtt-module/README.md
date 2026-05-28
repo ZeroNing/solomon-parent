@@ -144,7 +144,26 @@ message.setBody(command);
 sendService.send(message);
 ```
 
-发送失败会抛出底层异常并记录 `tenant/topic/payload`，业务侧可以明确感知失败。
+`solomon-mqtt` 和 `solomon-mqtt5` 已经切换为 Paho `MqttAsyncClient`，`send` 只提交发送请求，不等待 Broker ACK；如果业务需要感知真实发送结果，使用 `sendAsync` 监听底层客户端回调。
+
+```java
+mqttOperations.sendAsync(message)
+    .whenComplete((unused, throwable) -> {
+      if (throwable != null) {
+        // 中文注释：发送失败时可以在这里记录日志、告警或触发重试。
+      }
+    });
+```
+
+不同实现的发送方式：
+
+| 实现 | 发送方式 |
+| --- | --- |
+| `solomon-mqtt` | Paho MQTT3 `MqttAsyncClient.publish` |
+| `solomon-mqtt5` | Paho MQTT5 `MqttAsyncClient.publish` |
+| `solomon-vertx-mqtt` | Vert.x `publish(...).onComplete(...)` |
+| `solomon-mica-mqtt` | 使用 Mica 客户端发送，`sendAsync` 走统一异步接口兜底 |
+| `solomon-redis-mqtt` | Redis Pub/Sub 发送，`sendAsync` 走统一异步接口兜底 |
 
 ## 设计约定
 
