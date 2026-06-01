@@ -119,6 +119,34 @@ class TenantContextTest {
     }
 
     @Test
+    @DisplayName("trySetFactory - restores outer tenant after nested execution")
+    void testTrySetFactory_NestedRestore() {
+        context.registerFactory("tenant-001", "factory-1");
+        context.registerFactory("tenant-002", "factory-2");
+
+        context.trySetFactory("tenant-001", () -> {
+            assertEquals("factory-1", context.getFactory());
+            context.trySetFactory("tenant-002", () ->
+                assertEquals("factory-2", context.getFactory())
+            );
+            assertEquals("factory-1", context.getFactory());
+        });
+
+        assertNull(context.getFactory());
+    }
+
+    @Test
+    @DisplayName("executeWithFactory - returns a value and clears tenant binding")
+    void testExecuteWithFactory_ReturnValue() {
+        context.registerFactory("tenant-001", "factory-1");
+
+        String factory = context.executeWithFactory("tenant-001", context::getFactory);
+
+        assertEquals("factory-1", factory);
+        assertNull(context.getFactory());
+    }
+
+    @Test
     @DisplayName("trySetFactory - null任务抛出NullPointerException")
     void testTrySetFactory_NullTask() {
         context.registerFactory("tenant-001", "factory-1");

@@ -50,48 +50,12 @@ import java.util.List;
  * @see MongoDBCapped
  * @see MongoTenantContext
  */
-public class DefaultMongoDbInitService extends AbstractDataSourceInitService<MongoProperties, MongoTenantContext, SimpleMongoClientDatabaseFactory>{
+public class DefaultMongoDbInitService extends AbstractTenantResourceInitService<MongoProperties, MongoTenantContext, SimpleMongoClientDatabaseFactory>{
 
-    /**
-     * 初始化租户MongoDB连接
-     * 
-     * <p>流程：</p>
-     * <ol>
-     *   <li>创建MongoDB连接工厂</li>
-     *   <li>注册到租户上下文</li>
-     *   <li>初始化文档集合（自动创建固定集合）</li>
-     * </ol>
-     * 
-     * @param tenantCode 租户编码
-     * @param properties MongoDB配置
-     * @param context MongoDB租户上下文
-     * @throws Throwable 创建失败时抛出
-     */
     @Override
-    public void init(String tenantCode, MongoProperties properties, MongoTenantContext context) throws Throwable {
-        log.info("[MongoDB] 开始初始化租户MongoDB连接: tenantCode={}, host={}:{}, database={}", 
-            tenantCode, properties.getHost(), properties.getPort(), properties.getDatabase());
-        
-        long startTime = System.currentTimeMillis();
-        try {
-            // Step 1: 创建连接工厂
-            SimpleMongoClientDatabaseFactory factory = initFactory(properties);
-            
-            // Step 2: 注册到租户上下文
-            context.registerFactory(tenantCode, factory);
-            
-            // Step 3: 初始化文档集合
-            initDocument(factory);
-            
-            long cost = System.currentTimeMillis() - startTime;
-            log.info("[MongoDB] 租户MongoDB连接初始化成功: tenantCode={}, host={}:{}, database={}, cost={}ms", 
-                tenantCode, properties.getHost(), properties.getPort(), properties.getDatabase(), cost);
-        } catch (Exception e) {
-            long cost = System.currentTimeMillis() - startTime;
-            log.error("[MongoDB] 租户MongoDB连接初始化失败: tenantCode={}, host={}:{}, cost={}ms, error={}", 
-                tenantCode, properties.getHost(), properties.getPort(), cost, e.getMessage(), e);
-            throw e;
-        }
+    protected void afterRegistered(String tenantCode, MongoProperties properties,
+        SimpleMongoClientDatabaseFactory factory) {
+        initDocument(factory);
     }
 
     /**

@@ -69,7 +69,7 @@ public class RedisCacheAutoConfiguration {
     RedisConnectionFactory firstConnectionFactory = null;
     for (Map.Entry<String, RedisProperties> entry : tenantProperties.entrySet()) {
       RedisConnectionFactory connectionFactory = factoryBuilder.build(entry.getValue());
-      tenantContext.register(entry.getKey(), connectionFactory);
+      tenantContext.registerFactory(entry.getKey(), connectionFactory);
       if (firstConnectionFactory == null) {
         firstConnectionFactory = connectionFactory;
       }

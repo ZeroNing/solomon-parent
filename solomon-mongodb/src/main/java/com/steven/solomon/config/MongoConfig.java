@@ -9,7 +9,7 @@ import com.steven.solomon.converter.DateToLocalDateConverter;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
 import com.steven.solomon.converter.LocalDateTimeToDateConverter;
 import com.steven.solomon.converter.LocalDateToDateConverter;
-import com.steven.solomon.init.AbstractDataSourceInitService;
+import com.steven.solomon.init.AbstractTenantResourceInitService;
 import com.steven.solomon.init.DefaultMongoDbInitService;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.properties.TenantMongoProperties;
@@ -78,7 +78,7 @@ public class MongoConfig {
       return;
     }
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
-    AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> service = getService();
+    AbstractTenantResourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> service = getService();
     if (isSwitchDb) {
       Map<String, MongoProperties> tenantMap = ObjectUtil.defaultIfNull(mongoProperties.getTenant(),new HashMap<>());
       if (!tenantMap.containsKey(BaseCode.DEFAULT)) {
@@ -116,9 +116,9 @@ public class MongoConfig {
     return context.getFactoryMap().values().iterator().next();
   }
 
-  private AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> getService() {
+  private AbstractTenantResourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> getService() {
     return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
-            AbstractDataSourceInitService.class,
+            AbstractTenantResourceInitService.class,
             ResolvableType.forClass(MongoProperties.class),  // 替换P为实际类型
             ResolvableType.forClass(MongoTenantContext.class),  // 替换C为实际类型
             ResolvableType.forClass(SimpleMongoClientDatabaseFactory.class)   // 替换F为实际类型

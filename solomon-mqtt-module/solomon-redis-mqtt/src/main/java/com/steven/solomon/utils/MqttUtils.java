@@ -197,7 +197,7 @@ public class MqttUtils
     if (ObjectUtil.isNotEmpty(factory)) {
       destroyConnectionFactory(factory);
     }
-    redisCacheTenantContext.unregister(cacheTenantCode(tenantCode));
+    redisCacheTenantContext.unregisterFactory(cacheTenantCode(tenantCode));
     removeClient(tenantCode);
   }
 
@@ -273,7 +273,7 @@ public class MqttUtils
     }
     redisProperties.getSsl().setEnabled(profile.isSsl());
     RedisConnectionFactory factory = connectionFactoryBuilder.build(redisProperties);
-    redisCacheTenantContext.register(cacheTenantCode(tenantCode), factory);
+    redisCacheTenantContext.registerFactory(cacheTenantCode(tenantCode), factory);
     return factory;
   }
 

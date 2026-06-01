@@ -6,7 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.init.AbstractDataSourceInitService;
+import com.steven.solomon.init.AbstractTenantResourceInitService;
 import com.steven.solomon.init.DefaultRedisInitService;
 import com.steven.solomon.json.config.JsonConfig;
 import com.steven.solomon.manager.DynamicDefaultRedisCacheWriter;
@@ -26,7 +26,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -58,7 +57,7 @@ import java.util.Map;
 @Configuration
 @EnableConfigurationProperties(value={RedisProperties.class,TenantRedisProperties.class, CacheProfile.class,CacheProperties.class})
 @Import(value = {RedisTenantContext.class, JsonConfig.class})
-public class RedisConfig extends CachingConfigurerSupport {
+public class RedisConfig {
 
   /** 日志记录器 */
   private final Logger logger = LoggerUtils.logger(getClass());
@@ -125,7 +124,7 @@ public class RedisConfig extends CachingConfigurerSupport {
       properties.setTenant(tenantMap);
     }
     // 获取初始化服务并执行初始化
-    AbstractDataSourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory> service = getService();
+    AbstractTenantResourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory> service = getService();
     service.init(properties.getTenant(), context);
   }
 
@@ -176,8 +175,8 @@ public class RedisConfig extends CachingConfigurerSupport {
    */
   @Bean(name = "redisFactory")
   @ConditionalOnMissingBean(RedisConnectionFactory.class)
-  public RedisConnectionFactory tenantRedisFactory(RedisProperties redisProperties) throws Throwable {
-    RedisConnectionFactory factory;
+  public LettuceConnectionFactory tenantRedisFactory(RedisProperties redisProperties) throws Throwable {
+    LettuceConnectionFactory factory;
     if (isSwitchDb) {
       factory = context.getFactoryMap().values().iterator().next();
     } else {
@@ -195,7 +194,6 @@ public class RedisConfig extends CachingConfigurerSupport {
    * @return CacheManager实例
    */
   @Bean
-  @Override
   @ConditionalOnMissingBean(CacheManager.class)
   public CacheManager cacheManager() {
     RedisCacheConfiguration defaultCacheConfig = RedisCacheConfiguration.defaultCacheConfig().computePrefixWith((name -> name + ":"));
@@ -222,9 +220,9 @@ public class RedisConfig extends CachingConfigurerSupport {
    *
    * @return 数据源初始化服务
    */
-  private AbstractDataSourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> getService() {
+  private AbstractTenantResourceInitService<RedisProperties,RedisTenantContext, LettuceConnectionFactory> getService() {
     return SpringUtil.getBeansOfType(ResolvableType.forClassWithGenerics(
-            AbstractDataSourceInitService.class,
+            AbstractTenantResourceInitService.class,
             ResolvableType.forClass(RedisProperties.class),  // 替换P为实际类型
             ResolvableType.forClass(RedisTenantContext.class),  // 替换C为实际类型
             ResolvableType.forClass(LettuceConnectionFactory.class)   // 替换F为实际类型

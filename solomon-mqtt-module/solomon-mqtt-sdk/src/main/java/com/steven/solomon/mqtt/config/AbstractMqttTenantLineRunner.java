@@ -2,9 +2,9 @@ package com.steven.solomon.mqtt.config;
 
 import cn.hutool.core.util.ObjectUtil;
 
+import com.steven.solomon.context.AbstractTenantProperties;
 import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.mqtt.annotation.MessageListener;
-import com.steven.solomon.mqtt.model.AbstractTenantMqttProfile;
 import com.steven.solomon.mqtt.service.MqttClientInitService;
 import com.steven.solomon.spring.SpringUtil;
 import java.lang.annotation.Annotation;
@@ -26,13 +26,13 @@ public abstract class AbstractMqttTenantLineRunner<
         A extends Annotation, P, S extends MqttClientInitService<P>>
     extends AbstractMessageLineRunner<A> {
 
-  private final AbstractTenantMqttProfile<P> profile;
+  private final AbstractTenantProperties<P> profile;
   private final Class<? extends MqttClientInitService> serviceType;
   private final Supplier<S> defaultServiceSupplier;
 
   protected AbstractMqttTenantLineRunner(
       Class<A> annotationType,
-      AbstractTenantMqttProfile<P> profile,
+      AbstractTenantProperties<P> profile,
       ApplicationContext applicationContext,
       Class<? extends MqttClientInitService> serviceType,
       Supplier<S> defaultServiceSupplier) {
@@ -45,7 +45,7 @@ public abstract class AbstractMqttTenantLineRunner<
 
   @SuppressWarnings("unchecked")
   protected AbstractMqttTenantLineRunner(
-      AbstractTenantMqttProfile<P> profile,
+      AbstractTenantProperties<P> profile,
       ApplicationContext applicationContext,
       Class<? extends MqttClientInitService> serviceType,
       Supplier<S> defaultServiceSupplier) {

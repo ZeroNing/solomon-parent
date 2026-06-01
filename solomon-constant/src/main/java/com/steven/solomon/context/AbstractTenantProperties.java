@@ -1,23 +1,18 @@
-package com.steven.solomon.mqtt.model;
+package com.steven.solomon.context;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 多租户 MQTT 配置基础模型。
+ * Common configuration model for modules that own tenant-specific resources.
  *
- * @param <T> 单租户 MQTT 配置类型
+ * @param <T> single-tenant configuration type
  */
-public abstract class AbstractTenantMqttProfile<T> {
+public abstract class AbstractTenantProperties<T> {
 
-  /**
-   * 租户编码与 MQTT 配置映射。
-   */
-  private Map<String, T> tenant;
-
-  /**
-   * 是否启用 MQTT 模块。
-   */
   private boolean enabled = true;
+
+  private Map<String, T> tenant = new LinkedHashMap<>();
 
   public boolean getEnabled() {
     return enabled;

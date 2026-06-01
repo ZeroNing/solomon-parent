@@ -1,8 +1,11 @@
 package com.steven.solomon.context;
 
 import cn.hutool.core.util.ObjectUtil;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,8 @@ public abstract class TenantContext<F> {
   /**
    * 当前线程绑定的工厂对象。
    */
-  private final ThreadLocal<F> threadLocal = new ThreadLocal<>();
+  private final ThreadLocal<Deque<F>> factoryStack =
+      ThreadLocal.withInitial(ArrayDeque::new);
 
   /**
    * 全局租户工厂表，线程安全，支持运行期注册和注销。
@@ -38,7 +42,7 @@ public abstract class TenantContext<F> {
    * @return 当前线程工厂对象，没有绑定时返回 null
    */
   public F getFactory() {
-    return threadLocal.get();
+    return factoryStack.get().peek();
   }
 
   /**
@@ -54,7 +58,7 @@ public abstract class TenantContext<F> {
    * 将工厂对象绑定到当前线程。
    */
   protected void bindFactory(F factory) {
-    threadLocal.set(factory);
+    factoryStack.get().push(factory);
   }
 
   /**
@@ -77,7 +81,7 @@ public abstract class TenantContext<F> {
     if (ObjectUtil.isEmpty(factory)) {
       throw new IllegalStateException("未找到租户[" + tenantId + "]对应的工厂，请先注册");
     }
-    threadLocal.set(factory);
+    bindFactory(factory);
     logger.debug("[TenantContext] 已切换租户上下文: tenantId={}", tenantId);
   }
 
@@ -98,10 +102,29 @@ public abstract class TenantContext<F> {
   }
 
   /**
+   * Execute a task with a tenant factory and restore the previous binding afterwards.
+   */
+  public <T> T executeWithFactory(String tenantId, Supplier<T> supplier) {
+    requireNotEmpty(supplier, "supplier must not be null");
+    try {
+      setFactory(tenantId);
+      return supplier.get();
+    } finally {
+      removeFactory();
+    }
+  }
+
+  /**
    * 清理当前线程的工厂对象。
    */
   public void removeFactory() {
-    threadLocal.remove();
+    Deque<F> stack = factoryStack.get();
+    if (!stack.isEmpty()) {
+      stack.pop();
+    }
+    if (stack.isEmpty()) {
+      factoryStack.remove();
+    }
   }
 
   /**

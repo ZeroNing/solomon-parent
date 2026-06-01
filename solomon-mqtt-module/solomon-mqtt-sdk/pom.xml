@@ -15,6 +15,11 @@
 
         <dependency>
             <groupId>com.steven</groupId>
+            <artifactId>solomon-constant</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
             <artifactId>solomon-utils-spring</artifactId>
         </dependency>
 

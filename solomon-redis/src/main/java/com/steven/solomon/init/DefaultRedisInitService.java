@@ -40,37 +40,8 @@ import java.time.Duration;
  * @see RedisTenantContext
  * @see LettuceConnectionFactory
  */
-public class DefaultRedisInitService extends AbstractDataSourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory>{
+public class DefaultRedisInitService extends AbstractTenantResourceInitService<RedisProperties, RedisTenantContext, LettuceConnectionFactory>{
     
-    /**
-     * 初始化租户Redis连接工厂
-     * 
-     * @param tenantCode 租户编码
-     * @param properties Redis配置
-     * @param context Redis租户上下文
-     * @throws Throwable 创建失败时抛出
-     */
-    @Override
-    public void init(String tenantCode, RedisProperties properties, RedisTenantContext context) throws Throwable {
-        log.info("[Redis] 开始初始化租户Redis连接: tenantCode={}, host={}:{}", 
-            tenantCode, properties.getHost(), properties.getPort());
-        
-        long startTime = System.currentTimeMillis();
-        try {
-            LettuceConnectionFactory factory = initFactory(properties);
-            context.registerFactory(tenantCode, factory);
-            
-            long cost = System.currentTimeMillis() - startTime;
-            log.info("[Redis] 租户Redis连接初始化成功: tenantCode={}, host={}:{}, database={}, cost={}ms", 
-                tenantCode, properties.getHost(), properties.getPort(), properties.getDatabase(), cost);
-        } catch (Exception e) {
-            long cost = System.currentTimeMillis() - startTime;
-            log.error("[Redis] 租户Redis连接初始化失败: tenantCode={}, host={}:{}, cost={}ms, error={}", 
-                tenantCode, properties.getHost(), properties.getPort(), cost, e.getMessage(), e);
-            throw e;
-        }
-    }
-
     /**
      * 创建Redis连接工厂
      * 

@@ -59,7 +59,7 @@ public class TenantAwareRedisConnectionFactory implements RedisConnectionFactory
   }
 
   private RedisConnectionFactory delegate() {
-    RedisConnectionFactory connectionFactory = tenantContext.getResource();
+    RedisConnectionFactory connectionFactory = tenantContext.getFactory();
     return connectionFactory == null ? defaultConnectionFactory : connectionFactory;
   }
 }

@@ -1,5 +1,6 @@
 package com.steven.solomon.cache.context;
 
+import com.steven.solomon.context.TenantContext;
 import java.util.function.Supplier;
 
 /**
@@ -7,9 +8,9 @@ import java.util.function.Supplier;
  */
 public class CacheTenantSwitcher<R> {
 
-  private final CacheTenantContext<R> tenantContext;
+  private final TenantContext<R> tenantContext;
 
-  public CacheTenantSwitcher(CacheTenantContext<R> tenantContext) {
+  public CacheTenantSwitcher(TenantContext<R> tenantContext) {
     if (tenantContext == null) {
       throw new IllegalArgumentException("tenantContext 不能为空");
     }
@@ -17,20 +18,20 @@ public class CacheTenantSwitcher<R> {
   }
 
   public CacheTenantSwitcher<R> switchTo(String tenantCode) {
-    tenantContext.switchTo(tenantCode);
+    tenantContext.setFactory(tenantCode);
     return this;
   }
 
   public CacheTenantSwitcher<R> clear() {
-    tenantContext.clear();
+    tenantContext.removeFactory();
     return this;
   }
 
   public void run(String tenantCode, Runnable task) {
-    tenantContext.run(tenantCode, task);
+    tenantContext.trySetFactory(tenantCode, task);
   }
 
   public <T> T execute(String tenantCode, Supplier<T> supplier) {
-    return tenantContext.execute(tenantCode, supplier);
+    return tenantContext.executeWithFactory(tenantCode, supplier);
   }
 }

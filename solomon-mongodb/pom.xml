@@ -14,6 +14,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-constant</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
     </dependency>
