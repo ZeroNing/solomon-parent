@@ -1,7 +1,8 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.util.BooleanUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -24,7 +25,7 @@ public class MongoCondition implements Condition {
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         // 从环境配置中读取MongoDB启用开关，默认为true
-        String enabled = ValidateUtils.getOrDefault(context.getEnvironment().getProperty("spring.data.mongodb.enabled"),"true");
+        String enabled = ObjectUtil.defaultIfNull(context.getEnvironment().getProperty("spring.data.mongodb.enabled"),"true");
         return BooleanUtil.toBoolean(enabled);
     }
 }

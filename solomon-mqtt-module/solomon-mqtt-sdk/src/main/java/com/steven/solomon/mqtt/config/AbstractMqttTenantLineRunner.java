@@ -1,11 +1,12 @@
 package com.steven.solomon.mqtt.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.mqtt.annotation.MessageListener;
 import com.steven.solomon.mqtt.model.AbstractTenantMqttProfile;
 import com.steven.solomon.mqtt.service.MqttClientInitService;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,7 @@ public abstract class AbstractMqttTenantLineRunner<
       return;
     }
     Map<String, P> tenantProfileMap = profile.getTenant();
-    if (ValidateUtils.isEmpty(tenantProfileMap)) {
+    if (ObjectUtil.isEmpty(tenantProfileMap)) {
       logger.warn("未配置 MQTT 租户连接信息");
       return;
     }
@@ -76,7 +77,7 @@ public abstract class AbstractMqttTenantLineRunner<
   @SuppressWarnings("unchecked")
   private S resolveInitService() {
     Map<String, ? extends MqttClientInitService> serviceMap = SpringUtil.getBeansOfType(serviceType);
-    return ValidateUtils.isNotEmpty(serviceMap)
+    return ObjectUtil.isNotEmpty(serviceMap)
         ? (S) serviceMap.values().iterator().next()
         : defaultServiceSupplier.get();
   }

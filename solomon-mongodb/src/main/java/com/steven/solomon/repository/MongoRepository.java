@@ -1,5 +1,7 @@
 package com.steven.solomon.repository;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.util.ClassUtil;
 import cn.hutool.core.util.TypeUtil;
 import com.steven.solomon.pojo.enums.OrderByEnum;
@@ -10,7 +12,6 @@ import java.util.List;
 
 import com.steven.solomon.pojo.param.BasePageParam;
 import com.steven.solomon.pojo.vo.PageVO;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -203,7 +204,7 @@ public class MongoRepository<T, I> {
   }
 
   public PageVO<T> aggregate(List<AggregationOperation> list, Criteria criteria,BasePageParam basePageParam,Class<T> clazz) {
-    long   total = count(ValidateUtils.isNotEmpty(criteria) ? new Query(criteria) : new Query());
+    long   total = count(ObjectUtil.isNotEmpty(criteria) ? new Query(criteria) : new Query());
     PageVO<T> page  = new PageVO<>(null, total, basePageParam.getPageNo(), basePageParam.getPageSize());
     if (total <= 0) {
       return page;
@@ -216,7 +217,7 @@ public class MongoRepository<T, I> {
 
   public Sort sort(BasePageParam basePageParam) {
     List<BasePageParam.Sort> sorted        = basePageParam.getSorted();
-    if (ValidateUtils.isNotEmpty(sorted)) {
+    if (ObjectUtil.isNotEmpty(sorted)) {
       return Sort.by(getSort(basePageParam));
     } else {
       return Sort.unsorted();
@@ -227,7 +228,7 @@ public class MongoRepository<T, I> {
   public List<Sort.Order> getSort(BasePageParam basePageParam) {
     List<BasePageParam.Sort> sorted        = basePageParam.getSorted();
     List<Sort.Order>         querySortList = new ArrayList<>();
-    if (ValidateUtils.isNotEmpty(sorted)) {
+    if (ObjectUtil.isNotEmpty(sorted)) {
       for (BasePageParam.Sort sort : sorted) {
         String      orderByField = sort.getOrderByField();
         OrderByEnum orderBy      = sort.getOrderByMethod();

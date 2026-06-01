@@ -1,8 +1,9 @@
 package com.steven.solomon.template;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 
@@ -33,6 +34,6 @@ public class DynamicRedisTemplate<K,V> extends RedisTemplate<K,V> {
   public RedisConnectionFactory getConnectionFactory() {
     // 从租户上下文获取当前线程的连接工厂
     RedisConnectionFactory factory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
-    return ValidateUtils.getOrDefault(factory,super.getConnectionFactory());
+    return ObjectUtil.defaultIfNull(factory,super.getConnectionFactory());
   }
 }

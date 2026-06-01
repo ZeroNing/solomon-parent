@@ -1,5 +1,7 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.config.PowerJobCondition;
@@ -10,7 +12,6 @@ import com.steven.solomon.enums.JobPlatform;
 import com.steven.solomon.properties.JobProperties;
 import com.steven.solomon.service.PowerJobService;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Conditional;
@@ -64,7 +65,7 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
         for (Object obj : clazzList) {
             Class<?> clazz = AopUtils.getTargetClass(obj);
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
-            if (ValidateUtils.isEmpty(jobTask)) {
+            if (ObjectUtil.isEmpty(jobTask)) {
                 logger.error("{}没有JobTask注解,不进行初始化",clazz.getSimpleName());
                 continue;
             }
@@ -83,7 +84,7 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
     private void register(String cookie, Map<String, SaveJobInfoRequest> taskMap, JobTask jobTask, Integer appId, String className) throws Exception {
         try {
             SaveJobInfoRequest saveRequest = taskMap.get(className);
-            if (ValidateUtils.isEmpty(saveRequest)) {
+            if (ObjectUtil.isEmpty(saveRequest)) {
                 if (JobRegisterMode.UPDATE_ONLY.equals(jobProperties.getRegisterMode())) {
                     logger.info("{}不存在，当前PowerJob注册模式为UPDATE_ONLY，跳过创建", className);
                     return;

@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
 import com.rabbitmq.client.Channel;
@@ -17,7 +19,6 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.service.SendService;
-import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -106,7 +107,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         }
         Assert.state(concurrentConsumers > 0, "参数 'concurrentConsumers' 必须大于0.");
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
-        if (ValidateUtils.isNotEmpty(container) && container.isActive() && container.isRunning()) {
+        if (ObjectUtil.isNotEmpty(container) && container.isActive() && container.isRunning()) {
             container.setConsumersPerQueue(concurrentConsumers);
             return true;
         }
@@ -121,12 +122,12 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
-        if (ValidateUtils.isEmpty(queueName)) {
+        if (ObjectUtil.isEmpty(queueName)) {
             logger.error("restartMessageListener 重启队列失败,传入队列名为空!");
             return false;
         }
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
-        if (ValidateUtils.isEmpty(container)) {
+        if (ObjectUtil.isEmpty(container)) {
             logger.error("restartMessageListener 停止队列失败,没有这个监听器");
             return false;
         }
@@ -143,12 +144,12 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return false;
         }
-        if (ValidateUtils.isEmpty(queueName)) {
+        if (ObjectUtil.isEmpty(queueName)) {
             logger.error("stopMessageListener 停止队列失败,传入队列名为空!");
             return false;
         }
         DirectMessageListenerContainer container = (DirectMessageListenerContainer) findContainerByQueueName(queueName);
-        if (ValidateUtils.isEmpty(container)) {
+        if (ObjectUtil.isEmpty(container)) {
             logger.error("stopMessageListener 停止队列失败,没有这个监听器");
             return false;
         }
@@ -180,7 +181,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             return false;
         }
         RabbitMqModel<?> rabbitMQModel = (RabbitMqModel<?>) baseMq;
-        if (ValidateUtils.isEmpty(rabbitMQModel) || ValidateUtils.isEmpty(rabbitMQModel.getExchange())) {
+        if (ObjectUtil.isEmpty(rabbitMQModel) || ObjectUtil.isEmpty(rabbitMQModel.getExchange())) {
             return false;
         }
         Map<String, Object> headers = rabbitMQModel.getHeaders();
@@ -189,10 +190,10 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             msg.getMessageProperties().setDeliveryMode(rabbitMQModel.getMessagePersistent() ? MessageDeliveryMode.PERSISTENT : MessageDeliveryMode.NON_PERSISTENT);
             //设置消息优先级
             msg.getMessageProperties().setPriority(rabbitMQModel.getPriority());
-            if (ValidateUtils.equals(0L, expiration)) {
+            if (ObjectUtil.equals(0L, expiration)) {
                 return msg;
             }
-            if (ValidateUtils.isNotEmpty(headers)) {
+            if (ObjectUtil.isNotEmpty(headers)) {
                 for (Entry<String, Object> entry : headers.entrySet()) {
                     msg.getMessageProperties().setHeader(entry.getKey(), entry.getValue());
                 }
@@ -241,14 +242,14 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
         }
         Channel channel = rabbitTemplate.getConnectionFactory().createConnection().createChannel(transactional);
         GetResponse response = channel.basicGet(queueName, false);
-        if (ValidateUtils.isEmpty(response)) {
+        if (ObjectUtil.isEmpty(response)) {
             logger.error("没有从{}队列中获取到消息", queueName);
             return;
         }
         Map<String, Object> annotationMap = SpringUtil.getBeansWithAnnotation(MessageListener.class);
         for (Object obj : annotationMap.values()) {
             MessageListener messageListener = AnnotationUtil.getAnnotation(obj.getClass(), MessageListener.class);
-            if (ValidateUtils.isEmpty(messageListener)) {
+            if (ObjectUtil.isEmpty(messageListener)) {
                 continue;
             }
             List<String> queues = Arrays.asList(messageListener.queues());
@@ -269,7 +270,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("rabbitmq没开启,不发送消息");
             return null;
         }
-        if (ValidateUtils.isEmpty(model.getReplyTo())) {
+        if (ObjectUtil.isEmpty(model.getReplyTo())) {
             throw new BaseException(RabbitMqErrorCode.REPLY_TO_IS_NULL);
         }
         return rabbitTemplate.convertSendAndReceive(model.getRoutingKey(), model, message -> {

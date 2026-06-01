@@ -1,12 +1,13 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.crypto.digest.DigestUtil;
 import com.steven.solomon.enums.StorageCapability;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.model.FileUploadRequest;
 import com.steven.solomon.model.ShareFileRequest;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -170,6 +171,6 @@ public interface FileServiceInterface {
   }
 
   default String getFilePath(String fileName, FileChoiceProperties properties) {
-    return ValidateUtils.isEmpty(properties.getRootDirectory()) ? fileName : properties.getRootDirectory() + fileName;
+    return ObjectUtil.isEmpty(properties.getRootDirectory()) ? fileName : properties.getRootDirectory() + fileName;
   }
 }

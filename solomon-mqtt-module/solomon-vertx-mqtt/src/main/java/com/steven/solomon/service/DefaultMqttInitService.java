@@ -1,12 +1,13 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.lang.UUID;
 import com.steven.solomon.mqtt.service.MqttClientInitService;
 import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import com.steven.solomon.mqtt.annotation.MessageListener;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
         // 初始化 MQTT 连接配置
         MqttClientOptions options = utils.initMqttConnectOptions(mqttProfile);
         // 设置 clientId
-        String clientId = ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString());
+        String clientId = ObjectUtil.defaultIfNull(mqttProfile.getClientId(), UUID.randomUUID().toString());
         options.setClientId(clientId);
 
         // 创建 MQTT Client

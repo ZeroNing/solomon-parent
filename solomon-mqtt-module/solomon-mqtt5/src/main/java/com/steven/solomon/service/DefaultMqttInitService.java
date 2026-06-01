@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.lang.UUID;
 import com.steven.solomon.mqtt.annotation.MessageListener;
 import com.steven.solomon.mqtt.service.MqttClientInitService;
@@ -7,7 +9,6 @@ import com.steven.solomon.profile.MqttProfile;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.MqttUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import org.eclipse.paho.mqttv5.client.IMqttToken;
 import org.eclipse.paho.mqttv5.client.MqttAsyncClient;
@@ -65,7 +66,7 @@ public class DefaultMqttInitService implements MqttClientInitService<MqttProfile
     // 取第一个 URL 作为连接地址
     String url = mqttProfile.getUrl().split(",")[0];
     // 客户端 ID 为空时自动生成 UUID
-    String clientId = ValidateUtils.getOrDefault(mqttProfile.getClientId(), UUID.randomUUID().toString());
+    String clientId = ObjectUtil.defaultIfNull(mqttProfile.getClientId(), UUID.randomUUID().toString());
     MqttAsyncClient client = new MqttAsyncClient(url, clientId);
     MqttConnectionOptions options = utils.initMqttConnectOptions(mqttProfile);
     client.setCallback(callback(tenantCode, client, listenerList));

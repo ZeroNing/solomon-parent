@@ -1,7 +1,8 @@
 package com.steven.solomon.mqtt;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.verification.ValidateUtils;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -58,7 +59,7 @@ public abstract class AbstractMqttClientRegistry<C, O> {
    */
   protected C getRequiredClient(String tenantCode, String errorCode) throws BaseException {
     C client = clientMap.get(tenantCode);
-    if (ValidateUtils.isEmpty(client)) {
+    if (ObjectUtil.isEmpty(client)) {
       throw new BaseException(errorCode, tenantCode);
     }
     return client;

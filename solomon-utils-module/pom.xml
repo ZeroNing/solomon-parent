@@ -13,9 +13,13 @@
     <artifactId>solomon-utils-module</artifactId>
     <name>Solomon Utils Module</name>
     <packaging>pom</packaging>
-    <description>Solomon utility aggregation module (EPC coder, Bot notice, ClamAV scanner).</description>
+    <description>Solomon utility aggregation module with focused core, Spring, JSON and algorithm libraries.</description>
 
     <modules>
+        <module>solomon-utils-core</module>
+        <module>solomon-utils-spring</module>
+        <module>solomon-utils-json</module>
+        <module>solomon-utils-algorithm</module>
         <module>solomon-epc-coder</module>
         <module>solomon-bot-notice</module>
         <module>solomon-clamav</module>

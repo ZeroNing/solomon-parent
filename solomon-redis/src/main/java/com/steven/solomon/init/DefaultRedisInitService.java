@@ -1,7 +1,8 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.config.RedisTenantContext;
-import com.steven.solomon.verification.ValidateUtils;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.data.redis.connection.RedisPassword;
@@ -100,14 +101,14 @@ public class DefaultRedisInitService extends AbstractDataSourceInitService<Redis
         GenericObjectPoolConfig genericObjectPoolConfig = new GenericObjectPoolConfig();
         RedisProperties.Pool pool = properties.getLettuce().getPool();
         
-        if (ValidateUtils.isNotEmpty(pool)) {
-            // 连接池参数配置（使用ValidateUtils.getOrDefault提供默认值）
-            genericObjectPoolConfig.setMaxIdle(ValidateUtils.getOrDefault(pool.getMaxIdle(), 0));
-            genericObjectPoolConfig.setMinIdle(ValidateUtils.getOrDefault(pool.getMinIdle(), 0));
-            genericObjectPoolConfig.setMaxTotal(ValidateUtils.getOrDefault(pool.getMaxActive(), 8));
-            genericObjectPoolConfig.setMaxWaitMillis(ValidateUtils.getOrDefault(pool.getMaxWait().toMillis(), -1L));
+        if (ObjectUtil.isNotEmpty(pool)) {
+            // 连接池参数配置，缺省值由 Hutool ObjectUtil 提供。
+            genericObjectPoolConfig.setMaxIdle(ObjectUtil.defaultIfNull(pool.getMaxIdle(), 0));
+            genericObjectPoolConfig.setMinIdle(ObjectUtil.defaultIfNull(pool.getMinIdle(), 0));
+            genericObjectPoolConfig.setMaxTotal(ObjectUtil.defaultIfNull(pool.getMaxActive(), 8));
+            genericObjectPoolConfig.setMaxWaitMillis(ObjectUtil.defaultIfNull(pool.getMaxWait().toMillis(), -1L));
             genericObjectPoolConfig.setTimeBetweenEvictionRunsMillis(
-                ValidateUtils.getOrDefault(ValidateUtils.getOrDefault(pool.getTimeBetweenEvictionRuns(), 
+                ObjectUtil.defaultIfNull(ObjectUtil.defaultIfNull(pool.getTimeBetweenEvictionRuns(),
                     Duration.ofMillis(60L)).toMillis(), 60L));
             
             log.debug("[Redis] 连接池配置: maxIdle={}, minIdle={}, maxTotal={}, maxWait={}ms", 
@@ -128,13 +129,13 @@ public class DefaultRedisInitService extends AbstractDataSourceInitService<Redis
         
         log.debug("[Redis] Redis配置: host={}:{}, database={}, password={}", 
             properties.getHost(), properties.getPort(), properties.getDatabase(), 
-            ValidateUtils.isNotEmpty(properties.getPassword()) ? "已设置" : "未设置");
+            ObjectUtil.isNotEmpty(properties.getPassword()) ? "已设置" : "未设置");
         
         // ========== Step 3: 创建Lettuce客户端配置 ==========
         LettuceClientConfiguration clientConfig = LettucePoolingClientConfiguration.builder()
                 // 注释掉的配置项（可根据需要启用）：
-                // .commandTimeout(ValidateUtils.getOrDefault(redisProperties.getTimeout(), Duration.ofMillis(60L)))
-                // .shutdownTimeout(ValidateUtils.getOrDefault(redisProperties.getLettuce().getShutdownTimeout(), Duration.ofMillis(100)))
+                // .commandTimeout(ObjectUtil.defaultIfNull(redisProperties.getTimeout(), Duration.ofMillis(60L)))
+                // .shutdownTimeout(ObjectUtil.defaultIfNull(redisProperties.getLettuce().getShutdownTimeout(), Duration.ofMillis(100)))
                 .poolConfig(genericObjectPoolConfig)
                 .build();
         

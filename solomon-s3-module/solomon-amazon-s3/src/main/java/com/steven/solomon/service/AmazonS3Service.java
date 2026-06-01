@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.client.AmazonS3ClientFactory;
 import com.steven.solomon.enums.StorageCapability;
@@ -9,7 +11,6 @@ import com.steven.solomon.model.FileUploadRequest;
 import com.steven.solomon.model.ShareFileRequest;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -58,13 +59,13 @@ public class AmazonS3Service extends AbstractFileService {
             .bucket(request.getBucketName())
             .key(filePath)
             .contentLength((long) fileBytes.length);
-    if (ValidateUtils.isNotEmpty(request.getContentType())) {
+    if (ObjectUtil.isNotEmpty(request.getContentType())) {
       builder.contentType(request.getContentType());
     }
-    if (ValidateUtils.isNotEmpty(request.getMetadata())) {
+    if (ObjectUtil.isNotEmpty(request.getMetadata())) {
       builder.metadata(request.getMetadata());
     }
-    if (ValidateUtils.isNotEmpty(request.getTags())) {
+    if (ObjectUtil.isNotEmpty(request.getTags())) {
       builder.tagging(toTagging(request));
     }
     PutObjectRequest putObjectRequest = builder.build();
@@ -75,16 +76,16 @@ public class AmazonS3Service extends AbstractFileService {
   @Override
   public String share(ShareFileRequest request) throws Exception {
     requireCapability(StorageCapability.SHARE_URL);
-    if (ValidateUtils.isEmpty(request)) {
+    if (ObjectUtil.isEmpty(request)) {
       throw new IllegalArgumentException("分享请求不能为空");
     }
     GetObjectRequest.Builder objectRequest = GetObjectRequest.builder()
         .bucket(request.getBucketName())
         .key(getFilePath(request.getFileName(), properties));
-    if (ValidateUtils.isNotEmpty(request.getDownloadFileName())) {
+    if (ObjectUtil.isNotEmpty(request.getDownloadFileName())) {
       objectRequest.responseContentDisposition("attachment; filename=\"" + request.getDownloadFileName() + "\"");
     }
-    if (ValidateUtils.isNotEmpty(request.getContentType())) {
+    if (ObjectUtil.isNotEmpty(request.getContentType())) {
       objectRequest.responseContentType(request.getContentType());
     }
     GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -200,12 +201,12 @@ public class AmazonS3Service extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName, String key) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
     ListObjectsV2Request.Builder requestBuilder = ListObjectsV2Request.builder()
             .bucket(bucketName);
-    if (ValidateUtils.isNotEmpty(key)) {
+    if (ObjectUtil.isNotEmpty(key)) {
       requestBuilder.prefix(key);
     }
     ListObjectsV2Request request = requestBuilder.build();
@@ -355,7 +356,7 @@ public class AmazonS3Service extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName)) {
       logger.error("[S3] 删除桶失败，参数为空: bucketName= null");
       return;
     }
@@ -379,7 +380,7 @@ public class AmazonS3Service extends AbstractFileService {
     List<Bucket> bucketList = client.listBuckets().buckets();
     List<String> bucketNameList = new ArrayList<>();
 
-    if (ValidateUtils.isNotEmpty(bucketList)) {
+    if (ObjectUtil.isNotEmpty(bucketList)) {
       for (Bucket bucket : bucketList) {
         bucketNameList.add(bucket.name());
       }

@@ -31,12 +31,11 @@
   <modules>
     <!-- 核心基础模块 -->
     <module>solomon-constant</module>
-    <module>solomon-utils</module>
     <module>solomon-base</module>
     <module>solomon-common</module>
 
     <!-- 数据存储模块 -->
-    <module>solomon-datasource</module>
+    <module>solomon-dataSource</module>
     <module>solomon-mongodb</module>
     <module>solomon-redis</module>
 
@@ -213,7 +212,22 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-utils</artifactId>
+        <artifactId>solomon-utils-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-utils-spring</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-utils-json</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-utils-algorithm</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

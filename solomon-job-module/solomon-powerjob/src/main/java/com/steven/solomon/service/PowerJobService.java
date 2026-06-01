@@ -1,10 +1,15 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -14,10 +19,8 @@ import com.steven.solomon.entity.JobAppVO;
 import com.steven.solomon.entity.JobNamespace;
 import com.steven.solomon.entity.PowerJobRequestFactory;
 import com.steven.solomon.exception.BaseException;
-import com.steven.solomon.http.HttpUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.JobProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -58,13 +61,13 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         String userName = jobProperties.getUserName();
         String password = jobProperties.getPassword();
 
-        if (ValidateUtils.isEmpty(adminAddresses)) {
+        if (ObjectUtil.isEmpty(adminAddresses)) {
             throw new BaseException(POWER_JOB_URL_NULL);
         }
-        if (ValidateUtils.isEmpty(userName)) {
+        if (ObjectUtil.isEmpty(userName)) {
             throw new BaseException(POWER_JOB_USER_NAME_NULL);
         }
-        if (ValidateUtils.isEmpty(password)) {
+        if (ObjectUtil.isEmpty(password)) {
             throw new BaseException(POWER_JOB_PASSWORD_NULL);
         }
 
@@ -87,7 +90,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
                 ApiRequest.postJson("user/login", passwordParam)
         ));
         String token = resolveToken(body);
-        if (ValidateUtils.isEmpty(token)) {
+        if (ObjectUtil.isEmpty(token)) {
             throw new BaseException(POWER_JOB_EXECUTE_POST_ERROR, adminAddresses, JobLogSanitizer.sanitize(passwordParam), "登录成功但未返回token");
         }
         return token;
@@ -95,31 +98,31 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     @Override
     public void saveJob(String cookie, SaveJobInfoRequest job) throws Exception {
-        if (ValidateUtils.isNotEmpty(job.getId())) {
+        if (ObjectUtil.isNotEmpty(job.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NULL);
         }
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        cookie = ObjectUtil.defaultIfNull(cookie, login());
         executeFirst(cookie, Arrays.asList(openApi(OpenAPIConstant.SAVE_JOB), "job/save"), Method.POST, ContentType.JSON, PowerJobRequestFactory.toPayload(job));
     }
 
     @Override
     public void updateJob(String cookie, SaveJobInfoRequest job) throws Exception {
-        if (ValidateUtils.isEmpty(job.getId())) {
+        if (ObjectUtil.isEmpty(job.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NOT_NULL);
         }
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        cookie = ObjectUtil.defaultIfNull(cookie, login());
         executeFirst(cookie, Arrays.asList(openApi(OpenAPIConstant.SAVE_JOB), "job/save"), Method.POST, ContentType.JSON, PowerJobRequestFactory.toPayload(job));
     }
 
     @Override
     public void deleteJob(String cookie, String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        cookie = ObjectUtil.defaultIfNull(cookie, login());
         Map<String,SaveJobInfoRequest> jobMap = findByExecutorHandler(cookie,getAppId(cookie));
         SaveJobInfoRequest jobInfoRequest = jobMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(jobInfoRequest)) {
+        if (ObjectUtil.isEmpty(jobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
-        if (ValidateUtils.isEmpty(jobInfoRequest.getId())) {
+        if (ObjectUtil.isEmpty(jobInfoRequest.getId())) {
             throw new BaseException(POWER_JOB_ID_IS_NULL);
         }
         Map<String,Object> paramMap = new HashMap<>();
@@ -133,10 +136,10 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     @Override
     public void startJob(String cookie, String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        cookie = ObjectUtil.defaultIfNull(cookie, login());
         Map<String,SaveJobInfoRequest> taskMap = findByExecutorHandler(cookie,getAppId(cookie));
         SaveJobInfoRequest saveJobInfoRequest = taskMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(saveJobInfoRequest)) {
+        if (ObjectUtil.isEmpty(saveJobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
         updateStatus(cookie, saveJobInfoRequest, true);
@@ -144,10 +147,10 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     @Override
     public void stopJob(String cookie, String executorHandler) throws Exception {
-        cookie = ValidateUtils.getOrDefault(cookie, login());
+        cookie = ObjectUtil.defaultIfNull(cookie, login());
         Map<String,SaveJobInfoRequest> taskMap = findByExecutorHandler(cookie,getAppId(cookie));
         SaveJobInfoRequest saveJobInfoRequest = taskMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(saveJobInfoRequest)) {
+        if (ObjectUtil.isEmpty(saveJobInfoRequest)) {
             throw new BaseException(POWER_JOB_TASK_IS_NULL,executorHandler);
         }
         updateStatus(cookie, saveJobInfoRequest, false);
@@ -163,7 +166,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         paramMap.put("pageSize",100000);
         String body = executeFirst(cookie, Arrays.asList(openApi(OpenAPIConstant.FETCH_ALL_JOB), "job/list"), Method.POST, ContentType.JSON,paramMap);
         JSONArray data = readArray(body);
-        if (ValidateUtils.isEmpty(data)) {
+        if (ObjectUtil.isEmpty(data)) {
             return new HashMap<>();
         }
         List<JobInfoDTO> list = JSONUtil.toList(data, JobInfoDTO.class);
@@ -181,7 +184,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
         String body = executeFirst(cookie, Arrays.asList("appInfo/list", "app/list"), Method.POST, ContentType.JSON, paramMap);
         JSONArray jsonArray = readArray(body);
-        if (ValidateUtils.isEmpty(jsonArray)) {
+        if (ObjectUtil.isEmpty(jsonArray)) {
             return new HashMap<>();
         }
         List<JobAppVO> appVOList = JSONUtil.toList(jsonArray, JobAppVO.class);
@@ -194,7 +197,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     public Integer createAppId(String cookie,String appName,Integer namespacesId)throws BaseException {
         Map<String,Integer> appIdMap = getAllAppId(cookie);
         Integer appId = appIdMap.get(appName);
-        if (ValidateUtils.isNotEmpty(appId)) {
+        if (ObjectUtil.isNotEmpty(appId)) {
             return appId;
         }
         if (!jobProperties.getAutoCreateNamespaceApp()) {
@@ -229,7 +232,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     public Integer createNamespace(String code,String cookie) throws BaseException {
         Map<String, JobNamespace> namespaceMap = getAllNamespaces(cookie);
         JobNamespace jobNamespace =  namespaceMap.get(code);
-        if (ValidateUtils.isNotEmpty(jobNamespace)) {
+        if (ObjectUtil.isNotEmpty(jobNamespace)) {
             return jobNamespace.getId();
         }
         if (!jobProperties.getAutoCreateNamespaceApp()) {
@@ -241,7 +244,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         params.put("componentUserRoleInfo",initUserRole());
         String body = execute(cookie,adminAddresses + "namespace/save",Method.POST,ContentType.JSON,params);
         Map<String,Object> bodyMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-        return ValidateUtils.isEmpty(bodyMap) ? 0 : Integer.parseInt(bodyMap.get("id").toString());
+        return ObjectUtil.isEmpty(bodyMap) ? 0 : Integer.parseInt(bodyMap.get("id").toString());
     }
 
     /**
@@ -296,14 +299,14 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
                 lastException = exception;
             }
         }
-        throw ValidateUtils.isEmpty(lastException) ? new BaseException(POWER_JOB_EXECUTE_POST_ERROR, adminAddresses, "{}", "无可用接口路径") : lastException;
+        throw ObjectUtil.isEmpty(lastException) ? new BaseException(POWER_JOB_EXECUTE_POST_ERROR, adminAddresses, "{}", "无可用接口路径") : lastException;
     }
 
     /**
      * 兼容不同 PowerJob 版本的分页结构，统一提取列表数据。
      */
     private JSONArray readArray(String body) {
-        if (ValidateUtils.isEmpty(body)) {
+        if (ObjectUtil.isEmpty(body)) {
             return new JSONArray();
         }
         Object data = JSONUtil.parse(body);
@@ -323,7 +326,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     private Object firstNotEmpty(JSONObject json, String... keys) {
         for (String key : keys) {
             Object value = json.get(key);
-            if (ValidateUtils.isNotEmpty(value)) {
+            if (ObjectUtil.isNotEmpty(value)) {
                 return value;
             }
         }
@@ -334,7 +337,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
      * 兼容不同登录接口的 token 返回字段。
      */
     private String resolveToken(String body) {
-        if (ValidateUtils.isEmpty(body)) {
+        if (ObjectUtil.isEmpty(body)) {
             return null;
         }
         if (!JSONUtil.isTypeJSON(body) || !body.trim().startsWith("{")) {
@@ -342,14 +345,14 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         }
         JSONObject json = JSONUtil.parseObj(body);
         Object token = firstNotEmpty(json, "jwtToken", "token", "accessToken");
-        return ValidateUtils.isEmpty(token) ? null : token.toString();
+        return ObjectUtil.isEmpty(token) ? null : token.toString();
     }
 
     /**
      * 延迟创建应用，避免服务 Bean 初始化时强依赖 PowerJob 管理端可用。
      */
     private Integer getAppId(String cookie) throws BaseException {
-        if (ValidateUtils.isEmpty(appId)) {
+        if (ObjectUtil.isEmpty(appId)) {
             appId = createAppId(cookie, powerJobProperties.getWorker().getAppName(), createNamespace(jobProperties.getNamespace(), cookie));
         }
         return appId;
@@ -359,17 +362,20 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
      * 调用接口
      */
     private HttpResponse executeResponse(String cookie, String url, Method requestMethod, ContentType contentType, Map<String, Object> paramMap) throws BaseException {
-        HttpRequest request = HttpUtils.initRequest(requestMethod, url,contentType);
-        if (ValidateUtils.isNotEmpty(cookie)) {
+        HttpRequest request = HttpUtil.createRequest(requestMethod, url);
+        if (ObjectUtil.isNotEmpty(contentType)) {
+            request.contentType(contentType.getValue());
+        }
+        if (ObjectUtil.isNotEmpty(cookie)) {
             // 新版本使用 PowerJwt，部分历史版本仍兼容 Cookie 鉴权。
             request = request.header("PowerJwt",cookie)
                     .header("Cookie", cookie)
                     .header(OpenAPIConstant.REQUEST_HEADER_ACCESS_TOKEN, cookie);
         }
-        if (ValidateUtils.isNotEmpty(appId)) {
+        if (ObjectUtil.isNotEmpty(appId)) {
             request = request.header(OpenAPIConstant.REQUEST_HEADER_APP_ID, appId.toString());
         }
-        if (ValidateUtils.isNotEmpty(paramMap)) {
+        if (ObjectUtil.isNotEmpty(paramMap)) {
             request = request.body(JSONUtil.toJsonStr(paramMap));
         }
         HttpResponse response = request.execute();
@@ -380,12 +386,12 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             Object successValue = resultMap.get("success");
             Object codeValue = resultMap.get("code");
-            success = ValidateUtils.isEmpty(successValue) ? null : BooleanUtil.toBoolean(successValue.toString());
-            message = ValidateUtils.isEmpty(resultMap.get("message")) ? null : resultMap.get("message").toString();
-            if (ValidateUtils.isEmpty(message)) {
-                message = ValidateUtils.isEmpty(resultMap.get("msg")) ? null : resultMap.get("msg").toString();
+            success = ObjectUtil.isEmpty(successValue) ? null : BooleanUtil.toBoolean(successValue.toString());
+            message = ObjectUtil.isEmpty(resultMap.get("message")) ? null : resultMap.get("message").toString();
+            if (ObjectUtil.isEmpty(message)) {
+                message = ObjectUtil.isEmpty(resultMap.get("msg")) ? null : resultMap.get("msg").toString();
             }
-            if (ValidateUtils.isNotEmpty(codeValue) && !ValidateUtils.equalsIgnoreCase(codeValue.toString(), "200") && !ValidateUtils.equalsIgnoreCase(codeValue.toString(), "0")) {
+            if (ObjectUtil.isNotEmpty(codeValue) && !StrUtil.equalsIgnoreCase(codeValue.toString(), "200") && !StrUtil.equalsIgnoreCase(codeValue.toString(), "0")) {
                 success = false;
             }
         }
@@ -431,7 +437,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
                 return body;
             }
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-            return ValidateUtils.isEmpty(resultMap.get("data")) ? body : resultMap.get("data").toString();
+            return ObjectUtil.isEmpty(resultMap.get("data")) ? body : resultMap.get("data").toString();
         }
     }
 

@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.consumer.AbstractConsumer;
@@ -16,7 +18,6 @@ import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -107,7 +108,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttC
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer)
       throws MqttException, BaseException {
-    if (ValidateUtils.isEmpty(topic)) {
+    if (ObjectUtil.isEmpty(topic)) {
       return;
     }
     getClient(tenantCode).subscribe(topic, qos, (IMqttMessageListener) consumer);
@@ -162,7 +163,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttC
    */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws MqttException, BaseException {
-    if (ValidateUtils.isEmpty(topics)) {
+    if (ObjectUtil.isEmpty(topics)) {
       return;
     }
     getClient(tenantCode).unsubscribe(topics);
@@ -281,7 +282,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttAsyncClient, MqttC
 
     // 设置遗嘱消息
     MqttWill will = mqttProfile.getWill();
-    if (ValidateUtils.isNotEmpty(will)) {
+    if (ObjectUtil.isNotEmpty(will)) {
       options.setWill(
           will.getTopic(),
           will.getMessage().getBytes(StandardCharsets.UTF_8),

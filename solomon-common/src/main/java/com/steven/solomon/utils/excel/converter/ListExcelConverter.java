@@ -1,5 +1,7 @@
 package com.steven.solomon.utils.excel.converter;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.idev.excel.converters.Converter;
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.GlobalConfiguration;
@@ -7,7 +9,6 @@ import cn.idev.excel.metadata.data.ImageData;
 import cn.idev.excel.metadata.data.WriteCellData;
 import cn.idev.excel.metadata.property.ExcelContentProperty;
 import cn.idev.excel.util.IoUtils;
-import com.steven.solomon.verification.ValidateUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,7 @@ public class ListExcelConverter implements Converter<List<?>> {
     @Override
     public WriteCellData<?> convertToExcelData(List<?> list, ExcelContentProperty contentProperty,
                                                GlobalConfiguration globalConfiguration) throws IOException {
-        if (ValidateUtils.isEmpty(list)) {
+        if (ObjectUtil.isEmpty(list)) {
             return new WriteCellData<>("");
         }
         Object value = list.getFirst();
@@ -53,7 +54,7 @@ public class ListExcelConverter implements Converter<List<?>> {
         }catch (Exception e) {
             return new WriteCellData<>("InputStream异常");
         } finally {
-            if (ValidateUtils.isNotEmpty(list) && isInputStream) {
+            if (ObjectUtil.isNotEmpty(list) && isInputStream) {
                 for (Object val : list) {
                     InputStream inputStream = (InputStream) val;
                     inputStream.close();

@@ -14,11 +14,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.steven</groupId>
-            <artifactId>solomon-utils</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
         </dependency>

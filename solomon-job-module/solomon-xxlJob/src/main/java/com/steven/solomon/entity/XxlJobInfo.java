@@ -1,9 +1,10 @@
 package com.steven.solomon.entity;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.enums.*;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * xxl-job info
@@ -58,10 +59,10 @@ public class XxlJobInfo {
 	 */
 	private void fill(JobTask jobTask,String className) {
 		this.jobGroup = jobTask.jobGroup();
-		this.jobDesc = ValidateUtils.getOrDefault(jobTask.taskName(),className);
+		this.jobDesc = ObjectUtil.defaultIfNull(jobTask.taskName(),className);
 		String author = null;
-		if (ValidateUtils.isEmpty(jobTask.author())) {
-			author = ValidateUtils.getOrDefault(SpringUtil.getElValue("${spring.application.name}"),className);
+		if (ObjectUtil.isEmpty(jobTask.author())) {
+			author = ObjectUtil.defaultIfNull(SpringUtil.getElValue("${spring.application.name}"),className);
 		} else {
 			author = jobTask.author();
 		}

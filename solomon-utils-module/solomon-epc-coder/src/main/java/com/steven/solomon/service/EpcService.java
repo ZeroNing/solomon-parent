@@ -1,10 +1,11 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.code.EpcErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
 import com.steven.solomon.model.Gs1BarcodeResult;
-import com.steven.solomon.verification.ValidateUtils;
 
 import java.math.BigInteger;
 import java.util.Locale;
@@ -39,7 +40,7 @@ public class EpcService {
   public GiaiBuilder giai() { return new GiaiBuilder(this); }
 
   public EpcResult ean13ToSgtin96(String ean13, int companyPrefixLength, String serial) throws BaseException {
-    if (ValidateUtils.isEmpty(ean13) || ean13.length() != 13) {
+    if (ObjectUtil.isEmpty(ean13) || ean13.length() != 13) {
       throw new BaseException(EpcErrorCode.BARCODE_LENGTH_ERROR, ean13, 13);
     }
     return sgtin(ean13, companyPrefixLength, serial, 96, 0);
@@ -75,7 +76,7 @@ public class EpcService {
 
   public EpcResult giaiToEpc(String companyPrefix, String assetReference, int tagSize, int filter) throws BaseException {
     validateFilter(filter);
-    Partition partition = partitionByCompanyPrefixLength(ValidateUtils.isEmpty(companyPrefix) ? 0 : companyPrefix.length());
+    Partition partition = partitionByCompanyPrefixLength(ObjectUtil.isEmpty(companyPrefix) ? 0 : companyPrefix.length());
     validateCompanyPrefix(companyPrefix, partition);
     requireNotBlank(assetReference, EpcErrorCode.EPC_ASSET_REFERENCE_ERROR);
     String type; String bits;
@@ -99,7 +100,7 @@ public class EpcService {
   }
 
   public EpcResult ssccToSscc96(String sscc, int companyPrefixLength) throws BaseException {
-    if (ValidateUtils.isEmpty(sscc) || sscc.length() != 18 || !isNumeric(sscc)) { throw new BaseException(EpcErrorCode.BARCODE_LENGTH_ERROR, sscc, 18); }
+    if (ObjectUtil.isEmpty(sscc) || sscc.length() != 18 || !isNumeric(sscc)) { throw new BaseException(EpcErrorCode.BARCODE_LENGTH_ERROR, sscc, 18); }
     String companyPrefix = sscc.substring(1, 1 + companyPrefixLength);
     String serial = sscc.substring(1 + companyPrefixLength, 17);
     return new EpcResult().setType("SSCC-96").setBitLength(96).setHex("").setUri("urn:epc:tag:sscc-96:0." + companyPrefix + "." + serial)
@@ -107,7 +108,7 @@ public class EpcService {
   }
 
   public EpcResult decodeEpc(String hex) throws BaseException {
-    if (ValidateUtils.isEmpty(hex) || !hex.matches("(?i)[0-9a-f]+")) { throw new BaseException(EpcErrorCode.EPC_INVALID_FORMAT, hex); }
+    if (ObjectUtil.isEmpty(hex) || !hex.matches("(?i)[0-9a-f]+")) { throw new BaseException(EpcErrorCode.EPC_INVALID_FORMAT, hex); }
     String bits = hexToBinary(hex.toUpperCase(Locale.ROOT));
     int header = Integer.parseInt(bits.substring(0, 8), 2);
     if (header == HEADER_SGTIN_96) { return decodeSgtin(bits, hex, 96); }
@@ -193,10 +194,10 @@ public class EpcService {
     Matcher matcher = BRACKET_AI_PATTERN.matcher(barcode);
     String ai = null; int valueStart = -1;
     while (matcher.find()) {
-      if (ValidateUtils.isNotEmpty(ai)) { putAi(result, ai, barcode.substring(valueStart, matcher.start())); }
+      if (ObjectUtil.isNotEmpty(ai)) { putAi(result, ai, barcode.substring(valueStart, matcher.start())); }
       ai = matcher.group(1); valueStart = matcher.end();
     }
-    if (ValidateUtils.isNotEmpty(ai)) { putAi(result, ai, barcode.substring(valueStart)); }
+    if (ObjectUtil.isNotEmpty(ai)) { putAi(result, ai, barcode.substring(valueStart)); }
   }
 
   private void parsePlainGs1(String barcode, Gs1BarcodeResult result) {
@@ -242,10 +243,10 @@ public class EpcService {
   private void validateFilter(int filter) throws BaseException { if (filter < 0 || filter > 7) { throw new BaseException(EpcErrorCode.EPC_PARTITION_ERROR, filter); } }
 
   private void validateCompanyPrefix(String companyPrefix, Partition partition) throws BaseException {
-    if (ValidateUtils.isEmpty(companyPrefix) || companyPrefix.length() != partition.companyPrefixDigits || !isNumeric(companyPrefix)) { throw new BaseException(EpcErrorCode.EPC_COMPANY_PREFIX_LENGTH_ERROR, companyPrefix); }
+    if (ObjectUtil.isEmpty(companyPrefix) || companyPrefix.length() != partition.companyPrefixDigits || !isNumeric(companyPrefix)) { throw new BaseException(EpcErrorCode.EPC_COMPANY_PREFIX_LENGTH_ERROR, companyPrefix); }
   }
 
-  private void requireNotBlank(String value, String code) throws BaseException { if (ValidateUtils.isEmpty(value)) { throw new BaseException(code); } }
+  private void requireNotBlank(String value, String code) throws BaseException { if (ObjectUtil.isEmpty(value)) { throw new BaseException(code); } }
 
   private void validateSevenBit(String value, String code) throws BaseException { validateSevenBit(value, 20, code); }
 
@@ -254,7 +255,7 @@ public class EpcService {
     for (int i = 0; i < value.length(); i++) { if (value.charAt(i) > 127) { throw new BaseException(code, value); } }
   }
 
-  private static boolean isNumeric(String value) { return ValidateUtils.isNotEmpty(value) && value.matches("\\d+"); }
+  private static boolean isNumeric(String value) { return ObjectUtil.isNotEmpty(value) && value.matches("\\d+"); }
 
   private static String fixedBinary(long value, int bits) { return fixedBinary(BigInteger.valueOf(value), bits); }
 

@@ -1,12 +1,13 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.config.NoticeProperties;
 import com.steven.solomon.entity.NoticeMessage;
 import com.steven.solomon.enums.NoticeChannelEnum;
 import com.steven.solomon.enums.NoticeLevelEnum;
 import com.steven.solomon.service.NoticeService;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,7 @@ public class NoticeUtils implements DisposableBean {
 
     public void send(NoticeMessage message) throws Exception {
         if (!properties.isEnabled()) { logger.debug("通知服务已关闭，跳过发送"); return; }
-        if (message == null || ValidateUtils.isEmpty(message.getChannels())) { logger.warn("通知消息或通知渠道为空，跳过发送"); return; }
+        if (message == null || ObjectUtil.isEmpty(message.getChannels())) { logger.warn("通知消息或通知渠道为空，跳过发送"); return; }
         resolveTemplate(message);
         for (NoticeChannelEnum channel : message.getChannels()) {
             NoticeService service = serviceMap.get(channel);
@@ -77,6 +78,6 @@ public class NoticeUtils implements DisposableBean {
         try { TimeUnit.SECONDS.sleep(2L * retryIndex); return true; } catch (InterruptedException e) { Thread.currentThread().interrupt(); logger.warn("通知重试等待被中断，停止后续重试"); return false; }
     }
 
-    private void resolveTemplate(NoticeMessage message) { if (ValidateUtils.isEmpty(message.getTemplateCode())) { return; } }
+    private void resolveTemplate(NoticeMessage message) { if (ObjectUtil.isEmpty(message.getTemplateCode())) { return; } }
     private List<NoticeChannelEnum> defaultChannels() { return List.of(NoticeChannelEnum.WECHAT_WORK); }
 }

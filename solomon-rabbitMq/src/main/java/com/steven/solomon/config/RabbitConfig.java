@@ -1,10 +1,11 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.service.*;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -50,17 +51,17 @@ public class RabbitConfig {
                                          RabbitProperties properties) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(messageConverter);
-        rabbitTemplate.setMandatory(ValidateUtils.getOrDefault(properties.getTemplate().getMandatory(), true));
-        if (ValidateUtils.isNotEmpty(properties.getTemplate().getReceiveTimeout())) {
+        rabbitTemplate.setMandatory(ObjectUtil.defaultIfNull(properties.getTemplate().getMandatory(), true));
+        if (ObjectUtil.isNotEmpty(properties.getTemplate().getReceiveTimeout())) {
             rabbitTemplate.setReceiveTimeout(properties.getTemplate().getReceiveTimeout().toMillis());
         }
-        if (ValidateUtils.isNotEmpty(properties.getTemplate().getReplyTimeout())) {
+        if (ObjectUtil.isNotEmpty(properties.getTemplate().getReplyTimeout())) {
             rabbitTemplate.setReplyTimeout(properties.getTemplate().getReplyTimeout().toMillis());
         } else {
             rabbitTemplate.setReplyTimeout(120000);
         }
         Map<String, AbstractRabbitCallBack> callBackMap = SpringUtil.getBeansOfType(AbstractRabbitCallBack.class);
-        if (ValidateUtils.isNotEmpty(callBackMap)) {
+        if (ObjectUtil.isNotEmpty(callBackMap)) {
             RabbitCallBack rabbitCallBack = new RabbitCallBack(callBackMap.values());
             rabbitTemplate.setConfirmCallback(rabbitCallBack);
             rabbitTemplate.setReturnsCallback(rabbitCallBack);

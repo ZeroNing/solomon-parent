@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.alibaba.csp.sentinel.datasource.nacos.NacosDataSource;
 import com.alibaba.csp.sentinel.property.SentinelProperty;
 import com.alibaba.csp.sentinel.slots.block.degrade.DegradeRule;
@@ -17,7 +19,6 @@ import com.alibaba.nacos.api.config.ConfigType;
 import com.alibaba.nacos.api.exception.NacosException;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.core.lang.TypeReference;
-import com.steven.solomon.verification.ValidateUtils;
 import java.util.List;
 import java.util.Properties;
 
@@ -68,15 +69,15 @@ public class NacosSentinelWritableUtils {
     // Nacos服务地址
     properties.setProperty(PropertyKeyConst.SERVER_ADDR, url);
     // 用户名（可选）
-    if (ValidateUtils.isNotEmpty(userName)) {
+    if (ObjectUtil.isNotEmpty(userName)) {
       properties.setProperty(PropertyKeyConst.USERNAME, userName);
     }
     // 密码（可选）
-    if (ValidateUtils.isNotEmpty(password)) {
+    if (ObjectUtil.isNotEmpty(password)) {
       properties.setProperty(PropertyKeyConst.PASSWORD, password);
     }
     // 命名空间（可选）
-    if (ValidateUtils.isNotEmpty(namespace)) {
+    if (ObjectUtil.isNotEmpty(namespace)) {
       properties.setProperty(PropertyKeyConst.NAMESPACE, namespace);
     }
     return ConfigFactory.createConfigService(properties);

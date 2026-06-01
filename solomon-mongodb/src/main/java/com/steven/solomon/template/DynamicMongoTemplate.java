@@ -1,10 +1,11 @@
 package com.steven.solomon.template;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.steven.solomon.config.MongoTenantContext;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.bson.Document;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -24,13 +25,13 @@ public class DynamicMongoTemplate extends MongoTemplate {
   @Override
   protected MongoDatabase doGetDatabase() {
     MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantContext.class).getFactory();
-    return ValidateUtils.isEmpty(mongoDbFactory) ? super.doGetDatabase() : mongoDbFactory.getMongoDatabase();
+    return ObjectUtil.isEmpty(mongoDbFactory) ? super.doGetDatabase() : mongoDbFactory.getMongoDatabase();
   }
 
   @Override
   public MongoDatabaseFactory getMongoDatabaseFactory() {
     MongoDatabaseFactory mongoDbFactory = SpringUtil.getBean(MongoTenantContext.class).getFactory();
-    return ValidateUtils.isEmpty(mongoDbFactory) ? super.getMongoDatabaseFactory() : mongoDbFactory;
+    return ObjectUtil.isEmpty(mongoDbFactory) ? super.getMongoDatabaseFactory() : mongoDbFactory;
   }
 
   @Override

@@ -1,11 +1,12 @@
 package com.steven.solomon.entity;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import tech.powerjob.common.model.AlarmConfig;
 import tech.powerjob.common.model.JobAdvancedRuntimeConfig;
 import tech.powerjob.common.model.LifeCycle;
@@ -74,7 +75,7 @@ public final class PowerJobRequestFactory {
         request.setMinCpuCores(jobInfo.getMinCpuCores());
         request.setMinMemorySpace(jobInfo.getMinMemorySpace());
         request.setMinDiskSpace(jobInfo.getMinDiskSpace());
-        request.setEnable(!ValidateUtils.equals(jobInfo.getStatus(), 2));
+        request.setEnable(!ObjectUtil.equals(jobInfo.getStatus(), 2));
         request.setDesignatedWorkers(jobInfo.getDesignatedWorkers());
         request.setMaxWorkerCount(jobInfo.getMaxWorkerCount());
         request.setExtra(jobInfo.getExtra());
@@ -92,7 +93,7 @@ public final class PowerJobRequestFactory {
      */
     public static Map<String, Object> toPayload(SaveJobInfoRequest request) {
         Map<String, Object> payload = JSONUtil.toBean(JSONUtil.toJsonStr(request), new TypeReference<Map<String, Object>>() {}, true);
-        if (ValidateUtils.isNotEmpty(request.getLifeCycle())) {
+        if (ObjectUtil.isNotEmpty(request.getLifeCycle())) {
             payload.put("lifecycle", JSONUtil.toJsonStr(request.getLifeCycle()));
         }
         return payload;
@@ -112,14 +113,14 @@ public final class PowerJobRequestFactory {
      * 按注解统一填充 PowerJob 任务参数，保证创建和更新字段完全一致。
      */
     private static SaveJobInfoRequest fill(SaveJobInfoRequest request, JobTask jobTask, String className) {
-        request.setJobName(SpringUtil.getElValue(ValidateUtils.getOrDefault(jobTask.taskName(), className)));
+        request.setJobName(SpringUtil.getElValue(ObjectUtil.defaultIfNull(jobTask.taskName(), className)));
         request.setJobDescription(jobTask.taskDesc());
         request.setJobParams(jobTask.taskParams());
         request.setTimeExpressionType(tech.powerjob.common.enums.TimeExpressionType.valueOf(jobTask.timeExpressionType().name()));
         request.setTimeExpression(jobTask.timeExpression());
         request.setExecuteType(tech.powerjob.common.enums.ExecuteType.valueOf(jobTask.executeType().name()));
         request.setProcessorType(tech.powerjob.common.enums.ProcessorType.valueOf(jobTask.processorType().name()));
-        request.setProcessorInfo(ValidateUtils.getOrDefault(jobTask.processorInfo(), className));
+        request.setProcessorInfo(ObjectUtil.defaultIfNull(jobTask.processorInfo(), className));
         request.setMaxInstanceNum(jobTask.maxInstanceNum());
         request.setConcurrency(jobTask.concurrency());
         request.setInstanceTimeLimit(jobTask.instanceTimeLimit());
@@ -145,7 +146,7 @@ public final class PowerJobRequestFactory {
      * PowerJob 5.x 使用结构化生命周期配置。
      */
     private static LifeCycle buildLifeCycle(JobTask jobTask) {
-        if (ValidateUtils.isEmpty(jobTask.lifeCycleStart()) || ValidateUtils.isEmpty(jobTask.lifeCycleEnd())) {
+        if (ObjectUtil.isEmpty(jobTask.lifeCycleStart()) || ObjectUtil.isEmpty(jobTask.lifeCycleEnd())) {
             return null;
         }
         LifeCycle lifeCycle = new LifeCycle();

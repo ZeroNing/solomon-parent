@@ -3,7 +3,6 @@ package com.steven.solomon.manager;
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.data.redis.cache.CacheStatistics;
 import org.springframework.data.redis.cache.CacheStatisticsCollector;
@@ -73,7 +72,7 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
 
   public RedisConnectionFactory getRedisConnectionFactory() {
     RedisConnectionFactory connectionFactory = SpringUtil.getBean(RedisTenantContext.class).getFactory();
-    return ValidateUtils.isEmpty(connectionFactory) ? this.connectionFactory : connectionFactory;
+    return ObjectUtil.isEmpty(connectionFactory) ? this.connectionFactory : connectionFactory;
   }
 
 
@@ -343,7 +342,7 @@ public class DynamicDefaultRedisCacheWriter implements RedisCacheWriter {
   }
 
   private static boolean shouldExpireWithin(@Nullable Duration ttl) {
-    return ValidateUtils.isNotEmpty(ttl) && !ttl.isZero() && !ttl.isNegative();
+    return ObjectUtil.isNotEmpty(ttl) && !ttl.isZero() && !ttl.isNegative();
   }
 
   private static byte[] createCacheLockKey(String name) {

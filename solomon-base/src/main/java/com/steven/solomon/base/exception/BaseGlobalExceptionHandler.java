@@ -1,10 +1,11 @@
 package com.steven.solomon.base.exception;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.utils.i18n.I18nUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,14 +41,14 @@ public class BaseGlobalExceptionHandler {
     // 通过异常名称查找注册的处理器，生成初始响应体
     BaseExceptionVO baseExceptionVO = ExceptionUtil.getBaseExceptionVO(exceptionSimpleName, ex);
     // 从线程上下文中获取请求ID，若无则默认为"0"
-    String requestId = ValidateUtils.getOrDefault(ExceptionUtil.requestId.get(), "0");
+    String requestId = ObjectUtil.defaultIfNull(ExceptionUtil.requestId.get(), "0");
 
     // 设置服务标识、语言区域和请求ID
     baseExceptionVO.setServerId(serverId);
     baseExceptionVO.setLocale(locale);
     baseExceptionVO.setRequestId(requestId);
     // 若响应体中无消息，则通过国际化工具解析
-    if (ValidateUtils.isEmpty(baseExceptionVO.getMessage())) {
+    if (ObjectUtil.isEmpty(baseExceptionVO.getMessage())) {
       baseExceptionVO.setMessage(resolveMessage(baseExceptionVO, locale));
     }
     // 清除线程变量中的请求ID，防止内存泄漏
@@ -71,7 +72,7 @@ public class BaseGlobalExceptionHandler {
     BaseExceptionVO baseExceptionVO = handler(ex, serverId, locale);
     // 将异常响应体的关键字段写入 Map
     result.put(BaseCode.HTTP_STATUS,
-        ValidateUtils.getOrDefault(baseExceptionVO.getStatusCode(),
+        ObjectUtil.defaultIfNull(baseExceptionVO.getStatusCode(),
             HttpStatus.INTERNAL_SERVER_ERROR.value()));
     result.put(BaseCode.ERROR_CODE, baseExceptionVO.getCode());
     result.put(BaseCode.MESSAGE, baseExceptionVO.getMessage());
@@ -106,7 +107,7 @@ public class BaseGlobalExceptionHandler {
    * @return 国际化后的异常消息
    */
   private static String resolveMessage(BaseExceptionVO baseExceptionVO, Locale locale) {
-    if (ValidateUtils.isNotEmpty(locale)) {
+    if (ObjectUtil.isNotEmpty(locale)) {
       // 指定语言区域时，使用带 locale 的国际化消息解析
       return I18nUtils.getErrorMessage(baseExceptionVO.getCode(), locale, baseExceptionVO.getArg());
     }

@@ -1,9 +1,10 @@
 package com.steven.solomon.consumer;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.IJobHandler;
 import org.slf4j.Logger;
@@ -14,7 +15,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
 
     private final JobTask jobTask = getClass().getAnnotation(JobTask.class);
 
-    protected final String xxlJobBeanName = ValidateUtils.isNotEmpty(jobTask) ? ValidateUtils.getOrDefault(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
+    protected final String xxlJobBeanName = ObjectUtil.isNotEmpty(jobTask) ? ObjectUtil.defaultIfNull(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
 
     public void execute() throws Exception{
         String jobParam = XxlJobHelper.getJobParam();

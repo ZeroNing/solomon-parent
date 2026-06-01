@@ -1,5 +1,9 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpResponse;
@@ -12,7 +16,6 @@ import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.context.ApplicationContext;
 
@@ -40,13 +43,13 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     public String login() throws Exception {
         String userName = profile.getUserName();
         String password = profile.getPassword();
-        if (ValidateUtils.isEmpty(adminAddresses)) {
+        if (ObjectUtil.isEmpty(adminAddresses)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_ADMIN_URL_IS_NULL);
         }
-        if (ValidateUtils.isEmpty(userName)) {
+        if (ObjectUtil.isEmpty(userName)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_USERNAME_IS_NULL);
         }
-        if (ValidateUtils.isEmpty(password)) {
+        if (ObjectUtil.isEmpty(password)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_PASSWORD_IS_NULL);
         }
 
@@ -60,7 +63,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void saveJob(String cookie,XxlJobInfo job) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
 
@@ -74,14 +77,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void updateJob(String cookie,XxlJobInfo job) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie, job.getExecutorHandler(), job.getJobGroup());
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(job.getExecutorHandler());
-        if (ValidateUtils.isEmpty(exitJob)) {
+        if (ObjectUtil.isEmpty(exitJob)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,job.getExecutorHandler());
         }
         job.setId(exitJob.getId());
@@ -90,14 +93,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     @Override
     public void deleteJob(String cookie,String executorHandler) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie, executorHandler);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo exitJob = xxlJobInfoMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(exitJob)) {
+        if (ObjectUtil.isEmpty(exitJob)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_TASK_IS_NULL,executorHandler);
         }
 
@@ -112,14 +115,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     }
 
     public void startJob(String cookie,String executorHandler, int jobGroup) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler, jobGroup);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(xxlJobInfo)) {
+        if (ObjectUtil.isEmpty(xxlJobInfo)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_START_JOB_ERROR,executorHandler);
         }
         Map<String, Object> paramMap = new HashMap<>();
@@ -133,14 +136,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     }
 
     public void stopJob(String cookie,String executorHandler, int jobGroup) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
 
         List<XxlJobInfo> xxlJobInfoList = findByExecutorHandler(cookie,executorHandler, jobGroup);
         Map<String,XxlJobInfo> xxlJobInfoMap = Lambda.toMap(xxlJobInfoList, XxlJobInfo::getExecutorHandler);
         XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
-        if (ValidateUtils.isEmpty(xxlJobInfo)) {
+        if (ObjectUtil.isEmpty(xxlJobInfo)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_STOP_JOB_ERROR,executorHandler);
         }
         Map<String, Object> paramMap = new HashMap<>();
@@ -153,7 +156,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     }
 
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler, int jobGroup) throws Exception {
-        if (ValidateUtils.isEmpty(cookie)) {
+        if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
         }
         Map<String,Object> paramMap = new  HashMap<>();
@@ -167,7 +170,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         String body = executeFirst(cookie, Arrays.asList("jobinfo/pageList", "jobinfo/page"), paramMap);
         Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
         Object obj = firstNotEmpty(resultMap, "data", "rows", "records", "list");
-        if (ValidateUtils.isEmpty(obj)) {
+        if (ObjectUtil.isEmpty(obj)) {
             return Collections.emptyList();
         }
         return JSONUtil.toList(JSONUtil.toJsonStr(obj),XxlJobInfo.class);
@@ -191,7 +194,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
      * 根据执行器 appName 自动解析执行器组 ID，减少业务侧手写 jobGroup 的配置成本。
      */
     public int resolveJobGroup(String cookie, int defaultJobGroup) {
-        if (!profile.getAutoResolveJobGroup() || ValidateUtils.isEmpty(profile.getAppName())) {
+        if (!profile.getAutoResolveJobGroup() || ObjectUtil.isEmpty(profile.getAppName())) {
             return defaultJobGroup;
         }
         try {
@@ -206,9 +209,9 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
             List<Map> groups = JSONUtil.toList(JSONUtil.toJsonStr(data), Map.class);
             for (Map group : groups) {
                 Object appName = firstNotEmpty(group, "appname", "appName");
-                if (ValidateUtils.equalsIgnoreCase(profile.getAppName(), ValidateUtils.isEmpty(appName) ? null : appName.toString())) {
+                if (StrUtil.equalsIgnoreCase(profile.getAppName(), ObjectUtil.isEmpty(appName) ? null : appName.toString())) {
                     Object id = group.get("id");
-                    return ValidateUtils.isEmpty(id) ? defaultJobGroup : Integer.parseInt(id.toString());
+                    return ObjectUtil.isEmpty(id) ? defaultJobGroup : Integer.parseInt(id.toString());
                 }
             }
         } catch (Exception exception) {
@@ -226,7 +229,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
             String url = adminAddresses + path;
             try (HttpResponse response = executeResponse(null, url, paramMap)) {
                 List<String> cookies = response.headerList("Set-Cookie");
-                if (ValidateUtils.isEmpty(cookies)) {
+                if (ObjectUtil.isEmpty(cookies)) {
                     throw new BaseException(XxlJobErrorCode.XXL_JOB_COOKIE_IS_NULL);
                 }
                 String cookie = cookies.getFirst();
@@ -237,7 +240,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
                 logger.warn("请求XXL-JOB登录接口:{}失败,尝试下一个候选接口", url);
             }
         }
-        throw ValidateUtils.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_COOKIE_IS_NULL) : lastException;
+        throw ObjectUtil.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_COOKIE_IS_NULL) : lastException;
     }
 
     /**
@@ -252,7 +255,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
                 lastException = exception;
             }
         }
-        throw ValidateUtils.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR, adminAddresses, JobLogSanitizer.sanitize(paramMap), "无可用接口路径") : lastException;
+        throw ObjectUtil.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR, adminAddresses, JobLogSanitizer.sanitize(paramMap), "无可用接口路径") : lastException;
     }
 
     protected String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
@@ -263,13 +266,13 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     protected HttpResponse executeResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         HttpRequest request = HttpUtil.createPost(url);
-        if (ValidateUtils.isNotEmpty(cookie)) {
+        if (ObjectUtil.isNotEmpty(cookie)) {
             request = request.header("Cookie", cookie);
         }
-        if (ValidateUtils.isNotEmpty(profile.getAccessToken())) {
+        if (ObjectUtil.isNotEmpty(profile.getAccessToken())) {
             request = request.header("XXL-JOB-ACCESS-TOKEN", profile.getAccessToken());
         }
-        if (ValidateUtils.isNotEmpty(paramMap)) {
+        if (ObjectUtil.isNotEmpty(paramMap)) {
             request = request.form(paramMap);
         }
         HttpResponse response = request.execute();
@@ -279,12 +282,14 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         if (JSONUtil.isTypeJSON(body)) {
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
             Object codeValue = firstNotEmpty(resultMap, "code", "status");
-            code = ValidateUtils.isEmpty(codeValue) ? null : codeValue.toString();
+            code = ObjectUtil.isEmpty(codeValue) ? null : codeValue.toString();
             Object msgValue = firstNotEmpty(resultMap, "msg", "message");
-            msg = ValidateUtils.isEmpty(msgValue) ? null : msgValue.toString();
+            msg = ObjectUtil.isEmpty(msgValue) ? null : msgValue.toString();
         }
 
-        if (!response.isOk() || (ValidateUtils.isNotEmpty(code) && ValidateUtils.notEqualsIgnoreCase(code,"200") && ValidateUtils.notEqualsIgnoreCase(code,"0"))) {
+        if (!response.isOk() || (ObjectUtil.isNotEmpty(code)
+                && !StrUtil.equalsIgnoreCase(code, "200")
+                && !StrUtil.equalsIgnoreCase(code, "0"))) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url, JobLogSanitizer.sanitize(paramMap),msg);
         }
         return response;
@@ -311,7 +316,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
     private Object firstNotEmpty(Map resultMap, String... keys) {
         for (String key : keys) {
             Object value = resultMap.get(key);
-            if (ValidateUtils.isNotEmpty(value)) {
+            if (ObjectUtil.isNotEmpty(value)) {
                 return value;
             }
         }

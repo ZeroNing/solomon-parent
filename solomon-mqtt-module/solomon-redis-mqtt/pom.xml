@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>solomon-redis-mqtt</artifactId>
-    <description>Redis Pub/Sub MQTT 风格实现。</description>
+    <description>Redis Pub/Sub MQTT style implementation.</description>
 
     <dependencies>
         <dependency>

@@ -1,7 +1,8 @@
 package com.steven.solomon.aspect;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -33,7 +34,7 @@ public class PowerJobAspect {
         // 获取方法参数
         Object[] args = point.getArgs();
         TaskContext taskContext = null;
-        if (ValidateUtils.isNotEmpty(args)) {
+        if (ObjectUtil.isNotEmpty(args)) {
             for (Object arg : args) {
                 if (arg instanceof TaskContext) {
                     taskContext = (TaskContext) arg;
@@ -41,7 +42,7 @@ public class PowerJobAspect {
             }
         }
 
-        if (ValidateUtils.isNotEmpty(taskContext)) {
+        if (ObjectUtil.isNotEmpty(taskContext)) {
             String jobId = String.valueOf(taskContext.getJobId());
             String instanceId = String.valueOf(taskContext.getInstanceId());
             String subInstanceId = String.valueOf(taskContext.getSubInstanceId());
@@ -52,10 +53,10 @@ public class PowerJobAspect {
         try{
             result = point.proceed();
         } catch (Throwable e) {
-            String jobId = ValidateUtils.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getJobId());
-            String instanceId = ValidateUtils.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getInstanceId());
-            String subInstanceId = ValidateUtils.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getSubInstanceId());
-            String jobParams = ValidateUtils.isEmpty(taskContext) ? "" : taskContext.getJobParams();
+            String jobId = ObjectUtil.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getJobId());
+            String instanceId = ObjectUtil.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getInstanceId());
+            String subInstanceId = ObjectUtil.isEmpty(taskContext) ? "" : String.valueOf(taskContext.getSubInstanceId());
+            String jobParams = ObjectUtil.isEmpty(taskContext) ? "" : taskContext.getJobParams();
             logger.error("当前任务id:{},任务实例ID:{},子任务实例ID:{},任务参数:{},出现了异常", jobId, instanceId, subInstanceId, jobParams, e);
             return new ProcessResult(false, "出现异常:" + e.getMessage());
         }

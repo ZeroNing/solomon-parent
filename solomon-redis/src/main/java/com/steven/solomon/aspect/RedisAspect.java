@@ -1,11 +1,12 @@
 package com.steven.solomon.aspect;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.config.RedisTenantContext;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.enums.SwitchModeEnum;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import jakarta.annotation.Resource;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -42,7 +43,7 @@ public class RedisAspect {
 
   @Around("cutPoint()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
-    boolean isSwitch = ValidateUtils.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
+    boolean isSwitch = ObjectUtil.equals(mode, SwitchModeEnum.SWITCH_DB.toString());
     String tenantCode = isSwitch ? RequestHeaderHolder.getTenantCode() : BaseCode.DEFAULT;
     String msg = isSwitch ? "Redis切换数据源,租户编码为: " + tenantCode : "Redis不需要切换数据源,使用默认数据源";
     logger.info(msg);

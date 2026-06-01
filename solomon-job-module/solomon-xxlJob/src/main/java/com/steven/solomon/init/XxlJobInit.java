@@ -1,5 +1,9 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.entity.XxlJobInfo;
@@ -11,7 +15,6 @@ import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.properties.XxlJobProperties;
 import com.steven.solomon.service.XxlJobService;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import com.xxl.job.core.handler.IJobHandler;
 import org.springframework.context.ApplicationContext;
@@ -53,7 +56,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
         for (Object obj : clazzList) {
             Class<?> clazz = obj.getClass();
             JobTask jobTask = AnnotationUtil.getAnnotation(clazz, JobTask.class);
-            if (ValidateUtils.isEmpty(jobTask)) {
+            if (ObjectUtil.isEmpty(jobTask)) {
                 logger.error("{}没有JobTask注解,不进行初始化",obj.getClass().getSimpleName());
                 continue;
             }
@@ -62,7 +65,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 continue;
             }
             String className = obj.getClass().getSimpleName();
-            String executorHandler = ValidateUtils.getOrDefault(jobTask.executorHandler(),className);
+            String executorHandler = ObjectUtil.defaultIfNull(jobTask.executorHandler(),className);
             int jobGroup = service.resolveJobGroup(cookie, jobTask.jobGroup());
 
             Map<String,XxlJobInfo> xxlJobInfoMap = service.findMapByExecutorHandler(cookie, executorHandler, jobGroup);
@@ -78,7 +81,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
      */
     private void register(String cookie, JobTask jobTask, String className, String executorHandler, int jobGroup, XxlJobInfo existsJob) throws Exception {
         try {
-            boolean isCreate = ValidateUtils.isEmpty(existsJob);
+            boolean isCreate = ObjectUtil.isEmpty(existsJob);
             if (isCreate && JobRegisterMode.UPDATE_ONLY.equals(profile.getRegisterMode())) {
                 logger.info("{}不存在，当前XXL-JOB注册模式为UPDATE_ONLY，跳过创建", executorHandler);
                 return;
@@ -115,7 +118,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
      * 创建任务后按注解同步启停状态，NONE 调度类型不执行启停。
      */
     private void syncStatus(String cookie, JobTask jobTask, XxlJobInfo xxlJobInfo, boolean isCreate, String className, int jobGroup) throws Exception {
-        if (ValidateUtils.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())) {
+        if (StrUtil.equalsIgnoreCase(xxlJobInfo.getScheduleType().name(), ScheduleTypeEnum.NONE.name())) {
             logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
             return;
         }

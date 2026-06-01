@@ -1,7 +1,8 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.properties.XxlJobProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -23,10 +24,10 @@ public class XxlJobConfig {
         xxlJobSpringExecutor.setIp(profile.getIp());
         xxlJobSpringExecutor.setPort(profile.getPort());
         xxlJobSpringExecutor.setAccessToken(profile.getAccessToken());
-        if (ValidateUtils.isNotEmpty(profile.getLogPath())) {
+        if (ObjectUtil.isNotEmpty(profile.getLogPath())) {
             xxlJobSpringExecutor.setLogPath(profile.getLogPath());
         }
-        if (ValidateUtils.isNotEmpty(profile.getTimeout())) {
+        if (ObjectUtil.isNotEmpty(profile.getTimeout())) {
             xxlJobSpringExecutor.setTimeout(profile.getTimeout());
         }
         xxlJobSpringExecutor.setLogRetentionDays(profile.getLogRetentionDays());

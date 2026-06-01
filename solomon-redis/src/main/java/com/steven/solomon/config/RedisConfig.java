@@ -1,5 +1,9 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.init.AbstractDataSourceInitService;
@@ -15,7 +19,6 @@ import com.steven.solomon.service.RedisService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicRedisTemplate;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -94,7 +97,7 @@ public class RedisConfig extends CachingConfigurerSupport {
                      CacheProfile cacheProfileConfig, ObjectMapper objectMapperConfig) {
     this.properties = tenantRedisProperties;
     this.context = redisTenantContext;
-    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(
+    this.isSwitchDb = StrUtil.equalsIgnoreCase(
         SwitchModeEnum.SWITCH_DB.toString(), cacheProfileConfig.getMode().toString());
     this.redisProperties = redisPropertiesConfig;
     this.cacheProfile = cacheProfileConfig;
@@ -113,7 +116,7 @@ public class RedisConfig extends CachingConfigurerSupport {
   public void afterPropertiesSet() throws Throwable {
     logger.info("Redis当前模式为:{}", cacheProfile.getMode().getDesc());
     // 构建租户配置映射表，如果没有配置则使用默认Redis配置
-    Map<String, RedisProperties> tenantMap = ValidateUtils.isEmpty(properties.getTenant()) 
+    Map<String, RedisProperties> tenantMap = ObjectUtil.isEmpty(properties.getTenant())
         ? new HashMap<>() 
         : properties.getTenant();
     // 确保存在默认租户配置

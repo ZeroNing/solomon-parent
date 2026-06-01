@@ -1,7 +1,8 @@
 package com.steven.solomon.base.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.base.profile.SwaggerProfile;
-import com.steven.solomon.verification.ValidateUtils;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.StringSchema;
@@ -61,15 +62,15 @@ public class SwaggerConfig {
   @ConditionalOnMissingBean(name = "solomonOpenApiCustomizer")
   public OpenApiCustomizer solomonOpenApiCustomizer(SwaggerProfile profile) {
     return openApi -> {
-      if (ValidateUtils.isEmpty(openApi.getPaths())
-          || ValidateUtils.isEmpty(profile.getGlobalRequestParameters())) {
+      if (ObjectUtil.isEmpty(openApi.getPaths())
+          || ObjectUtil.isEmpty(profile.getGlobalRequestParameters())) {
         return;
       }
       openApi.getPaths().values().forEach(pathItem ->
           pathItem.readOperations().forEach(operation ->
               profile.getGlobalRequestParameters().stream()
-                  .filter(parameter -> ValidateUtils.isNotEmpty(parameter)
-                      && ValidateUtils.isNotEmpty(parameter.getName())
+                  .filter(parameter -> ObjectUtil.isNotEmpty(parameter)
+                      && ObjectUtil.isNotEmpty(parameter.getName())
                       && !parameter.isHidden())
                   .map(this::toOpenApiParameter)
                   .forEach(operation::addParametersItem)));
@@ -83,7 +84,7 @@ public class SwaggerConfig {
    * @return OpenAPI Parameter 对象
    */
   private Parameter toOpenApiParameter(SwaggerProfile.DocRequestParameter parameter) {
-    String position = ValidateUtils.isNotEmpty(parameter.getIn())
+    String position = ObjectUtil.isNotEmpty(parameter.getIn())
         ? parameter.getIn().toLowerCase()
         : "header";
     return new Parameter()

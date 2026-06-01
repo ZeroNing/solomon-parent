@@ -1,11 +1,12 @@
 package com.steven.solomon.entity;
 
+import cn.hutool.core.util.ObjectUtil;
+
 
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.code.BaseRabbitMqCode;
 import com.steven.solomon.properties.RabbitMqProperties;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
@@ -73,7 +74,7 @@ public class InitRabbitBinding implements Serializable {
     }
 
     private String getName(String name, boolean isAddDlxPrefix) {
-        if (ValidateUtils.isEmpty(name)) {
+        if (ObjectUtil.isEmpty(name)) {
             return name;
         }
         name = SpringUtil.getElValue(name);
@@ -81,7 +82,7 @@ public class InitRabbitBinding implements Serializable {
     }
 
     private Queue initQueue(RabbitMqProperties properties,MessageListener messageListener, RabbitAdmin admin, boolean isInitDlxMap) {
-        if (ValidateUtils.isNotEmpty(properties)) {
+        if (ObjectUtil.isNotEmpty(properties)) {
             if (properties.getAutoDeleteQueue()) {
                 admin.deleteQueue(queueName);
             }
@@ -99,19 +100,19 @@ public class InitRabbitBinding implements Serializable {
             return queueBuilder.build();
         }
         queueBuilder.deadLetterExchange(BaseRabbitMqCode.DLX_PREFIX + messageListener.exchange());
-        if (ValidateUtils.isNotEmpty(messageListener.routingKey())) {
+        if (ObjectUtil.isNotEmpty(messageListener.routingKey())) {
             queueBuilder.deadLetterRoutingKey(BaseRabbitMqCode.DLX_PREFIX + messageListener.routingKey());
         }
         if (messageListener.ttl() != 0L && !messageListener.isDelayExchange()) {
             queueBuilder.ttl(messageListener.ttl());
         }
-        if (!ValidateUtils.equals(messageListener.queueMaxLength(),-1)) {
+        if (!ObjectUtil.equals(messageListener.queueMaxLength(),-1)) {
             queueBuilder.maxLength(messageListener.queueMaxLength());
         }
-        if (!ValidateUtils.equals(messageListener.queueMaxLengthByte(),-1)) {
+        if (!ObjectUtil.equals(messageListener.queueMaxLengthByte(),-1)) {
             queueBuilder.maxLengthBytes(messageListener.queueMaxLengthByte());
         }
-        if (!ValidateUtils.equals(messageListener.maxPriority(),-1)) {
+        if (!ObjectUtil.equals(messageListener.maxPriority(),-1)) {
             queueBuilder.maxPriority(messageListener.maxPriority());
         }
         return queueBuilder.build();

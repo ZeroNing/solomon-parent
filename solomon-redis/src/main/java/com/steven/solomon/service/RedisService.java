@@ -1,7 +1,8 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.service.AbsICacheService;
-import com.steven.solomon.verification.ValidateUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.*;
@@ -58,7 +59,7 @@ public class RedisService extends AbsICacheService {
 
   @Override
   public void del(String group, String... keys) {
-    if (ValidateUtils.isEmpty(keys) || keys.length == 0) {
+    if (ObjectUtil.isEmpty(keys) || keys.length == 0) {
       return;
     }
     try {
@@ -79,7 +80,7 @@ public class RedisService extends AbsICacheService {
   public <T> T get(String group, String key) {
     try {
       String k = assembleKey(group, key);
-      if (ValidateUtils.isEmpty(k)) {
+      if (ObjectUtil.isEmpty(k)) {
         return null;
       }
       Object result = redisTemplate.opsForValue().get(k);

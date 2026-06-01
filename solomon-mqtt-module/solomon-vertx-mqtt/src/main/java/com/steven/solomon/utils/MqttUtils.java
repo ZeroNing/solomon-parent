@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -16,7 +18,6 @@ import com.steven.solomon.profile.MqttProfile.MqttWill;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import io.netty.handler.codec.mqtt.MqttQoS;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -132,7 +133,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer) throws Exception {
-    if (ValidateUtils.isEmpty(topic)) {
+    if (ObjectUtil.isEmpty(topic)) {
       return;
     }
     MqttClient client = getClient(tenantCode);
@@ -193,7 +194,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws Exception {
-    if (ValidateUtils.isEmpty(topics)) {
+    if (ObjectUtil.isEmpty(topics)) {
       return;
     }
     MqttClient client = getClient(tenantCode);
@@ -216,7 +217,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     client.disconnect();
     // 关闭并移除 Vert.x 实例
     Vertx vertx = vertxMap.remove(tenantCode);
-    if (ValidateUtils.isNotEmpty(vertx)) {
+    if (ObjectUtil.isNotEmpty(vertx)) {
       vertx.close();
     }
     // 清理消费者映射
@@ -296,10 +297,10 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
 
     // 设置遗嘱消息
     MqttWill will = mqttProfile.getWill();
-    if (ValidateUtils.isNotEmpty(will)) {
+    if (ObjectUtil.isNotEmpty(will)) {
       options.setWillFlag(true);
       options.setWillTopic(will.getTopic());
-      if (ValidateUtils.isNotEmpty(will.getMessage())) {
+      if (ObjectUtil.isNotEmpty(will.getMessage())) {
         options.setWillMessageBytes(Buffer.buffer(will.getMessage().getBytes(StandardCharsets.UTF_8)));
       }
       options.setWillQoS(will.getQos());
@@ -323,7 +324,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    * @return Vert.x 实例
    */
   public Vertx initVertx(MqttProfile.VertxConfig vertxConfig) {
-    if (ValidateUtils.isEmpty(vertxConfig)) {
+    if (ObjectUtil.isEmpty(vertxConfig)) {
       return Vertx.vertx();
     }
     VertxOptions options = new VertxOptions()
@@ -339,7 +340,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
         .setHAGroup(vertxConfig.getHaGroup())
         .setPreferNativeTransport(vertxConfig.isPreferNativeTransport())
         .setDisableTCCL(vertxConfig.isDisableTCCL());
-    if (ValidateUtils.isNotEmpty(vertxConfig.getUseDaemonThread())) {
+    if (ObjectUtil.isNotEmpty(vertxConfig.getUseDaemonThread())) {
       options.setUseDaemonThread(vertxConfig.getUseDaemonThread());
     }
     return Vertx.vertx(options);
@@ -359,7 +360,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
         String filter = MqttTopicFilterMatcher.findFirstMatchingFilter(
             message.topicName(), new ArrayList<>(tenantConsumerMap.keySet()));
         AbstractConsumer<?, ?> consumer = tenantConsumerMap.get(filter);
-        if (ValidateUtils.isEmpty(consumer)) {
+        if (ObjectUtil.isEmpty(consumer)) {
           logger.warn("租户:{} 未找到 MQTT 主题消费者, topic={}", tenantCode, message.topicName());
           return;
         }

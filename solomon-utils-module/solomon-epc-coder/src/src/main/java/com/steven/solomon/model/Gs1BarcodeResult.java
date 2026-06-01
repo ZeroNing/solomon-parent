@@ -1,6 +1,7 @@
 package com.steven.solomon.model;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
+
 
 public class Gs1BarcodeResult {
 
@@ -94,7 +95,7 @@ public class Gs1BarcodeResult {
    * @return 是否包含 GTIN 和序列号
    */
   public boolean hasGtinSerial() {
-    return ValidateUtils.isNotEmpty(ai01) && ValidateUtils.isNotEmpty(ai21);
+    return ObjectUtil.isNotEmpty(ai01) && ObjectUtil.isNotEmpty(ai21);
   }
 
   /**
@@ -103,6 +104,6 @@ public class Gs1BarcodeResult {
    * @return 是否包含 GIAI
    */
   public boolean hasGiai() {
-    return ValidateUtils.isNotEmpty(ai8004);
+    return ObjectUtil.isNotEmpty(ai8004);
   }
 }

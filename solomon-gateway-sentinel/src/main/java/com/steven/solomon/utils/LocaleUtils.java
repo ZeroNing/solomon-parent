@@ -1,7 +1,8 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.code.BaseCode;
-import com.steven.solomon.verification.ValidateUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -58,7 +59,7 @@ public class LocaleUtils {
      */
     private Locale getLocale(String language) {
         // 如果语言为空，返回默认语言
-        if (ValidateUtils.isEmpty(language)) {
+        if (ObjectUtil.isEmpty(language)) {
             return DEFAULT_LOCALE;
         }
         
@@ -69,7 +70,7 @@ public class LocaleUtils {
         List<Locale> supportedLocales = Arrays.asList(Locale.CHINA, Locale.ENGLISH, Locale.CHINESE);
         
         // 如果解析失败或者语言不支持，返回默认语言
-        if (ValidateUtils.isEmpty(resultLocale) || !supportedLocales.contains(resultLocale)) {
+        if (ObjectUtil.isEmpty(resultLocale) || !supportedLocales.contains(resultLocale)) {
             resultLocale = DEFAULT_LOCALE;
         }
         return resultLocale;

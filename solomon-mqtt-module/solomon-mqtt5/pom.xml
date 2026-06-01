@@ -31,7 +31,7 @@
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-utils</artifactId>
+            <artifactId>solomon-utils-spring</artifactId>
         </dependency>
 
     </dependencies>

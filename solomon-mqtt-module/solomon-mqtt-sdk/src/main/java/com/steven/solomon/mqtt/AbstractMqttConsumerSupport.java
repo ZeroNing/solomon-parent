@@ -1,12 +1,13 @@
 package com.steven.solomon.mqtt;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.entity.BaseMq;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 
@@ -67,7 +68,7 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
       if (checkMessageKey(model)) {
         throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
       }
-      if (ValidateUtils.isNotEmpty(tenantCode)) {
+      if (ObjectUtil.isNotEmpty(tenantCode)) {
         RequestHeaderHolder.setTenantCode(tenantCode);
       }
       result = handleMessage(model.getBody());

@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.cache.redis.factory.RedisConnectionFactoryBuilder;
@@ -16,7 +18,6 @@ import com.steven.solomon.redis.mqtt.consumer.AbstractRedisMqttConsumer;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +117,7 @@ public class MqttUtils
    */
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer) throws Exception {
-    if (ValidateUtils.isEmpty(topic)) {
+    if (ObjectUtil.isEmpty(topic)) {
       return;
     }
     RedisMqttProfile profile = getOptions(tenantCode);
@@ -165,7 +166,7 @@ public class MqttUtils
    */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws Exception {
-    if (ValidateUtils.isEmpty(topics)) {
+    if (ObjectUtil.isEmpty(topics)) {
       return;
     }
     RedisMessageListenerContainer container = getClient(tenantCode);
@@ -176,7 +177,7 @@ public class MqttUtils
       Topic redisTopic = toRedisTopic(tenantCode, topic, profile);
       org.springframework.data.redis.connection.MessageListener listener =
           tenantListenerMap.remove(redisTopic.getTopic());
-      if (ValidateUtils.isNotEmpty(listener)) {
+      if (ObjectUtil.isNotEmpty(listener)) {
         container.removeMessageListener(listener, redisTopic);
       }
     }
@@ -193,7 +194,7 @@ public class MqttUtils
     listenerMap.remove(tenantCode);
     redisTemplateMap.remove(tenantCode);
     RedisConnectionFactory factory = connectionFactoryMap.remove(tenantCode);
-    if (ValidateUtils.isNotEmpty(factory)) {
+    if (ObjectUtil.isNotEmpty(factory)) {
       destroyConnectionFactory(factory);
     }
     redisCacheTenantContext.unregister(cacheTenantCode(tenantCode));
@@ -261,10 +262,10 @@ public class MqttUtils
     redisProperties.setHost(profile.getHost());
     redisProperties.setPort(profile.getPort());
     redisProperties.setDatabase(profile.getDatabase());
-    if (ValidateUtils.isNotEmpty(profile.getUsername())) {
+    if (ObjectUtil.isNotEmpty(profile.getUsername())) {
       redisProperties.setUsername(profile.getUsername());
     }
-    if (ValidateUtils.isNotEmpty(profile.getPassword())) {
+    if (ObjectUtil.isNotEmpty(profile.getPassword())) {
       redisProperties.setPassword(profile.getPassword());
     }
     if (profile.getTimeout() > 0) {
@@ -308,7 +309,7 @@ public class MqttUtils
    */
   private StringRedisTemplate getRedisTemplate(String tenantCode) throws BaseException {
     StringRedisTemplate redisTemplate = redisTemplateMap.get(tenantCode);
-    if (ValidateUtils.isEmpty(redisTemplate)) {
+    if (ObjectUtil.isEmpty(redisTemplate)) {
       throw new BaseException(MqttErrorCodes.CLIENT_IS_NULL, tenantCode);
     }
     return redisTemplate;

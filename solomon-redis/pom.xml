@@ -25,6 +25,16 @@
         </dependency>
 
         <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils-spring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils-json</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>

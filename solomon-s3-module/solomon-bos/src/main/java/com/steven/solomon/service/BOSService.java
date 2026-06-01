@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.baidubce.Protocol;
 import com.baidubce.Region;
 import com.baidubce.auth.DefaultBceCredentials;
@@ -10,7 +12,6 @@ import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class BOSService extends AbstractFileService {
     configuration.setEndpoint(properties.getEndpoint());
     configuration.setConnectionTimeoutInMillis(properties.getConnectionTimeout());
     configuration.setSocketTimeoutInMillis(properties.getSocketTimeout());
-    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
+    if (ObjectUtil.isNotEmpty(properties.getRegionName())) {
       configuration.setRegion(Region.fromValue(properties.getRegionName()));
     }
     boolean             isHttps         = properties.getEndpoint().contains("https");
@@ -119,10 +120,10 @@ public class BOSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName) || !bucketExists(bucketName)) {
      return new ArrayList<>();
     }
-    ListObjectsResponse response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    ListObjectsResponse response = ObjectUtil.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getContents(), BosObjectSummary::getKey);
   }
 
@@ -140,7 +141,7 @@ public class BOSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -150,7 +151,7 @@ public class BOSService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     ListBucketsResponse listBucketsResponse     = client.listBuckets();
     List<String>        bucketNameList = new ArrayList<>();
-    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+    if (ObjectUtil.isNotEmpty(listBucketsResponse)) {
       for (BucketSummary bucket : listBucketsResponse.getBuckets()) {
         bucketNameList.add(bucket.getName());
       }

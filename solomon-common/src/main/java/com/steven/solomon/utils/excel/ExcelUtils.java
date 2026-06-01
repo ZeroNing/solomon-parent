@@ -1,5 +1,7 @@
 package com.steven.solomon.utils.excel;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.date.StopWatch;
 import cn.idev.excel.ExcelWriter;
 import cn.idev.excel.FastExcel;
@@ -18,7 +20,6 @@ import com.steven.solomon.utils.excel.converter.ListExcelConverter;
 import com.steven.solomon.utils.excel.handler.ImageCellWriteHandler;
 import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -61,9 +62,9 @@ public final class ExcelUtils {
 		StopWatch stopWatch = startLog("开始导出Excel");
 		FastExcel.write(response.getOutputStream(), clazz)
 				.registerConverter(new ListExcelConverter()).registerWriteHandler(new ImageCellWriteHandler())
-				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
-				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
-				.sheet(0,ValidateUtils.getOrDefault(sheetName,"sheet"))
+				.registerWriteHandler(ObjectUtil.defaultIfNull(cellStyleStrategy,formatExcel()))
+				.registerWriteHandler(ObjectUtil.defaultIfNull(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()))
+				.sheet(0,ObjectUtil.defaultIfNull(sheetName,"sheet"))
 				.doWrite(data);
 		stopLog(stopWatch, "结束导出Excel");
 	}
@@ -134,7 +135,7 @@ public final class ExcelUtils {
 			String i18nKey = clazz.getSimpleName()+"."+field.getName();
 			Map<String,Object> annotationNameAndValueMap = new HashMap<>();
 			String value = I18nUtils.getMessage(i18nKey,(String)null);
-			if (ValidateUtils.isNotEmpty(value)) {
+			if (ObjectUtil.isNotEmpty(value)) {
 				annotationNameAndValueMap.put("value", value);
 				ClassUtils.updateClassField(field, ExcelProperty.class,annotationNameAndValueMap);
 			}
@@ -145,14 +146,14 @@ public final class ExcelUtils {
 		ExcelWriterBuilder excelWriterBuilder = FastExcel.write(os, clazz)
 				.registerConverter(new ListExcelConverter())
 				.registerWriteHandler(new ImageCellWriteHandler())
-				.registerWriteHandler(ValidateUtils.getOrDefault(cellStyleStrategy,formatExcel()))
-				.registerWriteHandler(ValidateUtils.getOrDefault(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
+				.registerWriteHandler(ObjectUtil.defaultIfNull(cellStyleStrategy,formatExcel()))
+				.registerWriteHandler(ObjectUtil.defaultIfNull(columnWidthStyleStrategy,new ExcelWidthStyleStrategy()));
 		return excelWriterBuilder.build();
 	}
 
 	private static WriteSheet buildSheet(ExcelWriter excelWriter, String sheetName) {
 		ExcelWriterSheetBuilder excelWriterSheetBuilder = new ExcelWriterSheetBuilder(excelWriter);
-		excelWriterSheetBuilder.sheetNo(0).sheetName(ValidateUtils.getOrDefault(sheetName, "sheet"));
+		excelWriterSheetBuilder.sheetNo(0).sheetName(ObjectUtil.defaultIfNull(sheetName, "sheet"));
 		return excelWriterSheetBuilder.build();
 	}
 

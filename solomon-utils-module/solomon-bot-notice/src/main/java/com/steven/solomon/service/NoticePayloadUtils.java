@@ -1,8 +1,9 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.entity.NoticeMessage;
-import com.steven.solomon.verification.ValidateUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -18,7 +19,7 @@ final class NoticePayloadUtils {
 
     static PayloadMap map() { return new PayloadMap(); }
     static PayloadMap map(String key, Object value) { return map().put(key, value); }
-    static boolean hasItems(List<?> list) { return ValidateUtils.isNotEmpty(list); }
+    static boolean hasItems(List<?> list) { return ObjectUtil.isNotEmpty(list); }
     static Map<String, Object> mediaIdBody(String mediaId) { return map("media_id", mediaId).build(); }
     static String extString(NoticeMessage message, String key) { if (message == null || message.getExtParams() == null || !message.getExtParams().containsKey(key)) { return null; } Object value = message.getExtParams().get(key); return value == null ? null : String.valueOf(value); }
 

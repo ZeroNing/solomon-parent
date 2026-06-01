@@ -1,5 +1,7 @@
 package com.steven.solomon.utils.excel.handler;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.idev.excel.enums.CellDataTypeEnum;
 import cn.idev.excel.metadata.Head;
 import cn.idev.excel.metadata.data.ImageData;
@@ -7,7 +9,6 @@ import cn.idev.excel.metadata.data.WriteCellData;
 import cn.idev.excel.write.handler.CellWriteHandler;
 import cn.idev.excel.write.metadata.holder.WriteSheetHolder;
 import cn.idev.excel.write.metadata.holder.WriteTableHolder;
-import com.steven.solomon.verification.ValidateUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -73,7 +74,7 @@ public class ImageCellWriteHandler implements CellWriteHandler {
             return;
         }
         //将要插入图片的单元格的type设置为空,下面再填充图片
-        if (ValidateUtils.isNotEmpty(cellData.getImageDataList())) {
+        if (ObjectUtil.isNotEmpty(cellData.getImageDataList())) {
             List<ImageData> imageDataList = cellData.getImageDataList();
             maxImageSize.updateAndGet(size -> Math.max(size, imageDataList.size()));
             imageDataMap.put(getCellKey(cell), imageDataList);
@@ -85,7 +86,7 @@ public class ImageCellWriteHandler implements CellWriteHandler {
     @Override
     public void afterCellDispose(WriteSheetHolder writeSheetHolder, WriteTableHolder writeTableHolder, List<WriteCellData<?>> cellDataList, Cell cell, Head head, Integer relativeRowIndex, Boolean isHead) {
         //  在单元格写入完毕后 ，自己填充图片
-        if (isHead || ValidateUtils.isEmpty(cellDataList)) {
+        if (isHead || ObjectUtil.isEmpty(cellDataList)) {
             return;
         }
         Sheet sheet = cell.getSheet();
@@ -96,7 +97,7 @@ public class ImageCellWriteHandler implements CellWriteHandler {
             return;
         }
         List<ImageData> imageDataList = imageDataMap.get(getCellKey(cell));
-        if (ValidateUtils.isEmpty(imageDataList)) {
+        if (ObjectUtil.isEmpty(imageDataList)) {
             return;
         }
 
@@ -118,7 +119,7 @@ public class ImageCellWriteHandler implements CellWriteHandler {
         int picWidth = Units.pixelToEMU(imageWidth);
         int index = sheet.getWorkbook().addPicture(pictureData, HSSFWorkbook.PICTURE_TYPE_PNG);
         Drawing<?> drawing = sheet.getDrawingPatriarch();
-        if (ValidateUtils.isEmpty(drawing)) {
+        if (ObjectUtil.isEmpty(drawing)) {
             drawing = sheet.createDrawingPatriarch();
         }
         CreationHelper helper = sheet.getWorkbook().getCreationHelper();

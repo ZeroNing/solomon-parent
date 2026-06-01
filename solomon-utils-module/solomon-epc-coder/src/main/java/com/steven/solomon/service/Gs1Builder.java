@@ -1,8 +1,9 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
-import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * GS1 AI 条码链式构建器。
@@ -29,10 +30,10 @@ public class Gs1Builder {
   public Gs1Builder filter(int filter) { this.filter = filter; return this; }
 
   public EpcResult encode() throws BaseException {
-    if (ValidateUtils.isNotEmpty(ai01) || ValidateUtils.isNotEmpty(ai21)) {
+    if (ObjectUtil.isNotEmpty(ai01) || ObjectUtil.isNotEmpty(ai21)) {
       return service.gtinSerialToEpc(ai01, ai21, companyPrefixLength, tagSize, filter).setBarcode("(01)" + ai01 + "(21)" + ai21);
     }
-    if (ValidateUtils.isNotEmpty(ai8004)) {
+    if (ObjectUtil.isNotEmpty(ai8004)) {
       return service.gs1ToEpc("(8004)" + ai8004, companyPrefixLength, tagSize, filter);
     }
     return service.gs1ToEpc(barcode, companyPrefixLength, tagSize, filter);

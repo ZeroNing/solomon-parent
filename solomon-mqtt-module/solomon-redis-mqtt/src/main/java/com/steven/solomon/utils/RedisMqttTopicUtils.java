@@ -1,7 +1,8 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.profile.RedisMqttProfile;
-import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * Redis MQTT 主题工具类。
@@ -25,10 +26,10 @@ public final class RedisMqttTopicUtils {
    */
   public static String channel(String tenantCode, String topic, RedisMqttProfile profile) {
     StringBuilder builder = new StringBuilder();
-    if (ValidateUtils.isNotEmpty(profile) && ValidateUtils.isNotEmpty(profile.getChannelPrefix())) {
+    if (ObjectUtil.isNotEmpty(profile) && ObjectUtil.isNotEmpty(profile.getChannelPrefix())) {
       builder.append(trimSlash(profile.getChannelPrefix())).append(":");
     }
-    if (ValidateUtils.isEmpty(profile) || profile.isUseTenantPrefix()) {
+    if (ObjectUtil.isEmpty(profile) || profile.isUseTenantPrefix()) {
       builder.append(tenantCode).append(":");
     }
     return builder.append(topic).toString();
@@ -56,7 +57,7 @@ public final class RedisMqttTopicUtils {
    * @return 是否需要使用 PatternTopic
    */
   public static boolean needPattern(String topic, RedisMqttProfile profile) {
-    return (ValidateUtils.isNotEmpty(profile) && profile.isPatternTopic())
+    return (ObjectUtil.isNotEmpty(profile) && profile.isPatternTopic())
         || topic.contains("+")
         || topic.contains("#")
         || topic.contains("*");

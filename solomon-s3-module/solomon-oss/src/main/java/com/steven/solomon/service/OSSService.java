@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.aliyun.oss.ClientBuilderConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -9,7 +11,6 @@ import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -117,10 +118,10 @@ public class OSSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
-    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    ObjectListing response = ObjectUtil.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getObjectSummaries(), OSSObjectSummary::getKey);
   }
 
@@ -138,7 +139,7 @@ public class OSSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -148,7 +149,7 @@ public class OSSService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     List<Bucket> listBucketsResponse = client.listBuckets();
     List<String> bucketNameList      = new ArrayList<>();
-    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+    if (ObjectUtil.isNotEmpty(listBucketsResponse)) {
       for (Bucket bucket : listBucketsResponse) {
         bucketNameList.add(bucket.getName());
       }

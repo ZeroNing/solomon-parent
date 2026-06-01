@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.code.FileErrorCode;
 import com.steven.solomon.exception.BaseException;
@@ -7,7 +9,6 @@ import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.FileTypeUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import io.minio.BucketExistsArgs;
 import io.minio.CopyObjectArgs;
 import io.minio.CopySource;
@@ -49,7 +50,7 @@ public class MinioService extends AbstractFileService {
             .build();
 
     MinioClient.Builder builder = MinioClient.builder().credentials(properties.getAccessKey(), properties.getSecretKey()).endpoint(properties.getEndpoint());
-    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
+    if (ObjectUtil.isNotEmpty(properties.getRegionName())) {
       builder.region(properties.getRegionName());
     }
     builder.httpClient(okHttpClient);
@@ -98,7 +99,7 @@ public class MinioService extends AbstractFileService {
   @Override
   protected InputStream getObject(String bucketName, String filePath) throws Exception {
     StatObjectResponse statObject =client.statObject(StatObjectArgs.builder().bucket(bucketName).object(filePath).build());
-    if (ValidateUtils.isNotEmpty(statObject) && statObject.size() > 0) {
+    if (ObjectUtil.isNotEmpty(statObject) && statObject.size() > 0) {
       return client.getObject(GetObjectArgs.builder().bucket(bucketName).object(filePath).build());
     } else {
       return null;
@@ -113,7 +114,7 @@ public class MinioService extends AbstractFileService {
   @Override
   protected boolean checkObjectExist(String bucketName, String objectName) throws Exception {
     List<String> objectList = listObjects(bucketName,objectName);
-    return ValidateUtils.isNotEmpty(objectList);
+    return ObjectUtil.isNotEmpty(objectList);
   }
 
   @Override
@@ -129,10 +130,10 @@ public class MinioService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
-    Iterable<Result<Item>> response = ValidateUtils.isEmpty(key) ? client.listObjects(ListObjectsArgs.builder().bucket(bucketName).build()) : client.listObjects(ListObjectsArgs.builder().bucket(bucketName).prefix(key).build());
+    Iterable<Result<Item>> response = ObjectUtil.isEmpty(key) ? client.listObjects(ListObjectsArgs.builder().bucket(bucketName).build()) : client.listObjects(ListObjectsArgs.builder().bucket(bucketName).prefix(key).build());
     List<String> objectNames = new ArrayList<>();
     try {
       for (Result<Item> result : response) {
@@ -151,7 +152,7 @@ public class MinioService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.removeBucket(RemoveBucketArgs.builder().bucket(bucketName).build());
@@ -161,7 +162,7 @@ public class MinioService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     List<Bucket> listBucketsResponse = client.listBuckets();
     List<String> bucketNameList      = new ArrayList<>();
-    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+    if (ObjectUtil.isNotEmpty(listBucketsResponse)) {
       for (Bucket bucket : listBucketsResponse) {
         bucketNameList.add(bucket.name());
       }

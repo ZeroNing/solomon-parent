@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.qcloud.cos.COSClient;
 import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
@@ -11,7 +13,6 @@ import com.steven.solomon.clamav.utils.ClamAvUtils;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public class COSService extends AbstractFileService {
   private static COSClient initClient(FileChoiceProperties properties) {
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
     ClientConfig configuration = null;
-    if (ValidateUtils.isNotEmpty(properties.getRegionName())) {
+    if (ObjectUtil.isNotEmpty(properties.getRegionName())) {
       Region         region       = new Region(properties.getRegionName());
       configuration = new ClientConfig(region);
     } else {
@@ -125,10 +126,10 @@ public class COSService extends AbstractFileService {
 
   @Override
   public List<String> listObjects(String bucketName,String key) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName) || !bucketExists(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName) || !bucketExists(bucketName)) {
       return new ArrayList<>();
     }
-    ObjectListing response = ValidateUtils.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
+    ObjectListing response = ObjectUtil.isEmpty(key) ? client.listObjects(bucketName) : client.listObjects(bucketName,key);
     return Lambda.toList(response.getObjectSummaries(), COSObjectSummary::getKey);
   }
 
@@ -146,7 +147,7 @@ public class COSService extends AbstractFileService {
 
   @Override
   public void deleteBucket(String bucketName) throws Exception {
-    if (ValidateUtils.isEmpty(bucketName)) {
+    if (ObjectUtil.isEmpty(bucketName)) {
       logger.error("deleteBucket方法中,请求参数为空,删除桶失败");
     }
     client.deleteBucket(bucketName);
@@ -156,7 +157,7 @@ public class COSService extends AbstractFileService {
   public List<String> getBucketList() throws Exception {
     List<Bucket> listBucketsResponse = client.listBuckets();
     List<String> bucketNameList      = new ArrayList<>();
-    if (ValidateUtils.isNotEmpty(listBucketsResponse)) {
+    if (ObjectUtil.isNotEmpty(listBucketsResponse)) {
       for (Bucket bucket : listBucketsResponse) {
         bucketNameList.add(bucket.getName());
       }

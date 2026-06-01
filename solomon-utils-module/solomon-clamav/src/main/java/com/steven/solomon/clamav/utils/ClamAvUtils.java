@@ -1,10 +1,11 @@
 package com.steven.solomon.clamav.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.clamav.properties.ClamAvProperties;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +29,7 @@ public class ClamAvUtils {
 
   public boolean scanFile(InputStream inputStream) throws BaseException {
     if (!properties.getEnabled()) { return false; }
-    if (ValidateUtils.isEmpty(inputStream)) { throw new IllegalArgumentException("Input stream is empty"); }
+    if (ObjectUtil.isEmpty(inputStream)) { throw new IllegalArgumentException("Input stream is empty"); }
     return hasVirus(client.scan(inputStream));
   }
 

@@ -1,5 +1,9 @@
 package com.steven.solomon.consumer;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.json.JSONUtil;
 import com.rabbitmq.client.Channel;
 import com.steven.solomon.annotation.MessageListener;
@@ -12,7 +16,6 @@ import com.steven.solomon.mqtt.CommonMqttMessageListener;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Message;
@@ -47,8 +50,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
         this.rabbitUtils = rabbitUtils;
         MessageListenerRetry messageListenerRetry = getClass().getAnnotation(MessageListenerRetry.class);
         MessageListener messageListener = getClass().getAnnotation(MessageListener.class);
-        this.retryNumber = ValidateUtils.isEmpty(messageListenerRetry) ? defaultRetryNumber : messageListenerRetry.retryNumber();
-        this.isAutoAck = ValidateUtils.isNotEmpty(messageListener) && ValidateUtils.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), messageListener.mode().toString());
+        this.retryNumber = ObjectUtil.isEmpty(messageListenerRetry) ? defaultRetryNumber : messageListenerRetry.retryNumber();
+        this.isAutoAck = ObjectUtil.isNotEmpty(messageListener) && StrUtil.equalsIgnoreCase(AcknowledgeMode.AUTO.toString(), messageListener.mode().toString());
     }
 
     @Override
@@ -67,7 +70,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
             if (checkMessageKey(model)) {
                 throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
             }
-            if (ValidateUtils.isNotEmpty(tenantCode)) {
+            if (ObjectUtil.isNotEmpty(tenantCode)) {
                 RequestHeaderHolder.setTenantCode(tenantCode);
             }
             // 消费消息
@@ -104,7 +107,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
         logger.error("AbstractConsumer:消费报错 异常为:", e);
 
         Integer lock = messageProperties.getHeader("retryNumber");
-        Integer actualLock = ValidateUtils.isEmpty(lock) ? 1 : lock + 1;
+        Integer actualLock = ObjectUtil.isEmpty(lock) ? 1 : lock + 1;
         logger.error("rabbitMQ 失败记录:消费者correlationId为:{},deliveryTag为:{},失败次数为:{}", correlationId, messageProperties.getDeliveryTag(), actualLock);
 
         if (retryNumber <= this.defaultRetryNumber || actualLock >= retryNumber) {
@@ -124,7 +127,7 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
      * 发送请求-回应方法
      */
     public void sendReplyTo(R result) {
-        if (ValidateUtils.isEmpty(messageProperties.getReplyTo())) {
+        if (ObjectUtil.isEmpty(messageProperties.getReplyTo())) {
             return;
         }
         ResultVO<R> resultVO = new ResultVO<>(result);

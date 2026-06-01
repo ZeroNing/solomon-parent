@@ -1,11 +1,12 @@
 package com.steven.solomon.aspect.controller;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.date.StopWatch;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.utils.date.DateTimeUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -96,7 +97,7 @@ public class ControllerAspect {
       String requestId, Object result, String startTime) {
     ServletRequestAttributes attributes =
         (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-    if (ValidateUtils.isEmpty(attributes)) {
+    if (ObjectUtil.isEmpty(attributes)) {
       stopWatch.stop();
       return;
     }
@@ -118,8 +119,8 @@ public class ControllerAspect {
     sb.append("elapsedMillis:").append(millisecond).append(System.lineSeparator());
     sb.append("elapsedSeconds:").append(second).append(System.lineSeparator());
     sb.append("response:").append(safeToJson(result)).append(System.lineSeparator());
-    if (ValidateUtils.isNotEmpty(error)) {
-      Locale locale = ValidateUtils.isNotEmpty(request.getLocale()) ? request.getLocale() : defaultLocale;
+    if (ObjectUtil.isNotEmpty(error)) {
+      Locale locale = ObjectUtil.isNotEmpty(request.getLocale()) ? request.getLocale() : defaultLocale;
       String message = ExceptionUtil.getMessage(error.getClass().getSimpleName(), error, locale);
       sb.append("exception:").append(message).append(System.lineSeparator());
     }

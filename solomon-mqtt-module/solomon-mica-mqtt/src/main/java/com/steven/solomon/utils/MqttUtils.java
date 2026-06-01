@@ -1,5 +1,7 @@
 package com.steven.solomon.utils;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -14,7 +16,6 @@ import com.steven.solomon.mqtt.support.MqttListenerRegistry;
 import com.steven.solomon.service.SendService;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -113,7 +114,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   @Override
   public void subscribe(String tenantCode, String topic, int qos, Object consumer) throws BaseException {
-    if (ValidateUtils.isEmpty(topic)) {
+    if (ObjectUtil.isEmpty(topic)) {
       return;
     }
     getClient(tenantCode).subscribe(topic, MqttQoS.valueOf(qos), (AbstractConsumer<?, ?>) consumer);
@@ -153,7 +154,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   @Override
   public void unsubscribe(String tenantCode, String[] topics) throws BaseException {
-    if (ValidateUtils.isEmpty(topics)) {
+    if (ObjectUtil.isEmpty(topics)) {
       return;
     }
     MqttClient client = getClient(tenantCode);
@@ -168,7 +169,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
   @Override
   public void disconnect(String tenantCode) throws BaseException {
     MqttClient client = getClient(tenantCode);
-    if (ValidateUtils.isNotEmpty(client)) {
+    if (ObjectUtil.isNotEmpty(client)) {
       client.disconnect();
     }
     removeClient(tenantCode);
@@ -180,7 +181,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
   @Override
   public void reconnect(String tenantCode) throws BaseException {
     MqttClient client = getClient(tenantCode);
-    if (ValidateUtils.isNotEmpty(client) && !client.isConnected()) {
+    if (ObjectUtil.isNotEmpty(client) && !client.isConnected()) {
       client.reconnect();
       subscribe(client, tenantCode);
     }
@@ -228,17 +229,17 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
         .statEnable(properties.isStatEnable())
         .debug(properties.isDebug())
         .disconnectBeforeStop(properties.isDisconnectBeforeStop());
-    if (ValidateUtils.isNotEmpty(properties.getTimeout()) && properties.getTimeout() > 0) {
+    if (ObjectUtil.isNotEmpty(properties.getTimeout()) && properties.getTimeout() > 0) {
       clientCreator.timeout(properties.getTimeout());
     }
-    if (ValidateUtils.isNotEmpty(properties.getBizThreadPoolSize())
+    if (ObjectUtil.isNotEmpty(properties.getBizThreadPoolSize())
         && properties.getBizThreadPoolSize() > 0) {
       clientCreator.bizThreadPoolSize(properties.getBizThreadPoolSize());
     }
     applySsl(clientCreator, properties);
     applyWill(clientCreator, properties);
     List<MqttTopicSubscription> globalSubscribe = properties.getGlobalSubscribe();
-    if (ValidateUtils.isNotEmpty(globalSubscribe)) {
+    if (ObjectUtil.isNotEmpty(globalSubscribe)) {
       clientCreator.globalSubscribe(globalSubscribe);
     }
     MqttClient client = clientCreator.connect();
@@ -258,7 +259,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   private void applyWill(MqttClientCreator clientCreator, MqttClientProperties properties) {
     MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
-    if (ValidateUtils.isEmpty(willMessage) || StrUtil.isBlank(willMessage.getTopic())) {
+    if (ObjectUtil.isEmpty(willMessage) || StrUtil.isBlank(willMessage.getTopic())) {
       return;
     }
     clientCreator.willMessage(builder -> {
@@ -282,14 +283,14 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     }
     invokeNoArg(clientCreator, "useSsl");
     Object sslConfig = buildSslConfig(ssl);
-    if (ValidateUtils.isNotEmpty(sslConfig)) {
+    if (ObjectUtil.isNotEmpty(sslConfig)) {
       invokeOneArg(clientCreator, "sslConfig", sslConfig);
     }
     logger.info("Mica MQTT SSL 已启用, host={}, port={}", properties.getIp(), properties.getPort());
   }
 
   private boolean isSslEnabled(Object ssl) {
-    if (ValidateUtils.isEmpty(ssl)) {
+    if (ObjectUtil.isEmpty(ssl)) {
       return false;
     }
     Object enabled = invokeNoArg(ssl, "isEnabled");
@@ -300,7 +301,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
   }
 
   private Object buildSslConfig(Object ssl) {
-    if (ValidateUtils.isEmpty(ssl)) {
+    if (ObjectUtil.isEmpty(ssl)) {
       return null;
     }
     String keyStorePath = readString(ssl, "getKeystorePath", "getKeyStorePath");
@@ -359,7 +360,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
   }
 
   private Object invokeNoArg(Object target, String methodName) {
-    if (ValidateUtils.isEmpty(target)) {
+    if (ObjectUtil.isEmpty(target)) {
       return null;
     }
     try {

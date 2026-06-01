@@ -1,5 +1,7 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.clamav.utils.ClamAvUtils;
@@ -13,7 +15,6 @@ import com.steven.solomon.model.FileUploadRequest;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -64,17 +65,17 @@ public abstract class AbstractFileService implements FileServiceInterface{
   @Override
   public FileUpload upload(FileUploadRequest request) throws Exception {
     requireCapability(StorageCapability.UPLOAD);
-    if (ValidateUtils.isEmpty(request)) {
+    if (ObjectUtil.isEmpty(request)) {
       throw new BaseException(FileErrorCode.INVALID_UPLOAD_REQUEST);
     }
-    if (ValidateUtils.isNotEmpty(request.getFile())) {
+    if (ObjectUtil.isNotEmpty(request.getFile())) {
       return uploadFileRequest(request, request.getFile());
     }
-    if (ValidateUtils.isNotEmpty(request.getInputStream())) {
+    if (ObjectUtil.isNotEmpty(request.getInputStream())) {
       MockMultipartFile file = new MockMultipartFile(request.getFileName(), request.getFileName(), MediaType.MULTIPART_FORM_DATA_VALUE, request.getInputStream());
       return uploadFileRequest(request, file);
     }
-    if (ValidateUtils.isNotEmpty(request.getImage())) {
+    if (ObjectUtil.isNotEmpty(request.getImage())) {
       return upload(request.getBucketName(), request.getImage(), request.getFileName());
     }
     throw new BaseException(FileErrorCode.INVALID_UPLOAD_REQUEST);
@@ -153,7 +154,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
     requireCapability(StorageCapability.DELETE);
-    if (!bucketExists(bucketName) || ValidateUtils.isEmpty(fileName)) {
+    if (!bucketExists(bucketName) || ObjectUtil.isEmpty(fileName)) {
       return;
     }
     delete(bucketName,getFilePath(fileName,properties));
@@ -213,7 +214,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
     makeBucket(bucketName);
     String extensionName = fileNamingRulesGenerationService.getExtensionName(objectName);
     objectName = objectName.substring(0,objectName.indexOf("."+extensionName));
-    String thumbnailName = new StringBuilder(ValidateUtils.getOrDefault(filePath,ValidateUtils.getOrDefault(properties.getRootDirectory(), StrUtil.EMPTY))).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
+    String thumbnailName = new StringBuilder(ObjectUtil.defaultIfNull(filePath,ObjectUtil.defaultIfNull(properties.getRootDirectory(), StrUtil.EMPTY))).append(objectName).append("_").append(width).append("_").append(height).append(".").append(extensionName).toString();
     if (!objectExist(bucketName,thumbnailName)) {
       MockMultipartFile file = null;
       try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -349,7 +350,7 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * 启动时按配置检查默认桶，降低第一次上传时才暴露配置问题的概率。
    */
   public void checkDefaultBucketOnStartup() throws Exception {
-    if (properties.getCheckBucketOnStartup() && ValidateUtils.isNotEmpty(properties.getBucketName())) {
+    if (properties.getCheckBucketOnStartup() && ObjectUtil.isNotEmpty(properties.getBucketName())) {
       makeBucket(properties.getBucketName());
     }
   }

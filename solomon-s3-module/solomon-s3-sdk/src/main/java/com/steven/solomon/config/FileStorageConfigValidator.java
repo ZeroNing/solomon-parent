@@ -1,7 +1,8 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.properties.FileChoiceProperties;
-import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * 对象存储配置校验器。
@@ -22,7 +23,7 @@ public final class FileStorageConfigValidator {
   }
 
   private static void require(String value, String providerName, String propertyName) {
-    if (ValidateUtils.isEmpty(value)) {
+    if (ObjectUtil.isEmpty(value)) {
       throw new IllegalArgumentException(providerName + " 对象存储缺少必要配置: " + propertyName);
     }
   }

@@ -1,5 +1,7 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.annotation.MessageListenerRetry;
@@ -10,7 +12,6 @@ import com.steven.solomon.service.*;
 import com.steven.solomon.utils.RabbitUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -83,7 +84,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         for (Object abstractConsumer : clazzList) {
             // 根据反射获取rabbitMQ注解信息
             messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
-            if (ValidateUtils.isEmpty(messageListener)) {
+            if (ObjectUtil.isEmpty(messageListener)) {
                 logger.error("{}没有RabbitMq注解,不进行初始化",abstractConsumer.getClass().getSimpleName());
                 continue;
             }
@@ -151,7 +152,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         container.setPrefetchCount(messageListener.prefetchCount());
         container.setAmqpAdmin(admin);
         MessageListenerRetry messageListenerRetry = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
-        if (ValidateUtils.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
+        if (ObjectUtil.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
             container.setAdviceChain(setRabbitRetry (messageListenerRetry));
         }
@@ -190,7 +191,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
 
     private Queue initBinding(String queue, boolean isInitDlxMap,
                               boolean isAddDlxPrefix) {
-        AbstractMQService<?> abstractMQService = (ValidateUtils.isNotEmpty(messageListener) && messageListener.isDelayExchange())
+        AbstractMQService<?> abstractMQService = (ObjectUtil.isNotEmpty(messageListener) && messageListener.isDelayExchange())
                 ? abstractMQMap.get("delayedMQService") : abstractMQMap
                 .get(messageListener.exchangeTypes() + AbstractMQService.SERVICE_NAME);
         return abstractMQService.initBinding(properties,messageListener, queue, admin, isInitDlxMap, isAddDlxPrefix);

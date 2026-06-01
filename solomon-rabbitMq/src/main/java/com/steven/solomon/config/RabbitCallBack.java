@@ -1,7 +1,8 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.ReturnedMessage;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
@@ -25,7 +26,7 @@ public class RabbitCallBack implements ReturnsCallback, ConfirmCallback {
         if (!ack) {
             logger.error("RabbitMQConfig:消息发送失败:correlationData({}),ack(false),cause({})", correlationData, cause);
         }
-        if (ValidateUtils.isNotEmpty(RabbitCallBack.rabbitCallBackList)) {
+        if (ObjectUtil.isNotEmpty(RabbitCallBack.rabbitCallBackList)) {
             for (AbstractRabbitCallBack abstractRabbitCallBack : RabbitCallBack.rabbitCallBackList) {
                 abstractRabbitCallBack.saveRabbitCallBack(correlationData, ack, cause);
             }
@@ -36,7 +37,7 @@ public class RabbitCallBack implements ReturnsCallback, ConfirmCallback {
     public void returnedMessage(ReturnedMessage returned) {
         logger.error("RabbitMQConfig:消息丢失:exchange({}),route({}),replyCode({}),replyText({}),message:{}",
                 returned.getExchange(), returned.getRoutingKey(), returned.getReplyCode(), returned.getReplyText(), returned.getMessage());
-        if (ValidateUtils.isNotEmpty(RabbitCallBack.rabbitCallBackList)) {
+        if (ObjectUtil.isNotEmpty(RabbitCallBack.rabbitCallBackList)) {
             for (AbstractRabbitCallBack abstractRabbitCallBack : RabbitCallBack.rabbitCallBackList) {
                 abstractRabbitCallBack.saveReturnedMessage(returned);
             }

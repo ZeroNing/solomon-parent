@@ -1,6 +1,7 @@
 package com.steven.solomon.model;
 
-import com.steven.solomon.verification.ValidateUtils;
+import cn.hutool.core.util.ObjectUtil;
+
 
 public class Gs1BarcodeResult {
 
@@ -24,6 +25,6 @@ public class Gs1BarcodeResult {
   public void setAi21(String ai21) { this.ai21 = ai21; }
   public String getAi8004() { return ai8004; }
   public void setAi8004(String ai8004) { this.ai8004 = ai8004; }
-  public boolean hasGtinSerial() { return ValidateUtils.isNotEmpty(ai01) && ValidateUtils.isNotEmpty(ai21); }
-  public boolean hasGiai() { return ValidateUtils.isNotEmpty(ai8004); }
+  public boolean hasGtinSerial() { return ObjectUtil.isNotEmpty(ai01) && ObjectUtil.isNotEmpty(ai21); }
+  public boolean hasGiai() { return ObjectUtil.isNotEmpty(ai8004); }
 }

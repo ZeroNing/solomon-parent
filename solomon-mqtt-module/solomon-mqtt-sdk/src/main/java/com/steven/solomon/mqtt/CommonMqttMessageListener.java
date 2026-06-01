@@ -1,12 +1,13 @@
 package com.steven.solomon.mqtt;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.TypeUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.pojo.entity.BaseMq;
-import com.steven.solomon.verification.ValidateUtils;
 import java.lang.reflect.Type;
 import java.util.Map;
 
@@ -70,7 +71,7 @@ public interface CommonMqttMessageListener<T, R, M extends BaseMq<T>> {
    */
   @SuppressWarnings("unchecked")
   default T resolveBody(String json, T body) {
-    if (ValidateUtils.isEmpty(body)) {
+    if (ObjectUtil.isEmpty(body)) {
       return JSONUtil.toBean(json, getParameterizedType("T"), true);
     }
     if (body instanceof JSONObject || body instanceof JSONArray) {

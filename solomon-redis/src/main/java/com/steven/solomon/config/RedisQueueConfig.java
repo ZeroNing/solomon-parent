@@ -1,5 +1,9 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.MessageListener;
 import com.steven.solomon.enums.TopicMode;
@@ -9,7 +13,6 @@ import com.steven.solomon.profile.CacheProfile;
 import com.steven.solomon.profile.TenantRedisProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
@@ -47,11 +50,11 @@ public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener>
             RedisConnectionFactory factory = entry.getValue();
             for (Object abstractConsumer : clazzList) {
                 MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
-                if (ValidateUtils.isEmpty(messageListener) || ValidateUtils.isEmpty(messageListener.topic())) {
+                if (ObjectUtil.isEmpty(messageListener) || ObjectUtil.isEmpty(messageListener.topic())) {
                     continue;
                 }
                 String topicName = SpringUtil.getElValue(messageListener.topic());
-                Topic topic = ValidateUtils.equalsIgnoreCase(messageListener.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
+                Topic topic = StrUtil.equalsIgnoreCase(messageListener.mode().toString(), TopicMode.CHANNEL.toString()) ? new ChannelTopic(topicName) : new PatternTopic(topicName);
                 RedisMessageListenerContainer container = new RedisMessageListenerContainer();
                 container.setConnectionFactory(factory);
                 container.addMessageListener((org.springframework.data.redis.connection.MessageListener) abstractConsumer, topic);

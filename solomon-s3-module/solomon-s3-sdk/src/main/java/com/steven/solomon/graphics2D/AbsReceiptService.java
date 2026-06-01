@@ -1,9 +1,10 @@
 package com.steven.solomon.graphics2D;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.graphics2D.entity.BaseReceipt;
 import com.steven.solomon.graphics2D.entity.FileUpload;
 import com.steven.solomon.service.FileServiceInterface;
-import com.steven.solomon.verification.ValidateUtils;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -39,7 +40,7 @@ public abstract class AbsReceiptService<T extends BaseReceipt>{
       g2 = setGraphics2DOptimize(g2);
       return upload(bufferedImage,receipt);
     } finally {
-      if (ValidateUtils.isNotEmpty(bufferedImage)) {
+      if (ObjectUtil.isNotEmpty(bufferedImage)) {
         bufferedImage.getGraphics().dispose();
         bufferedImage= null;
       }

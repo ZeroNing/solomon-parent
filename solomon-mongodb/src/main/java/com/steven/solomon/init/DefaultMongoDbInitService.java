@@ -1,5 +1,7 @@
 package com.steven.solomon.init;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import cn.hutool.core.annotation.AnnotationUtil;
 import cn.hutool.core.util.StrUtil;
 import com.mongodb.MongoClientSettings;
@@ -16,7 +18,6 @@ import com.steven.solomon.annotation.MongoDBCapped;
 import com.steven.solomon.config.MongoTenantContext;
 import com.steven.solomon.enums.MongoDbRoleEnum;
 import com.steven.solomon.spring.SpringUtil;
-import com.steven.solomon.verification.ValidateUtils;
 import org.bson.Document;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
@@ -176,15 +177,15 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
                 AnnotationUtil.getAnnotation(obj.getClass(), org.springframework.data.mongodb.core.mapping.Document.class);
             
             // 确定集合名称
-            String name = ValidateUtils.isNotEmpty(document.collection()) ? document.collection() : 
-                ValidateUtils.isNotEmpty(document.value()) ? document.value() : StrUtil.EMPTY;
+            String name = ObjectUtil.isNotEmpty(document.collection()) ? document.collection() :
+                ObjectUtil.isNotEmpty(document.value()) ? document.value() : StrUtil.EMPTY;
             
             boolean isCreate = collectionNameList.contains(name);
             
             // ========== Step 3: 创建集合 ==========
             if (!isCreate) {
                 // 集合不存在，创建新集合
-                if (ValidateUtils.isNotEmpty(mongoDBCapped)) {
+                if (ObjectUtil.isNotEmpty(mongoDBCapped)) {
                     // 创建固定集合（Capped Collection）
                     mongoDatabase.createCollection(name, 
                         new CreateCollectionOptions()
@@ -241,16 +242,16 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
      * @param size 集合的大小，单位为kb
      */
     public Document convertToCapped(String collectionName,Long max,Long size) {
-        if (ValidateUtils.isEmpty(collectionName)) {
+        if (ObjectUtil.isEmpty(collectionName)) {
             return null;
         }
         Document doc = new Document();
         doc.put("convertToCapped",collectionName);
         doc.put("capped",true);
-        if (ValidateUtils.isNotEmpty(size)) {
+        if (ObjectUtil.isNotEmpty(size)) {
             doc.put("maxSize",size);
         }
-        if (ValidateUtils.isNotEmpty(max)) {
+        if (ObjectUtil.isNotEmpty(max)) {
             doc.put("max",max);
         }
         return doc;
@@ -263,7 +264,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
      * @param collectionName 集合名词
      */
     public MongoDatabase createDb(String mongoClient,String dbName,String collectionName) {
-        if (ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(dbName) || ValidateUtils.isEmpty(collectionName)) {
+        if (ObjectUtil.isEmpty(mongoClient) || ObjectUtil.isEmpty(dbName) || ObjectUtil.isEmpty(collectionName)) {
             return null;
         }
         MongoDatabase mongoDatabase = createDb(mongoClient,dbName);
@@ -280,7 +281,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
      * @param dbName 数据库名（用户获取连接中的数据库名以及赋予数据库权限）
      */
     public boolean createUser(String mongoClient, String userName, String password, MongoDbRoleEnum roleEnum, String dbName) {
-        if (ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(dbName)) {
+        if (ObjectUtil.isEmpty(mongoClient) || ObjectUtil.isEmpty(roleEnum) || ObjectUtil.isEmpty(dbName)) {
             return false;
         }
         try {
@@ -301,7 +302,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
      * @param roleEnum mongodb权限
      */
     public boolean createUser(MongoDatabase mongoDatabase,String userName,String password, MongoDbRoleEnum roleEnum) {
-        if (ValidateUtils.isEmpty(mongoDatabase) || ValidateUtils.isEmpty(userName) || ValidateUtils.isEmpty(roleEnum) || ValidateUtils.isEmpty(password)) {
+        if (ObjectUtil.isEmpty(mongoDatabase) || ObjectUtil.isEmpty(userName) || ObjectUtil.isEmpty(roleEnum) || ObjectUtil.isEmpty(password)) {
             return false;
         }
         try {
@@ -314,7 +315,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
     }
 
     private MongoDatabase createDb(String mongoClient, String dbName) {
-        if (ValidateUtils.isEmpty(mongoClient) || ValidateUtils.isEmpty(dbName)) {
+        if (ObjectUtil.isEmpty(mongoClient) || ObjectUtil.isEmpty(dbName)) {
             return null;
         }
         try (MongoClient mongoClients = MongoClients.create(mongoClient);) {
@@ -323,7 +324,7 @@ public class DefaultMongoDbInitService extends AbstractDataSourceInitService<Mon
     }
 
     private void createCollection(MongoDatabase mongoDatabase,String collectionName) {
-        if (ValidateUtils.isNotEmpty(mongoDatabase)) {
+        if (ObjectUtil.isNotEmpty(mongoDatabase)) {
             List<String> collectionNames = new ArrayList<>();
             mongoDatabase.listCollectionNames().forEach(collectionNames::add);
             if (!collectionNames.contains(collectionName)) {

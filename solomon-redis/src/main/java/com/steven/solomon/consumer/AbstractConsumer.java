@@ -1,5 +1,7 @@
 package com.steven.solomon.consumer;
 
+import cn.hutool.core.util.ObjectUtil;
+
 
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.TypeUtil;
@@ -12,7 +14,6 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.mqtt.CommonMqttMessageListener;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import org.slf4j.Logger;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
@@ -80,7 +81,7 @@ public abstract class AbstractConsumer<T,R> extends MessageListenerAdapter imple
               throw new BaseException(MqErrorCode.MESSAGE_REPEAT_CONSUMPTION);
           }
           // 设置租户上下文，用于后续数据源切换
-          if (ValidateUtils.isNotEmpty(tenantCode)) {
+          if (ObjectUtil.isNotEmpty(tenantCode)) {
               RequestHeaderHolder.setTenantCode(tenantCode);
          }
           logger.info("线程名:{},AbstractConsumer:主题:{},消费者消息: {}", Thread.currentThread().getName(),topic, body);

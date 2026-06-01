@@ -1,5 +1,9 @@
 package com.steven.solomon.config;
 
+import cn.hutool.core.util.StrUtil;
+
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.converter.DateToLocalDateConverter;
 import com.steven.solomon.converter.DateToLocalDateTimeConverter;
@@ -12,7 +16,6 @@ import com.steven.solomon.properties.TenantMongoProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.template.DynamicMongoTemplate;
 import com.steven.solomon.utils.logger.LoggerUtils;
-import com.steven.solomon.verification.ValidateUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -64,7 +67,7 @@ public class MongoConfig {
     this.mongoProperties = mongoProperties;
     this.context         = context;
     this.properties      = properties;
-    this.isSwitchDb = ValidateUtils.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
+    this.isSwitchDb = StrUtil.equalsIgnoreCase(SwitchModeEnum.SWITCH_DB.toString(), mongoProperties.getMode().toString());
     SpringUtil.setContext(applicationContext);
   }
 
@@ -77,7 +80,7 @@ public class MongoConfig {
     logger.info("mongoDb当前模式为:{}",mongoProperties.getMode().getDesc());
     AbstractDataSourceInitService<MongoProperties,MongoTenantContext,SimpleMongoClientDatabaseFactory> service = getService();
     if (isSwitchDb) {
-      Map<String, MongoProperties> tenantMap = ValidateUtils.getOrDefault(mongoProperties.getTenant(),new HashMap<>());
+      Map<String, MongoProperties> tenantMap = ObjectUtil.defaultIfNull(mongoProperties.getTenant(),new HashMap<>());
       if (!tenantMap.containsKey(BaseCode.DEFAULT)) {
         tenantMap.put(BaseCode.DEFAULT, properties);
         mongoProperties.setTenant(tenantMap);

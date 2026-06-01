@@ -1,8 +1,9 @@
 package com.steven.solomon.service;
 
+import cn.hutool.core.util.ObjectUtil;
+
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.model.EpcResult;
-import com.steven.solomon.verification.ValidateUtils;
 
 /**
  * SGTIN 链式构建器。
@@ -27,7 +28,7 @@ public class EpcBuilder {
   public EpcBuilder filter(int filter) { this.filter = filter; return this; }
 
   public EpcResult encode() throws BaseException {
-    if (ValidateUtils.isEmpty(serialNumber) && ValidateUtils.isNotEmpty(barcode) && barcode.startsWith("(")) {
+    if (ObjectUtil.isEmpty(serialNumber) && ObjectUtil.isNotEmpty(barcode) && barcode.startsWith("(")) {
       return service.gs1ToEpc(barcode, companyPrefixLength, tagSize, filter);
     }
     return service.gtinSerialToEpc(barcode, serialNumber, companyPrefixLength, tagSize, filter);
