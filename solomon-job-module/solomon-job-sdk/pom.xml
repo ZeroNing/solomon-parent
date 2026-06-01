@@ -18,5 +18,10 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant</artifactId>
+        </dependency>
+
     </dependencies>
 </project>

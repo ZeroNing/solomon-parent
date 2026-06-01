@@ -38,7 +38,7 @@ public final class MqttListenerRegistry {
       }
       List<String> tenantRange = Lambda.toList(
           Arrays.asList(annotation.tenantRange()),
-          ValidateUtils::isNotEmpty,
+          ObjectUtil::isNotEmpty,
           key -> key);
       if (ObjectUtil.isNotEmpty(tenantRange) && !tenantRange.contains(tenantCode)) {
         LOGGER.info("{} 租户跳过 MQTT 监听器 {}, 支持范围: {}",

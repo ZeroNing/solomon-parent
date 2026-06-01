@@ -21,6 +21,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
@@ -45,9 +46,9 @@ public class RedisQueueConfig extends AbstractMessageLineRunner<MessageListener>
 
     @Override
     public void init(List<Object> clazzList) throws Exception {
-        Map<String, RedisConnectionFactory> tenantFactoryMap = redisTenantContext.getFactoryMap();
-        for (Map.Entry<String, RedisConnectionFactory> entry : tenantFactoryMap.entrySet()) {
-            RedisConnectionFactory factory = entry.getValue();
+        Map<String, LettuceConnectionFactory> tenantFactoryMap = redisTenantContext.getFactoryMap();
+        for (Map.Entry<String, LettuceConnectionFactory> entry : tenantFactoryMap.entrySet()) {
+            LettuceConnectionFactory factory = entry.getValue();
             for (Object abstractConsumer : clazzList) {
                 MessageListener messageListener = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListener.class);
                 if (ObjectUtil.isEmpty(messageListener) || ObjectUtil.isEmpty(messageListener.topic())) {
