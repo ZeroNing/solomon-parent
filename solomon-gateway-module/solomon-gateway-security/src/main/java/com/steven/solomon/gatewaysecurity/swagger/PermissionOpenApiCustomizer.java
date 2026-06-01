@@ -56,7 +56,9 @@ public class PermissionOpenApiCustomizer implements OpenApiCustomizer {
   }
 
   private void configure(Operation operation, PermissionDefinition permission) {
-    operation.addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME));
+    if (!permission.anonymous()) {
+      operation.addSecurityItem(new SecurityRequirement().addList(SECURITY_SCHEME));
+    }
     operation.addExtension(PERMISSION_EXTENSION, permission.code());
   }
 }

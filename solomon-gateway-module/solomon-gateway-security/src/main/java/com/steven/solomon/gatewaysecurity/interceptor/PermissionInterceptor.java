@@ -10,6 +10,7 @@ import com.steven.solomon.gatewaysecurity.model.AccessTokenClaims;
 import com.steven.solomon.gatewaysecurity.model.PermissionDefinition;
 import com.steven.solomon.gatewaysecurity.service.PermissionVerifier;
 import com.steven.solomon.gatewaysecurity.service.TenantVerifier;
+import com.steven.solomon.gatewaysecurity.utils.PermissionCodeUtils;
 import com.steven.solomon.gatewaysecurity.utils.TokenUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +21,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 /**
  * 根据接口注解执行多租户 Token 鉴权。
  *
- * <p>无注解接口允许匿名访问；有注解接口必须携带有效 Token，并拥有对应接口权限。</p>
+ * <p>无注解接口允许匿名访问；有注解接口根据 anonymous 属性决定是否强制校验 Token。</p>
  */
 public class PermissionInterceptor implements HandlerInterceptor {
 
@@ -43,15 +44,27 @@ public class PermissionInterceptor implements HandlerInterceptor {
     AuthContext.clear();
     String token = tokenUtils.resolveBearerToken(request.getHeader(AuthHeaders.AUTHORIZATION));
     ApiPermission annotation = resolveAnnotation(handler);
-    AccessTokenClaims claims = annotation == null
+    if (annotation == null) {
+      // 无注解 → 完全匿名，尝试解析但不强制
+      AccessTokenClaims claims = tokenUtils.parseOptionalToken(token);
+      if (claims != null) {
+        validateTenant(request, claims);
+        AuthContext.set(claims);
+        request.setAttribute(AUTH_CLAIMS_ATTRIBUTE, claims);
+      }
+      return true;
+    }
+
+    boolean anonymous = annotation.anonymous();
+    AccessTokenClaims claims = anonymous
         ? tokenUtils.parseOptionalToken(token)
         : tokenUtils.parseToken(token);
     if (claims == null) {
       return true;
     }
     validateTenant(request, claims);
-    if (annotation != null && !permissionVerifier.hasPermission(
-        claims, toPermission(request, annotation))) {
+    if (!anonymous && !permissionVerifier.hasPermission(
+        claims, toPermission(request, annotation, handler))) {
       throw new BaseException(AuthErrorCode.PERMISSION_DENIED);
     }
     AuthContext.set(claims);
@@ -90,8 +103,26 @@ public class PermissionInterceptor implements HandlerInterceptor {
         : AnnotatedElementUtils.findMergedAnnotation(handlerMethod.getBeanType(), ApiPermission.class);
   }
 
-  private PermissionDefinition toPermission(HttpServletRequest request, ApiPermission annotation) {
-    return new PermissionDefinition(annotation.value(), annotation.name(), annotation.description(),
-        request.getRequestURI(), request.getMethod());
+  private PermissionDefinition toPermission(HttpServletRequest request, ApiPermission annotation,
+      Object handler) {
+    String code = StrUtil.blankToDefault(annotation.value(),
+        PermissionCodeUtils.pathToCode(request.getRequestURI()));
+    String name = resolveName(annotation, handler);
+    return new PermissionDefinition(code, name, annotation.description(),
+        request.getRequestURI(), request.getMethod(), annotation.anonymous());
+  }
+
+  private String resolveName(ApiPermission annotation, Object handler) {
+    if (StrUtil.isNotBlank(annotation.name())) {
+      return annotation.name();
+    }
+    if (handler instanceof HandlerMethod handlerMethod) {
+      String methodName = PermissionCodeUtils.resolveOperationName(handlerMethod.getMethod());
+      if (StrUtil.isNotBlank(methodName)) {
+        return methodName;
+      }
+      return PermissionCodeUtils.resolveOperationName(handlerMethod.getBeanType());
+    }
+    return "";
   }
 }

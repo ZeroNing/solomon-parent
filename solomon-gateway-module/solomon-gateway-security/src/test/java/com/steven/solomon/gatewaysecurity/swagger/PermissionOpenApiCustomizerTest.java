@@ -2,6 +2,7 @@ package com.steven.solomon.gatewaysecurity.swagger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.steven.solomon.gatewaysecurity.model.PermissionDefinition;
 import com.steven.solomon.gatewaysecurity.support.PermissionRegistry;
@@ -17,7 +18,7 @@ class PermissionOpenApiCustomizerTest {
   void addBearerAuthAndPermissionCode() {
     PermissionRegistry registry = new PermissionRegistry();
     registry.replaceAll(
-        java.util.List.of(new PermissionDefinition("order:query", "查询订单", "", "/orders", "GET")));
+        java.util.List.of(new PermissionDefinition("order:query", "查询订单", "", "/orders", "GET", false)));
     OpenAPI openApi = new OpenAPI().paths(
         new Paths().addPathItem("/orders", new PathItem().get(new Operation())));
 
@@ -30,5 +31,21 @@ class PermissionOpenApiCustomizerTest {
         operation.getExtensions().get(PermissionOpenApiCustomizer.PERMISSION_EXTENSION));
     assertEquals(PermissionOpenApiCustomizer.SECURITY_SCHEME,
         operation.getSecurity().getFirst().keySet().iterator().next());
+  }
+
+  @Test
+  void anonymousEndpointHasNoSecurityRequirement() {
+    PermissionRegistry registry = new PermissionRegistry();
+    registry.replaceAll(
+        java.util.List.of(new PermissionDefinition("PUBLIC:STATUS", "状态检查", "", "/status", "GET", true)));
+    OpenAPI openApi = new OpenAPI().paths(
+        new Paths().addPathItem("/status", new PathItem().get(new Operation())));
+
+    new PermissionOpenApiCustomizer(registry).customise(openApi);
+
+    Operation operation = openApi.getPaths().get("/status").getGet();
+    assertEquals("PUBLIC:STATUS",
+        operation.getExtensions().get(PermissionOpenApiCustomizer.PERMISSION_EXTENSION));
+    assertNull(operation.getSecurity());
   }
 }

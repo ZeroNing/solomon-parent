@@ -92,6 +92,19 @@ class PermissionInterceptorTest {
     assertEquals("tenant-1", AuthContext.getTenantCode());
   }
 
+  @Test
+  void allowAnonymousAnnotatedEndpoint() throws Exception {
+    assertTrue(interceptor.preHandle(request("/public", null), response(), handler("anonymousApi")));
+    assertNull(AuthContext.get());
+  }
+
+  @Test
+  void allowAnonymousAnnotatedEndpointWithInvalidToken() throws Exception {
+    assertTrue(interceptor.preHandle(request("/public", "invalid-token"), response(),
+        handler("anonymousApi")));
+    assertNull(AuthContext.get());
+  }
+
   private MockHttpServletRequest request(String path, String token) {
     MockHttpServletRequest request = new MockHttpServletRequest("GET", path);
     if (token != null) {
@@ -131,6 +144,10 @@ class PermissionInterceptorTest {
 
     @ApiPermission(value = "order:query", name = "查询订单")
     public void orders() {
+    }
+
+    @ApiPermission(anonymous = true)
+    public void anonymousApi() {
     }
   }
 }

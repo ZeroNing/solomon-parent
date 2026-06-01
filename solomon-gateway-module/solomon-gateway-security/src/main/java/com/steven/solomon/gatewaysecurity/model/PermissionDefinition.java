@@ -6,5 +6,6 @@ public record PermissionDefinition(
     String name,
     String description,
     String path,
-    String httpMethod) {
+    String httpMethod,
+    boolean anonymous) {
 }
