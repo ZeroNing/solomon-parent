@@ -13,9 +13,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>solomon-gateway</module>
-        <module>solomon-security</module>
-        <module>solomon-gateway-sentinel</module>
+        <module>solomon-gateway-security</module>
     </modules>
 
     <properties>

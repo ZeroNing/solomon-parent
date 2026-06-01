@@ -357,17 +357,7 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-gateway</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.steven</groupId>
-        <artifactId>solomon-gateway-sentinel</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.steven</groupId>
-        <artifactId>solomon-security</artifactId>
+        <artifactId>solomon-gateway-security</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
