@@ -16,6 +16,11 @@
   <dependencies>
 
     <dependency>
+      <groupId>com.steven</groupId>
+      <artifactId>solomon-gateway</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.alibaba.csp</groupId>
       <artifactId>sentinel-datasource-nacos</artifactId>
     </dependency>

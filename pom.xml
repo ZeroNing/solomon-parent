@@ -53,7 +53,6 @@
 
     <!-- 网关模块 -->
     <module>solomon-gateway-module</module>
-
     <!-- 工具模块 -->
     <module>solomon-utils-module</module>
   </modules>
@@ -358,7 +357,17 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
+        <artifactId>solomon-gateway</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
         <artifactId>solomon-gateway-sentinel</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-security</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
