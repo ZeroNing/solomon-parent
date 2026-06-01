@@ -51,8 +51,10 @@
     <!-- 任务调度模块 -->
     <module>solomon-job-module</module>
 
-    <!-- 网关与工具模块 -->
-    <module>solomon-gateway-sentinel</module>
+    <!-- 网关模块 -->
+    <module>solomon-gateway-module</module>
+
+    <!-- 工具模块 -->
     <module>solomon-utils-module</module>
   </modules>
 

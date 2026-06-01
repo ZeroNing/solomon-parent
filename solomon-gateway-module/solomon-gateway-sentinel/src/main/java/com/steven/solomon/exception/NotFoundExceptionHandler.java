@@ -32,7 +32,7 @@ public class NotFoundExceptionHandler extends AbstractExceptionHandler {
   /**
    * 从 Gateway 的异常 reason 中提取服务标识。
    *
-   * <p>常见 reason 格式包含 “for xxx”，没有匹配到时直接返回原始 reason。</p>
+   * <p>常见 reason 格式包含 "for xxx"，没有匹配到时直接返回原始 reason。</p>
    */
   private String resolveServiceName(String reason) {
     if (StrUtil.isBlank(reason)) {
