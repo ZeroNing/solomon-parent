@@ -37,7 +37,6 @@
     <!-- 数据存储模块 -->
     <module>solomon-dataSource</module>
     <module>solomon-mongodb</module>
-    <module>solomon-redis</module>
 
     <!-- 缓存模块 -->
     <module>solomon-cache-module</module>
@@ -248,11 +247,6 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-datasource</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.steven</groupId>
-        <artifactId>solomon-redis</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
