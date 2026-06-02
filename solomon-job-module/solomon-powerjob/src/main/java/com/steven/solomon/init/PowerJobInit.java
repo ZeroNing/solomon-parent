@@ -26,15 +26,26 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * PowerJob 任务自动注册初始化器。
+ *
+ * <p>在应用启动时，扫描所有标注 {@link JobTask} 注解且支持 PowerJob 平台的 Bean，
+ * 自动登录管理端、创建命名空间和应用，并按照 {@link JobRegisterMode} 配置执行任务注册（新增/更新）。
+ * 支持通过 {@link JobRegisterFailureStrategy} 配置注册失败时的行为。</p>
+ */
 @Configuration
 @Import(value = {PowerJobRegisterProperties.class})
 @Conditional(PowerJobCondition.class)
 @Order(1)
 public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
 
+    /** PowerJob Worker 配置，用于获取应用名称和连接信息。 */
     private final PowerJobProperties powerJobProperties;
 
+    /** PowerJob 管理端 API 服务。 */
     private final PowerJobService service;
+
+    /** 自动注册配置。 */
     private final PowerJobRegisterProperties registerProperties;
 
     public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service, PowerJobRegisterProperties registerProperties) {

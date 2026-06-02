@@ -12,18 +12,25 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("powerjob.worker.register")
 public class PowerJobRegisterProperties {
 
+    /** PowerJob 管理端登录用户名。 */
     private String userName;
 
+    /** PowerJob 管理端登录密码。 */
     private String password;
 
+    /** 目标命名空间编码。 */
     private String namespace;
 
+    /** 是否启用自动注册，默认关闭。 */
     private boolean enabled = false;
 
+    /** 自动注册写入模式，默认 UPSERT（不存在创建、存在更新）。 */
     private JobRegisterMode mode = JobRegisterMode.UPSERT;
 
+    /** 注册失败处理策略，默认 FAIL_FAST（快速失败）。 */
     private JobRegisterFailureStrategy failureStrategy = JobRegisterFailureStrategy.FAIL_FAST;
 
+    /** 是否自动创建不存在的命名空间和应用，默认 true。 */
     private boolean autoCreateNamespaceApp = true;
 
     public boolean getEnabled() {

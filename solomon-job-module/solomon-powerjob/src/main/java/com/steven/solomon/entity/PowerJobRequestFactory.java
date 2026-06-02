@@ -31,6 +31,11 @@ public final class PowerJobRequestFactory {
 
     /**
      * 创建新增任务请求。
+     *
+     * @param jobTask   统一任务注解
+     * @param appId     所属应用 ID
+     * @param className 任务类全限定名，用于回退任务名称
+     * @return PowerJob 保存请求对象
      */
     public static SaveJobInfoRequest create(JobTask jobTask, Integer appId, String className) {
         SaveJobInfoRequest request = new SaveJobInfoRequest();
@@ -40,6 +45,11 @@ public final class PowerJobRequestFactory {
 
     /**
      * 基于已有任务创建更新请求，保留任务 ID 与应用 ID。
+     *
+     * @param request   已有任务请求（含 ID）
+     * @param jobTask   统一任务注解
+     * @param className 任务类全限定名
+     * @return 更新后的请求对象
      */
     public static SaveJobInfoRequest update(SaveJobInfoRequest request, JobTask jobTask, String className) {
         return fill(request, jobTask, className);
@@ -47,6 +57,11 @@ public final class PowerJobRequestFactory {
 
     /**
      * 判断注解生成的任务参数与管理端已有任务是否一致。
+     *
+     * @param existsRequest 管理端已有任务
+     * @param jobTask       统一任务注解
+     * @param className     任务类全限定名
+     * @return true 表示参数一致无需更新
      */
     public static boolean samePayload(SaveJobInfoRequest existsRequest, JobTask jobTask, String className) {
         SaveJobInfoRequest target = copyIdentity(existsRequest);

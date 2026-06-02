@@ -26,12 +26,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * XXL-JOB 管理端 API 抽象服务。
+ *
+ * <p>封装与 XXL-JOB Admin 的 HTTP 通信，提供登录、任务 CRUD、启停、
+ * 执行器组解析等通用能力。子类只需实例化后即可使用。</p>
+ */
 public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
+    /** XXL-JOB Executor 配置。 */
     protected final XxlJobProperties profile;
 
+    /** 自动注册配置。 */
     protected final XxlJobRegisterProperties registerProperties;
 
+    /** 管理端基础地址。 */
     protected final String adminAddresses;
 
     private final Logger logger = LoggerUtils.logger(CommonXxlJobService.class);
@@ -155,10 +164,27 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         executeFirst(cookie, Arrays.asList("jobinfo/stop", "jobinfo/triggerStatus/stop"), paramMap);
     }
 
+    /**
+     * 根据执行器 Handler 名称查询任务列表（默认执行器组 1）。
+     *
+     * @param cookie         登录 Cookie
+     * @param executorHandler 执行器 Handler 名称
+     * @return 任务列表
+     * @throws Exception 请求失败时抛出
+     */
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler) throws Exception {
         return findByExecutorHandler(cookie, executorHandler, 1);
     }
 
+    /**
+     * 根据执行器 Handler 和执行器组查询任务列表（分页，默认取 10000 条）。
+     *
+     * @param cookie         登录 Cookie
+     * @param executorHandler 执行器 Handler 名称
+     * @param jobGroup        执行器组 ID
+     * @return 任务列表
+     * @throws Exception 请求失败时抛出
+     */
     public List<XxlJobInfo> findByExecutorHandler(String cookie, String executorHandler, int jobGroup) throws Exception {
         if (ObjectUtil.isEmpty(cookie)) {
             cookie = login();
@@ -262,12 +288,30 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         throw ObjectUtil.isEmpty(lastException) ? new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR, adminAddresses, JobLogSanitizer.sanitize(paramMap), "无可用接口路径") : lastException;
     }
 
+    /**
+     * 发送 POST 请求并返回响应体字符串。
+     *
+     * @param cookie   登录 Cookie
+     * @param url      请求地址
+     * @param paramMap 表单参数
+     * @return 响应体字符串
+     * @throws BaseException 请求失败时抛出
+     */
     protected String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
             return response.body();
         }
     }
 
+    /**
+     * 发送 POST 请求并执行。
+     *
+     * @param cookie   登录 Cookie
+     * @param url      请求地址
+     * @param paramMap 表单参数
+     * @return HTTP 响应
+     * @throws BaseException 请求失败或返回状态异常时抛出
+     */
     protected HttpResponse executeResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
         HttpRequest request = HttpUtil.createPost(url);
         if (ObjectUtil.isNotEmpty(cookie)) {
@@ -299,6 +343,9 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
         return response;
     }
 
+    /**
+     * 组装管理端基础地址，确保以 / 结尾。
+     */
     protected String getUrl() {
         String adminAddresses = profile.getAdminAddresses();
         if (!adminAddresses.endsWith("/")) {

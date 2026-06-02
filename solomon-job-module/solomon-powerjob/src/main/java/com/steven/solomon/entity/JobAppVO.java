@@ -2,22 +2,45 @@ package com.steven.solomon.entity;
 
 import java.util.Date;
 
+/**
+ * PowerJob 应用（App）视图对象。
+ *
+ * <p>映射 PowerJob 管理端应用信息，用于查询和创建应用时与 Admin API 交互。
+ * 包含应用名称、所属命名空间、创建人等信息。</p>
+ */
 public class JobAppVO {
+
+    /** 应用主键 ID。 */
     private int id;
+    /** 应用名称。 */
     private String appName;
+    /** 所属命名空间 ID。 */
     private int namespaceId;
+    /** 应用标题。 */
     private String title;
+    /** 应用密码。 */
     private String password;
+    /** 标签。 */
     private String tags;
+    /** 扩展信息。 */
     private String extra;
+    /** 组件用户角色信息。 */
     private JobComponentUserRoleInfoVO componentUserRoleInfo;
+    /** 创建时间。 */
     private Date gmtCreate;
+    /** 创建时间字符串。 */
     private String gmtCreateStr;
+    /** 修改时间。 */
     private Date gmtModified;
+    /** 修改时间字符串。 */
     private String gmtModifiedStr;
+    /** 创建人显示名称。 */
     private String creatorShowName;
+    /** 修改人显示名称。 */
     private String modifierShowName;
+    /** 命名空间对象。 */
     private JobNamespaceVO namespace;
+    /** 命名空间名称。 */
     private String namespaceName;
 
     public int getId() {

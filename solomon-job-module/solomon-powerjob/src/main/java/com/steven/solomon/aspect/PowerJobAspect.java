@@ -13,18 +13,36 @@ import org.springframework.context.annotation.Configuration;
 import tech.powerjob.worker.core.processor.ProcessResult;
 import tech.powerjob.worker.core.processor.TaskContext;
 
+/**
+ * PowerJob 任务执行切面。
+ *
+ * <p>拦截所有 {@link tech.powerjob.worker.core.processor.sdk.BasicProcessor#process} 执行，
+ * 记录任务上下文日志（任务 ID、实例 ID、子实例 ID、任务参数），
+ * 并在异常时返回失败结果而非抛出异常。</p>
+ */
 @Aspect
 @Configuration
 public class PowerJobAspect {
 
     private final Logger logger = LoggerUtils.logger(getClass());
 
+    /** 是否启用 PowerJob 组件。 */
     @Value("${powerjob.worker.enabled: true}")
     private boolean enabled;
 
+    /**
+     * 切点：拦截所有 BasicProcessor 的 process 方法。
+     */
     @Pointcut("execution(* tech.powerjob.worker.core.processor.sdk.BasicProcessor.process(..))")
     void cutPoint() {}
 
+    /**
+     * 环绕通知：记录任务上下文信息，异常时返回失败 ProcessResult。
+     *
+     * @param point 连接点
+     * @return 任务执行结果
+     * @throws Throwable 执行异常
+     */
     @Around("cutPoint()")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         if (!enabled) {

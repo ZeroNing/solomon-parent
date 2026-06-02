@@ -6,24 +6,34 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("xxl")
 public class XxlJobProperties {
 
+    /** 是否启用 XXL-JOB Executor，默认启用。 */
     private boolean enabled = true;
 
+    /** XXL-JOB 管理端地址，多个用逗号分隔。 */
     private String adminAddresses;
 
+    /** 与 XXL-JOB 管理端通信的访问令牌。 */
     private String accessToken;
 
+    /** 执行器应用名称（AppName），用于注册到调度中心识别。 */
     private String appName;
 
+    /** 执行器注册地址，为空时自动获取。 */
     private String address;
 
+    /** 执行器注册 IP。 */
     private String ip;
 
+    /** 执行器注册端口。 */
     private int port;
 
+    /** 执行器日志路径。 */
     private String logPath;
 
+    /** 日志保留天数，默认 30 天。 */
     private Integer logRetentionDays = 30;
 
+    /** 任务执行超时时间，单位秒。 */
     private Integer timeout;
 
     public boolean getEnabled() {

@@ -28,15 +28,25 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * XXL-JOB 任务自动注册初始化器。
+ *
+ * <p>在应用启动时，扫描所有标注 {@link JobTask} 注解且支持 XXL-JOB 平台的 Bean，
+ * 自动登录管理端、按 appName 解析执行器组 ID，并按照 {@link JobRegisterMode} 配置
+ * 执行任务注册（新增/更新），同时同步启停状态。</p>
+ */
 @Configuration
 @Import({XxlJobProperties.class, XxlJobRegisterProperties.class})
 @Conditional(XxlJobCondition.class)
 public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
+    /** XXL-JOB Executor 配置。 */
     private final XxlJobProperties profile;
 
+    /** 自动注册配置。 */
     private final XxlJobRegisterProperties registerProperties;
 
+    /** XXL-JOB 管理端 API 服务。 */
     private final XxlJobService service;
 
     public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobRegisterProperties registerProperties, XxlJobService service) {

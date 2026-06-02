@@ -37,17 +37,27 @@ import java.util.stream.Collectors;
 
 import static com.steven.solomon.code.PowerJobErrorCode.*;
 
+/**
+ * PowerJob 管理端 API 服务实现。
+ *
+ * <p>通过 HTTP 请求与 PowerJob 管理端交互，支持登录、任务创建/更新/删除/启停、
+ * 命名空间创建、应用创建等功能。自动兼容 PowerJob 4.x 和 5.x 版本的接口差异。</p>
+ */
 @Service
 @Import(value = {PowerJobRegisterProperties.class})
 @Conditional(PowerJobCondition.class)
 public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
+    /** 自动注册配置。 */
     private final PowerJobRegisterProperties registerProperties;
 
+    /** PowerJob Worker 配置。 */
     private final PowerJobProperties powerJobProperties;
 
+    /** 管理端基础地址（格式：{protocol}://{host}）。 */
     private final String adminAddresses;
 
+    /** 当前应用 ID（延迟加载）。 */
     private Integer appId;
 
     public PowerJobService(PowerJobRegisterProperties registerProperties, PowerJobProperties powerJobProperties) {
@@ -404,15 +414,22 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     /**
      * 管理端接口候选项。
+     *
+     * <p>封装请求路径、方法、ContentType 和参数，支持按候选列表顺序尝试，
+     * 兼容不同 PowerJob 版本的接口差异。</p>
      */
     private static class ApiRequest {
 
+        /** 请求路径（相对路径）。 */
         private final String path;
 
+        /** HTTP 请求方法。 */
         private final Method method;
 
+        /** Content-Type。 */
         private final ContentType contentType;
 
+        /** 请求参数字典。 */
         private final Map<String, Object> paramMap;
 
         private ApiRequest(String path, Method method, ContentType contentType, Map<String, Object> paramMap) {
@@ -422,6 +439,13 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
             this.paramMap = paramMap;
         }
 
+        /**
+         * 快捷创建 POST JSON 请求。
+         *
+         * @param path     请求路径
+         * @param paramMap 请求参数
+         * @return API 请求对象
+         */
         private static ApiRequest postJson(String path, Map<String, Object> paramMap) {
             return new ApiRequest(path, Method.POST, ContentType.JSON, paramMap);
         }
@@ -441,6 +465,10 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         }
     }
 
+    /**
+     * 组装管理端基础地址。
+     * <p>格式：{protocol}://{serverAddress}/，例如 http://localhost:7700/。</p>
+     */
     private String getUrl() {
         String adminAddresses = powerJobProperties.getWorker().getProtocol().name().toLowerCase() +"://"+ powerJobProperties.getWorker().getServerAddress();
         if (!adminAddresses.endsWith("/")) {
@@ -449,6 +477,10 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         return adminAddresses;
     }
 
+    /**
+     * 初始化空的角色权限配置。
+     * <p>创建命名空间或应用时默认所有角色列表为空。</p>
+     */
     private Map<String,Object> initUserRole() {
         Map<String,Object> componentUserRoleInfoMap = new HashMap<>();
         componentUserRoleInfoMap.put("observer",new String[]{});

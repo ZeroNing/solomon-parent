@@ -9,38 +9,71 @@ import com.steven.solomon.enums.*;
 import com.steven.solomon.spring.SpringUtil;
 
 /**
- * xxl-job info
+ * XXL-JOB 任务信息实体。
+ *
+ * <p>映射 XXL-JOB 调度中心的任务信息表结构，包含执行器、调度策略、路由策略、
+ * 阻塞处理、超时、重试等完整任务配置。支持通过 {@link JobTask} 注解自动填充。</p>
  *
  * @author xuxueli  2016-1-12 18:25:49
  */
 public class XxlJobInfo {
-	
-	private int id;				// 主键ID
-	
-	private int jobGroup;		// 执行器主键ID
+
+	/** 主键 ID。 */
+	private int id;
+
+	/** 执行器主键 ID。 */
+	private int jobGroup;
+
+	/** 任务描述。 */
 	private String jobDesc;
-	
-	private String author;		// 负责人
-	private String alarmEmail;	// 报警邮件
 
-	private ScheduleTypeEnum scheduleType;			// 调度类型
-	private String scheduleConf;			// 调度配置，值含义取决于调度类型
-	private MisfireStrategyEnum misfireStrategy;			// 调度过期策略
+	/** 任务负责人。 */
+	private String author;
 
-	private ExecutorRouteStrategyEnum executorRouteStrategy;	// 执行器路由策略
-	private String executorHandler;		    // 执行器，任务Handler名称
-	private String executorParam;		    // 执行器，任务参数
-	private ExecutorBlockStrategyEnum executorBlockStrategy;	// 阻塞处理策略
-	private int executorTimeout;     		// 任务执行超时时间，单位秒
-	private int executorFailRetryCount;		// 失败重试次数
-	
-	private GlueTypeEnum glueType;		// GLUE类型	#com.xxl.job.core.glue.GlueTypeEnum
-	private String glueSource;		// GLUE源代码
-	private String glueRemark;		// GLUE备注
+	/** 报警邮件地址，多个用逗号分隔。 */
+	private String alarmEmail;
 
-	private String childJobId;		// 子任务ID，多个逗号分隔
+	/** 调度类型。 */
+	private ScheduleTypeEnum scheduleType;
 
-	private int triggerStatus;		// 调度状态：0-停止，1-运行
+	/** 调度配置，值含义取决于调度类型。 */
+	private String scheduleConf;
+
+	/** 调度过期策略。 */
+	private MisfireStrategyEnum misfireStrategy;
+
+	/** 执行器路由策略。 */
+	private ExecutorRouteStrategyEnum executorRouteStrategy;
+
+	/** 执行器任务 Handler 名称。 */
+	private String executorHandler;
+
+	/** 执行器任务参数。 */
+	private String executorParam;
+
+	/** 阻塞处理策略。 */
+	private ExecutorBlockStrategyEnum executorBlockStrategy;
+
+	/** 任务执行超时时间，单位秒。 */
+	private int executorTimeout;
+
+	/** 失败重试次数。 */
+	private int executorFailRetryCount;
+
+	/** GLUE 运行模式类型。 */
+	private GlueTypeEnum glueType;
+
+	/** GLUE 源代码。 */
+	private String glueSource;
+
+	/** GLUE 备注。 */
+	private String glueRemark;
+
+	/** 子任务 ID，多个逗号分隔。 */
+	private String childJobId;
+
+	/** 调度状态：0-停止，1-运行。 */
+	private int triggerStatus;
 
 	public XxlJobInfo() {
 		super();
