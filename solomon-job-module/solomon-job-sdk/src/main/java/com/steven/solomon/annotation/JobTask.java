@@ -20,6 +20,9 @@ import java.lang.annotation.Target;
 @Component
 public @interface JobTask {
 
+    /**
+     * Bean 名称，同时作为 {@link Component} 的别名。
+     */
     @AliasFor(annotation = Component.class)
     String value() default StrUtil.EMPTY;
 
