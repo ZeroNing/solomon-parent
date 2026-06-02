@@ -13,12 +13,12 @@
 
   <artifactId>test-solomon-datasource</artifactId>
   <name>test-solomon-datasource</name>
-  <description>solomon-datasource 查询测试模块</description>
+  <description>solomon-persistence 查询测试模块</description>
 
   <dependencies>
     <dependency>
       <groupId>com.steven</groupId>
-      <artifactId>solomon-datasource</artifactId>
+      <artifactId>solomon-persistence-jdbc</artifactId>
     </dependency>
 
     <dependency>

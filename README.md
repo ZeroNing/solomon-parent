@@ -55,7 +55,7 @@ Solomon Parent 是一个基础设施型 Maven 多模块工程，目标是把微�
 | `solomon-utils` | 基础模块 | JSON、日期、校验、加密、Spring、ClamAV 等工具 |
 | `solomon-base` | 基础模块 | 基础自动配置、OpenAPI、统一异常处理 |
 | `solomon-common` | 基础模块 | Web MVC、过滤器、日志切面、Excel 等通用能力 |
-| `solomon-datasource` | 数据模块 | 多数据源、连接池、数据源基础封装 |
+| `solomon-persistence-module` | 持久化模块 | SDK、主流数据库方言、深浅分页、多租户数据源、HikariCP/Druid、报表查询 |
 | `solomon-mongodb` | 数据模块 | MongoDB 自动配置、多租户 MongoTemplate、集合初始化 |
 | `solomon-redis` | 历史模块 | 历史 Redis 能力，保留给旧业务使用 |
 | `solomon-cache-module` | 聚合模块 | 通用缓存 SDK、Redis 缓存实现、Caffeine 本地缓存实现 |
@@ -77,7 +77,7 @@ solomon-parent
 ├── solomon-utils
 ├── solomon-base
 ├── solomon-common
-├── solomon-datasource
+├── solomon-persistence-module
 ├── solomon-mongodb
 ├── solomon-redis
 ├── solomon-cache-module

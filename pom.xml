@@ -35,7 +35,7 @@
     <module>solomon-common</module>
 
     <!-- 数据存储模块 -->
-    <module>solomon-dataSource</module>
+    <module>solomon-persistence-module</module>
     <module>solomon-mongodb</module>
 
     <!-- 缓存模块 -->
@@ -247,7 +247,12 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-datasource</artifactId>
+        <artifactId>solomon-persistence-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-persistence-jdbc</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

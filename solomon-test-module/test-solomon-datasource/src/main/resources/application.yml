@@ -50,32 +50,33 @@ solomon:
         description: 用户认证令牌
         required: true
         hidden: false
-  datasource:
-    enabled: true
-    default-tenant: default
-    page:
-      auto-seek-enabled: true
-      seek-page-no: 100
-      seek-page-size: 100
-      default-seek-column: id
-    tenants:
-      default:
-        pool-type: HIKARI
-        database-type: MYSQL
-        url:
-        username:
-        password:
-        hikari:
-          maximum-pool-size: 5
-          minimum-idle: 1
-          pool-name: test-solomon-datasource
-      test:
-        pool-type: HIKARI
-        database-type: MYSQL
-        url:
-        username:
-        password:
-        hikari:
-          maximum-pool-size: 5
-          minimum-idle: 1
-          pool-name: test-solomon-datasource
+
+persistence:
+  enabled: true
+  default-tenant: default
+  page:
+    auto-seek-enabled: true
+    seek-page-no: 100
+    seek-page-size: 100
+    default-seek-column: id
+  tenants:
+    default:
+      pool-type: HIKARI
+      database-type: MYSQL
+      url:
+      username:
+      password:
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        pool-name: test-solomon-datasource
+    test:
+      pool-type: HIKARI
+      database-type: MYSQL
+      url:
+      username:
+      password:
+      hikari:
+        maximum-pool-size: 5
+        minimum-idle: 1
+        pool-name: test-solomon-datasource

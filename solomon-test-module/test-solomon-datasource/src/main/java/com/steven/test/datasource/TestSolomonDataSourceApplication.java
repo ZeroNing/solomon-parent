@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * solomon-datasource 查询测试启动类。
+ * solomon-persistence 查询测试启动类。
  */
 @SpringBootApplication
 public class TestSolomonDataSourceApplication {
