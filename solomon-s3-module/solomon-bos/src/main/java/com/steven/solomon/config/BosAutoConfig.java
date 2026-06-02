@@ -21,6 +21,17 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "file", name = "choice", havingValue = "BOS")
 public class BosAutoConfig {
 
+  /**
+   * 注册百度云 BOS 文件服务 Bean。
+   *
+   * <p>当 classpath 中存在 {@link BosClient} 且配置 {@code file.choice=BOS} 时生效。</p>
+   *
+   * @param properties     文件存储配置属性
+   * @param fileNamingRule 文件命名规则
+   * @param clamAvUtils    ClamAV 病毒扫描工具
+   * @return BOS 文件服务实例
+   * @throws Exception 初始化或检查默认桶时抛出
+   */
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   public FileServiceInterface bosFileService(

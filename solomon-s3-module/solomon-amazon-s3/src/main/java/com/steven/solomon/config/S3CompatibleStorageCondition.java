@@ -15,6 +15,7 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  */
 public class S3CompatibleStorageCondition implements Condition {
 
+  /** 兼容 S3 协议的供应商枚举集合。 */
   private static final Set<FileChoiceEnum> S3_COMPATIBLE_CHOICES = EnumSet.of(
       FileChoiceEnum.S3,
       FileChoiceEnum.KODO,
@@ -37,6 +38,13 @@ public class S3CompatibleStorageCondition implements Condition {
       FileChoiceEnum.INSPUR
   );
 
+  /**
+   * 判断当前配置是否匹配 S3 兼容存储供应商。
+   *
+   * @param context  条件上下文
+   * @param metadata 注解元数据
+   * @return 如果 {@code file.choice} 属于 S3 兼容供应商集合则返回 {@code true}
+   */
   @Override
   public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
     String choice = context.getEnvironment().getProperty("file.choice");

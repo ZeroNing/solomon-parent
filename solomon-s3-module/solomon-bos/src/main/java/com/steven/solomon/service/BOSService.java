@@ -21,12 +21,23 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 百度云文件实现类
+ * 百度云 BOS（Baidu Object Storage）文件存储服务实现。
+ *
+ * <p>基于百度云 BOS Java SDK 实现文件上传、下载、分享、
+ * 分片上传和桶管理等操作。</p>
  */
 public class BOSService extends AbstractFileService {
 
+  /** BOS 客户端实例。 */
   private final BosClient client;
 
+  /**
+   * 创建 BOS 客户端。
+   *
+   * <p>配置项包括端点、凭证、超时时间和区域。</p>
+   *
+   * @return BOS 客户端
+   */
   private BosClient client() {
     BosClientConfiguration configuration = new BosClientConfiguration();
     configuration.setCredentials(new DefaultBceCredentials(properties.getAccessKey(), properties.getSecretKey()));
@@ -41,6 +52,13 @@ public class BOSService extends AbstractFileService {
     return new BosClient(configuration);
   }
 
+  /**
+   * 构造 BOS 服务。
+   *
+   * @param properties                     文件存储配置属性
+   * @param fileNamingRulesGenerationService 文件命名规则
+   * @param clamAvUtils                    ClamAV 病毒扫描工具
+   */
   public BOSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client = client();

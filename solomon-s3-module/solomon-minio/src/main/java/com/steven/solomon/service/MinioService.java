@@ -34,13 +34,28 @@ import java.util.concurrent.TimeUnit;
 
 import okhttp3.OkHttpClient;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
- * Minio文件实现类
+ * MinIO 对象存储文件服务实现。
+ *
+ * <p>基于 MinIO Java SDK 实现文件上传、下载、分享和桶管理等操作。
+ * MinIO 不支持标准分片上传，使用普通上传代替。</p>
  */
 public class MinioService extends AbstractFileService {
 
+  /** MinIO 客户端实例。 */
   public MinioClient client;
 
+  /**
+   * 构造 MinIO 服务。
+   *
+   * <p>初始化 OkHttp 客户端配置连接超时和 Socket 超时，
+   * 构建 MinIO 客户端实例。</p>
+   *
+   * @param properties                     文件存储配置属性
+   * @param fileNamingRulesGenerationService 文件命名规则
+   * @param clamAvUtils                    ClamAV 病毒扫描工具
+   */
   public MinioService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
 

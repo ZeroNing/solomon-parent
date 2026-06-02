@@ -13,12 +13,24 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * S3Service单元测试
- * 主要测试multipartUpload方法的InputStream处理逻辑
+ * AmazonS3Service 分片上传 InputStream 处理逻辑的单元测试。
+ *
+ * <p>主要测试 {@code multipartUpload} 方法中 InputStream 的 skip 和 read 操作
+ * 在各种边界情况下的正确性。</p>
+ *
+ * <p>测试覆盖的场景包括：</p>
+ * <ul>
+ *   <li>正常跳过和读取</li>
+ *   <li>跳过 0 字节</li>
+ *   <li>分段读取（模拟网络 InputStream 逐段返回数据）</li>
+ *   <li>组合测试（跳过 + 读取模拟分片上传）</li>
+ *   <li>边界情况（空 InputStream、单字节 InputStream）</li>
+ *   <li>异常处理逻辑验证</li>
+ * </ul>
  */
 class AmazonS3ServiceInputStreamTest {
 
-    // ========== InputStream处理逻辑测试 ==========
+    // ========== InputStream 处理逻辑测试 ==========
 
     @Test
     @DisplayName("skipBytes - 正常跳过字节")
@@ -167,7 +179,7 @@ class AmazonS3ServiceInputStreamTest {
         }
     }
 
-    // ========== Mock测试 ==========
+    // ========== Mock 测试 ==========
 
     @Test
     @DisplayName("checkObjectExist - NoSuchKeyException返回false")
@@ -189,7 +201,10 @@ class AmazonS3ServiceInputStreamTest {
     // ========== 辅助类 ==========
 
     /**
-     * 模拟分段返回的InputStream
+     * 模拟分段返回数据的 InputStream。
+     *
+     * <p>构造时传入多个字节数组，read() 方法会按顺序从一个 chunk 读完
+     * 再进入下一个 chunk，用于模拟网络传输中数据分段到达的场景。</p>
      */
     private static class ChunkedInputStream extends InputStream {
         private final byte[][] chunks;

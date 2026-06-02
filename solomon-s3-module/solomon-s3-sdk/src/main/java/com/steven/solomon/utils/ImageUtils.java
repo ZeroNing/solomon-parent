@@ -9,7 +9,10 @@ import net.coobird.thumbnailator.geometry.Coordinate;
 import net.coobird.thumbnailator.geometry.Positions;
 
 /**
- * 图片处理工具类
+ * 图片处理工具类。
+ *
+ * <p>基于 Thumbnailator 库提供图片压缩、旋转、格式转换、裁剪、
+ * 水印添加等功能。</p>
  */
 public class ImageUtils {
 

@@ -17,18 +17,37 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
- * 阿里云文件实现类
+ * 阿里云 OSS（Object Storage Service）文件存储服务实现。
+ *
+ * <p>基于阿里云 OSS Java SDK 实现文件上传、下载、分享、
+ * 分片上传和桶管理等操作。</p>
  */
 public class OSSService extends AbstractFileService {
 
+  /** OSS 客户端实例。 */
   private final OSS client;
 
+  /**
+   * 构造 OSS 服务。
+   *
+   * @param properties                     文件存储配置属性
+   * @param fileNamingRulesGenerationService 文件命名规则
+   * @param clamAvUtils                    ClamAV 病毒扫描工具
+   */
   public OSSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client     = client();
   }
 
+  /**
+   * 创建 OSS 客户端。
+   *
+   * <p>配置项包括端点、凭证、超时时间和协议（HTTP/HTTPS）。</p>
+   *
+   * @return OSS 客户端
+   */
   public OSS client() {
     ClientBuilderConfiguration configuration = new ClientBuilderConfiguration();
     configuration.setConnectionTimeout(properties.getConnectionTimeout());

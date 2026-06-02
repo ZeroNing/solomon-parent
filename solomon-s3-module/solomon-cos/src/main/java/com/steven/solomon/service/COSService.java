@@ -22,17 +22,34 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * 腾讯云文件实现类
+ * 腾讯云 COS（Cloud Object Storage）文件存储服务实现。
+ *
+ * <p>基于腾讯云 COS Java SDK 实现文件上传、下载、分享、
+ * 分片上传和桶管理等操作。</p>
  */
 public class COSService extends AbstractFileService {
 
+  /** COS 客户端实例。 */
   private final COSClient client;
 
+  /**
+   * 构造 COS 服务。
+   *
+   * @param properties                     文件存储配置属性
+   * @param fileNamingRulesGenerationService 文件命名规则
+   * @param clamAvUtils                    ClamAV 病毒扫描工具
+   */
   public COSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client = initClient(properties);
   }
 
+  /**
+   * 初始化 COS 客户端。
+   *
+   * @param properties 文件存储配置属性
+   * @return COS 客户端
+   */
   private static COSClient initClient(FileChoiceProperties properties) {
     COSCredentials credentials  = new BasicCOSCredentials(properties.getAccessKey(), properties.getSecretKey());
     ClientConfig configuration = null;

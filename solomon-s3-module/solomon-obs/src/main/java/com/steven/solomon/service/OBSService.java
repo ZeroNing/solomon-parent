@@ -15,18 +15,37 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
- * 华为云文件实现类
+ * 华为云 OBS（Object Storage Service）文件存储服务实现。
+ *
+ * <p>基于华为云 OBS Java SDK 实现文件上传、下载、分享、
+ * 分片上传和桶管理等操作。</p>
  */
 public class OBSService extends AbstractFileService {
 
+  /** OBS 客户端实例。 */
   private final ObsClient client;
 
+  /**
+   * 构造 OBS 服务。
+   *
+   * @param properties                     文件存储配置属性
+   * @param fileNamingRulesGenerationService 文件命名规则
+   * @param clamAvUtils                    ClamAV 病毒扫描工具
+   */
   public OBSService(FileChoiceProperties properties, FileNamingRulesGenerationService fileNamingRulesGenerationService, ClamAvUtils clamAvUtils) {
     super(properties,fileNamingRulesGenerationService,clamAvUtils);
     this.client = client();
   }
 
+  /**
+   * 创建 OBS 客户端。
+   *
+   * <p>配置项包括端点、超时时间和访问凭证。</p>
+   *
+   * @return OBS 客户端
+   */
   private ObsClient client() {
     ObsConfiguration configuration = new ObsConfiguration();
     configuration.setEndPoint(properties.getEndpoint());

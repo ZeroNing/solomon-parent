@@ -21,6 +21,17 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "file", name = "choice", havingValue = "OSS")
 public class OssAutoConfig {
 
+  /**
+   * 注册阿里云 OSS 文件服务 Bean。
+   *
+   * <p>当 classpath 中存在 {@link OSS} 且配置 {@code file.choice=OSS} 时生效。</p>
+   *
+   * @param properties     文件存储配置属性
+   * @param fileNamingRule 文件命名规则
+   * @param clamAvUtils    ClamAV 病毒扫描工具
+   * @return OSS 文件服务实例
+   * @throws Exception 初始化或检查默认桶时抛出
+   */
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   public FileServiceInterface ossFileService(

@@ -32,8 +32,10 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
  */
 public class AmazonS3Service extends AbstractFileService {
 
+  /** AWS S3 同步客户端。 */
   protected S3Client client;
 
+  /** AWS S3 预签名 URL 生成器。 */
   private S3Presigner presigner;
 
   public AmazonS3Service(FileNamingRulesGenerationService fileNamingRulesGenerationService) {
@@ -119,12 +121,26 @@ public class AmazonS3Service extends AbstractFileService {
     return client.getObject(GetObjectRequest.builder().bucket(bucketName).key(filePath).build());
   }
 
+  /**
+   * 将标签 Map 编码为 S3 Tagging 字符串格式。
+   *
+   * <p>S3 标签格式为 URL 编码的 {@code key=value&key=value...}。</p>
+   *
+   * @param request 上传请求，包含标签信息
+   * @return 编码后的标签字符串
+   */
   private String toTagging(FileUploadRequest request) {
     return request.getTags().entrySet().stream()
         .map(entry -> encodeTag(entry.getKey()) + "=" + encodeTag(entry.getValue()))
         .collect(Collectors.joining("&"));
   }
 
+  /**
+   * 对标签值进行 URL 编码。
+   *
+   * @param value 原始标签值
+   * @return URL 编码后的字符串
+   */
   private String encodeTag(String value) {
     return URLEncoder.encode(value, StandardCharsets.UTF_8);
   }
@@ -162,6 +178,15 @@ public class AmazonS3Service extends AbstractFileService {
     }
   }
 
+  /**
+   * 复制文件。
+   *
+   * @param sourceBucket     源存储桶
+   * @param targetBucket     目标存储桶
+   * @param sourceObjectName 源对象键名
+   * @param targetObjectName 目标对象键名
+   * @throws Exception 复制失败时抛出
+   */
   @Override
   protected void copyFile(String sourceBucket, String targetBucket, String sourceObjectName, String targetObjectName) throws Exception {
     client.copyObject(CopyObjectRequest.builder()
@@ -231,6 +256,13 @@ public class AmazonS3Service extends AbstractFileService {
     return uploadId;
   }
 
+  /**
+   * 中止分片上传。
+   *
+   * @param uploadId   上传任务 ID
+   * @param bucketName 存储桶名称
+   * @param filePath   对象键名
+   */
   @Override
   protected void abortMultipartUpload(String uploadId, String bucketName, String filePath) {
     logger.warn("[S3] 中止分片上传任务: bucket={}, key={}, uploadId={}", bucketName, filePath, uploadId);

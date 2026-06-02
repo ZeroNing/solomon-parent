@@ -21,6 +21,18 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Conditional(S3CompatibleStorageCondition.class)
 public class S3AutoConfig {
 
+  /**
+   * 注册 S3 协议兼容对象存储服务 Bean。
+   *
+   * <p>当 classpath 中存在 {@link S3Client} 且 {@code file.choice} 匹配 S3 兼容供应商时生效。
+   * 在容器中不存在 {@link FileServiceInterface} 类型的 Bean 时才会注册。</p>
+   *
+   * @param properties     文件存储配置属性
+   * @param fileNamingRule 文件命名规则
+   * @param clamAvUtils    ClamAV 病毒扫描工具
+   * @return S3 文件服务实例
+   * @throws Exception 初始化或检查默认桶时抛出
+   */
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)
   public FileServiceInterface s3FileService(

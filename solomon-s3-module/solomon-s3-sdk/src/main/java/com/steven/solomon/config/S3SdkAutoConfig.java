@@ -30,6 +30,18 @@ public class S3SdkAutoConfig {
 
   /**
    * 根据配置选择文件命名策略，业务侧可以注册同类型 Bean 覆盖默认规则。
+   *
+   * <p>根据 {@link FileChoiceProperties#getFileNamingMethod()} 返回的枚举值，
+   * 创建对应的命名规则实现：</p>
+   * <ul>
+   *   <li>{@code DATE} - {@link DateNamingRulesGenerationService} 按日期时间命名</li>
+   *   <li>{@code UUID} - {@link UUIDNamingRulesGenerationService} 按 UUID 命名</li>
+   *   <li>{@code SNOWFLAKE} - {@link SnowflakeNamingRulesGenerationService} 按雪花 ID 命名</li>
+   *   <li>其他情况（含 {@code ORIGINAL}）- {@link OriginalNamingRulesGenerationService} 保留原名</li>
+   * </ul>
+   *
+   * @param properties 文件存储配置属性
+   * @return 文件命名规则服务实例
    */
   @Bean
   @ConditionalOnMissingBean(FileNamingRulesGenerationService.class)
@@ -49,6 +61,14 @@ public class S3SdkAutoConfig {
 
   /**
    * 未选择具体供应商时提供默认服务，调用时会抛出明确的无实现异常。
+   *
+   * <p>当配置项 {@code file.choice} 未设置或设置为 {@code DEFAULT} 时生效，
+   * 确保在没有引入任何供应商模块时不会静默失败。</p>
+   *
+   * @param properties      文件存储配置属性
+   * @param fileNamingRule  文件命名规则
+   * @param clamAvUtils     ClamAV 病毒扫描工具
+   * @return 默认文件服务实例（所有操作均抛出无实现异常）
    */
   @Bean
   @ConditionalOnMissingBean(FileServiceInterface.class)

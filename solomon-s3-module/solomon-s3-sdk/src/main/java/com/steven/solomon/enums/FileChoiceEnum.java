@@ -2,6 +2,12 @@ package com.steven.solomon.enums;
 
 import com.steven.solomon.pojo.enums.BaseEnum;
 
+/**
+ * 对象存储供应商枚举。
+ *
+ * <p>定义所有支持的对象存储服务商，每个枚举项对应一个供应商，
+ * 用于配置文件中 {@code file.choice} 属性的可选值。</p>
+ */
 public enum FileChoiceEnum implements BaseEnum<String> {
   DEFAULT("DEFAULT","无文件存储实现"),
   MINIO("MINIO","minio对象存储"),
@@ -30,8 +36,10 @@ public enum FileChoiceEnum implements BaseEnum<String> {
   S3("S3","S3协议对象存储")
   ;
 
+  /** 枚举标签，与配置值对应。 */
   private String label;
 
+  /** 枚举描述，说明供应商名称。 */
   private String desc;
 
   FileChoiceEnum(String label,String desc) {
