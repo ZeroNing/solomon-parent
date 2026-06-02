@@ -4,9 +4,12 @@ import cn.hutool.core.util.ObjectUtil;
 
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
+import com.steven.solomon.context.TenantRequestBinder;
+import com.steven.solomon.context.TenantResourceScope;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.entity.BaseMq;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
@@ -55,6 +58,7 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
     Throwable throwable = null;
     R result = null;
     M model = null;
+    TenantResourceScope tenantResourceScope = null;
     try {
       model = conversion(json);
       tenantCode = model.getTenantCode();
@@ -70,6 +74,8 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
       }
       if (ObjectUtil.isNotEmpty(tenantCode)) {
         RequestHeaderHolder.setTenantCode(tenantCode);
+        tenantResourceScope = TenantResourceScope.open(tenantCode,
+            SpringUtil.getBeansOfType(TenantRequestBinder.class).values());
       }
       result = handleMessage(model.getBody());
     } catch (Throwable e) {
@@ -78,6 +84,9 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
     } finally {
       deleteCheckMessageKey(model);
       saveLog(result, throwable, model);
+      if (tenantResourceScope != null) {
+        tenantResourceScope.close();
+      }
       RequestHeaderHolder.remove();
     }
   }

@@ -1,5 +1,7 @@
 package com.steven.solomon.mqtt.model;
 
+import cn.hutool.core.util.StrUtil;
+import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.pojo.entity.BaseMq;
 
 /**
@@ -61,5 +63,25 @@ public class MqttMessageModel<T> extends BaseMq<T> {
 
   public void setTopic(String topic) {
     this.topic = topic;
+  }
+
+  /**
+   * 获取消息租户，未显式设置时自动继承当前上下文。
+   */
+  @Override
+  public String getTenantCode() {
+    inheritTenantCode();
+    return super.getTenantCode();
+  }
+
+  /**
+   * 消息未指定租户时继承当前上下文租户。
+   *
+   * <p>显式设置的租户编码优先，适用于跨租户管理场景。</p>
+   */
+  public void inheritTenantCode() {
+    if (StrUtil.isBlank(super.getTenantCode())) {
+      setTenantCode(RequestHeaderHolder.getTenantCode());
+    }
   }
 }

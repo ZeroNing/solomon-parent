@@ -15,6 +15,7 @@ import com.steven.solomon.datasource.sql.SqlExecutor;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterCustomizer;
 import com.steven.solomon.datasource.sql.converter.SqlTypeConverterRegistry;
 import com.steven.solomon.datasource.sql.script.SqlScriptExecutor;
+import com.steven.solomon.context.TenantRequestBinder;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -76,6 +77,24 @@ public class DataSourceAutoConfiguration {
       DataSourceTenantContext context,
       SolomonDataSourceProperties properties) {
     return new DataSourceTenantAspect(context, properties);
+  }
+
+  /**
+   * 将网关透传的租户编码绑定到当前请求的数据源上下文。
+   */
+  @Bean
+  public TenantRequestBinder dataSourceTenantRequestBinder(DataSourceTenantContext context) {
+    return new TenantRequestBinder() {
+      @Override
+      public void bind(String tenantCode) throws DataSourceException {
+        context.switchTenant(tenantCode);
+      }
+
+      @Override
+      public void clear() {
+        context.removeFactory();
+      }
+    };
   }
 
   /**
