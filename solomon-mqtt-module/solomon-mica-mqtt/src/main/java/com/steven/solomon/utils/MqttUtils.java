@@ -73,6 +73,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    */
   @Override
   public CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
+    prepareMessage(data);
     return CompletableFuture.runAsync(() -> {
       try {
         send(data);

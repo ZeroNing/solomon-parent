@@ -20,7 +20,7 @@ import com.steven.solomon.entity.JobNamespace;
 import com.steven.solomon.entity.PowerJobRequestFactory;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
-import com.steven.solomon.properties.JobProperties;
+import com.steven.solomon.properties.PowerJobRegisterProperties;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -38,11 +38,11 @@ import java.util.stream.Collectors;
 import static com.steven.solomon.code.PowerJobErrorCode.*;
 
 @Service
-@Import(value = {JobProperties.class})
+@Import(value = {PowerJobRegisterProperties.class})
 @Conditional(PowerJobCondition.class)
 public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
-    private final JobProperties jobProperties;
+    private final PowerJobRegisterProperties registerProperties;
 
     private final PowerJobProperties powerJobProperties;
 
@@ -50,16 +50,16 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
     private Integer appId;
 
-    public PowerJobService(JobProperties jobProperties, PowerJobProperties powerJobProperties) {
-        this.jobProperties = jobProperties;
+    public PowerJobService(PowerJobRegisterProperties registerProperties, PowerJobProperties powerJobProperties) {
+        this.registerProperties = registerProperties;
         this.powerJobProperties = powerJobProperties;
         this.adminAddresses = getUrl();
     }
 
     @Override
     public String login() throws Exception {
-        String userName = jobProperties.getUserName();
-        String password = jobProperties.getPassword();
+        String userName = registerProperties.getUserName();
+        String password = registerProperties.getPassword();
 
         if (ObjectUtil.isEmpty(adminAddresses)) {
             throw new BaseException(POWER_JOB_URL_NULL);
@@ -200,14 +200,14 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         if (ObjectUtil.isNotEmpty(appId)) {
             return appId;
         }
-        if (!jobProperties.getAutoCreateNamespaceApp()) {
+        if (!registerProperties.getAutoCreateNamespaceApp()) {
             throw new BaseException(POWER_JOB_APP_NOT_FOUND, appName);
         }
         Map<String,Object> paramMap = new HashMap<>();
         paramMap.put("appName",appName);
         paramMap.put("title",appName);
         paramMap.put("namespaceId",namespacesId);
-        paramMap.put("password",jobProperties.getPassword());
+        paramMap.put("password",registerProperties.getPassword());
         paramMap.put("componentUserRoleInfo",initUserRole());
         String body = executeFirst(cookie, Arrays.asList("appInfo/save", "app/save"), Method.POST, ContentType.JSON, paramMap);
         JobAppVO jobApp = JSONUtil.toBean(body,JobAppVO.class);
@@ -235,7 +235,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
         if (ObjectUtil.isNotEmpty(jobNamespace)) {
             return jobNamespace.getId();
         }
-        if (!jobProperties.getAutoCreateNamespaceApp()) {
+        if (!registerProperties.getAutoCreateNamespaceApp()) {
             throw new BaseException(POWER_JOB_NAMESPACE_NOT_FOUND, code);
         }
         Map<String,Object> params = new HashMap<>();
@@ -353,7 +353,7 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
      */
     private Integer getAppId(String cookie) throws BaseException {
         if (ObjectUtil.isEmpty(appId)) {
-            appId = createAppId(cookie, powerJobProperties.getWorker().getAppName(), createNamespace(jobProperties.getNamespace(), cookie));
+            appId = createAppId(cookie, powerJobProperties.getWorker().getAppName(), createNamespace(registerProperties.getNamespace(), cookie));
         }
         return appId;
     }

@@ -1,8 +1,10 @@
 package com.steven.solomon.entity;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 import com.steven.solomon.annotation.JobTask;
+import com.steven.solomon.annotation.XxlJobTask;
 import com.steven.solomon.enums.*;
 import com.steven.solomon.spring.SpringUtil;
 
@@ -58,27 +60,28 @@ public class XxlJobInfo {
 	 * 按注解统一填充 XXL-JOB 任务参数，避免创建和更新逻辑分叉。
 	 */
 	private void fill(JobTask jobTask,String className) {
-		this.jobGroup = jobTask.jobGroup();
-		this.jobDesc = ObjectUtil.defaultIfNull(jobTask.taskName(),className);
+		XxlJobTask xxlJob = jobTask.xxlJob();
+		this.jobGroup = xxlJob.jobGroup();
+		this.jobDesc = StrUtil.blankToDefault(jobTask.taskName(),className);
 		String author = null;
-		if (ObjectUtil.isEmpty(jobTask.author())) {
+		if (ObjectUtil.isEmpty(xxlJob.author())) {
 			author = ObjectUtil.defaultIfNull(SpringUtil.getElValue("${spring.application.name}"),className);
 		} else {
-			author = jobTask.author();
+			author = xxlJob.author();
 		}
 		this.author = author;
-		this.alarmEmail = SpringUtil.getElValue(jobTask.alarmEmail());
-		this.scheduleType = jobTask.scheduleType();
-		this.scheduleConf = jobTask.scheduleConf();
-		this.misfireStrategy = jobTask.misfireStrategy();
-		this.executorRouteStrategy = jobTask.executorRouteStrategy();
-		this.executorParam = jobTask.executorParam();
-		this.executorBlockStrategy = jobTask.executorBlockStrategy();
-		this.executorTimeout = jobTask.executorTimeout();
-		this.executorFailRetryCount = jobTask.executorFailRetryCount();
-		this.glueType = jobTask.glueType();
-		this.childJobId = jobTask.childJobId();
-		this.triggerStatus = jobTask.start() ? 1 : 0;
+		this.alarmEmail = SpringUtil.getElValue(xxlJob.alarmEmail());
+		this.scheduleType = xxlJob.scheduleType();
+		this.scheduleConf = xxlJob.scheduleConf();
+		this.misfireStrategy = xxlJob.misfireStrategy();
+		this.executorRouteStrategy = xxlJob.executorRouteStrategy();
+		this.executorParam = xxlJob.executorParam();
+		this.executorBlockStrategy = xxlJob.executorBlockStrategy();
+		this.executorTimeout = xxlJob.executorTimeout();
+		this.executorFailRetryCount = xxlJob.executorFailRetryCount();
+		this.glueType = xxlJob.glueType();
+		this.childJobId = xxlJob.childJobId();
+		this.triggerStatus = xxlJob.start() ? 1 : 0;
 	}
 
 	public int getId() {

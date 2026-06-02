@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
+import com.steven.solomon.annotation.XxlJobTask;
 import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.enums.JobRegisterFailureStrategy;
 import com.steven.solomon.enums.JobRegisterMode;
@@ -13,6 +14,7 @@ import com.steven.solomon.enums.JobPlatform;
 import com.steven.solomon.enums.ScheduleTypeEnum;
 import com.steven.solomon.config.XxlJobCondition;
 import com.steven.solomon.properties.XxlJobProperties;
+import com.steven.solomon.properties.XxlJobRegisterProperties;
 import com.steven.solomon.service.XxlJobService;
 import com.steven.solomon.spring.SpringUtil;
 import com.xxl.job.core.executor.impl.XxlJobSpringExecutor;
@@ -27,18 +29,21 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@Import(XxlJobProperties.class)
+@Import({XxlJobProperties.class, XxlJobRegisterProperties.class})
 @Conditional(XxlJobCondition.class)
 public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
 
     private final XxlJobProperties profile;
 
+    private final XxlJobRegisterProperties registerProperties;
+
     private final XxlJobService service;
 
-    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobService service) {
+    public XxlJobInit(ApplicationContext applicationContext, XxlJobProperties profile, XxlJobRegisterProperties registerProperties, XxlJobService service) {
         SpringUtil.setContext(applicationContext);
         this.service = service;
         this.profile = profile;
+        this.registerProperties = registerProperties;
 
     }
 
@@ -48,7 +53,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             logger.error("xxl-Job不启用,不初始化定时任务");
             return;
         }
-        if (!profile.getAutoRegister()) {
+        if (!registerProperties.getEnabled()) {
             logger.error("xxl-Job启用,但是配置了不允许自动注册");
             return;
         }
@@ -65,8 +70,9 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
                 continue;
             }
             String className = obj.getClass().getSimpleName();
-            String executorHandler = ObjectUtil.defaultIfNull(jobTask.executorHandler(),className);
-            int jobGroup = service.resolveJobGroup(cookie, jobTask.jobGroup());
+            XxlJobTask xxlJob = jobTask.xxlJob();
+            String executorHandler = StrUtil.blankToDefault(xxlJob.executorHandler(),className);
+            int jobGroup = service.resolveJobGroup(cookie, xxlJob.jobGroup());
 
             Map<String,XxlJobInfo> xxlJobInfoMap = service.findMapByExecutorHandler(cookie, executorHandler, jobGroup);
             XxlJobInfo xxlJobInfo = xxlJobInfoMap.get(executorHandler);
@@ -82,11 +88,11 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
     private void register(String cookie, JobTask jobTask, String className, String executorHandler, int jobGroup, XxlJobInfo existsJob) throws Exception {
         try {
             boolean isCreate = ObjectUtil.isEmpty(existsJob);
-            if (isCreate && JobRegisterMode.UPDATE_ONLY.equals(profile.getRegisterMode())) {
+            if (isCreate && JobRegisterMode.UPDATE_ONLY.equals(registerProperties.getMode())) {
                 logger.info("{}不存在，当前XXL-JOB注册模式为UPDATE_ONLY，跳过创建", executorHandler);
                 return;
             }
-            if (!isCreate && JobRegisterMode.CREATE_ONLY.equals(profile.getRegisterMode())) {
+            if (!isCreate && JobRegisterMode.CREATE_ONLY.equals(registerProperties.getMode())) {
                 logger.info("{}已存在，当前XXL-JOB注册模式为CREATE_ONLY，跳过更新", executorHandler);
                 return;
             }
@@ -106,7 +112,7 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             }
             syncStatus(cookie, jobTask, xxlJobInfo, isCreate, className, jobGroup);
         } catch (Exception exception) {
-            if (JobRegisterFailureStrategy.WARN_ONLY.equals(profile.getFailureStrategy())) {
+            if (JobRegisterFailureStrategy.WARN_ONLY.equals(registerProperties.getFailureStrategy())) {
                 logger.warn("{}自动注册XXL-JOB失败，已按WARN_ONLY策略忽略", executorHandler, exception);
                 return;
             }
@@ -122,10 +128,10 @@ public class XxlJobInit extends AbstractMessageLineRunner<JobTask> {
             logger.info("{}类的调度类型为不调度,不允许启用或者禁止任务",className);
             return;
         }
-        if (!isCreate && !profile.getSyncStatusOnUpdate()) {
+        if (!isCreate && !registerProperties.getSyncStatusOnUpdate()) {
             return;
         }
-        if (jobTask.start()) {
+        if (jobTask.xxlJob().start()) {
             service.startJob(cookie, xxlJobInfo.getExecutorHandler(), jobGroup);
         } else {
             service.stopJob(cookie, xxlJobInfo.getExecutorHandler(), jobGroup);

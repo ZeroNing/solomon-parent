@@ -21,6 +21,9 @@ public class XxlJobConfig {
         XxlJobSpringExecutor xxlJobSpringExecutor = new XxlJobSpringExecutor();
         xxlJobSpringExecutor.setAdminAddresses(profile.getAdminAddresses());
         xxlJobSpringExecutor.setAppname(profile.getAppName());
+        if (ObjectUtil.isNotEmpty(profile.getAddress())) {
+            xxlJobSpringExecutor.setAddress(profile.getAddress());
+        }
         xxlJobSpringExecutor.setIp(profile.getIp());
         xxlJobSpringExecutor.setPort(profile.getPort());
         xxlJobSpringExecutor.setAccessToken(profile.getAccessToken());

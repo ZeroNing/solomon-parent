@@ -1,6 +1,7 @@
 package com.steven.solomon.consumer;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 import cn.hutool.core.date.StopWatch;
 import com.steven.solomon.annotation.JobTask;
@@ -15,7 +16,7 @@ public abstract class AbstractJobConsumer extends IJobHandler {
 
     private final JobTask jobTask = getClass().getAnnotation(JobTask.class);
 
-    protected final String xxlJobBeanName = ObjectUtil.isNotEmpty(jobTask) ? ObjectUtil.defaultIfNull(jobTask.executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
+    protected final String xxlJobBeanName = ObjectUtil.isNotEmpty(jobTask) ? StrUtil.blankToDefault(jobTask.xxlJob().executorHandler(),getClass().getSimpleName()) : getClass().getSimpleName();
 
     public void execute() throws Exception{
         String jobParam = XxlJobHelper.getJobParam();

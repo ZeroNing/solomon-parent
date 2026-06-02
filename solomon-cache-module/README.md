@@ -2,6 +2,9 @@
 
 `solomon-cache-module` 提供统一缓存能力，当前包含缓存基础 SDK 与 Redis 实现。模块默认支持不处理 key、增加前缀、多租户 key 前缀、多租户连接切换四种模式。
 
+引入 `solomon-common` 和 `solomon-cache-redis` 后，HTTP 请求会自动读取网关透传的
+`X-Tenant-Code` 并绑定当前租户 Redis 连接，请求结束后自动清理。
+
 ## 模块说明
 
 | 模块 | 说明 |
@@ -204,4 +207,5 @@ public OrderVO createOrder(@RequestBody OrderCreateParam param) {
 - `@CacheRemove`：方法执行前后删除缓存，支持明确 key、整个 group、pattern 删除。
 - `@RepeatRequestLimit`：按当前 URL 和 token 限制重复请求，默认锁定 3 秒。
 - Caffeine 默认不启用，需要配置 `cache.caffeine.enabled=true`，避免和 Redis 实现同时抢占 `CacheService`。
+- Caffeine 不支持 `TENANT_SWITCH`，启动时会直接报错；多租户本地缓存请使用 `TENANT_PREFIX`。
 - `CacheService` 只暴露常用缓存能力，复杂 Redis 命令建议直接注入 `redisTemplate`。

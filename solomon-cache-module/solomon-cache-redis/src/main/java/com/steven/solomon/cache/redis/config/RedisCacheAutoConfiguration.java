@@ -8,6 +8,7 @@ import com.steven.solomon.cache.redis.factory.RedisConnectionFactoryBuilder;
 import com.steven.solomon.cache.redis.properties.RedisCacheProperties;
 import com.steven.solomon.cache.redis.service.RedisCacheService;
 import com.steven.solomon.cache.service.CacheService;
+import com.steven.solomon.context.TenantRequestBinder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -44,6 +45,24 @@ public class RedisCacheAutoConfiguration {
   public CacheTenantSwitcher<RedisConnectionFactory> redisCacheTenantSwitcher(
       RedisCacheTenantContext tenantContext) {
     return new CacheTenantSwitcher<>(tenantContext);
+  }
+
+  /**
+   * 将网关透传的租户编码绑定到当前请求的 Redis 连接上下文。
+   */
+  @Bean
+  public TenantRequestBinder redisCacheTenantRequestBinder(RedisCacheTenantContext context) {
+    return new TenantRequestBinder() {
+      @Override
+      public void bind(String tenantCode) {
+        context.setFactory(tenantCode);
+      }
+
+      @Override
+      public void clear() {
+        context.removeFactory();
+      }
+    };
   }
 
   @Bean

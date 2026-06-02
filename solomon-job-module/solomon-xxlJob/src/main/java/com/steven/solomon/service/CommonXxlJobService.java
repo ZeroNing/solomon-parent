@@ -14,6 +14,7 @@ import com.steven.solomon.entity.XxlJobInfo;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.properties.XxlJobProperties;
+import com.steven.solomon.properties.XxlJobRegisterProperties;
 import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
@@ -29,20 +30,23 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     protected final XxlJobProperties profile;
 
+    protected final XxlJobRegisterProperties registerProperties;
+
     protected final String adminAddresses;
 
     private final Logger logger = LoggerUtils.logger(CommonXxlJobService.class);
 
-    protected CommonXxlJobService(XxlJobProperties profile, ApplicationContext applicationContext) {
+    protected CommonXxlJobService(XxlJobProperties profile, XxlJobRegisterProperties registerProperties, ApplicationContext applicationContext) {
         this.profile = profile;
+        this.registerProperties = registerProperties;
         this.adminAddresses = getUrl();
         SpringUtil.setContext(applicationContext);
     }
 
     @Override
     public String login() throws Exception {
-        String userName = profile.getUserName();
-        String password = profile.getPassword();
+        String userName = registerProperties.getUserName();
+        String password = registerProperties.getPassword();
         if (ObjectUtil.isEmpty(adminAddresses)) {
             throw new BaseException(XxlJobErrorCode.XXL_JOB_ADMIN_URL_IS_NULL);
         }
@@ -194,7 +198,7 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
      * 根据执行器 appName 自动解析执行器组 ID，减少业务侧手写 jobGroup 的配置成本。
      */
     public int resolveJobGroup(String cookie, int defaultJobGroup) {
-        if (!profile.getAutoResolveJobGroup() || ObjectUtil.isEmpty(profile.getAppName())) {
+        if (!registerProperties.getAutoResolveJobGroup() || ObjectUtil.isEmpty(profile.getAppName())) {
             return defaultJobGroup;
         }
         try {

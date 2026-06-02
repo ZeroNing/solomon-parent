@@ -1,11 +1,13 @@
 package com.steven.solomon.entity;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.annotation.JobTask;
+import com.steven.solomon.annotation.PowerJobTask;
 import com.steven.solomon.spring.SpringUtil;
 import tech.powerjob.common.model.AlarmConfig;
 import tech.powerjob.common.model.JobAdvancedRuntimeConfig;
@@ -113,56 +115,57 @@ public final class PowerJobRequestFactory {
      * 按注解统一填充 PowerJob 任务参数，保证创建和更新字段完全一致。
      */
     private static SaveJobInfoRequest fill(SaveJobInfoRequest request, JobTask jobTask, String className) {
-        request.setJobName(SpringUtil.getElValue(ObjectUtil.defaultIfNull(jobTask.taskName(), className)));
+        PowerJobTask powerJob = jobTask.powerJob();
+        request.setJobName(SpringUtil.getElValue(StrUtil.blankToDefault(jobTask.taskName(), className)));
         request.setJobDescription(jobTask.taskDesc());
         request.setJobParams(jobTask.taskParams());
-        request.setTimeExpressionType(tech.powerjob.common.enums.TimeExpressionType.valueOf(jobTask.timeExpressionType().name()));
-        request.setTimeExpression(jobTask.timeExpression());
-        request.setExecuteType(tech.powerjob.common.enums.ExecuteType.valueOf(jobTask.executeType().name()));
-        request.setProcessorType(tech.powerjob.common.enums.ProcessorType.valueOf(jobTask.processorType().name()));
-        request.setProcessorInfo(ObjectUtil.defaultIfNull(jobTask.processorInfo(), className));
-        request.setMaxInstanceNum(jobTask.maxInstanceNum());
-        request.setConcurrency(jobTask.concurrency());
-        request.setInstanceTimeLimit(jobTask.instanceTimeLimit());
-        request.setInstanceRetryNum(jobTask.instanceRetryNum());
-        request.setTaskRetryNum(jobTask.taskRetryNum());
-        request.setMinCpuCores(jobTask.minCpuCores());
-        request.setMinMemorySpace(jobTask.minMemorySpace());
-        request.setMinDiskSpace(jobTask.minDiskSpace());
-        request.setEnable(jobTask.enable());
-        request.setDispatchStrategy(tech.powerjob.common.enums.DispatchStrategy.valueOf(jobTask.dispatchStrategy().name()));
-        request.setDispatchStrategyConfig(jobTask.dispatchStrategyConfig());
-        request.setLifeCycle(buildLifeCycle(jobTask));
-        request.setAlarmConfig(buildAlarmConfig(jobTask));
+        request.setTimeExpressionType(tech.powerjob.common.enums.TimeExpressionType.valueOf(powerJob.timeExpressionType().name()));
+        request.setTimeExpression(powerJob.timeExpression());
+        request.setExecuteType(tech.powerjob.common.enums.ExecuteType.valueOf(powerJob.executeType().name()));
+        request.setProcessorType(tech.powerjob.common.enums.ProcessorType.valueOf(powerJob.processorType().name()));
+        request.setProcessorInfo(StrUtil.blankToDefault(powerJob.processorInfo(), className));
+        request.setMaxInstanceNum(powerJob.maxInstanceNum());
+        request.setConcurrency(powerJob.concurrency());
+        request.setInstanceTimeLimit(powerJob.instanceTimeLimit());
+        request.setInstanceRetryNum(powerJob.instanceRetryNum());
+        request.setTaskRetryNum(powerJob.taskRetryNum());
+        request.setMinCpuCores(powerJob.minCpuCores());
+        request.setMinMemorySpace(powerJob.minMemorySpace());
+        request.setMinDiskSpace(powerJob.minDiskSpace());
+        request.setEnable(powerJob.enable());
+        request.setDispatchStrategy(tech.powerjob.common.enums.DispatchStrategy.valueOf(powerJob.dispatchStrategy().name()));
+        request.setDispatchStrategyConfig(powerJob.dispatchStrategyConfig());
+        request.setLifeCycle(buildLifeCycle(powerJob));
+        request.setAlarmConfig(buildAlarmConfig(powerJob));
         request.setLogConfig(new LogConfig()
-                .setType(jobTask.type().label())
-                .setLevel(jobTask.level().label()));
+                .setType(powerJob.type().label())
+                .setLevel(powerJob.level().label()));
         request.setAdvancedRuntimeConfig(new JobAdvancedRuntimeConfig()
-                .setTaskTrackerBehavior(jobTask.taskTrackerBehavior().label()));
+                .setTaskTrackerBehavior(powerJob.taskTrackerBehavior().label()));
         return request;
     }
 
     /**
      * PowerJob 5.x 使用结构化生命周期配置。
      */
-    private static LifeCycle buildLifeCycle(JobTask jobTask) {
-        if (ObjectUtil.isEmpty(jobTask.lifeCycleStart()) || ObjectUtil.isEmpty(jobTask.lifeCycleEnd())) {
+    private static LifeCycle buildLifeCycle(PowerJobTask powerJob) {
+        if (ObjectUtil.isEmpty(powerJob.lifeCycleStart()) || ObjectUtil.isEmpty(powerJob.lifeCycleEnd())) {
             return null;
         }
         LifeCycle lifeCycle = new LifeCycle();
-        lifeCycle.setStart(DateUtil.parse(jobTask.lifeCycleStart(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss:SSS").getTime());
-        lifeCycle.setEnd(DateUtil.parse(jobTask.lifeCycleEnd(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss:SSS").getTime());
+        lifeCycle.setStart(DateUtil.parse(powerJob.lifeCycleStart(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss:SSS").getTime());
+        lifeCycle.setEnd(DateUtil.parse(powerJob.lifeCycleEnd(), "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss:SSS").getTime());
         return lifeCycle;
     }
 
     /**
      * 告警配置统一封装，未配置时保持 PowerJob 默认值。
      */
-    private static AlarmConfig buildAlarmConfig(JobTask jobTask) {
+    private static AlarmConfig buildAlarmConfig(PowerJobTask powerJob) {
         AlarmConfig alarmConfig = new AlarmConfig();
-        alarmConfig.setAlertThreshold(jobTask.alertThreshold());
-        alarmConfig.setStatisticWindowLen(jobTask.statisticWindowLen());
-        alarmConfig.setSilenceWindowLen(jobTask.silenceWindowLen());
+        alarmConfig.setAlertThreshold(powerJob.alertThreshold());
+        alarmConfig.setStatisticWindowLen(powerJob.statisticWindowLen());
+        alarmConfig.setSilenceWindowLen(powerJob.silenceWindowLen());
         return alarmConfig;
     }
 }

@@ -9,7 +9,7 @@ import com.steven.solomon.entity.PowerJobRequestFactory;
 import com.steven.solomon.enums.JobRegisterFailureStrategy;
 import com.steven.solomon.enums.JobRegisterMode;
 import com.steven.solomon.enums.JobPlatform;
-import com.steven.solomon.properties.JobProperties;
+import com.steven.solomon.properties.PowerJobRegisterProperties;
 import com.steven.solomon.service.PowerJobService;
 import com.steven.solomon.spring.SpringUtil;
 import org.springframework.aop.support.AopUtils;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 @Configuration
-@Import(value = {JobProperties.class})
+@Import(value = {PowerJobRegisterProperties.class})
 @Conditional(PowerJobCondition.class)
 @Order(1)
 public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
@@ -35,13 +35,13 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
     private final PowerJobProperties powerJobProperties;
 
     private final PowerJobService service;
-    private final JobProperties jobProperties;
+    private final PowerJobRegisterProperties registerProperties;
 
-    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service, JobProperties jobProperties) {
+    public PowerJobInit(ApplicationContext applicationContext, PowerJobProperties powerJobProperties, PowerJobService service, PowerJobRegisterProperties registerProperties) {
         this.powerJobProperties = powerJobProperties;
         this.service = service;
         SpringUtil.setContext(applicationContext);
-        this.jobProperties = jobProperties;
+        this.registerProperties = registerProperties;
     }
 
     @Override
@@ -50,14 +50,14 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
             logger.error("powerJob不启用,不初始化定时任务");
             return;
         }
-        if (!jobProperties.getAutoRegister()) {
+        if (!registerProperties.getEnabled()) {
             logger.error("powerJob启用,配置了不自动注册任务");
             return;
         }
         //登陆获取cookie
         String cookie = service.login();
         //创建命名空间
-        Integer namespaceId = service.createNamespace(jobProperties.getNamespace(),cookie);
+        Integer namespaceId = service.createNamespace(registerProperties.getNamespace(),cookie);
         //根据appName创建namespace并返回namespaceId
         Integer appId = service.createAppId(cookie,powerJobProperties.getWorker().getAppName(),namespaceId);
         //获取全部任务
@@ -85,14 +85,14 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
         try {
             SaveJobInfoRequest saveRequest = taskMap.get(className);
             if (ObjectUtil.isEmpty(saveRequest)) {
-                if (JobRegisterMode.UPDATE_ONLY.equals(jobProperties.getRegisterMode())) {
+                if (JobRegisterMode.UPDATE_ONLY.equals(registerProperties.getMode())) {
                     logger.info("{}不存在，当前PowerJob注册模式为UPDATE_ONLY，跳过创建", className);
                     return;
                 }
                 service.saveJob(cookie, PowerJobRequestFactory.create(jobTask, appId, className));
                 return;
             }
-            if (JobRegisterMode.CREATE_ONLY.equals(jobProperties.getRegisterMode())) {
+            if (JobRegisterMode.CREATE_ONLY.equals(registerProperties.getMode())) {
                 logger.info("{}已存在，当前PowerJob注册模式为CREATE_ONLY，跳过更新", className);
                 return;
             }
@@ -102,7 +102,7 @@ public class PowerJobInit extends AbstractMessageLineRunner<JobTask> {
             }
             service.updateJob(cookie, PowerJobRequestFactory.update(saveRequest, jobTask, className));
         } catch (Exception exception) {
-            if (JobRegisterFailureStrategy.WARN_ONLY.equals(jobProperties.getFailureStrategy())) {
+            if (JobRegisterFailureStrategy.WARN_ONLY.equals(registerProperties.getFailureStrategy())) {
                 logger.warn("{}自动注册PowerJob失败，已按WARN_ONLY策略忽略", className, exception);
                 return;
             }

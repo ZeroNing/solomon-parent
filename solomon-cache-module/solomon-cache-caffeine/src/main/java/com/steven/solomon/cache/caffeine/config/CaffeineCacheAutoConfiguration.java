@@ -5,8 +5,10 @@ import com.steven.solomon.cache.caffeine.model.CaffeineCacheValue;
 import com.steven.solomon.cache.caffeine.properties.CaffeineCacheProperties;
 import com.steven.solomon.cache.caffeine.service.CaffeineCacheService;
 import com.steven.solomon.cache.key.CacheKeyBuilder;
+import com.steven.solomon.cache.key.CacheKeyMode;
 import com.steven.solomon.cache.service.CacheService;
 import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,6 +26,19 @@ import org.springframework.context.annotation.Bean;
     matchIfMissing = false)
 @EnableConfigurationProperties(CaffeineCacheProperties.class)
 public class CaffeineCacheAutoConfiguration {
+
+  /**
+   * Caffeine 是本地缓存，不支持按租户切换连接资源。
+   */
+  @Bean
+  public InitializingBean caffeineCacheModeValidator(CaffeineCacheProperties properties) {
+    return () -> {
+      if (properties.getKey().getMode() == CacheKeyMode.TENANT_SWITCH) {
+        throw new IllegalStateException(
+            "Caffeine 不支持 TENANT_SWITCH，请使用 TENANT_PREFIX 或切换到 Redis 缓存");
+      }
+    };
+  }
 
   /**
    * 注册 Caffeine 原生缓存实例。

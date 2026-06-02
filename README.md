@@ -377,7 +377,14 @@ file:
 @JobTask(
     platforms = {JobPlatform.POWERJOB, JobPlatform.XXL_JOB},
     taskName = "库存同步",
-    cron = "0 0/5 * * * ?"
+    powerJob = @PowerJobTask(
+        timeExpressionType = TimeExpressionType.CRON,
+        timeExpression = "0 0/5 * * * ?"
+    ),
+    xxlJob = @XxlJobTask(
+        scheduleType = ScheduleTypeEnum.CRON,
+        scheduleConf = "0 0/5 * * * ?"
+    )
 )
 public class StockSyncJob {
 }

@@ -19,6 +19,7 @@ public interface MqttOperations {
    * <p>支持异步客户端的实现会直接绑定底层客户端发送回调；不支持异步回调的实现可以自行降级处理。</p>
    */
   default CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
+    prepareMessage(data);
     return CompletableFuture.runAsync(() -> {
       try {
         send(data);
@@ -26,6 +27,13 @@ public interface MqttOperations {
         throw new IllegalStateException("MQTT 异步发送失败", e);
       }
     });
+  }
+
+  /**
+   * 发送前补充当前请求租户，显式指定的租户编码保持不变。
+   */
+  default void prepareMessage(MqttMessageModel<?> data) {
+    data.inheritTenantCode();
   }
 
   /**

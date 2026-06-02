@@ -44,6 +44,18 @@ public interface BaseCode {
   /** HTTP Timezone 头名称。 */
   String TIMEZONE = "Timezone";
 
+  /** 网关校验后向下游透传的租户编码头。 */
+  String TENANT_CODE = "X-Tenant-Code";
+
+  /** 网关校验后向下游透传的用户标识头。 */
+  String USER_ID = "X-User-Id";
+
+  /** 可选的租户标识头。 */
+  String TENANT_ID = "X-Tenant-Id";
+
+  /** 可选的租户名称头。 */
+  String TENANT_NAME = "X-Tenant-Name";
+
   /** 默认租户标识。 */
   String DEFAULT = "default";
 }
