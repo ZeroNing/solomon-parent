@@ -9,10 +9,17 @@ import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
 
 /**
- * EPC 编解码 main 方法测试。
+ * EPC 编解码 Main 方法测试类。
+ * <p>
+ * 提供 SGTIN-96、SGTIN-198、GIAI-96、GIAI-202 等多种 EPC 类型的
+ * GS1 译码、EPC 编码生成和 EPC 反译测试示例。
+ * </p>
+ *
+ * @author 创建者
  */
 public class EpcCoderMainTest {
 
+  /** 日志记录器。 */
   private static final Logger LOGGER = LoggerUtils.logger(EpcCoderMainTest.class);
 
   /**
