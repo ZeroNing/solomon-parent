@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.context.TenantModeProperties;
+import com.steven.solomon.context.TenantModeResolver;
 import com.steven.solomon.context.TenantRequestBinder;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import java.util.List;
@@ -32,7 +34,8 @@ class RequestFilterTest {
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.addHeader(BaseCode.TENANT_CODE, "tenant-1");
 
-    new RequestFilter(List.of(binder)).doFilter(request, new MockHttpServletResponse(),
+    new RequestFilter(List.of(binder), tenantModeResolver()).doFilter(request,
+        new MockHttpServletResponse(),
         (currentRequest, response) ->
             assertEquals("tenant-1", RequestHeaderHolder.getTenantCode()));
 
@@ -58,11 +61,26 @@ class RequestFilterTest {
     request.addHeader(BaseCode.TENANT_CODE, "tenant-1");
 
     assertThrows(Exception.class,
-        () -> new RequestFilter(List.of(binder)).doFilter(request,
+        () -> new RequestFilter(List.of(binder), tenantModeResolver()).doFilter(request,
             new MockHttpServletResponse(), (currentRequest, response) -> {
             }));
 
     assertTrue(cleared.get());
     assertEquals("", RequestHeaderHolder.getTenantCode());
+  }
+
+  @Test
+  void useDefaultTenantWhenHeaderIsMissing() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+
+    new RequestFilter(List.of(), tenantModeResolver()).doFilter(request,
+        new MockHttpServletResponse(), (currentRequest, response) ->
+            assertEquals("default", RequestHeaderHolder.getTenantCode()));
+
+    assertEquals("", RequestHeaderHolder.getTenantCode());
+  }
+
+  private TenantModeResolver tenantModeResolver() {
+    return new TenantModeResolver(new TenantModeProperties());
   }
 }

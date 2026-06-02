@@ -1,4 +1,5 @@
 com.steven.solomon.config.i18n.I18nConfig
+com.steven.solomon.context.TenantModeAutoConfiguration
 com.steven.solomon.exception.handler.BaseExceptionHandler
 com.steven.solomon.exception.handler.BindExceptionHandler
 com.steven.solomon.exception.handler.HttpRequestMethodNotSupportedExceptionHandler

@@ -13,7 +13,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
 /**
- * 缓存通用自动装配，所有缓存实现共享缓存注解能力。
+ * 缓存通用自动装配配置。
+ *
+ * <p>所有缓存实现（Redis / Caffeine）共享此配置中的注解切面能力。
+ * 自动装配 {@link CacheExpressionResolver}、{@link RequestFingerprintBuilder}、
+ * {@link CacheAspect} 和 {@link RepeatRequestLimitAspect}，
+ * 并确保在具体缓存实现之后注入。</p>
  */
 @AutoConfiguration
 @AutoConfigureAfter(name = {
@@ -22,18 +27,27 @@ import org.springframework.context.annotation.Bean;
 })
 public class CacheAutoConfiguration {
 
+  /**
+   * 创建缓存 SpEL 表达式解析器 Bean。
+   */
   @Bean
   @ConditionalOnMissingBean
   public CacheExpressionResolver cacheExpressionResolver() {
     return new CacheExpressionResolver();
   }
 
+  /**
+   * 创建请求指纹生成器 Bean。
+   */
   @Bean
   @ConditionalOnMissingBean
   public RequestFingerprintBuilder requestFingerprintBuilder() {
     return new RequestFingerprintBuilder();
   }
 
+  /**
+   * 创建缓存注解切面 Bean（依赖 CacheService 存在且配置未禁用时生效）。
+   */
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnBean(CacheService.class)
@@ -45,6 +59,9 @@ public class CacheAutoConfiguration {
     return new CacheAspect(cacheService, expressionResolver);
   }
 
+  /**
+   * 创建重复请求限制切面 Bean（依赖 CacheService 存在且配置未禁用时生效）。
+   */
   @Bean
   @ConditionalOnMissingBean
   @ConditionalOnBean(CacheService.class)

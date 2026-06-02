@@ -63,6 +63,7 @@ Solomon Parent 是一个基础设施型 Maven 多模块工程，目标是把微�
 | `solomon-mqtt-module` | 聚合模块 | 多种 MQTT Client 实现、Redis MQTT、多租户初始化 |
 | `solomon-s3-module` | 聚合模块 | 对象存储公共 SDK 与多供应商实现 |
 | `solomon-job-module` | 聚合模块 | PowerJob、XXL-JOB 统一任务注解与自动注册 |
+| `solomon-gateway-security` | 网关模块 | Spring Cloud Gateway + Spring Security 多租户 JWT 鉴权 |
 | `solomon-gateway-sentinel` | 网关模块 | Spring Cloud Gateway + Sentinel 限流熔断 |
 | `solomon-bot-notice` | 通知模块 | 企业微信、钉钉、飞书机器人通知 |
 | `solomon-epc-coder` | 工具模块 | GS1 EPC 编码、解码、反译 |

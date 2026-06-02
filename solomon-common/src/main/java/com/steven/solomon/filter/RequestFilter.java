@@ -1,6 +1,7 @@
 package com.steven.solomon.filter;
 
 import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.context.TenantModeResolver;
 import com.steven.solomon.context.TenantRequestBinder;
 import com.steven.solomon.context.TenantResourceScope;
 import com.steven.solomon.exception.ExceptionUtil;
@@ -30,10 +31,13 @@ import org.springframework.web.util.ContentCachingRequestWrapper;
 public class RequestFilter extends OncePerRequestFilter {
 
   private final List<TenantRequestBinder> tenantRequestBinders;
+  private final TenantModeResolver tenantModeResolver;
 
-  public RequestFilter(List<TenantRequestBinder> tenantRequestBinders) {
+  public RequestFilter(List<TenantRequestBinder> tenantRequestBinders,
+      TenantModeResolver tenantModeResolver) {
     this.tenantRequestBinders = tenantRequestBinders == null
         ? Collections.emptyList() : List.copyOf(tenantRequestBinders);
+    this.tenantModeResolver = tenantModeResolver;
   }
 
   /**
@@ -46,7 +50,8 @@ public class RequestFilter extends OncePerRequestFilter {
     try {
       ExceptionUtil.requestId.set(UUID.randomUUID().toString());
       RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
-      RequestHeaderHolder.setTenantCode(request.getHeader(BaseCode.TENANT_CODE));
+      RequestHeaderHolder.setTenantCode(
+          tenantModeResolver.resolve(request.getHeader(BaseCode.TENANT_CODE)));
       RequestHeaderHolder.setTenantId(request.getHeader(BaseCode.TENANT_ID));
       RequestHeaderHolder.setTenantName(request.getHeader(BaseCode.TENANT_NAME));
       tenantResourceScope =

@@ -26,7 +26,10 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Redis 缓存自动装配。
+ * Redis 缓存自动装配配置。
+ *
+ * <p>注册 Redis 多租户连接上下文、租户切换器、连接工厂、
+ * RedisTemplate 和缓存服务。支持通过 {@code cache.redis.enabled} 关闭。</p>
  */
 @AutoConfiguration(before = RedisAutoConfiguration.class)
 @ConditionalOnProperty(prefix = "cache.redis", name = "enabled", havingValue = "true",
@@ -34,12 +37,18 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @EnableConfigurationProperties(RedisCacheProperties.class)
 public class RedisCacheAutoConfiguration {
 
+  /**
+   * 创建 Redis 多租户连接上下文。
+   */
   @Bean
   @ConditionalOnMissingBean
   public RedisCacheTenantContext redisCacheTenantContext() {
     return new RedisCacheTenantContext();
   }
 
+  /**
+   * 创建 Redis 缓存租户切换器。
+   */
   @Bean
   @ConditionalOnMissingBean
   public CacheTenantSwitcher<RedisConnectionFactory> redisCacheTenantSwitcher(
@@ -65,18 +74,28 @@ public class RedisCacheAutoConfiguration {
     };
   }
 
+  /**
+   * 创建缓存 key 构建器。
+   */
   @Bean
   @ConditionalOnMissingBean
   public CacheKeyBuilder cacheKeyBuilder(RedisCacheProperties properties) {
     return new CacheKeyBuilder(properties.getKey());
   }
 
+  /**
+   * 创建 Redis 连接工厂构建器。
+   */
   @Bean
   @ConditionalOnMissingBean
   public RedisConnectionFactoryBuilder redisConnectionFactoryBuilder() {
     return new RedisConnectionFactoryBuilder();
   }
 
+  /**
+   * 创建多租户 Redis 连接工厂。
+   * 遍历所有租户配置建立独立连接，并包装为 {@link TenantAwareRedisConnectionFactory}。
+   */
   @Bean("redisConnectionFactory")
   @ConditionalOnMissingBean(RedisConnectionFactory.class)
   public RedisConnectionFactory redisConnectionFactory(
@@ -102,6 +121,9 @@ public class RedisCacheAutoConfiguration {
     return new TenantAwareRedisConnectionFactory(tenantContext, defaultConnectionFactory);
   }
 
+  /**
+   * 创建 RedisTemplate（key 使用 String 序列化，value 使用 JSON 序列化）。
+   */
   @Bean("redisTemplate")
   @ConditionalOnMissingBean(name = "redisTemplate")
   public RedisTemplate<String, Object> redisTemplate(
@@ -118,6 +140,9 @@ public class RedisCacheAutoConfiguration {
     return redisTemplate;
   }
 
+  /**
+   * 创建 StringRedisTemplate。
+   */
   @Bean("stringRedisTemplate")
   @ConditionalOnMissingBean(StringRedisTemplate.class)
   public StringRedisTemplate stringRedisTemplate(
@@ -125,6 +150,9 @@ public class RedisCacheAutoConfiguration {
     return new StringRedisTemplate(connectionFactory);
   }
 
+  /**
+   * 创建 Redis 缓存服务实现。
+   */
   @Bean
   @ConditionalOnMissingBean
   public CacheService cacheService(
@@ -133,6 +161,10 @@ public class RedisCacheAutoConfiguration {
     return new RedisCacheService(redisTemplate, keyBuilder);
   }
 
+  /**
+   * 组装多租户 Redis 配置映射。
+   * 如果未配置 tenants，则使用默认配置作为唯一租户。
+   */
   private Map<String, RedisProperties> tenantProperties(
       RedisCacheProperties cacheProperties) {
     Map<String, RedisProperties> tenants = new LinkedHashMap<>();

@@ -21,7 +21,7 @@ public class TenantAwareRedisConnectionFactory implements RedisConnectionFactory
   private final RedisConnectionFactory defaultConnectionFactory;
 
   /**
-   * 构造函数。
+   * 构造支持租户切换的 Redis 连接工厂。
    *
    * @param tenantContext            租户上下文
    * @param defaultConnectionFactory 默认连接工厂

@@ -10,14 +10,21 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * 基于 Caffeine 的本地缓存实现。
+ * 基于 Caffeine 的本地缓存服务实现。
+ *
+ * <p>使用 Caffeine 缓存库实现 {@link CacheService} 接口。
+ * 通过 {@link CaffeineCacheValue} 包装值和时间戳，模拟 per-key TTL。
+ * 支持按 pattern 删除（将 * 通配符转为正则表达式在 keySet 中过滤）。</p>
  */
 public class CaffeineCacheService implements CacheService {
 
+  /** Caffeine 原生缓存实例。 */
   private final Cache<String, CaffeineCacheValue> cache;
 
+  /** 缓存 key 构建器。 */
   private final CacheKeyBuilder keyBuilder;
 
+  /** 默认过期秒数。 */
   private final long defaultExpireSeconds;
 
   public CaffeineCacheService(
@@ -121,10 +128,17 @@ public class CaffeineCacheService implements CacheService {
     return map.putIfAbsent(cacheKey, new CaffeineCacheValue(value, expireAt(seconds))) == null;
   }
 
+  /** 使用 keyBuilder 组装完整缓存 key。 */
   private String buildKey(String group, String key) {
     return keyBuilder.build(group, key);
   }
 
+  /**
+   * 计算过期时间戳。
+   *
+   * @param seconds 过期秒数（<=0 表示永不过期）
+   * @return 过期时间戳（毫秒），0 表示永不过期
+   */
   private long expireAt(long seconds) {
     if (seconds <= 0) {
       return 0;
@@ -132,6 +146,10 @@ public class CaffeineCacheService implements CacheService {
     return System.currentTimeMillis() + seconds * 1000;
   }
 
+  /**
+   * 将 pattern 中的 * 通配符转换为 Java 正则表达式。
+   * 先对 pattern 做 quote 处理，再将 * 替换为 .*。
+   */
   private String toRegex(String pattern) {
     return Pattern.quote(pattern).replace("*", "\\E.*\\Q");
   }

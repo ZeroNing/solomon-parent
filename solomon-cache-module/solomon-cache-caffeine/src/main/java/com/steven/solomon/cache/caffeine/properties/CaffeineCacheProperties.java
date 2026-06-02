@@ -5,7 +5,10 @@ import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Caffeine 本地缓存配置。
+ * Caffeine 本地缓存配置属性。
+ *
+ * <p>定义 Caffeine 缓存的启用开关、最大容量、默认过期时间和 key 生成规则。
+ * 默认不启用，需设置 {@code cache.caffeine.enabled=true}。</p>
  */
 @ConfigurationProperties(prefix = "cache.caffeine")
 public class CaffeineCacheProperties {
@@ -16,17 +19,17 @@ public class CaffeineCacheProperties {
   private boolean enabled = false;
 
   /**
-   * 最大缓存条数。
+   * 最大缓存条目数。
    */
   private long maximumSize = 10_000;
 
   /**
-   * 默认过期时间，业务没有指定过期秒数时使用。
+   * 默认过期时间，业务没有通过 {@link com.steven.solomon.cache.annotation.CacheResult#expireSeconds()} 指定时使用此值。
    */
   private Duration defaultExpire = Duration.ofMinutes(30);
 
   /**
-   * 缓存 key 生成规则。
+   * 缓存 key 生成规则配置。
    */
   private CacheKeyProperties key = new CacheKeyProperties();
 

@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Redis 缓存模块配置。
+ * Redis 缓存模块配置属性。
+ *
+ * <p>继承 {@link RedisProperties}，扩展缓存启用开关、默认租户、
+ * key 生成规则和多租户连接配置等。</p>
  */
 @ConfigurationProperties(prefix = "cache.redis")
 public class RedisCacheProperties extends RedisProperties {
@@ -23,12 +26,12 @@ public class RedisCacheProperties extends RedisProperties {
   private String defaultTenant = "default";
 
   /**
-   * 缓存 key 生成规则。
+   * 缓存 key 生成规则配置。
    */
   private CacheKeyProperties key = new CacheKeyProperties();
 
   /**
-   * 多租户 Redis 配置，key 为租户编码。
+   * 多租户 Redis 连接配置，key 为租户编码，value 为独立连接参数。
    */
   private Map<String, RedisProperties> tenants = new LinkedHashMap<>();
 

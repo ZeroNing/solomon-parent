@@ -13,12 +13,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 
 /**
- * 基于 RedisTemplate 的缓存服务实现。
+ * 基于 Redis 的缓存服务实现。
+ *
+ * <p>使用 {@link RedisTemplate} 操作 Redis，通过 #{@link CacheKeyBuilder}
+ * 自动生成完整的缓存 key。支持过期设置、查询、删除、按 pattern 删除（SCAN 命令）、
+ * 读写和原子写入（setIfAbsent）等操作。</p>
  */
 public class RedisCacheService implements CacheService {
 
+  /** Redis 操作模板。 */
   private final RedisTemplate<String, Object> redisTemplate;
 
+  /** 缓存 key 构建器。 */
   private final CacheKeyBuilder keyBuilder;
 
   public RedisCacheService(RedisTemplate<String, Object> redisTemplate, CacheKeyBuilder keyBuilder) {
@@ -92,10 +98,15 @@ public class RedisCacheService implements CacheService {
         .setIfAbsent(buildKey(group, key), value, seconds, TimeUnit.SECONDS);
   }
 
+  /** 使用 keyBuilder 组装完整缓存 key。 */
   private String buildKey(String group, String key) {
     return keyBuilder.build(group, key);
   }
 
+  /**
+   * 使用 SCAN 命令查找匹配 pattern 的 key，避免 KEYS 命令的阻塞问题。
+   * 每次扫描 1000 条，直到遍历完所有匹配 key。
+   */
   private Set<String> scanKeys(String pattern) {
     Set<String> keys = new LinkedHashSet<>();
     ScanOptions options = ScanOptions.scanOptions().match(pattern).count(1000).build();
@@ -107,6 +118,7 @@ public class RedisCacheService implements CacheService {
     return keys;
   }
 
+  /** 判断字符串是否为 null 或空白。 */
   private boolean isBlank(String value) {
     return value == null || value.isBlank();
   }

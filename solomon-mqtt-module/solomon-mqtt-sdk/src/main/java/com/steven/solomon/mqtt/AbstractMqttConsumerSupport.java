@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
+import com.steven.solomon.context.TenantModeResolver;
 import com.steven.solomon.context.TenantRequestBinder;
 import com.steven.solomon.context.TenantResourceScope;
 import com.steven.solomon.exception.BaseException;
@@ -61,7 +62,7 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
     TenantResourceScope tenantResourceScope = null;
     try {
       model = conversion(json);
-      tenantCode = model.getTenantCode();
+      tenantCode = SpringUtil.getBean(TenantModeResolver.class).resolve(model.getTenantCode());
       logger.info(
           "线程名:{}, 租户编码:{}, 消息ID:{}, topic主题:{}, MQTT消费者消息:{}",
           Thread.currentThread().getName(),
@@ -82,12 +83,18 @@ public abstract class AbstractMqttConsumerSupport<T, R, M extends BaseMq<T>>
       logger.error("MQTT消费者消费失败, 消息:{}, 异常:", json, e);
       throwable = e;
     } finally {
-      deleteCheckMessageKey(model);
-      saveLog(result, throwable, model);
-      if (tenantResourceScope != null) {
-        tenantResourceScope.close();
+      try {
+        deleteCheckMessageKey(model);
+        saveLog(result, throwable, model);
+      } finally {
+        try {
+          if (tenantResourceScope != null) {
+            tenantResourceScope.close();
+          }
+        } finally {
+          RequestHeaderHolder.remove();
+        }
       }
-      RequestHeaderHolder.remove();
     }
   }
 }

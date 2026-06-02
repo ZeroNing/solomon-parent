@@ -1,0 +1,2 @@
+com.steven.solomon.gateway.config.GatewayAutoConfiguration
+com.steven.solomon.gateway.config.GatewaySecurityAutoConfiguration
