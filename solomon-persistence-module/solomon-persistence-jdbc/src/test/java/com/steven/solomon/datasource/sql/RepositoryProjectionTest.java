@@ -33,19 +33,24 @@ class RepositoryProjectionTest {
   }
 
   @Test
-  void shouldQueryProjectionFromLambdaQuery() throws Exception {
+  void shouldQueryProjectionWithLambdaCond() throws Exception {
     SqlExecutor sqlExecutor = mock(SqlExecutor.class);
     UserRepository repository = new UserRepository(sqlExecutor);
     List<UserView> expected = List.of(new UserView());
     when(sqlExecutor.query(any(Sql.class), eq(UserView.class))).thenReturn(expected);
 
-    List<UserView> actual = repository.lambdaQuery(UserEntity::getId, UserEntity::getUserName)
+    List<UserView> actual = repository.query(Sql.select("id", "user_name")
+            .from("demo_user")
+            .where(Cond.eq(UserEntity::getId, 1L)))
         .list(UserView.class);
 
     ArgumentCaptor<Sql> captor = ArgumentCaptor.forClass(Sql.class);
     verify(sqlExecutor).query(captor.capture(), eq(UserView.class));
     assertEquals(expected, actual);
-    assertEquals("SELECT id, user_name FROM demo_user", captor.getValue().getText());
+    Sql sql = captor.getValue();
+    String paramName = sql.getParams().keySet().iterator().next();
+    assertEquals("SELECT id, user_name FROM demo_user WHERE id = :" + paramName, sql.getText());
+    assertEquals(1L, sql.getParams().get(paramName));
   }
 
   private static class UserRepository extends Repository<UserEntity> {

@@ -2,6 +2,9 @@ package com.steven.solomon.datasource.sql;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import com.steven.solomon.datasource.exception.DataSourceException;
+import com.steven.solomon.datasource.lambda.LambdaProperty;
+import com.steven.solomon.datasource.lambda.SFunction;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -49,6 +52,40 @@ public class Cond {
     return eq(field, value, false);
   }
 
+  public static <T> Cond eq(SFunction<T, ?> field, Object value) {
+    return eq(columnName(field), value);
+  }
+
+  public static <T> Cond eq(SFunction<T, ?> field, Object value, boolean isRequired) {
+    return eq(columnName(field), value, isRequired);
+  }
+
+  public static <T> Cond eq(String alias, SFunction<T, ?> field, Object value) {
+    return eq(columnName(alias, field), value);
+  }
+
+  public static <T> Cond eq(
+      String alias,
+      SFunction<T, ?> field,
+      Object value,
+      boolean isRequired) {
+    return eq(columnName(alias, field), value, isRequired);
+  }
+
+  public static <TLeft, TRight> Cond eq(
+      String leftAlias,
+      SFunction<TLeft, ?> leftField,
+      String rightAlias,
+      SFunction<TRight, ?> rightField) {
+    return compareColumns(columnName(leftAlias, leftField), "=", columnName(rightAlias, rightField));
+  }
+
+  public static <TLeft, TRight> Cond eq(
+      SFunction<TLeft, ?> leftField,
+      SFunction<TRight, ?> rightField) {
+    return compareColumns(defaultAliasColumnName(leftField), "=", defaultAliasColumnName(rightField));
+  }
+
   /**
    * 创建不等于条件。
    *
@@ -70,6 +107,30 @@ public class Cond {
    */
   public static Cond ne(String field, Object value) {
     return ne(field, value, false);
+  }
+
+  public static <T> Cond ne(SFunction<T, ?> field, Object value) {
+    return ne(columnName(field), value);
+  }
+
+  public static <T> Cond ne(String alias, SFunction<T, ?> field, Object value) {
+    return ne(columnName(alias, field), value);
+  }
+
+  public static <TLeft, TRight> Cond ne(
+      String leftAlias,
+      SFunction<TLeft, ?> leftField,
+      String rightAlias,
+      SFunction<TRight, ?> rightField) {
+    return compareColumns(columnName(leftAlias, leftField), "<>",
+        columnName(rightAlias, rightField));
+  }
+
+  public static <TLeft, TRight> Cond ne(
+      SFunction<TLeft, ?> leftField,
+      SFunction<TRight, ?> rightField) {
+    return compareColumns(defaultAliasColumnName(leftField), "<>",
+        defaultAliasColumnName(rightField));
   }
 
   /**
@@ -95,6 +156,14 @@ public class Cond {
     return gt(field, value, false);
   }
 
+  public static <T> Cond gt(SFunction<T, ?> field, Object value) {
+    return gt(columnName(field), value);
+  }
+
+  public static <T> Cond gt(String alias, SFunction<T, ?> field, Object value) {
+    return gt(columnName(alias, field), value);
+  }
+
   /**
    * 创建大于等于条件。
    *
@@ -116,6 +185,14 @@ public class Cond {
    */
   public static Cond ge(String field, Object value) {
     return ge(field, value, false);
+  }
+
+  public static <T> Cond ge(SFunction<T, ?> field, Object value) {
+    return ge(columnName(field), value);
+  }
+
+  public static <T> Cond ge(String alias, SFunction<T, ?> field, Object value) {
+    return ge(columnName(alias, field), value);
   }
 
   /**
@@ -141,6 +218,14 @@ public class Cond {
     return lt(field, value, false);
   }
 
+  public static <T> Cond lt(SFunction<T, ?> field, Object value) {
+    return lt(columnName(field), value);
+  }
+
+  public static <T> Cond lt(String alias, SFunction<T, ?> field, Object value) {
+    return lt(columnName(alias, field), value);
+  }
+
   /**
    * 创建小于等于条件。
    *
@@ -162,6 +247,14 @@ public class Cond {
    */
   public static Cond le(String field, Object value) {
     return le(field, value, false);
+  }
+
+  public static <T> Cond le(SFunction<T, ?> field, Object value) {
+    return le(columnName(field), value);
+  }
+
+  public static <T> Cond le(String alias, SFunction<T, ?> field, Object value) {
+    return le(columnName(alias, field), value);
   }
 
   /**
@@ -187,6 +280,14 @@ public class Cond {
     return like(field, value, false);
   }
 
+  public static <T> Cond like(SFunction<T, ?> field, Object value) {
+    return like(columnName(field), value);
+  }
+
+  public static <T> Cond like(String alias, SFunction<T, ?> field, Object value) {
+    return like(columnName(alias, field), value);
+  }
+
   /**
    * 创建NOT LIKE条件。
    *
@@ -208,6 +309,14 @@ public class Cond {
    */
   public static Cond notLike(String field, Object value) {
     return notLike(field, value, false);
+  }
+
+  public static <T> Cond notLike(SFunction<T, ?> field, Object value) {
+    return notLike(columnName(field), value);
+  }
+
+  public static <T> Cond notLike(String alias, SFunction<T, ?> field, Object value) {
+    return notLike(columnName(alias, field), value);
   }
 
   /**
@@ -233,6 +342,14 @@ public class Cond {
     return in(field, values, false);
   }
 
+  public static <T> Cond in(SFunction<T, ?> field, Collection<?> values) {
+    return in(columnName(field), values);
+  }
+
+  public static <T> Cond in(String alias, SFunction<T, ?> field, Collection<?> values) {
+    return in(columnName(alias, field), values);
+  }
+
   /**
    * 创建NOT IN条件。
    *
@@ -254,6 +371,14 @@ public class Cond {
    */
   public static Cond notIn(String field, Collection<?> values) {
     return notIn(field, values, false);
+  }
+
+  public static <T> Cond notIn(SFunction<T, ?> field, Collection<?> values) {
+    return notIn(columnName(field), values);
+  }
+
+  public static <T> Cond notIn(String alias, SFunction<T, ?> field, Collection<?> values) {
+    return notIn(columnName(alias, field), values);
   }
 
   /**
@@ -335,6 +460,18 @@ public class Cond {
     return new Cond(field + " BETWEEN :" + startParam + " AND :" + endParam, params);
   }
 
+  public static <T> Cond between(SFunction<T, ?> field, Object start, Object end) {
+    return between(columnName(field), start, end);
+  }
+
+  public static <T> Cond between(
+      String alias,
+      SFunction<T, ?> field,
+      Object start,
+      Object end) {
+    return between(columnName(alias, field), start, end);
+  }
+
   /**
    * 创建IS NULL条件。
    *
@@ -346,6 +483,14 @@ public class Cond {
     return new Cond(field + " IS NULL", new LinkedHashMap<>());
   }
 
+  public static <T> Cond isNull(SFunction<T, ?> field) {
+    return isNull(columnName(field));
+  }
+
+  public static <T> Cond isNull(String alias, SFunction<T, ?> field) {
+    return isNull(columnName(alias, field));
+  }
+
   /**
    * 创建IS NOT NULL条件。
    *
@@ -355,6 +500,14 @@ public class Cond {
   public static Cond isNotNull(String field) {
     SqlInjectionGuard.validateExpression(field, "conditionField");
     return new Cond(field + " IS NOT NULL", new LinkedHashMap<>());
+  }
+
+  public static <T> Cond isNotNull(SFunction<T, ?> field) {
+    return isNotNull(columnName(field));
+  }
+
+  public static <T> Cond isNotNull(String alias, SFunction<T, ?> field) {
+    return isNotNull(columnName(alias, field));
   }
 
   /**
@@ -415,6 +568,12 @@ public class Cond {
     return new Cond(field + " " + operator + " :" + paramName, params);
   }
 
+  private static Cond compareColumns(String leftField, String operator, String rightField) {
+    SqlInjectionGuard.validateExpression(leftField, "conditionField");
+    SqlInjectionGuard.validateExpression(rightField, "conditionField");
+    return new Cond(leftField + " " + operator + " " + rightField, new LinkedHashMap<>());
+  }
+
   private static Cond inOrNotIn(
       String field,
       Collection<?> values,
@@ -434,6 +593,32 @@ public class Cond {
     return "c" + PARAM_INDEX.incrementAndGet();
   }
 
+  private static <T> String columnName(SFunction<T, ?> field) {
+    try {
+      String fieldName = LambdaProperty.name(field);
+      Class<?> owner = LambdaProperty.owner(field);
+      return SqlLambdaMetadata.columnName(owner, fieldName);
+    } catch (DataSourceException e) {
+      throw sneakyThrow(e);
+    }
+  }
+
+  private static <T> String columnName(String alias, SFunction<T, ?> field) {
+    SqlInjectionGuard.validateIdentifier(alias, "conditionAlias");
+    String columnName = columnName(field);
+    return StrUtil.isBlank(alias) ? columnName : alias + "." + columnName;
+  }
+
+  private static <T> String defaultAliasColumnName(SFunction<T, ?> field) {
+    try {
+      String fieldName = LambdaProperty.name(field);
+      Class<?> owner = LambdaProperty.owner(field);
+      return SqlLambdaMetadata.qualifiedColumnName(owner, fieldName);
+    } catch (DataSourceException e) {
+      throw sneakyThrow(e);
+    }
+  }
+
   private static boolean isEmpty(Object value) {
     if (ObjectUtil.isEmpty(value)) {
       return true;
@@ -445,5 +630,11 @@ public class Cond {
       return ObjectUtil.isEmpty(collection);
     }
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static <TException extends Throwable> RuntimeException sneakyThrow(Throwable throwable)
+      throws TException {
+    throw (TException) throwable;
   }
 }

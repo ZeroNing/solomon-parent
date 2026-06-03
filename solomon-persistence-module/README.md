@@ -1,4 +1,4 @@
-# solomon-persistence-module
+﻿# solomon-persistence-module
 
 `solomon-persistence-module` 是关系型数据库持久化聚合模块。`solomon-persistence-sdk` 提供公共查询模型，`solomon-persistence-jdbc` 提供动态数据源、轻量 ORM 和自动配置。模块支持多租户数据源路由、HikariCP/Druid、命名参数 SQL、对象写入、深浅分页、自定义报表查询和可扩展类型转换器。
 
@@ -146,27 +146,12 @@ return userRepository.findPageLite(sql, param);
 Sql sql = Sql.select("u.id", "u.user_name", "d.name as dept_name")
     .from("sys_user", "u")
     .leftJoin("sys_dept", "d")
-    .on("d.id = u.dept_id")
-    .on("d.deleted = 0")
-    .eq("u.status", 1)
+    .on(Cond.eq("u", User::getDeptId, "d", Dept::getId))
+    .on(Cond.eq("d", Dept::getDeleted, 0))
+    .where(Cond.eq("u", User::getStatus, 1))
     .orderByDesc("u.id");
 
 List<UserVO> list = userRepository.query(sql).list();
-```
-
-## 自定义报表查询
-
-报表查询使用 `ReportQueryExecutor`，统一复用租户切换、命名参数绑定、数据库方言与深浅分页逻辑。
-
-```java
-ReportQuery report = ReportQuery.of(
-    "select dept_id, count(1) as user_count from sys_user "
-        + "where status = :status group by dept_id",
-    Map.of("status", 1));
-
-PageResult<Map<String, Object>> page = reportQueryExecutor.page(
-    report,
-    DataSourcePageParam.of(1, 20));
 ```
 
 分组和 HAVING：

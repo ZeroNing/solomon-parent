@@ -37,13 +37,37 @@ public final class LambdaProperty {
     return CACHE.computeIfAbsent(function.getClass(), key -> resolveName(function));
   }
 
+  /**
+   * 从 Getter 方法引用中解析实体类型。
+   *
+   * @param function 字段方法引用
+   * @param <T> 实体类型
+   * @return Getter 所属实体类型
+   * @throws DataSourceException Lambda 解析失败时抛出
+   */
+  public static <T> Class<?> owner(SFunction<T, ?> function) throws DataSourceException {
+    if (ObjectUtil.isEmpty(function)) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND, "lambda");
+    }
+    SerializedLambda lambda = serializedLambda(function);
+    try {
+      return Class.forName(lambda.getImplClass().replace('/', '.'));
+    } catch (ClassNotFoundException e) {
+      throw risk(e, lambda.getImplClass());
+    }
+  }
+
   private static String resolveName(SFunction<?, ?> function) {
+    SerializedLambda lambda = serializedLambda(function);
+    return toPropertyName(lambda.getImplMethodName());
+  }
+
+  private static SerializedLambda serializedLambda(SFunction<?, ?> function) {
     try {
       Class<?> lambdaClass = function.getClass();
       Method method = lambdaClass.getDeclaredMethod("writeReplace");
       method.setAccessible(true);
-      SerializedLambda lambda = (SerializedLambda) method.invoke(function);
-      return toPropertyName(lambda.getImplMethodName());
+      return (SerializedLambda) method.invoke(function);
     } catch (Exception e) {
       throw risk(e, function.getClass().getName());
     }

@@ -286,6 +286,18 @@ public class Sql {
   }
 
   /**
+   * 设置主表，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * <p>例如实体表名 {@code demo_user} 会生成 {@code FROM demo_user demoUser}。</p>
+   *
+   * @param entityClass 实体类型
+   * @return 当前SQL对象
+   */
+  public Sql from(Class<?> entityClass) {
+    return from(SqlLambdaMetadata.tableName(entityClass), SqlLambdaMetadata.tableAlias(entityClass));
+  }
+
+  /**
    * 追加INNER JOIN。
    *
    * @param table 关联表名或子查询
@@ -298,6 +310,17 @@ public class Sql {
   }
 
   /**
+   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * @param entityClass 关联实体类型
+   * @param on ON条件表达式
+   * @return 当前SQL对象
+   */
+  public Sql join(Class<?> entityClass, String on) {
+    return join(entityClass).on(on);
+  }
+
+  /**
    * 追加INNER JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
@@ -306,6 +329,16 @@ public class Sql {
    */
   public Sql join(String table, String alias) {
     return join(JoinType.JOIN, table, alias);
+  }
+
+  /**
+   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * @param entityClass 关联实体类型
+   * @return 当前SQL对象
+   */
+  public Sql join(Class<?> entityClass) {
+    return join(JoinType.JOIN, entityClass);
   }
 
   /**
@@ -321,6 +354,17 @@ public class Sql {
   }
 
   /**
+   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * @param entityClass 关联实体类型
+   * @param on ON条件表达式
+   * @return 当前SQL对象
+   */
+  public Sql leftJoin(Class<?> entityClass, String on) {
+    return leftJoin(entityClass).on(on);
+  }
+
+  /**
    * 追加LEFT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
@@ -329,6 +373,16 @@ public class Sql {
    */
   public Sql leftJoin(String table, String alias) {
     return join(JoinType.LEFT_JOIN, table, alias);
+  }
+
+  /**
+   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * @param entityClass 关联实体类型
+   * @return 当前SQL对象
+   */
+  public Sql leftJoin(Class<?> entityClass) {
+    return join(JoinType.LEFT_JOIN, entityClass);
   }
 
   /**
@@ -343,6 +397,10 @@ public class Sql {
     return join(JoinType.RIGHT_JOIN, table, alias, on);
   }
 
+  public Sql rightJoin(Class<?> entityClass, String on) {
+    return rightJoin(entityClass).on(on);
+  }
+
   /**
    * 追加RIGHT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
@@ -352,6 +410,10 @@ public class Sql {
    */
   public Sql rightJoin(String table, String alias) {
     return join(JoinType.RIGHT_JOIN, table, alias);
+  }
+
+  public Sql rightJoin(Class<?> entityClass) {
+    return join(JoinType.RIGHT_JOIN, entityClass);
   }
 
   /**
@@ -366,6 +428,10 @@ public class Sql {
     return join(JoinType.FULL_JOIN, table, alias, on);
   }
 
+  public Sql fullJoin(Class<?> entityClass, String on) {
+    return fullJoin(entityClass).on(on);
+  }
+
   /**
    * 追加FULL JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
@@ -375,6 +441,10 @@ public class Sql {
    */
   public Sql fullJoin(String table, String alias) {
     return join(JoinType.FULL_JOIN, table, alias);
+  }
+
+  public Sql fullJoin(Class<?> entityClass) {
+    return join(JoinType.FULL_JOIN, entityClass);
   }
 
   /**
@@ -394,6 +464,11 @@ public class Sql {
     return this;
   }
 
+  public Sql crossJoin(Class<?> entityClass) {
+    return crossJoin(SqlLambdaMetadata.tableName(entityClass),
+        SqlLambdaMetadata.tableAlias(entityClass));
+  }
+
   /**
    * 按指定关联类型追加JOIN。
    *
@@ -405,6 +480,10 @@ public class Sql {
    */
   public Sql join(JoinType joinType, String table, String alias, String on) {
     return join(joinType, table, alias).on(on);
+  }
+
+  public Sql join(JoinType joinType, Class<?> entityClass, String on) {
+    return join(joinType, entityClass).on(on);
   }
 
   /**
@@ -425,6 +504,11 @@ public class Sql {
     return this;
   }
 
+  public Sql join(JoinType joinType, Class<?> entityClass) {
+    return join(joinType, SqlLambdaMetadata.tableName(entityClass),
+        SqlLambdaMetadata.tableAlias(entityClass));
+  }
+
   /**
    * 给最近一次JOIN追加AND ON条件。
    *
@@ -439,12 +523,34 @@ public class Sql {
   }
 
   /**
+   * 给最近一次JOIN追加AND ON条件。
+   *
+   * <p>支持 {@code Cond.eq("u", User::getDeptId, "d", Dept::getId)} 这类Lambda字段写法。</p>
+   *
+   * @param condition ON条件对象
+   * @return 当前SQL对象
+   */
+  public Sql on(Cond condition) {
+    return on("AND", condition);
+  }
+
+  /**
    * 给最近一次JOIN追加OR ON条件。
    *
    * @param condition ON条件表达式，不要包含 {@code ON} 关键字
    * @return 当前SQL对象
    */
   public Sql orOn(String condition) {
+    return on("OR", condition);
+  }
+
+  /**
+   * 给最近一次JOIN追加OR ON条件。
+   *
+   * @param condition ON条件对象
+   * @return 当前SQL对象
+   */
+  public Sql orOn(Cond condition) {
     return on("OR", condition);
   }
 
@@ -1144,6 +1250,15 @@ public class Sql {
     }
     SqlInjectionGuard.validateRawSql(condition, "joinOn");
     lastJoin.addOn(keyword, condition);
+    return this;
+  }
+
+  private Sql on(String keyword, Cond condition) {
+    if (ObjectUtil.isEmpty(condition) || StrUtil.isBlank(condition.getText())) {
+      return this;
+    }
+    on(keyword, condition.getText());
+    params.putAll(condition.getParams());
     return this;
   }
 

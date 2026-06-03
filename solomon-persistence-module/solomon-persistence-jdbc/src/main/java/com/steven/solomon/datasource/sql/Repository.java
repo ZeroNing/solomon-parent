@@ -64,14 +64,11 @@ public class Repository<TModel> {
    */
   @SafeVarargs
   public final Sql sql(SFunction<TModel, ?>... columns) throws DataSourceException {
-    if (ObjectUtil.isEmpty(columns)) {
+    String[] columnNames = lambdaColumnNames(columns);
+    if (ObjectUtil.isEmpty(columnNames)) {
       return sql();
     }
-    List<String> columnNames = new ArrayList<>(columns.length);
-    for (SFunction<TModel, ?> column : columns) {
-      columnNames.add(columnName(LambdaProperty.name(column)));
-    }
-    return Sql.select(columnNames.toArray(new String[0]))
+    return Sql.select(columnNames)
         .from(SqlMetadataUtils.tableName(modelClass));
   }
 
@@ -93,54 +90,6 @@ public class Repository<TModel> {
    */
   public RepositoryQuery<TModel> query(Sql sql) {
     return new RepositoryQuery<>(this, sql);
-  }
-
-  /**
-   * 创建 Lambda 查询器。
-   *
-   * <p>调用方可以使用 {@code User::getName} 选择字段，框架会按实体注解映射为数据库列名，
-   * 比直接手写字段字符串更安全，也更方便重构。</p>
-   *
-   * @return Lambda 查询器
-   * @throws DataSourceException 实体未配置 {@code @Table} 时抛出
-   */
-  public LambdaRepositoryQuery<TModel> lambdaQuery() throws DataSourceException {
-    return new LambdaRepositoryQuery<>(this, sql());
-  }
-
-  /**
-   * 创建指定查询列的 Lambda 查询器。
-   *
-   * @param columns 查询列；为空时查询全部字段
-   * @return Lambda 查询器
-   * @throws DataSourceException 实体元数据缺失时抛出
-   */
-  @SafeVarargs
-  public final LambdaRepositoryQuery<TModel> lambdaQuery(SFunction<TModel, ?>... columns)
-      throws DataSourceException {
-    return new LambdaRepositoryQuery<>(this, sql(columns));
-  }
-
-  /**
-   * 创建 Lambda 更新器。
-   *
-   * <p>更新字段和条件字段都通过 Getter 方法引用指定，执行时必须带条件，避免误更新全表。</p>
-   *
-   * @return Lambda 更新器
-   */
-  public LambdaRepositoryUpdate<TModel> lambdaUpdate() {
-    return new LambdaRepositoryUpdate<>(this);
-  }
-
-  /**
-   * 创建 Lambda 删除器。
-   *
-   * <p>删除条件通过 Getter 方法引用指定，执行时必须带条件，避免误删除全表。</p>
-   *
-   * @return Lambda 删除器
-   */
-  public LambdaRepositoryDelete<TModel> lambdaDelete() {
-    return new LambdaRepositoryDelete<>(this);
   }
 
   /**
@@ -651,7 +600,7 @@ public class Repository<TModel> {
   @SafeVarargs
   public final int updateColumns(TModel entity, SFunction<TModel, ?>... columns)
       throws DataSourceException {
-    return update(entity, lambdaColumns(columns));
+    return update(entity, lambdaColumnNames(columns));
   }
 
   /**
@@ -665,7 +614,7 @@ public class Repository<TModel> {
   @SafeVarargs
   public final int[] updateColumns(Collection<TModel> entities, SFunction<TModel, ?>... columns)
       throws DataSourceException {
-    return update(entities, lambdaColumns(columns));
+    return update(entities, lambdaColumnNames(columns));
   }
 
   /**
@@ -880,7 +829,7 @@ public class Repository<TModel> {
   }
 
   @SafeVarargs
-  private final String[] lambdaColumns(SFunction<TModel, ?>... columns)
+  private final String[] lambdaColumnNames(SFunction<TModel, ?>... columns)
       throws DataSourceException {
     if (ObjectUtil.isEmpty(columns)) {
       return null;

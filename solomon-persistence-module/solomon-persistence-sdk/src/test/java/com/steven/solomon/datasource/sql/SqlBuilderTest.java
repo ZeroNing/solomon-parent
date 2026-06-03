@@ -3,6 +3,9 @@ package com.steven.solomon.datasource.sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.steven.solomon.datasource.annotation.Column;
+import com.steven.solomon.datasource.annotation.PrimaryKey;
+import com.steven.solomon.datasource.annotation.Table;
 import com.steven.solomon.datasource.exception.DataSourceException;
 import java.util.List;
 import java.util.Map;
@@ -48,5 +51,84 @@ class SqlBuilderTest {
 
     assertThrows(DataSourceException.class,
         () -> sql.orderByIf(true, "id DESC; DROP TABLE demo_user"));
+  }
+
+  @Test
+  void shouldBuildConditionByLambdaGetter() {
+    Cond cond = Cond.eq(UserEntity::getId, 123L);
+
+    assertEquals("id = :" + cond.getParams().keySet().iterator().next(), cond.getText());
+    assertEquals(123L, cond.getParams().values().iterator().next());
+  }
+
+  @Test
+  void shouldBuildJoinOnByLambdaGetterWithAlias() {
+    Sql sql = Sql.select("u.id", "d.dept_name")
+        .from("demo_user", "u")
+        .leftJoin("demo_dept", "d")
+        .on(Cond.eq("u", UserEntity::getDeptId, "d", DeptEntity::getId))
+        .on(Cond.eq("d", DeptEntity::getDeleted, 0));
+
+    String deletedParam = sql.getParams().keySet().iterator().next();
+    assertEquals(
+        "SELECT u.id, d.dept_name FROM demo_user u LEFT JOIN demo_dept d ON u.dept_id = d.id AND d.deleted = :"
+            + deletedParam,
+        sql.getText());
+    assertEquals(0, sql.getParams().get(deletedParam));
+  }
+
+  @Test
+  void shouldBuildJoinOnByLambdaGetterWithDefaultEntityAlias() {
+    Sql sql = Sql.select("demoUser.id", "demoDept.dept_name")
+        .from(UserEntity.class)
+        .leftJoin(DeptEntity.class)
+        .on(Cond.eq(UserEntity::getDeptId, DeptEntity::getId));
+
+    assertEquals(
+        "SELECT demoUser.id, demoDept.dept_name FROM demo_user demoUser LEFT JOIN demo_dept demoDept ON demoUser.dept_id = demoDept.id",
+        sql.getText());
+  }
+
+  @Table("demo_user")
+  private static class UserEntity {
+
+    @PrimaryKey
+    private Long id;
+
+    @Column("dept_id")
+    private Long deptId;
+
+    public Long getId() {
+      return id;
+    }
+
+    public Long getDeptId() {
+      return deptId;
+    }
+  }
+
+  @Table("demo_dept")
+  private static class DeptEntity {
+
+    @PrimaryKey
+    private Long id;
+
+    @Column("dept_name")
+    private String deptName;
+
+    @Column("deleted")
+    private Integer deleted;
+
+    public Long getId() {
+      return id;
+    }
+
+    public String getDeptName() {
+      return deptName;
+    }
+
+    public Integer getDeleted() {
+      return deleted;
+    }
   }
 }

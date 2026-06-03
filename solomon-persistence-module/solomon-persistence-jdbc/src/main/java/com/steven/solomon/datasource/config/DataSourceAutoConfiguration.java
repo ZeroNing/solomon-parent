@@ -9,7 +9,6 @@ import com.steven.solomon.datasource.factory.DynamicDataSourceFactory;
 import com.steven.solomon.datasource.manager.DataSourceTenantManager;
 import com.steven.solomon.datasource.properties.PersistenceProperties;
 import com.steven.solomon.datasource.properties.TenantDataSourceProperties;
-import com.steven.solomon.datasource.report.ReportQueryExecutor;
 import com.steven.solomon.datasource.routing.DataSourceTenantContext;
 import com.steven.solomon.datasource.routing.DynamicRoutingDataSource;
 import com.steven.solomon.datasource.sql.SqlExecutor;
@@ -127,18 +126,6 @@ public class DataSourceAutoConfiguration {
       DataSourceTenantContext context,
       SqlTypeConverterRegistry converterRegistry) {
     return new SqlExecutor(jdbcTemplate, properties, context, converterRegistry);
-  }
-
-  /**
-   * 创建自定义报表查询执行器。
-   *
-   * @param sqlExecutor 通用 SQL 执行器
-   * @return 报表查询执行器
-   */
-  @Bean
-  @ConditionalOnMissingBean
-  public ReportQueryExecutor reportQueryExecutor(SqlExecutor sqlExecutor) {
-    return new ReportQueryExecutor(sqlExecutor);
   }
 
   /**
