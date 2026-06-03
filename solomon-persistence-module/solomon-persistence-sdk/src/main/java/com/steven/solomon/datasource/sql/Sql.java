@@ -480,6 +480,46 @@ public class Sql {
   }
 
   /**
+   * 条件成立时追加原始WHERE条件。
+   *
+   * @param condition 是否追加
+   * @param where WHERE条件片段，不包含WHERE关键字
+   * @return 当前SQL对象
+   */
+  public Sql whereIf(boolean condition, String where) {
+    return condition ? where(where) : this;
+  }
+
+  /**
+   * 追加带命名参数的原始WHERE条件。
+   *
+   * <p>SQL片段只负责表达式，参数值统一进入命名参数集合，避免业务侧把值拼进SQL。</p>
+   *
+   * @param condition WHERE条件片段，不包含WHERE关键字
+   * @param params 命名参数集合
+   * @return 当前SQL对象
+   */
+  public Sql where(String condition, Map<String, Object> params) {
+    if (StrUtil.isBlank(condition)) {
+      return this;
+    }
+    where(condition);
+    return params(params);
+  }
+
+  /**
+   * 条件成立时追加带命名参数的原始WHERE条件。
+   *
+   * @param matched 是否追加
+   * @param condition WHERE条件片段，不包含WHERE关键字
+   * @param params 命名参数集合
+   * @return 当前SQL对象
+   */
+  public Sql whereIf(boolean matched, String condition, Map<String, Object> params) {
+    return matched ? where(condition, params) : this;
+  }
+
+  /**
    * 追加结构化WHERE条件。
    *
    * @param cond 条件对象；为空时忽略
@@ -562,40 +602,80 @@ public class Sql {
     return condition(column, "=", value);
   }
 
+  public Sql eqIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "=", value);
+  }
+
   public Sql ne(String column, Object value) {
     return condition(column, "<>", value);
+  }
+
+  public Sql neIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "<>", value);
   }
 
   public Sql gt(String column, Object value) {
     return condition(column, ">", value);
   }
 
+  public Sql gtIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, ">", value);
+  }
+
   public Sql ge(String column, Object value) {
     return condition(column, ">=", value);
+  }
+
+  public Sql geIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, ">=", value);
   }
 
   public Sql lt(String column, Object value) {
     return condition(column, "<", value);
   }
 
+  public Sql ltIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "<", value);
+  }
+
   public Sql le(String column, Object value) {
     return condition(column, "<=", value);
+  }
+
+  public Sql leIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "<=", value);
   }
 
   public Sql like(String column, Object value) {
     return condition(column, "LIKE", value);
   }
 
+  public Sql likeIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "LIKE", value);
+  }
+
   public Sql notLike(String column, Object value) {
     return condition(column, "NOT LIKE", value);
+  }
+
+  public Sql notLikeIf(boolean condition, String column, Object value) {
+    return conditionIf(condition, column, "NOT LIKE", value);
   }
 
   public Sql in(String column, Collection<?> values) {
     return collectionCondition(column, "IN", values);
   }
 
+  public Sql inIf(boolean condition, String column, Collection<?> values) {
+    return collectionConditionIf(condition, column, "IN", values);
+  }
+
   public Sql notIn(String column, Collection<?> values) {
     return collectionCondition(column, "NOT IN", values);
+  }
+
+  public Sql notInIf(boolean condition, String column, Collection<?> values) {
+    return collectionConditionIf(condition, column, "NOT IN", values);
   }
 
   public Sql between(String column, Object start, Object end) {
@@ -609,6 +689,10 @@ public class Sql {
     return this;
   }
 
+  public Sql betweenIf(boolean condition, String column, Object start, Object end) {
+    return condition ? between(column, start, end) : this;
+  }
+
   public Sql isNull(String column) {
     SqlInjectionGuard.validateExpression(column, "whereColumn");
     this.wheres.add(column + " IS NULL");
@@ -616,11 +700,19 @@ public class Sql {
     return this;
   }
 
+  public Sql isNullIf(boolean condition, String column) {
+    return condition ? isNull(column) : this;
+  }
+
   public Sql isNotNull(String column) {
     SqlInjectionGuard.validateExpression(column, "whereColumn");
     this.wheres.add(column + " IS NOT NULL");
     this.selectMode = true;
     return this;
+  }
+
+  public Sql isNotNullIf(boolean condition, String column) {
+    return condition ? isNotNull(column) : this;
   }
 
   public Sql exists(String sql) {
@@ -695,6 +787,10 @@ public class Sql {
     return this;
   }
 
+  public Sql orderByIf(boolean condition, String orderBy) {
+    return condition ? orderBy(orderBy) : this;
+  }
+
   /**
    * 追加GROUP BY分组。
    *
@@ -712,6 +808,10 @@ public class Sql {
       this.text.append(" GROUP BY ").append(groupBy);
     }
     return this;
+  }
+
+  public Sql groupByIf(boolean condition, String groupBy) {
+    return condition ? groupBy(groupBy) : this;
   }
 
   public Sql groupBy(String... groupBy) {
@@ -758,6 +858,22 @@ public class Sql {
       this.text.append(" HAVING ").append(having);
     }
     return this;
+  }
+
+  public Sql having(String having, Map<String, Object> params) {
+    if (StrUtil.isBlank(having)) {
+      return this;
+    }
+    having(having);
+    return params(params);
+  }
+
+  public Sql havingIf(boolean condition, String having) {
+    return condition ? having(having) : this;
+  }
+
+  public Sql havingIf(boolean condition, String having, Map<String, Object> params) {
+    return condition ? having(having, params) : this;
   }
 
   public Sql havingEq(String column, Object value) {
@@ -994,6 +1110,18 @@ public class Sql {
     this.params.put(paramName, values);
     this.selectMode = true;
     return this;
+  }
+
+  private Sql conditionIf(boolean matched, String column, String operator, Object value) {
+    return matched ? condition(column, operator, value) : this;
+  }
+
+  private Sql collectionConditionIf(
+      boolean matched,
+      String column,
+      String operator,
+      Collection<?> values) {
+    return matched ? collectionCondition(column, operator, values) : this;
   }
 
   private Sql havingCondition(String column, String operator, Object value) {

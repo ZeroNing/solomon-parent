@@ -27,6 +27,13 @@ public final class SqlInjectionGuard {
   private static final Pattern AGGREGATE_FUNCTION =
       Pattern.compile("^(COUNT|SUM|MAX|MIN|AVG)$", Pattern.CASE_INSENSITIVE);
 
+  private static final Pattern QUERY_START =
+      Pattern.compile("^(SELECT|WITH|SHOW|DESC|DESCRIBE|EXPLAIN)\\b", Pattern.CASE_INSENSITIVE);
+
+  private static final Pattern WRITE_KEYWORD =
+      Pattern.compile("\\b(INSERT|UPDATE|DELETE|MERGE|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|CALL|EXEC|EXECUTE)\\b",
+          Pattern.CASE_INSENSITIVE);
+
   private SqlInjectionGuard() {
   }
 
@@ -43,6 +50,27 @@ public final class SqlInjectionGuard {
     }
     String text = value.trim();
     rejectDangerousToken(text, scene);
+    return value;
+  }
+
+  /**
+   * 校验只读查询SQL。
+   *
+   * <p>适用于自定义报表等只允许读取数据的入口，会拒绝写操作、DDL和存储过程调用。</p>
+   *
+   * @param value SQL文本
+   * @param scene 使用场景，用于异常提示
+   * @return 原始SQL文本
+   */
+  public static String validateQuerySql(String value, String scene) {
+    validateRawSql(value, scene);
+    if (StrUtil.isBlank(value)) {
+      return value;
+    }
+    String text = trimTrailingSemicolon(value.trim());
+    if (!QUERY_START.matcher(text).find() || WRITE_KEYWORD.matcher(text).find()) {
+      throw risk(scene, value);
+    }
     return value;
   }
 
@@ -182,6 +210,14 @@ public final class SqlInjectionGuard {
     String text = value.trim();
     int index = text.indexOf(';');
     return index >= 0 && index != text.length() - 1;
+  }
+
+  private static String trimTrailingSemicolon(String value) {
+    String text = value;
+    while (text.endsWith(";")) {
+      text = text.substring(0, text.length() - 1).trim();
+    }
+    return text;
   }
 
   private static String trimQuote(String value) {

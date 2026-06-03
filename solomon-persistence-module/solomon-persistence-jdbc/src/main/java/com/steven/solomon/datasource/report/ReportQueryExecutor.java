@@ -21,16 +21,19 @@ public class ReportQueryExecutor {
   }
 
   public List<Map<String, Object>> list(ReportQuery query) throws DataSourceException {
+    query.validateParams();
     return sqlExecutor.queryForList(query.getSql());
   }
 
   public <T> List<T> list(ReportQuery query, Class<T> resultType) throws DataSourceException {
+    query.validateParams();
     return sqlExecutor.query(query.getSql(), resultType);
   }
 
   public PageResult<Map<String, Object>> page(
       ReportQuery query,
       DataSourcePageParam param) throws DataSourceException {
+    query.validateParams();
     return sqlExecutor.page(query.getSql(), param);
   }
 
@@ -38,6 +41,7 @@ public class ReportQueryExecutor {
       ReportQuery query,
       DataSourcePageParam param,
       Class<T> resultType) throws DataSourceException {
+    query.validateParams();
     return sqlExecutor.page(query.getSql(), param, resultType);
   }
 }

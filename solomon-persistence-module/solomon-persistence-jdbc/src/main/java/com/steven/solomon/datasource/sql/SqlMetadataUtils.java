@@ -11,12 +11,16 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * SQL元数据工具。
  */
 public class SqlMetadataUtils {
+
+  private static final Map<Class<?>, SqlEntityMetadata> CACHE = new ConcurrentHashMap<>();
 
   private SqlMetadataUtils() {
   }
@@ -29,19 +33,12 @@ public class SqlMetadataUtils {
    * @throws DataSourceException 未标注表注解时抛出
    */
   public static String tableName(Class<?> entityClass) throws DataSourceException {
-    Table table = entityClass.getAnnotation(Table.class);
-    if (ObjectUtil.isNull(table)) {
+    String tableName = metadata(entityClass).getTableName();
+    if (StrUtil.isBlank(tableName)) {
       throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_TABLE_NOT_FOUND,
           entityClass.getName());
     }
-    if (StrUtil.isNotBlank(table.value())) {
-      return SqlInjectionGuard.validateTableExpression(table.value(), "tableAnnotation");
-    }
-    if (StrUtil.isNotBlank(table.name())) {
-      return SqlInjectionGuard.validateTableExpression(table.name(), "tableAnnotation");
-    }
-    return SqlInjectionGuard.validateTableExpression(entityClass.getSimpleName(),
-        "tableAnnotation");
+    return tableName;
   }
 
   /**
@@ -69,14 +66,9 @@ public class SqlMetadataUtils {
    * @throws DataSourceException 未找到主键注解时抛出
    */
   public static ColumnField primaryKeyField(Class<?> entityClass) throws DataSourceException {
-    for (Field field : entityClass.getDeclaredFields()) {
-      PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-      if (ObjectUtil.isNull(primaryKey)) {
-        continue;
-      }
-      field.setAccessible(true);
-      return new ColumnField(field, resolveColumnName(field, field.getAnnotation(Column.class)),
-          true);
+    ColumnField primaryKey = metadata(entityClass).getPrimaryKey();
+    if (ObjectUtil.isNotEmpty(primaryKey)) {
+      return primaryKey;
     }
     throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_PRIMARY_KEY_NOT_FOUND,
         entityClass.getName());
@@ -116,6 +108,30 @@ public class SqlMetadataUtils {
     return fields;
   }
 
+  /**
+   * 将 Java 字段名解析为数据库列名。
+   *
+   * @param entityClass 实体类型
+   * @param fieldName Java 字段名，也允许传入数据库列名
+   * @return 数据库列名
+   * @throws DataSourceException 字段未在实体元数据中声明时抛出
+   */
+  public static String columnName(Class<?> entityClass, String fieldName)
+      throws DataSourceException {
+    if (StrUtil.isBlank(fieldName)) {
+      throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
+          entityClass.getName());
+    }
+    for (ColumnField field : metadata(entityClass).getFields()) {
+      if (StrUtil.equals(field.getFieldName(), fieldName)
+          || StrUtil.equals(field.getColumnName(), fieldName)) {
+        return field.getColumnName();
+      }
+    }
+    throw new DataSourceException(DataSourceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND,
+        entityClass.getName(), fieldName);
+  }
+
   private static List<ColumnField> columnFields(
       Class<?> entityClass,
       String[] includeFields,
@@ -130,14 +146,9 @@ public class SqlMetadataUtils {
     }
 
     List<ColumnField> fields = new ArrayList<>();
-    for (Field field : entityClass.getDeclaredFields()) {
-      Column column = field.getAnnotation(Column.class);
-      PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
-      if (ObjectUtil.isNull(column) && ObjectUtil.isNull(primaryKey)) {
-        continue;
-      }
-      String columnName = resolveColumnName(field, column);
-      if (!insert && ObjectUtil.isNotEmpty(primaryKey)) {
+    for (ColumnField field : metadata(entityClass).getFields()) {
+      Column column = field.getField().getAnnotation(Column.class);
+      if (!insert && field.isPrimaryKey()) {
         continue;
       }
       if (ObjectUtil.isNotEmpty(column) && insert && !column.insertable()) {
@@ -147,17 +158,53 @@ public class SqlMetadataUtils {
         continue;
       }
       if (ObjectUtil.isNotEmpty(includeFieldSet)
-          && !includeFieldSet.contains(field.getName())
-          && !includeFieldSet.contains(columnName)) {
+          && !includeFieldSet.contains(field.getFieldName())
+          && !includeFieldSet.contains(field.getColumnName())) {
         continue;
       }
-      field.setAccessible(true);
-      fields.add(new ColumnField(field, columnName, ObjectUtil.isNotEmpty(primaryKey)));
+      fields.add(field);
     }
     return fields;
   }
 
-  private static String resolveColumnName(Field field, Column column) throws DataSourceException {
+  private static SqlEntityMetadata metadata(Class<?> entityClass) {
+    return CACHE.computeIfAbsent(entityClass, SqlMetadataUtils::parseMetadata);
+  }
+
+  private static SqlEntityMetadata parseMetadata(Class<?> entityClass) {
+    String tableName = null;
+    Table table = entityClass.getAnnotation(Table.class);
+    if (ObjectUtil.isNotEmpty(table)) {
+      if (StrUtil.isNotBlank(table.value())) {
+        tableName = SqlInjectionGuard.validateTableExpression(table.value(), "tableAnnotation");
+      } else if (StrUtil.isNotBlank(table.name())) {
+        tableName = SqlInjectionGuard.validateTableExpression(table.name(), "tableAnnotation");
+      } else {
+        tableName = SqlInjectionGuard.validateTableExpression(entityClass.getSimpleName(),
+            "tableAnnotation");
+      }
+    }
+
+    List<ColumnField> fields = new ArrayList<>();
+    ColumnField primaryKey = null;
+    for (Field field : entityClass.getDeclaredFields()) {
+      Column column = field.getAnnotation(Column.class);
+      PrimaryKey primaryKeyAnnotation = field.getAnnotation(PrimaryKey.class);
+      if (ObjectUtil.isNull(column) && ObjectUtil.isNull(primaryKeyAnnotation)) {
+        continue;
+      }
+      field.setAccessible(true);
+      ColumnField columnField = new ColumnField(field, resolveColumnName(field, column),
+          ObjectUtil.isNotEmpty(primaryKeyAnnotation));
+      fields.add(columnField);
+      if (columnField.isPrimaryKey()) {
+        primaryKey = columnField;
+      }
+    }
+    return new SqlEntityMetadata(tableName, List.copyOf(fields), primaryKey);
+  }
+
+  private static String resolveColumnName(Field field, Column column) {
     if (ObjectUtil.isNotEmpty(column) && StrUtil.isNotBlank(column.value())) {
       return SqlInjectionGuard.validateQualifiedIdentifier(column.value(), "columnAnnotation");
     }

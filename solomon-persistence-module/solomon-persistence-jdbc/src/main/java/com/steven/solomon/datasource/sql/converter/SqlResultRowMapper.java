@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -27,9 +28,12 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class SqlResultRowMapper<T> implements RowMapper<T> {
 
+  private static final Map<Class<?>, SqlResultMetadata<?>> METADATA_CACHE =
+      new ConcurrentHashMap<>();
+
   private final Class<T> resultType;
 
-  private final Map<String, Field> fields;
+  private final SqlResultMetadata<T> metadata;
 
   private final SqlTypeConverterRegistry converterRegistry;
 
@@ -50,7 +54,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
    */
   public SqlResultRowMapper(Class<T> resultType, SqlTypeConverterRegistry converterRegistry) {
     this.resultType = resultType;
-    this.fields = resolveFields(resultType);
+    this.metadata = metadata(resultType);
     this.converterRegistry = ObjectUtil.defaultIfNull(
         converterRegistry,
         SqlTypeConverterRegistry.defaultRegistry());
@@ -117,9 +121,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
 
   private T newInstance() throws SQLException {
     try {
-      Constructor<T> constructor = resultType.getDeclaredConstructor();
-      constructor.setAccessible(true);
-      return constructor.newInstance();
+      return metadata.getConstructor().newInstance();
     } catch (Exception e) {
       throw new SQLException(new DataSourceException(
           DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, e, resultType.getName()));
@@ -141,11 +143,27 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
     if (StrUtil.isBlank(columnLabel)) {
       return null;
     }
-    Field field = fields.get(normalize(columnLabel));
+    Field field = metadata.getFields().get(normalize(columnLabel));
     if (ObjectUtil.isNotNull(field)) {
       return field;
     }
-    return fields.get(normalize(underlineToCamel(columnLabel)));
+    return metadata.getFields().get(normalize(underlineToCamel(columnLabel)));
+  }
+
+  @SuppressWarnings("unchecked")
+  private SqlResultMetadata<T> metadata(Class<T> type) {
+    return (SqlResultMetadata<T>) METADATA_CACHE.computeIfAbsent(type, this::resolveMetadata);
+  }
+
+  @SuppressWarnings("unchecked")
+  private SqlResultMetadata<T> resolveMetadata(Class<?> type) {
+    try {
+      Constructor<?> constructor = type.getDeclaredConstructor();
+      constructor.setAccessible(true);
+      return new SqlResultMetadata<>((Constructor<T>) constructor, resolveFields(type));
+    } catch (Exception e) {
+      throw risk(e, type.getName());
+    }
   }
 
   private Map<String, Field> resolveFields(Class<?> type) {
@@ -166,7 +184,7 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
       }
       current = current.getSuperclass();
     }
-    return mapping;
+    return Map.copyOf(mapping);
   }
 
   private String normalize(String value) {
@@ -210,5 +228,16 @@ public class SqlResultRowMapper<T> implements RowMapper<T> {
       }
     }
     return builder.toString();
+  }
+
+  private RuntimeException risk(Throwable throwable, Object... args) {
+    return sneakyThrow(new DataSourceException(
+        DataSourceErrorCode.DATA_SOURCE_SQL_EXECUTE_FAILED, throwable, args));
+  }
+
+  @SuppressWarnings("unchecked")
+  private <TException extends Throwable> RuntimeException sneakyThrow(Throwable throwable)
+      throws TException {
+    throw (TException) throwable;
   }
 }

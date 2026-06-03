@@ -3,6 +3,8 @@ package com.steven.solomon.datasource.sql;
 import cn.hutool.core.util.ObjectUtil;
 import com.steven.solomon.datasource.code.DataSourceErrorCode;
 import com.steven.solomon.datasource.exception.DataSourceException;
+import com.steven.solomon.datasource.lambda.LambdaProperty;
+import com.steven.solomon.datasource.lambda.SFunction;
 import com.steven.solomon.datasource.sql.param.DataSourcePageParam;
 import com.steven.solomon.datasource.sql.result.PageResult;
 import com.steven.solomon.pojo.param.BasePageParam;
@@ -52,6 +54,28 @@ public class Repository<TModel> {
   }
 
   /**
+   * 创建指定查询列的基础SQL。
+   *
+   * <p>查询列通过实体 Getter 方法引用传入，会先解析为 Java 字段，再按实体元数据映射为数据库列名。</p>
+   *
+   * @param columns 查询列；为空时查询全部字段
+   * @return 当前实体表的查询SQL
+   * @throws DataSourceException 实体元数据缺失时抛出
+   */
+  @SafeVarargs
+  public final Sql sql(SFunction<TModel, ?>... columns) throws DataSourceException {
+    if (ObjectUtil.isEmpty(columns)) {
+      return sql();
+    }
+    List<String> columnNames = new ArrayList<>(columns.length);
+    for (SFunction<TModel, ?> column : columns) {
+      columnNames.add(columnName(LambdaProperty.name(column)));
+    }
+    return Sql.select(columnNames.toArray(new String[0]))
+        .from(SqlMetadataUtils.tableName(modelClass));
+  }
+
+  /**
    * 创建当前实体表的查询执行器。
    *
    * @return Repository查询执行器，可继续调用 {@code list()}、{@code page(param)}
@@ -69,6 +93,67 @@ public class Repository<TModel> {
    */
   public RepositoryQuery<TModel> query(Sql sql) {
     return new RepositoryQuery<>(this, sql);
+  }
+
+  /**
+   * 创建 Lambda 查询器。
+   *
+   * <p>调用方可以使用 {@code User::getName} 选择字段，框架会按实体注解映射为数据库列名，
+   * 比直接手写字段字符串更安全，也更方便重构。</p>
+   *
+   * @return Lambda 查询器
+   * @throws DataSourceException 实体未配置 {@code @Table} 时抛出
+   */
+  public LambdaRepositoryQuery<TModel> lambdaQuery() throws DataSourceException {
+    return new LambdaRepositoryQuery<>(this, sql());
+  }
+
+  /**
+   * 创建指定查询列的 Lambda 查询器。
+   *
+   * @param columns 查询列；为空时查询全部字段
+   * @return Lambda 查询器
+   * @throws DataSourceException 实体元数据缺失时抛出
+   */
+  @SafeVarargs
+  public final LambdaRepositoryQuery<TModel> lambdaQuery(SFunction<TModel, ?>... columns)
+      throws DataSourceException {
+    return new LambdaRepositoryQuery<>(this, sql(columns));
+  }
+
+  /**
+   * 创建 Lambda 更新器。
+   *
+   * <p>更新字段和条件字段都通过 Getter 方法引用指定，执行时必须带条件，避免误更新全表。</p>
+   *
+   * @return Lambda 更新器
+   */
+  public LambdaRepositoryUpdate<TModel> lambdaUpdate() {
+    return new LambdaRepositoryUpdate<>(this);
+  }
+
+  /**
+   * 创建 Lambda 删除器。
+   *
+   * <p>删除条件通过 Getter 方法引用指定，执行时必须带条件，避免误删除全表。</p>
+   *
+   * @return Lambda 删除器
+   */
+  public LambdaRepositoryDelete<TModel> lambdaDelete() {
+    return new LambdaRepositoryDelete<>(this);
+  }
+
+  /**
+   * 创建 Lambda 分页参数。
+   *
+   * <p>排序字段和深分页游标字段可以使用 Getter 方法引用指定。</p>
+   *
+   * @param pageNo 页码
+   * @param pageSize 每页条数
+   * @return Lambda 分页参数
+   */
+  public LambdaPageParam<TModel> pageParam(int pageNo, int pageSize) {
+    return LambdaPageParam.of(this, pageNo, pageSize);
   }
 
   /**
@@ -98,6 +183,21 @@ public class Repository<TModel> {
   }
 
   /**
+   * 按主键判断记录是否存在。
+   *
+   * @param id 主键值；为空时直接返回false
+   * @return 存在返回true
+   * @throws DataSourceException 主键元数据缺失或SQL执行失败时抛出
+   */
+  public boolean existsById(Object id) throws DataSourceException {
+    if (ObjectUtil.isEmpty(id)) {
+      return false;
+    }
+    ColumnField primaryKey = SqlMetadataUtils.primaryKeyField(modelClass);
+    return exists(sql().eq(primaryKey.getColumnName(), id));
+  }
+
+  /**
    * 查询当前实体表全部数据。
    *
    * @return 实体列表
@@ -117,6 +217,18 @@ public class Repository<TModel> {
    */
   public List<TModel> findByField(String field, Object value) throws DataSourceException {
     return find(sql().eq(field, value));
+  }
+
+  /**
+   * 按 Getter 字段判断记录是否存在。
+   *
+   * @param column 实体字段 Getter
+   * @param value 字段值
+   * @return 存在返回true
+   * @throws DataSourceException 字段元数据缺失或SQL执行失败时抛出
+   */
+  public boolean exists(SFunction<TModel, ?> column, Object value) throws DataSourceException {
+    return exists(sql().eq(columnName(LambdaProperty.name(column)), value));
   }
 
   /**
@@ -167,6 +279,38 @@ public class Repository<TModel> {
   }
 
   /**
+   * 按指定结果类型查询列表。
+   *
+   * <p>适合 DTO/VO 投影查询，结果字段由 {@code SqlResultRowMapper} 按字段名、下划线字段名和
+   * {@code @Column} 做映射。</p>
+   *
+   * @param sql SQL对象
+   * @param resultType 返回结果类型
+   * @param <TResult> 返回结果泛型
+   * @return 查询结果列表
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> List<TResult> findAs(Sql sql, Class<TResult> resultType)
+      throws DataSourceException {
+    return sqlExecutor.query(sql, resultType);
+  }
+
+  /**
+   * 按指定结果类型查询单条记录。
+   *
+   * @param sql SQL对象
+   * @param resultType 返回结果类型
+   * @param <TResult> 返回结果泛型
+   * @return 第一条记录；无结果时返回null
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> TResult getAs(Sql sql, Class<TResult> resultType)
+      throws DataSourceException {
+    List<TResult> list = findAs(sql, resultType);
+    return ObjectUtil.isEmpty(list) ? null : list.get(0);
+  }
+
+  /**
    * 查询当前实体类型列表，作为 {@link #find(Sql)} 的简单别名。
    *
    * @param sql SQL对象，包含SQL文本和命名参数
@@ -211,6 +355,23 @@ public class Repository<TModel> {
   public PageResult<TModel> findPage(Sql sql, DataSourcePageParam param)
       throws DataSourceException {
     return sqlExecutor.page(sql, param, modelClass);
+  }
+
+  /**
+   * 按指定结果类型分页查询。
+   *
+   * @param sql SQL对象
+   * @param param 分页参数
+   * @param resultType 返回结果类型
+   * @param <TResult> 返回结果泛型
+   * @return 分页结果
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> PageResult<TResult> findPageAs(
+      Sql sql,
+      DataSourcePageParam param,
+      Class<TResult> resultType) throws DataSourceException {
+    return sqlExecutor.page(sql, param, resultType);
   }
 
   /**
@@ -480,6 +641,34 @@ public class Repository<TModel> {
   }
 
   /**
+   * 按主键更新单个实体的指定 Getter 字段。
+   *
+   * @param entity 实体对象；为null时不执行SQL
+   * @param columns 需要更新的字段 Getter；为空时更新全部可更新字段
+   * @return 受影响行数
+   * @throws DataSourceException 元数据缺失或SQL执行失败时抛出
+   */
+  @SafeVarargs
+  public final int updateColumns(TModel entity, SFunction<TModel, ?>... columns)
+      throws DataSourceException {
+    return update(entity, lambdaColumns(columns));
+  }
+
+  /**
+   * 按主键批量更新实体的指定 Getter 字段。
+   *
+   * @param entities 实体集合；集合中的null元素会被忽略
+   * @param columns 需要更新的字段 Getter；为空时更新全部可更新字段
+   * @return 每条更新SQL的受影响行数
+   * @throws DataSourceException 元数据缺失或SQL执行失败时抛出
+   */
+  @SafeVarargs
+  public final int[] updateColumns(Collection<TModel> entities, SFunction<TModel, ?>... columns)
+      throws DataSourceException {
+    return update(entities, lambdaColumns(columns));
+  }
+
+  /**
    * 按主键删除单条实体。
    *
    * @param entity 实体对象；为null时不执行SQL
@@ -520,6 +709,26 @@ public class Repository<TModel> {
   }
 
   /**
+   * 按主键批量删除记录。
+   *
+   * <p>主键集合通过命名参数绑定，不会把值拼进SQL文本；集合为空时直接返回0。</p>
+   *
+   * @param ids 主键集合
+   * @return 受影响行数
+   * @throws DataSourceException 主键元数据缺失或SQL执行失败时抛出
+   */
+  public int deleteByIds(Collection<?> ids) throws DataSourceException {
+    if (ObjectUtil.isEmpty(ids)) {
+      return 0;
+    }
+    ColumnField primaryKey = SqlMetadataUtils.primaryKeyField(modelClass);
+    Sql sql = Sql.of("DELETE FROM " + SqlMetadataUtils.tableName(modelClass)
+        + " WHERE " + primaryKey.getColumnName() + " IN (:ids)")
+        .param("ids", ids);
+    return execute(sql);
+  }
+
+  /**
    * 统计当前实体表总数。
    *
    * @return 当前实体表总行数
@@ -538,6 +747,17 @@ public class Repository<TModel> {
    */
   public long count(Sql sql) throws DataSourceException {
     return sqlExecutor.count(sql);
+  }
+
+  /**
+   * 判断指定查询是否存在数据。
+   *
+   * @param sql 查询SQL
+   * @return 至少存在一行返回true
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public boolean exists(Sql sql) throws DataSourceException {
+    return count(sql) > 0;
   }
 
   /**
@@ -642,6 +862,10 @@ public class Repository<TModel> {
     return sqlExecutor.avg(sql, columnName);
   }
 
+  String columnName(String fieldName) throws DataSourceException {
+    return SqlMetadataUtils.columnName(modelClass, fieldName);
+  }
+
   private String[] toStringArray(Collection<String> values) {
     if (ObjectUtil.isEmpty(values)) {
       return null;
@@ -653,6 +877,19 @@ public class Repository<TModel> {
       }
     }
     return list.toArray(new String[0]);
+  }
+
+  @SafeVarargs
+  private final String[] lambdaColumns(SFunction<TModel, ?>... columns)
+      throws DataSourceException {
+    if (ObjectUtil.isEmpty(columns)) {
+      return null;
+    }
+    List<String> columnNames = new ArrayList<>(columns.length);
+    for (SFunction<TModel, ?> column : columns) {
+      columnNames.add(columnName(LambdaProperty.name(column)));
+    }
+    return columnNames.toArray(new String[0]);
   }
 
   private List<TModel> toModelList(TModel entity) {

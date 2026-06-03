@@ -44,6 +44,18 @@ public class RepositoryQuery<TModel> {
   }
 
   /**
+   * 查询指定投影类型的第一条数据。
+   *
+   * @param resultType DTO/VO/简单值类型
+   * @param <TResult> 返回结果泛型
+   * @return 第一条记录；无结果时返回null
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> TResult one(Class<TResult> resultType) throws DataSourceException {
+    return repository.getAs(sql, resultType);
+  }
+
+  /**
    * 查询当前实体类型列表。
    *
    * @return 实体列表
@@ -51,6 +63,18 @@ public class RepositoryQuery<TModel> {
    */
   public List<TModel> list() throws DataSourceException {
     return repository.find(sql);
+  }
+
+  /**
+   * 查询指定投影类型列表。
+   *
+   * @param resultType DTO/VO/简单值类型
+   * @param <TResult> 返回结果泛型
+   * @return 查询结果列表
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> List<TResult> list(Class<TResult> resultType) throws DataSourceException {
+    return repository.findAs(sql, resultType);
   }
 
   /**
@@ -75,6 +99,21 @@ public class RepositoryQuery<TModel> {
   }
 
   /**
+   * 查询指定投影类型分页。
+   *
+   * @param param 分页参数
+   * @param resultType DTO/VO/简单值类型
+   * @param <TResult> 返回结果泛型
+   * @return 分页结果
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public <TResult> PageResult<TResult> page(
+      DataSourcePageParam param,
+      Class<TResult> resultType) throws DataSourceException {
+    return repository.findPageAs(sql, param, resultType);
+  }
+
+  /**
    * 查询Map分页。
    *
    * @param param 分页参数，包含页码、页大小和排序
@@ -94,6 +133,16 @@ public class RepositoryQuery<TModel> {
    */
   public long count() throws DataSourceException {
     return repository.count(sql);
+  }
+
+  /**
+   * 判断当前查询是否存在数据。
+   *
+   * @return 至少存在一行返回true
+   * @throws DataSourceException SQL执行失败时抛出
+   */
+  public boolean exists() throws DataSourceException {
+    return repository.exists(sql);
   }
 
   /**
