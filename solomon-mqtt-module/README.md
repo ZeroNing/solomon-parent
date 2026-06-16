@@ -52,9 +52,18 @@ Redis 实现使用 Redis Pub/Sub，不需要 MQTT Broker：
 
 ## 多租户配置
 
+通过 `mqtt.tenant-mode` 切换两种多租户连接模式：
+
+| 模式 | 行为 | 适用场景 |
+| --- | --- | --- |
+| `PER_TENANT_CONNECTION`（默认） | 遍历 `mqtt.tenant`，为每个租户创建独立 MQTT 连接与订阅 | 各租户连接不同 Broker，需要物理隔离 |
+| `SHARED_CONNECTION` | 只取一个租户配置（优先 `default`）创建单一连接，所有监听器订阅一次，消费时按消息体 `tenantCode` 路由 | 所有租户共用同一 Broker，仅做逻辑隔离，节省连接资源 |
+
 ```yaml
 mqtt:
   enabled: true
+  # 多租户连接模式：PER_TENANT_CONNECTION（每租户独立连接，默认）或 SHARED_CONNECTION（共享连接按租户编码路由）
+  tenant-mode: PER_TENANT_CONNECTION
   tenant:
     default:
       url: tcp://127.0.0.1:1883
@@ -82,6 +91,8 @@ mqtt:
 `solomon-redis-mqtt` 的 `mqtt.tenant.*` 就是多租户 Redis 配置，每个租户会通过 `solomon-cache-redis` 的连接工厂构建器创建独立 Redis 连接、监听容器和发送模板。不同租户可以连接不同 Redis 实例，也可以连接同一实例的不同 database。
 
 Redis MQTT 会把连接注册到 `RedisCacheTenantContext`，租户编码使用 `mqtt:{tenantCode}` 命名空间，避免覆盖普通缓存租户连接。
+
+> `SHARED_CONNECTION` 模式下只会使用 `default`（或 Map 首个）租户配置建立唯一连接，其余租户配置被忽略；消费侧依旧按消息体中的 `tenantCode` 字段完成租户上下文绑定，因此业务消息体必须携带租户编码。
 
 ## SSL / TLS
 

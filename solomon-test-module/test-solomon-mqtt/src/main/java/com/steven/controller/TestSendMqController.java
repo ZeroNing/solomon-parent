@@ -1,7 +1,7 @@
 package com.steven.controller;
 
 import com.steven.solomon.mqtt.model.MqttMessageModel;
-import com.steven.solomon.utils.MqttUtils;
+import com.steven.solomon.mqtt.v3.utils.MqttUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 

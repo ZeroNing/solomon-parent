@@ -51,60 +51,64 @@ Solomon Parent 是一个基础设施型 Maven 多模块工程，目标是把微�
 
 | 模块 | 类型 | 职责 |
 | --- | --- | --- |
-| `solomon-constant` | 基础模块 | 常量、错误码、基础模型、请求上下文、租户上下文 |
-| `solomon-utils` | 基础模块 | JSON、日期、校验、加密、Spring、ClamAV 等工具 |
-| `solomon-base` | 基础模块 | 基础自动配置、OpenAPI、统一异常处理 |
-| `solomon-common` | 基础模块 | Web MVC、过滤器、日志切面、Excel 等通用能力 |
-| `solomon-persistence-module` | 持久化模块 | SDK、主流数据库方言、深浅分页、多租户数据源、HikariCP/Druid、报表查询 |
-| `solomon-mongodb` | 数据模块 | MongoDB 自动配置、多租户 MongoTemplate、集合初始化 |
-| `solomon-redis` | 历史模块 | 历史 Redis 能力，保留给旧业务使用 |
+| `solomon-constant-module` | 基础模块 | 常量、错误码、i18n、BaseException、租户上下文、多租户资源初始化 |
+| `solomon-common-module` | 基础模块 | Web MVC、Swagger、全局异常处理、过滤器、Excel、IP/UserAgent 工具（已吸收原 solomon-base） |
+| `solomon-utils-module` | 工具聚合 | JSON、日期、校验、加密、Spring、ClamAV、EPC 编解码、机器人通知 |
+| `solomon-persistence-module` | 持久化模块 | SDK、主流数据库方言、深浅分页、多租户数据源、HikariCP/Druid |
+| `solomon-mongodb-module` | 数据模块 | MongoDB 自动配置、多租户 MongoTemplate、集合初始化 |
 | `solomon-cache-module` | 聚合模块 | 通用缓存 SDK、Redis 缓存实现、Caffeine 本地缓存实现 |
-| `solomon-rabbitMq` | 消息模块 | RabbitMQ 发送、交换机队列声明、消费者封装 |
-| `solomon-mqtt-module` | 聚合模块 | 多种 MQTT Client 实现、Redis MQTT、多租户初始化 |
+| `solomon-mq-module` | 消息聚合 | 跨 MQ 公共 SPI（消费模板/消息模型/发送接口）+ RabbitMQ/RocketMQ 实现 |
+| `solomon-mqtt-module` | 聚合模块 | 多种 MQTT Client 实现、Redis MQTT、多租户连接（`mqtt.tenant-mode`） |
 | `solomon-s3-module` | 聚合模块 | 对象存储公共 SDK 与多供应商实现 |
 | `solomon-job-module` | 聚合模块 | PowerJob、XXL-JOB 统一任务注解与自动注册 |
-| `solomon-gateway-security` | 网关模块 | Spring Cloud Gateway + Spring Security 多租户 JWT 鉴权 |
-| `solomon-gateway-sentinel` | 网关模块 | Spring Cloud Gateway + Sentinel 限流熔断 |
-| `solomon-bot-notice` | 通知模块 | 企业微信、钉钉、飞书机器人通知 |
-| `solomon-epc-coder` | 工具模块 | GS1 EPC 编码、解码、反译 |
+| `solomon-gateway-module` | 网关模块 | Spring Cloud Gateway + Spring Security 多租户 JWT 鉴权、灰度发布 |
+| `solomon-cloud-module` | 微服务聚合 | 租户透传（Feign/Dubbo）、Nacos 服务发现配置、Seata 分布式事务、Sentinel 限流熔断 |
 | `solomon-test-module` | 测试模块 | 测试用例聚合模块，仅在 `test-modules` profile 中启用 |
 
 ## 工程结构
 
 ```text
 solomon-parent
-├── solomon-constant
-├── solomon-utils
-├── solomon-base
-├── solomon-common
+├── solomon-constant-module
+├── solomon-common-module
+├── solomon-utils-module
+│   ├── solomon-utils-core / -spring / -json / -algorithm
+│   ├── solomon-epc-coder
+│   ├── solomon-bot-notice
+│   └── solomon-clamav
 ├── solomon-persistence-module
-├── solomon-mongodb
-├── solomon-redis
+│   ├── solomon-persistence-sdk
+│   └── solomon-persistence-jdbc
+├── solomon-mongodb-module
 ├── solomon-cache-module
 │   ├── solomon-cache-sdk
 │   ├── solomon-cache-redis
 │   └── solomon-cache-caffeine
+├── solomon-mq-module
+│   ├── solomon-mq-sdk          # 跨 MQ 公共 SPI
+│   ├── solomon-rabbitmq        # RabbitMQ 实现（多租户连接）
+│   └── solomon-rocketmq
 ├── solomon-mqtt-module
 │   ├── solomon-mqtt-sdk
-│   ├── solomon-mqtt
-│   ├── solomon-mqtt5
-│   ├── solomon-vertx-mqtt
-│   ├── solomon-mica-mqtt
+│   ├── solomon-mqtt / -mqtt5 / -vertx-mqtt / -mica-mqtt
 │   └── solomon-redis-mqtt
 ├── solomon-s3-module
 │   ├── solomon-s3-sdk
-│   ├── solomon-minio
-│   ├── solomon-oss
-│   ├── solomon-obs
-│   ├── solomon-cos
-│   ├── solomon-bos
-│   └── solomon-amazon-s3
+│   └── solomon-minio / -oss / -obs / -cos / -bos / -amazon-s3
 ├── solomon-job-module
 │   ├── solomon-job-sdk
 │   ├── solomon-powerjob
-│   └── solomon-xxlJob
+│   └── solomon-xxl-job
+├── solomon-gateway-module
+│   └── solomon-gateway-security
+├── solomon-cloud-module
+│   ├── solomon-cloud-sdk        # 租户透传、可插拔租户解析策略
+│   ├── solomon-nacos
+│   ├── solomon-dubbo
+│   ├── solomon-seata
+│   └── solomon-sentinel
 └── solomon-test-module
-    └── test-*
+    └── test-solomon-*
 ```
 
 ## 快速开始

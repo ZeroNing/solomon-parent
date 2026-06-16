@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>solomon-persistence-module</artifactId>
+    <name>Solomon Persistence Module</name>
+    <description>数据库持久化聚合模块，包含 JDBC SDK、动态数据源、多租户路由、深浅分页。</description>
     <packaging>pom</packaging>
 
     <modules>

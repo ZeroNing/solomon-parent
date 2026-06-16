@@ -17,16 +17,16 @@
     <description>Solomon test aggregation module.</description>
 
     <modules>
-        <module>test-solomon-datasource</module>
+        <module>test-solomon-persistence</module>
         <module>test-solomon-mongo</module>
         <module>test-solomon-mqtt</module>
         <module>test-solomon-mqtt5</module>
-        <module>test-solomon-rabbitmq</module>
+        <module>test-solomon-rabbitmq-module</module>
         <module>test-solomon-s3</module>
-        <module>test-solomon-xxlJob</module>
+        <module>test-solomon-xxl-job</module>
         <module>test-solomon-powerjob</module>
         <module>test-solomon-bot-notice</module>
         <module>test-solomon-vertx-mqtt</module>
-        <module>test-solonmon-mica-mqtt</module>
+        <module>test-solomon-mica-mqtt</module>
     </modules>
 </project>

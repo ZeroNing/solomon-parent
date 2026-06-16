@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mq-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-rocketmq</artifactId>
+    <name>Solomon RocketMQ</name>
+    <description>RocketMQ 消息队列实现，基于 rocketmq-spring-boot-starter，复用 solomon-mq-sdk 的统一消费模板与多租户路由。</description>
+
+    <dependencies>
+        <!-- MQ 公共 SPI -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-mq-sdk</artifactId>
+        </dependency>
+        <!-- RocketMQ Spring Boot Starter -->
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

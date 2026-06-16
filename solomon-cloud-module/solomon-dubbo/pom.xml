@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cloud-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-dubbo</artifactId>
+    <name>Solomon Dubbo</name>
+    <description>Dubbo RPC 模块，提供多租户上下文透传 Filter，确保跨服务调用时租户编码不丢失。</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-cloud-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

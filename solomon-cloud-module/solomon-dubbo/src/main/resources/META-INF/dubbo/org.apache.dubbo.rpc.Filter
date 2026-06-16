@@ -1,0 +1,1 @@
+dubboTenantFilter=com.steven.solomon.cloud.dubbo.filter.DubboTenantFilter

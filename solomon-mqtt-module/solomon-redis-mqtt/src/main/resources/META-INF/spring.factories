@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.steven.solomon.config.MqttConfig
+com.steven.solomon.mqtt.redis.config.MqttConfig

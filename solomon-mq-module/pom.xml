@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-parent</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-mq-module</artifactId>
+    <name>Solomon MQ Module</name>
+    <description>消息队列聚合模块，包含跨 MQ 的公共 SPI 与多供应商实现（RabbitMQ、RocketMQ、Kafka、Pulsar、ActiveMQ、MQTT 等）。</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>solomon-mq-sdk</module>
+        <module>solomon-rabbitmq</module>
+        <module>solomon-rocketmq</module>
+    </modules>
+
+</project>

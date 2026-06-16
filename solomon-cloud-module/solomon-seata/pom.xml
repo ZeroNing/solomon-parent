@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cloud-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-seata</artifactId>
+    <name>Solomon Seata</name>
+    <description>Seata 分布式事务模块，提供 @GlobalTransactional 全局事务与数据源代理适配。</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-cloud-sdk</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.seata</groupId>
+            <artifactId>seata-spring-boot-starter</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -25,7 +25,7 @@
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-common</artifactId>
+            <artifactId>solomon-common-module</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>solomon-gateway-module</artifactId>
+    <name>Solomon Gateway Module</name>
+    <description>Spring Cloud Gateway 网关聚合模块，包含 JWT 多租户鉴权、Swagger 聚合、灰度发布。</description>
     <packaging>pom</packaging>
 
     <modules>

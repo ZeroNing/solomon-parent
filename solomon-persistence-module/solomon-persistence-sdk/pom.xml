@@ -17,10 +17,6 @@
   <dependencies>
     <dependency>
       <groupId>com.steven</groupId>
-      <artifactId>solomon-base</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.steven</groupId>
       <artifactId>solomon-utils-core</artifactId>
     </dependency>
   </dependencies>

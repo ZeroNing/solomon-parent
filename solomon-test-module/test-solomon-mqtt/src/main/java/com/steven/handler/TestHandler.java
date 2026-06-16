@@ -1,7 +1,7 @@
 package com.steven.handler;
 
 import com.steven.solomon.mqtt.annotation.MessageListener;
-import com.steven.solomon.consumer.AbstractConsumer;
+import com.steven.solomon.mqtt.v3.consumer.AbstractConsumer;
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 

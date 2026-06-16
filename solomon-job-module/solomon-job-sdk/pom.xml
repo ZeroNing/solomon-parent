@@ -20,7 +20,7 @@
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-constant</artifactId>
+            <artifactId>solomon-constant-module</artifactId>
         </dependency>
 
     </dependencies>

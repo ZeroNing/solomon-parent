@@ -1,2 +1,2 @@
-com.steven.solomon.config.MqttConfig
-com.steven.solomon.utils.MqttUtils
+com.steven.solomon.mqtt.vertx.config.MqttConfig
+com.steven.solomon.mqtt.vertx.utils.MqttUtils

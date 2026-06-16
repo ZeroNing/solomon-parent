@@ -1,7 +1,7 @@
 package steven.handler;
 
 import com.steven.solomon.mqtt.annotation.MessageListener;
-import com.steven.solomon.consumer.AbstractConsumer;
+import com.steven.solomon.mqtt.v5.consumer.AbstractConsumer;
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 
 @MessageListener(topics = "top/+/123")

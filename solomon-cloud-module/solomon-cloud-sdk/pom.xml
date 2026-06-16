@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cloud-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-cloud-sdk</artifactId>
+    <name>Solomon Cloud SDK</name>
+    <description>微服务公共 SDK：租户上下文透传、灰度路由、统一跨服务调用注解。</description>
+
+    <dependencies>
+        <!-- 依赖常量模块，复用租户上下文、请求头持有者 -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant-module</artifactId>
+        </dependency>
+        <!-- Spring Web，提供拦截器与请求头操作 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <!-- Servlet API（provided），用于读取 HTTP 请求头 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- OpenFeign（optional），提供跨服务调用的租户头透传拦截器 -->
+        <dependency>
+            <groupId>io.github.openfeign</groupId>
+            <artifactId>feign-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+
+</project>

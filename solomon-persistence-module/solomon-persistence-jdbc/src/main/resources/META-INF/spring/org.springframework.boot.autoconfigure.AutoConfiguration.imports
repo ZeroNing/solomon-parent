@@ -1,2 +1,2 @@
-com.steven.solomon.datasource.config.DataSourceAutoConfiguration
-com.steven.solomon.datasource.exception.DataSourceExceptionHandler
+com.steven.solomon.persistence.config.PersistenceAutoConfiguration
+com.steven.solomon.persistence.exception.PersistenceExceptionHandler

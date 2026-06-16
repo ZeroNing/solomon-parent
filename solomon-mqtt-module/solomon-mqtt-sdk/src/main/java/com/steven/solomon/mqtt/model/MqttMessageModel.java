@@ -2,7 +2,7 @@ package com.steven.solomon.mqtt.model;
 
 import cn.hutool.core.util.StrUtil;
 import com.steven.solomon.holder.RequestHeaderHolder;
-import com.steven.solomon.pojo.entity.BaseMq;
+import com.steven.solomon.mq.model.BaseMq;
 
 /**
  * MQTT 消息基础模型，统一维护各 MQTT 实现共用的主题、QoS 和保留消息标记。

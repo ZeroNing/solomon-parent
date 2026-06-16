@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-mq-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-mq-sdk</artifactId>
+    <name>Solomon MQ SDK</name>
+    <description>消息队列公共 SPI：统一消息模型、消费模板、发送接口、租户路由，供各 MQ 实现复用。</description>
+
+    <dependencies>
+        <!-- 依赖常量模块，复用 BaseException/I18nUtils/租户上下文等基础设施 -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant-module</artifactId>
+        </dependency>
+        <!-- Spring 上下文，用于自动配置与 Bean 管理 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

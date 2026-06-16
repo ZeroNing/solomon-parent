@@ -1,0 +1,271 @@
+package com.steven.solomon.job.xxl.entity;
+
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+
+import com.steven.solomon.annotation.JobTask;
+import com.steven.solomon.annotation.XxlJobTask;
+import com.steven.solomon.enums.*;
+import com.steven.solomon.spring.SpringUtil;
+
+/**
+ * XXL-JOB 任务信息实体。
+ *
+ * <p>映射 XXL-JOB 调度中心的任务信息表结构，包含执行器、调度策略、路由策略、
+ * 阻塞处理、超时、重试等完整任务配置。支持通过 {@link JobTask} 注解自动填充。</p>
+ *
+ * @author xuxueli  2016-1-12 18:25:49
+ */
+public class XxlJobInfo {
+
+	/** 主键 ID。 */
+	private int id;
+
+	/** 执行器主键 ID。 */
+	private int jobGroup;
+
+	/** 任务描述。 */
+	private String jobDesc;
+
+	/** 任务负责人。 */
+	private String author;
+
+	/** 报警邮件地址，多个用逗号分隔。 */
+	private String alarmEmail;
+
+	/** 调度类型。 */
+	private ScheduleTypeEnum scheduleType;
+
+	/** 调度配置，值含义取决于调度类型。 */
+	private String scheduleConf;
+
+	/** 调度过期策略。 */
+	private MisfireStrategyEnum misfireStrategy;
+
+	/** 执行器路由策略。 */
+	private ExecutorRouteStrategyEnum executorRouteStrategy;
+
+	/** 执行器任务 Handler 名称。 */
+	private String executorHandler;
+
+	/** 执行器任务参数。 */
+	private String executorParam;
+
+	/** 阻塞处理策略。 */
+	private ExecutorBlockStrategyEnum executorBlockStrategy;
+
+	/** 任务执行超时时间，单位秒。 */
+	private int executorTimeout;
+
+	/** 失败重试次数。 */
+	private int executorFailRetryCount;
+
+	/** GLUE 运行模式类型。 */
+	private GlueTypeEnum glueType;
+
+	/** GLUE 源代码。 */
+	private String glueSource;
+
+	/** GLUE 备注。 */
+	private String glueRemark;
+
+	/** 子任务 ID，多个逗号分隔。 */
+	private String childJobId;
+
+	/** 调度状态：0-停止，1-运行。 */
+	private int triggerStatus;
+
+	public XxlJobInfo() {
+		super();
+	}
+
+	public XxlJobInfo(JobTask jobTask,String className) {
+		super();
+		fill(jobTask, className);
+	}
+
+	public XxlJobInfo update(JobTask jobTask,String className) {
+		fill(jobTask, className);
+		return this;
+	}
+
+	/**
+	 * 按注解统一填充 XXL-JOB 任务参数，避免创建和更新逻辑分叉。
+	 */
+	private void fill(JobTask jobTask,String className) {
+		XxlJobTask xxlJob = jobTask.xxlJob();
+		this.jobGroup = xxlJob.jobGroup();
+		this.jobDesc = StrUtil.blankToDefault(jobTask.taskName(),className);
+		String author = null;
+		if (ObjectUtil.isEmpty(xxlJob.author())) {
+			author = ObjectUtil.defaultIfNull(SpringUtil.getElValue("${spring.application.name}"),className);
+		} else {
+			author = xxlJob.author();
+		}
+		this.author = author;
+		this.alarmEmail = SpringUtil.getElValue(xxlJob.alarmEmail());
+		this.scheduleType = xxlJob.scheduleType();
+		this.scheduleConf = xxlJob.scheduleConf();
+		this.misfireStrategy = xxlJob.misfireStrategy();
+		this.executorRouteStrategy = xxlJob.executorRouteStrategy();
+		this.executorParam = xxlJob.executorParam();
+		this.executorBlockStrategy = xxlJob.executorBlockStrategy();
+		this.executorTimeout = xxlJob.executorTimeout();
+		this.executorFailRetryCount = xxlJob.executorFailRetryCount();
+		this.glueType = xxlJob.glueType();
+		this.childJobId = xxlJob.childJobId();
+		this.triggerStatus = xxlJob.start() ? 1 : 0;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getJobGroup() {
+		return jobGroup;
+	}
+
+	public void setJobGroup(int jobGroup) {
+		this.jobGroup = jobGroup;
+	}
+
+	public String getJobDesc() {
+		return jobDesc;
+	}
+
+	public void setJobDesc(String jobDesc) {
+		this.jobDesc = jobDesc;
+	}
+
+	public String getAuthor() {
+		return author;
+	}
+
+	public void setAuthor(String author) {
+		this.author = author;
+	}
+
+	public String getAlarmEmail() {
+		return alarmEmail;
+	}
+
+	public void setAlarmEmail(String alarmEmail) {
+		this.alarmEmail = alarmEmail;
+	}
+
+	public ScheduleTypeEnum getScheduleType() {
+		return scheduleType;
+	}
+
+	public void setScheduleType(ScheduleTypeEnum scheduleType) {
+		this.scheduleType = scheduleType;
+	}
+
+	public String getScheduleConf() {
+		return scheduleConf;
+	}
+
+	public void setScheduleConf(String scheduleConf) {
+		this.scheduleConf = scheduleConf;
+	}
+
+	public MisfireStrategyEnum getMisfireStrategy() {
+		return misfireStrategy;
+	}
+
+	public void setMisfireStrategy(MisfireStrategyEnum misfireStrategy) {
+		this.misfireStrategy = misfireStrategy;
+	}
+
+	public ExecutorRouteStrategyEnum getExecutorRouteStrategy() {
+		return executorRouteStrategy;
+	}
+
+	public void setExecutorRouteStrategy(ExecutorRouteStrategyEnum executorRouteStrategy) {
+		this.executorRouteStrategy = executorRouteStrategy;
+	}
+
+	public String getExecutorHandler() {
+		return executorHandler;
+	}
+
+	public void setExecutorHandler(String executorHandler) {
+		this.executorHandler = executorHandler;
+	}
+
+	public String getExecutorParam() {
+		return executorParam;
+	}
+
+	public void setExecutorParam(String executorParam) {
+		this.executorParam = executorParam;
+	}
+
+	public ExecutorBlockStrategyEnum getExecutorBlockStrategy() {
+		return executorBlockStrategy;
+	}
+
+	public void setExecutorBlockStrategy(ExecutorBlockStrategyEnum executorBlockStrategy) {
+		this.executorBlockStrategy = executorBlockStrategy;
+	}
+
+	public int getExecutorTimeout() {
+		return executorTimeout;
+	}
+
+	public void setExecutorTimeout(int executorTimeout) {
+		this.executorTimeout = executorTimeout;
+	}
+
+	public int getExecutorFailRetryCount() {
+		return executorFailRetryCount;
+	}
+
+	public void setExecutorFailRetryCount(int executorFailRetryCount) {
+		this.executorFailRetryCount = executorFailRetryCount;
+	}
+
+	public GlueTypeEnum getGlueType() {
+		return glueType;
+	}
+
+	public void setGlueType(GlueTypeEnum glueType) {
+		this.glueType = glueType;
+	}
+
+	public String getGlueSource() {
+		return glueSource;
+	}
+
+	public void setGlueSource(String glueSource) {
+		this.glueSource = glueSource;
+	}
+
+	public String getGlueRemark() {
+		return glueRemark;
+	}
+
+	public void setGlueRemark(String glueRemark) {
+		this.glueRemark = glueRemark;
+	}
+
+	public String getChildJobId() {
+		return childJobId;
+	}
+
+	public void setChildJobId(String childJobId) {
+		this.childJobId = childJobId;
+	}
+
+	public int getTriggerStatus() {
+		return triggerStatus;
+	}
+
+	public void setTriggerStatus(int triggerStatus) {
+		this.triggerStatus = triggerStatus;
+	}
+}

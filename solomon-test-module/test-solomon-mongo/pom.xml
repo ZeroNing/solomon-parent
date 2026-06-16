@@ -20,12 +20,12 @@
     <dependencies>
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-mongodb</artifactId>
+            <artifactId>solomon-mongodb-module</artifactId>
         </dependency>
 
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-common</artifactId>
+            <artifactId>solomon-common-module</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -10,6 +10,8 @@
     </parent>
 
     <artifactId>solomon-mqtt-module</artifactId>
+    <name>Solomon MQTT Module</name>
+    <description>MQTT 聚合模块，包含公共 SDK 及多种 MQTT Client 实现（Paho v3/v5、Vert.x、Mica、Redis Pub/Sub）。</description>
     <packaging>pom</packaging>
 
     <modules>

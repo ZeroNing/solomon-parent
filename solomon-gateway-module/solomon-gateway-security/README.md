@@ -1,116 +1,112 @@
 # solomon-gateway-security
 
-基于 Spring Cloud Gateway 与 Spring Security WebFlux 的多租户安全网关模块。
+基于 Spring Cloud Gateway + Spring Security WebFlux 的多租户安全网关 SDK。
+
+## 定位
+
+**底层安全网关 SDK**：只提供框架、抽象接口、默认实现和自动装配。用户认证、权限数据源、
+租户校验等业务逻辑全部以 SPI 接口暴露，交由客户实现。
 
 ## 能力
 
-- JWT 仅保存用户标识和租户编码，并校验签名、签发方和过期时间。
-- 支持 `SINGLE` 单租户模式和 `MULTI` 多租户模式。
-- 支持 `MICROSERVICE` 微服务模式和 `STANDALONE` 单机模式。
-- 登录等公开路径可以在鉴权前校验租户，Swagger 和健康检查路径可以直接放行。
-- 默认拒绝缺少业务校验实现的请求，角色与接口权限交由引入模块动态查询。
-- 清理外部伪造的租户、用户和灰度请求头，只向下游写入网关计算出的可信值。
-- 支持 I18n 错误响应、Swagger 路由资源聚合和稳定分桶灰度发布。
+- **JWT 生成/解密**：`JwtTokenService` 基于 Hutool HS256，校验签名、签发方、过期时间，密钥不少于 32 字节。
+- **单/多租户**：复用 `TenantModeResolver`，SINGLE 模式空租户回退 default，MULTI 模式必须传。
+- **鉴权（Authentication）**：`GatewaySecurityFilter` 解析 Token 得到身份。
+- **授权（Authorization）**：SPI 接口 `GatewayAccessValidator`，客户实现后按租户+用户+路径校验。
+- **租户校验**：SPI 接口 `GatewayTenantValidator`，登录等公开路径校验租户合法性。
+- **灰度发布**：`GrayReleaseFilter` 按租户+用户+路径稳定分桶，写可信版本头。
+- **权限扫描**：`@RequirePermission` 注解 + `PermissionScanner`，启动扫描 Controller 自动生成权限目录。
+- **权限存储**：默认 `InMemoryPermissionStore`，可替换为 DB/配置中心实现。
+- **Swagger 聚合**：`SwaggerResourceProvider` 按网关路由聚合文档。
+- **可信头透传**：MICROSERVICE 模式写 X-Tenant-Code/X-User-Id；STANDALONE 只存上下文。
+- **安全原则**：清理外部伪造身份头，只写网关权威值；SPI 未实现时默认拒绝（403）。
+
+## SDK 提供 vs 客户实现
+
+| 能力 | SDK 提供 | 客户实现（SPI） |
+| --- | --- | --- |
+| JWT 签发/解密 | ✅ `JwtTokenService` | — |
+| 单/多租户模式 | ✅ `GatewaySecurityFilter` | — |
+| 鉴权 | ✅ `GatewaySecurityFilter` | — |
+| 授权 | 框架+默认拒绝 | `GatewayAccessValidator` |
+| 租户合法性校验 | 框架+默认拒绝 | `GatewayTenantValidator` |
+| 灰度发布 | ✅ `GrayReleaseFilter` | — |
+| 权限扫描 | ✅ `PermissionScanner` | — |
+| 权限存储 | ✅ 默认内存实现 | `PermissionStore`（可替换） |
+| 匿名路径 | ✅ 从扫描结果收集 | `AnonymousPathProvider` |
 
 ## 配置
 
 ```yaml
-tenant:
-  mode: SINGLE # SINGLE 或 MULTI
-  default-code: default
-  require-code-in-multi-mode: true
-
 gateway:
   enabled: true
   security:
-    mode: MICROSERVICE # MICROSERVICE 或 STANDALONE
-    # forward-trusted-headers: true # 可选，默认按部署模式决定
+    mode: MICROSERVICE          # MICROSERVICE 或 STANDALONE
   jwt:
     secret: 请配置至少32字节的安全密钥
     issuer: gateway
     expire-seconds: 7200
   tenant:
     enabled: true
-    ignored-paths:
-      - /auth/**
+    ignored-paths:              # 完全跳过鉴权
       - /actuator/health
       - /v3/api-docs/**
       - /swagger-ui/**
-      - /swagger-resources/**
-    public-tenant-paths:
-      - /auth/**
-  swagger:
-    enabled: true
-    api-docs-path: /v3/api-docs
+    public-tenant-paths:        # 无Token但需校验租户（必须同时在ignored-paths中）
+      - /auth/login
   gray:
     enabled: false
     header-name: X-Gray-Version
     stable-version: stable
     candidate-version: gray
     candidate-weight: 10
+  swagger:
+    enabled: true
+    api-docs-path: /v3/api-docs
 ```
 
-`SINGLE` 模式下，请求或 Token 没有租户编码时自动使用 `tenant.default-code`。
-`MULTI` 模式下，默认要求请求和 Token 明确携带租户编码。
-
-`MICROSERVICE` 模式向下游写入可信的 `X-Tenant-Code` 和 `X-User-Id`。
-`STANDALONE` 模式默认只在网关交换上下文中保留身份，不继续外发身份头。
-
-`public-tenant-paths` 必须同时配置在 `ignored-paths` 中。租户编码和用户标识仅允许字母、
-数字、`.`、`_`、`:`、`@`、`-`，最大长度为 `128`。
-
-## 外部校验
-
-引入模块必须声明 `GatewayAccessValidator` Bean，按租户、用户和路由校验角色与接口权限。
-未声明时默认拒绝受保护接口。
+## 客户实现示例
 
 ```java
-@Bean
-public GatewayAccessValidator gatewayAccessValidator() {
-  return (claims, exchange) -> permissionService.validate(
-      claims.tenantCode(), claims.userId(),
-      exchange.getRequest().getPath().value());
+// 授权校验器
+@Component
+public class MyAccessValidator implements GatewayAccessValidator {
+    @Override
+    public Mono<Boolean> validate(TokenClaims claims, ServerWebExchange exchange) {
+        String path = exchange.getRequest().getPath().value();
+        return permissionService.hasPermission(claims.userId(), claims.tenantCode(), path);
+    }
+}
+
+// 租户校验器
+@Component
+public class MyTenantValidator implements GatewayTenantValidator {
+    @Override
+    public Mono<Boolean> validate(String tenantCode, ServerWebExchange exchange) {
+        return tenantService.isActive(tenantCode);
+    }
 }
 ```
-
-引入模块还必须声明 `GatewayTenantValidator` Bean，用于校验租户是否存在、是否启用。
-未声明时默认拒绝租户预校验。
 
 ## 权限注解
 
-接口使用 `@ApiPermission` 标记后，启动时会同步到 `ApiPermissionStore`。默认实现是单机内存目录；
-微服务可以替换为数据库或配置中心实现。权限编码根据接口路径自动生成，例如：
-
 ```java
 @Operation(summary = "订单详情")
-@ApiPermission
+@RequirePermission                              // 自动生成权限码 CORE:ORDERS:ID
 @GetMapping("/api/core/orders/{id}")
-public OrderVO detail(@PathVariable String id) {
-  return orderService.detail(id);
-}
+public OrderVO detail(@PathVariable String id) { ... }
+
+@RequirePermission(anonymous = true)            // 匿名接口，无需Token
+@PostMapping("/api/auth/login")
+public TokenVO login(@RequestBody LoginDTO dto) { ... }
 ```
 
-该接口生成的权限编码为 `CORE:ORDERS:ID`，名称取 Swagger `@Operation` 的 `summary`。
-匿名接口使用 `@ApiPermission(anonymous = true)`。微服务网关需要实现
-`GatewayAnonymousPathProvider`，从权限中心加载已同步的匿名路径。
+## 核心流程
 
-## 灰度发布
-
-灰度过滤器始终删除客户端传入的 `gateway.gray.header-name`，避免客户端自行选择版本。
-开启灰度后，网关按可信租户、用户和请求路径稳定分桶，并写入可信版本头。下游服务发现、
-负载均衡或路由规则可基于该请求头选择实例。
-
-## 下游租户切换
-
-下游服务引入 `solomon-common` 后，请求入口会读取网关透传的 `X-Tenant-Code`，
-并通过 `TenantRequestBinder` 在请求结束前绑定租户资源，结束后统一清理。
-
-当前可以复用该生命周期的模块：
-
-| 模块 | 切换方式 |
-| --- | --- |
-| `solomon-cache-redis` | 请求进入时切换 Redis 连接工厂 |
-| MQTT 模块 | 消费消息时按消息租户绑定资源；单租户消息可以省略租户编码 |
-| `solomon-cache-caffeine` | 使用 `TENANT_PREFIX` 隔离缓存键，不支持 `TENANT_SWITCH` |
-
-数据库模块暂不在本轮改造范围内。
+1. 忽略路径 → 清理不可信头，放行
+2. 匿名路径 → 清理头，放行
+3. Token 鉴权 → 解析 JWT，无 Token/无效返回 401
+4. 授权校验 → 调 `GatewayAccessValidator`，失败 403
+5. 租户校验（公开路径）→ 调 `GatewayTenantValidator`，失败 403
+6. 写可信头 → MICROSERVICE 写 X-Tenant-Code/X-User-Id
+7. 灰度过滤器 → 写版本头

@@ -11,11 +11,13 @@
     </parent>
 
     <artifactId>solomon-job-module</artifactId>
+    <name>Solomon Job Module</name>
+    <description>任务调度聚合模块，包含统一 SDK 及 PowerJob、XXL-JOB 实现。</description>
     <packaging>pom</packaging>
 
     <modules>
         <module>solomon-job-sdk</module>
         <module>solomon-powerjob</module>
-        <module>solomon-xxlJob</module>
+        <module>solomon-xxl-job</module>
     </modules>
 </project>

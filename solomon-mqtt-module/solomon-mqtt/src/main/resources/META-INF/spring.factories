@@ -1,4 +1,4 @@
 # Auto Configure
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.steven.solomon.config.MqttConfig,\
-com.steven.solomon.utils.MqttUtils
+com.steven.solomon.mqtt.v3.config.MqttConfig,\
+com.steven.solomon.mqtt.v3.utils.MqttUtils

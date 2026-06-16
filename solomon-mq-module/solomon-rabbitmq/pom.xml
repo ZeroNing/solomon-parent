@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>solomon-mq-module</artifactId>
+        <groupId>com.steven</groupId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>solomon-rabbitmq</artifactId>
+    <name>Solomon RabbitMQ</name>
+    <description>RabbitMQ 消息模块，复用 solomon-mq-sdk 统一消费模板与多租户路由，支持 rabbitmq.tenant-mode 多租户连接切换。</description>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils-spring</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-mq-sdk</artifactId>
+        </dependency>
+
+    </dependencies>
+</project>

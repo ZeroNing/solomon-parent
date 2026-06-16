@@ -11,6 +11,8 @@
     </parent>
 
     <artifactId>solomon-s3-module</artifactId>
+    <name>Solomon S3 Module</name>
+    <description>对象存储聚合模块，包含公共 SDK 及多供应商实现（MinIO、阿里云 OSS、华为云 OBS、腾讯云 COS、百度云 BOS、Amazon S3）。</description>
     <packaging>pom</packaging>
 
     <modules>

@@ -13,9 +13,15 @@
 
     <dependencies>
 
+        <!-- 消息队列公共 SPI：复用统一消息模型、消费模板、发送接口 -->
         <dependency>
             <groupId>com.steven</groupId>
-            <artifactId>solomon-constant</artifactId>
+            <artifactId>solomon-mq-sdk</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant-module</artifactId>
         </dependency>
 
         <dependency>

@@ -20,15 +20,35 @@
     </dependency>
     <dependency>
       <groupId>com.steven</groupId>
-      <artifactId>solomon-constant</artifactId>
+      <artifactId>solomon-constant-module</artifactId>
     </dependency>
+    <!-- Spring Cloud Gateway，提供响应式路由与全局过滤器 -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-gateway</artifactId>
     </dependency>
+    <!-- Spring Security WebFlux，提供鉴权过滤器链与认证体系 -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-security</artifactId>
+    </dependency>
+    <!-- Hutool JWT，用于签发与解密令牌（hutool-all 5.8.36 已含） -->
+    <dependency>
+      <groupId>cn.hutool</groupId>
+      <artifactId>hutool-jwt</artifactId>
+      <version>${hutool.version}</version>
+    </dependency>
+
+    <!-- 测试依赖 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

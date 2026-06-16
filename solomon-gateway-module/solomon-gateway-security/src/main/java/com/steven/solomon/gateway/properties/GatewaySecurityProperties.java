@@ -2,34 +2,57 @@ package com.steven.solomon.gateway.properties;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/** 网关鉴权部署配置。 */
-@ConfigurationProperties("gateway.security")
+/**
+ * 网关安全配置属性。
+ *
+ * <p>配置前缀 {@code gateway.security}，控制部署模式（微服务/单机）和是否向下游
+ * 透传可信身份头。</p>
+ *
+ * <ul>
+ *   <li>{@link SecurityMode#MICROSERVICE}：微服务模式，向下游写入 {@code X-Tenant-Code}、
+ *       {@code X-User-Id}，下游服务据此绑定租户资源。</li>
+ *   <li>{@link SecurityMode#STANDALONE}：单机模式，身份仅保留在网关上下文中，不外发身份头，
+ *       适合不需要透传的单体应用。</li>
+ * </ul>
+ *
+ * @author steven
+ */
+@ConfigurationProperties(prefix = "gateway.security")
 public class GatewaySecurityProperties {
 
-  /** 默认适配微服务网关，单机应用可切换为 STANDALONE。 */
-  private GatewaySecurityMode mode = GatewaySecurityMode.MICROSERVICE;
+    /** 部署模式，默认微服务模式。 */
+    private SecurityMode mode = SecurityMode.MICROSERVICE;
 
-  /** 是否透传可信身份头；未配置时按部署模式自动决定。 */
-  private Boolean forwardTrustedHeaders;
+    /** 是否强制向下游透传可信头。未配置时按部署模式决定。 */
+    private Boolean forwardTrustedHeaders;
 
-  public GatewaySecurityMode getMode() {
-    return mode;
-  }
+    public SecurityMode getMode() {
+        return mode;
+    }
 
-  public void setMode(GatewaySecurityMode mode) {
-    this.mode = mode;
-  }
+    public void setMode(SecurityMode mode) {
+        this.mode = mode;
+    }
 
-  public Boolean getForwardTrustedHeaders() {
-    return forwardTrustedHeaders;
-  }
+    public Boolean getForwardTrustedHeaders() {
+        return forwardTrustedHeaders;
+    }
 
-  public void setForwardTrustedHeaders(Boolean forwardTrustedHeaders) {
-    this.forwardTrustedHeaders = forwardTrustedHeaders;
-  }
+    public void setForwardTrustedHeaders(Boolean forwardTrustedHeaders) {
+        this.forwardTrustedHeaders = forwardTrustedHeaders;
+    }
 
-  public boolean shouldForwardTrustedHeaders() {
-    return forwardTrustedHeaders != null
-        ? forwardTrustedHeaders : GatewaySecurityMode.MICROSERVICE.equals(mode);
-  }
+    /**
+     * 判断是否应向下游透传可信身份头。
+     *
+     * <p>优先使用显式配置；未配置时微服务模式透传，单机模式不透传。</p>
+     *
+     * @return true 表示向下游写入 {@code X-Tenant-Code}、{@code X-User-Id}
+     */
+    public boolean shouldForwardTrustedHeaders() {
+        if (forwardTrustedHeaders != null) {
+            return forwardTrustedHeaders;
+        }
+        return mode == SecurityMode.MICROSERVICE;
+    }
 }

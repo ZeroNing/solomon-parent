@@ -29,32 +29,29 @@
   </licenses>
 
   <modules>
-    <!-- 核心基础模块 -->
-    <module>solomon-constant</module>
-    <module>solomon-base</module>
-    <module>solomon-common</module>
+    <!-- ============ 核心基础设施（被其他模块依赖，最优先构建）============ -->
+    <module>solomon-constant-module</module>
+    <module>solomon-common-module</module>
+    <module>solomon-utils-module</module>
 
-    <!-- 数据存储模块 -->
+    <!-- ============ 数据存储 ============ -->
     <module>solomon-persistence-module</module>
-    <module>solomon-mongodb</module>
-
-    <!-- 缓存模块 -->
+    <module>solomon-mongodb-module</module>
     <module>solomon-cache-module</module>
 
-    <!-- 消息队列模块 -->
-    <module>solomon-rabbitMq</module>
+    <!-- ============ 消息队列（公共 SDK 优先于各实现构建）============ -->
+    <module>solomon-mq-module</module>
     <module>solomon-mqtt-module</module>
 
-    <!-- 对象存储模块 -->
+    <!-- ============ 对象存储 ============ -->
     <module>solomon-s3-module</module>
 
-    <!-- 任务调度模块 -->
+    <!-- ============ 任务调度 ============ -->
     <module>solomon-job-module</module>
 
-    <!-- 网关模块 -->
+    <!-- ============ 微服务（网关 + 服务治理）============ -->
+    <module>solomon-cloud-module</module>
     <module>solomon-gateway-module</module>
-    <!-- 工具模块 -->
-    <module>solomon-utils-module</module>
   </modules>
 
   <profiles>
@@ -207,7 +204,7 @@
       <!-- ========== 内部模块依赖 ========== -->
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-constant</artifactId>
+        <artifactId>solomon-constant-module</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -232,17 +229,12 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-base</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.steven</groupId>
         <artifactId>solomon-clamav</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-common</artifactId>
+        <artifactId>solomon-common-module</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -272,7 +264,7 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-mongodb</artifactId>
+        <artifactId>solomon-mongodb-module</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -287,6 +279,16 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
+        <artifactId>solomon-mq-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-rocketmq</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
         <artifactId>solomon-mqtt5</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -297,7 +299,7 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-rabbitMq</artifactId>
+        <artifactId>solomon-rabbitmq</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -352,7 +354,7 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
-        <artifactId>solomon-xxlJob</artifactId>
+        <artifactId>solomon-xxl-job</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -363,6 +365,31 @@
       <dependency>
         <groupId>com.steven</groupId>
         <artifactId>solomon-gateway-security</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-cloud-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-nacos</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-dubbo</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-seata</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-sentinel</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
