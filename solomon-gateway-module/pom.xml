@@ -11,10 +11,11 @@
 
     <artifactId>solomon-gateway-module</artifactId>
     <name>Solomon Gateway Module</name>
-    <description>Spring Cloud Gateway 网关聚合模块，包含 JWT 多租户鉴权、Swagger 聚合、灰度发布。</description>
+    <description>安全与网关聚合模块，包含网关层（Spring Cloud Gateway + WebFlux）和服务层（Servlet MVC）两套安全 SDK、Swagger 聚合、灰度发布。</description>
     <packaging>pom</packaging>
 
     <modules>
+        <module>solomon-security</module>
         <module>solomon-gateway-security</module>
     </modules>
 

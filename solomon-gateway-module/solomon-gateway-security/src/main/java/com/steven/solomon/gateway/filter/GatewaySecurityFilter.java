@@ -104,18 +104,16 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
 
         // 1. 忽略路径：健康检查/Swagger 等，清理不可信头后直接放行
         if (matchesAny(tenantProperties.getIgnoredPaths(), path)) {
-            cleanUntrustedHeaders(exchange);
             logger.debug("忽略路径放行: {}", path);
-            return chain.filter(exchange);
+            return chain.filter(cleanUntrustedHeaders(exchange));
         }
 
         // 2. 匿名路径：扫描到的 anonymous 接口，清理头后放行
         List<String> anonymousPaths = anonymousPathProvider != null
                 ? anonymousPathProvider.getAnonymousPaths() : List.of();
         if (matchesAny(anonymousPaths, path)) {
-            cleanUntrustedHeaders(exchange);
             logger.debug("匿名路径放行: {}", path);
-            return chain.filter(exchange);
+            return chain.filter(cleanUntrustedHeaders(exchange));
         }
 
         // 3. 公开租户路径：登录等，无 Token 但需校验租户
@@ -151,9 +149,9 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
                         return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
                                 ERR_ACCESS_DENIED, "无权访问该接口");
                     }
-                    // 6. 写可信头
-                    writeTrustedHeaders(exchange, finalClaims);
-                    return chain.filter(exchange);
+                    // 6. 写可信头，用新 exchange 继续链路（exchange 不可变，不能丢弃返回值）
+                    ServerWebExchange securedExchange = writeTrustedHeaders(exchange, finalClaims);
+                    return chain.filter(securedExchange);
                 })
                 .onErrorResume(e -> {
                     logger.error("授权校验异常, 用户={}, 路径={}", finalClaims.userId(), path, e);
@@ -186,19 +184,18 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
                         return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
                                 ERR_TENANT_INVALID, "租户不存在或未启用");
                     }
-                    // 公开路径只写入租户编码，不写用户头（尚未登录）
-                    cleanUntrustedHeaders(exchange);
+                    // 公开路径先清理不可信头，再写入校验过的租户编码
+                    ServerWebExchange cleaned = cleanUntrustedHeaders(exchange);
+                    if (StrUtil.isNotBlank(finalTenantCode)) {
+                        cleaned.getAttributes().put(TENANT_ATTRIBUTE, finalTenantCode);
+                    }
                     if (securityProperties.shouldForwardTrustedHeaders() && StrUtil.isNotBlank(finalTenantCode)) {
-                        ServerHttpRequest mutated = exchange.getRequest().mutate()
+                        ServerHttpRequest mutated = cleaned.getRequest().mutate()
                                 .header(GatewayHeaders.TENANT_CODE, finalTenantCode)
                                 .build();
-                        exchange.getAttributes().put(TENANT_ATTRIBUTE, finalTenantCode);
-                        return chain.filter(exchange.mutate().request(mutated).build());
+                        return chain.filter(cleaned.mutate().request(mutated).build());
                     }
-                    if (StrUtil.isNotBlank(finalTenantCode)) {
-                        exchange.getAttributes().put(TENANT_ATTRIBUTE, finalTenantCode);
-                    }
-                    return chain.filter(exchange);
+                    return chain.filter(cleaned);
                 })
                 .onErrorResume(e -> {
                     logger.error("租户校验异常, 租户={}", finalTenantCode, e);
@@ -208,27 +205,39 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * 写入网关权威计算的信任头。
+     * 写入网关权威计算的信任头，返回修改后的新 exchange。
      *
      * <p>先清理所有外部伪造的身份头，再写入网关计算出的可信值。
-     * 微服务模式写入请求头供下游读取；单机模式只存 exchange attribute。</p>
+     * 微服务模式写入请求头供下游读取；单机模式只存 exchange attribute。
+     * 返回的新 exchange 必须在调用方继续传递，不能丢弃（exchange 不可变）。</p>
+     *
+     * @param exchange 原始 exchange
+     * @param claims   令牌声明
+     * @return 写入可信头后的新 exchange
      */
-    private void writeTrustedHeaders(ServerWebExchange exchange, TokenClaims claims) {
-        cleanUntrustedHeaders(exchange);
-        exchange.getAttributes().put(TENANT_ATTRIBUTE, claims.tenantCode());
+    private ServerWebExchange writeTrustedHeaders(ServerWebExchange exchange, TokenClaims claims) {
+        ServerWebExchange cleaned = cleanUntrustedHeaders(exchange);
+        cleaned.getAttributes().put(TENANT_ATTRIBUTE, claims.tenantCode());
         if (securityProperties.shouldForwardTrustedHeaders()) {
-            ServerHttpRequest mutated = exchange.getRequest().mutate()
+            ServerHttpRequest mutated = cleaned.getRequest().mutate()
                     .header(GatewayHeaders.TENANT_CODE, claims.tenantCode())
                     .header(GatewayHeaders.USER_ID, claims.userId())
                     .build();
-            exchange.mutate().request(mutated).build();
+            return cleaned.mutate().request(mutated).build();
         }
+        return cleaned;
     }
 
     /**
-     * 清理外部伪造的身份头，防止下游误用。
+     * 清理外部伪造的身份头，返回修改后的新 exchange。
+     *
+     * <p>{@link ServerWebExchange} 是不可变对象，mutate().build() 返回新实例，
+     * 原始 exchange 不受影响。调用方必须使用返回的新 exchange。</p>
+     *
+     * @param exchange 原始 exchange
+     * @return 清理身份头后的新 exchange
      */
-    private void cleanUntrustedHeaders(ServerWebExchange exchange) {
+    private ServerWebExchange cleanUntrustedHeaders(ServerWebExchange exchange) {
         ServerHttpRequest mutated = exchange.getRequest().mutate()
                 .headers(headers -> {
                     headers.remove(GatewayHeaders.TENANT_CODE);
@@ -237,7 +246,7 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
                     headers.remove(GatewayHeaders.TENANT_NAME);
                 })
                 .build();
-        exchange.mutate().request(mutated).build();
+        return exchange.mutate().request(mutated).build();
     }
 
     /**

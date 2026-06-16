@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-gateway-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-security</artifactId>
+    <name>Solomon Security</name>
+    <description>通用安全 SDK（Servlet MVC 版），提供 JWT、多租户、鉴权授权、灰度发布、权限扫描能力，业务逻辑通过 SPI 接口交由客户实现。</description>
+
+    <dependencies>
+        <!-- 依赖常量模块，复用 BaseCode、TenantModeResolver、LoggerUtils 等基础设施 -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant-module</artifactId>
+        </dependency>
+        <!-- Spring Web MVC，提供 OncePerRequestFilter 和拦截器 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <!-- Servlet API（provided），运行时由 Tomcat 提供 -->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <!-- Hutool JWT，用于签发与解密令牌 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-jwt</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>

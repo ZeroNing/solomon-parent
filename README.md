@@ -61,7 +61,7 @@ Solomon Parent 是一个基础设施型 Maven 多模块工程，目标是把微�
 | `solomon-mqtt-module` | 聚合模块 | 多种 MQTT Client 实现、Redis MQTT、多租户连接（`mqtt.tenant-mode`） |
 | `solomon-s3-module` | 聚合模块 | 对象存储公共 SDK 与多供应商实现 |
 | `solomon-job-module` | 聚合模块 | PowerJob、XXL-JOB 统一任务注解与自动注册 |
-| `solomon-gateway-module` | 网关模块 | Spring Cloud Gateway + Spring Security 多租户 JWT 鉴权、灰度发布 |
+| `solomon-gateway-module` | 安全网关聚合 | 两套安全 SDK：网关层（WebFlux 响应式）+ 服务层（Servlet MVC），JWT/多租户/鉴权授权/灰度/权限扫描 |
 | `solomon-cloud-module` | 微服务聚合 | 租户透传（Feign/Dubbo）、Nacos 服务发现配置、Seata 分布式事务、Sentinel 限流熔断 |
 | `solomon-test-module` | 测试模块 | 测试用例聚合模块，仅在 `test-modules` profile 中启用 |
 
@@ -100,7 +100,8 @@ solomon-parent
 │   ├── solomon-powerjob
 │   └── solomon-xxl-job
 ├── solomon-gateway-module
-│   └── solomon-gateway-security
+│   ├── solomon-security           # 服务层安全 SDK（Servlet MVC，JWT/多租户/鉴权授权/权限扫描）
+│   └── solomon-gateway-security   # 网关层安全 SDK（WebFlux，JWT/多租户/灰度/权限扫描/Swagger聚合）
 ├── solomon-cloud-module
 │   ├── solomon-cloud-sdk        # 租户透传、可插拔租户解析策略
 │   ├── solomon-nacos

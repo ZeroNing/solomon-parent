@@ -2,7 +2,6 @@ package com.steven.solomon.mq;
 
 import cn.hutool.core.util.ObjectUtil;
 
-import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.context.TenantModeResolver;
@@ -12,6 +11,7 @@ import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import com.steven.solomon.mq.model.BaseMq;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import cn.hutool.extra.spring.SpringUtil;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 
@@ -32,6 +32,9 @@ public abstract class AbstractMessageConsumer<T, R, M extends BaseMq<T>>
 
   /** 日志记录器，统一使用项目封装的 LoggerUtils 获取。 */
   protected final Logger logger = LoggerUtils.logger(getClass());
+
+  /** 缓存租户模式解析器（单例无状态），避免每条消息重复 getBean。 */
+  private volatile TenantModeResolver cachedTenantModeResolver;
 
   /** 当前消息所属的订阅主题。 */
   protected String topic;
@@ -72,7 +75,11 @@ public abstract class AbstractMessageConsumer<T, R, M extends BaseMq<T>>
     try {
       model = conversion(json);
       // 从消息体解析有效租户编码（单租户回退默认值，多租户校验）
-      tenantCode = SpringUtil.getBean(TenantModeResolver.class).resolve(model.getTenantCode());
+      // 使用缓存的解析器避免每条消息重复 getBean（TenantModeResolver 是无状态单例）
+      if (cachedTenantModeResolver == null) {
+        cachedTenantModeResolver = SpringUtil.getBean(TenantModeResolver.class);
+      }
+      tenantCode = cachedTenantModeResolver.resolve(model.getTenantCode());
       logger.info(
           "线程名:{}, 租户编码:{}, 消息ID:{}, topic主题:{}, 消息消费者消息:{}",
           Thread.currentThread().getName(),
