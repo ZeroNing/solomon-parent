@@ -31,6 +31,12 @@
             <artifactId>spring-webmvc</artifactId>
             <optional>true</optional>
         </dependency>
+        <!-- Spring Security（optional），提供 SecurityFilterChain 禁用默认拦截 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+            <optional>true</optional>
+        </dependency>
         <!-- Servlet API（provided），运行时由 Tomcat 提供 -->
         <dependency>
             <groupId>jakarta.servlet</groupId>

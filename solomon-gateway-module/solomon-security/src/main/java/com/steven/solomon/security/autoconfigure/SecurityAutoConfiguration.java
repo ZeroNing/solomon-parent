@@ -106,4 +106,37 @@ public class SecurityAutoConfiguration {
         logger.info("注册安全认证授权过滤器");
         return registration;
     }
+
+    /**
+     * Spring Security Servlet 安全过滤器链。
+     *
+     * <p>禁用 Spring Security 的默认认证授权拦截（CSRF、表单登录、默认 HTTP Basic），
+     * 让服务的 {@link SecurityAuthenticationFilter} 全面接管鉴权与授权。
+     * 所有请求都允许通过 Spring Security 层（permitAll），实际的安全校验由
+     * {@code SecurityAuthenticationFilter} 在更高优先级执行。</p>
+     *
+     * <p>客户若需要自定义 Spring Security 行为，可声明自己的
+     * {@code SecurityFilterChain} Bean 覆盖本默认实现。</p>
+     *
+     * @param http HttpSecurity 配置器
+     * @return 安全过滤器链
+     * @throws Exception 配置异常
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnClass(
+            name = "org.springframework.security.config.annotation.web.builders.HttpSecurity")
+    public org.springframework.security.web.SecurityFilterChain securityFilterChain(
+            org.springframework.security.config.annotation.web.builders.HttpSecurity http) throws Exception {
+        logger.info("配置 Spring Security Servlet 过滤链: 禁用默认拦截，由 SecurityAuthenticationFilter 接管鉴权授权");
+        http
+                // 禁用 CSRF（RESTful API 服务不需要 CSRF 保护）
+                .csrf(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
+                // 禁用默认表单登录和 HTTP Basic（由 JWT Token 替代）
+                .formLogin(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
+                .httpBasic(org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer::disable)
+                // 所有请求放行，实际鉴权授权由 SecurityAuthenticationFilter 执行
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+        return http.build();
+    }
 }

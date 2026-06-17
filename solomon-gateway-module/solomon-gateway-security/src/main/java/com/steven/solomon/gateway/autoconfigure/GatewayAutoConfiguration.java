@@ -163,4 +163,38 @@ public class GatewayAutoConfiguration {
             GatewaySwaggerProperties properties) {
         return new SwaggerResourceProvider(locatorProvider.getIfAvailable(), properties);
     }
+
+    /**
+     * Spring Security 响应式安全过滤器链。
+     *
+     * <p>禁用 Spring Security 的默认认证授权拦截（CSRF、表单登录、默认 HTTP Basic），
+     * 让网关的 {@link GatewaySecurityFilter} 全面接管鉴权与授权。
+     * 所有请求都允许通过 Spring Security 层（permitAll），实际的安全校验由
+     * {@code GatewaySecurityFilter} 在更高优先级执行。</p>
+     *
+     * <p>客户若需要自定义 Spring Security 行为（如添加额外的 WebFilter），
+     * 可声明自己的 {@code SecurityWebFilterChain} Bean 覆盖本默认实现。</p>
+     *
+     * @param http ServerHttpSecurity 配置器
+     * @return 安全过滤器链
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @org.springframework.boot.autoconfigure.condition.ConditionalOnClass(
+            name = "org.springframework.security.config.web.server.ServerHttpSecurity")
+    public org.springframework.security.web.server.SecurityWebFilterChain securityWebFilterChain(
+            org.springframework.security.config.web.server.ServerHttpSecurity http) {
+        logger.info("配置 Spring Security 响应式过滤链: 禁用默认拦截，由 GatewaySecurityFilter 接管鉴权授权");
+        http
+                // 禁用 CSRF（网关是无状态的 API 网关，不渲染表单）
+                .csrf(org.springframework.security.config.web.server.ServerHttpSecurity.CsrfSpec::disable)
+                // 禁用默认表单登录和 HTTP Basic（由 JWT Token 替代）
+                .formLogin(org.springframework.security.config.web.server.ServerHttpSecurity.FormLoginSpec::disable)
+                .httpBasic(org.springframework.security.config.web.server.ServerHttpSecurity.HttpBasicSpec::disable)
+                // 禁用默认登出页
+                .logout(org.springframework.security.config.web.server.ServerHttpSecurity.LogoutSpec::disable)
+                // 所有请求放行，实际鉴权授权由 GatewaySecurityFilter 执行
+                .authorizeExchange(exchanges -> exchanges.anyExchange().permitAll());
+        return http.build();
+    }
 }
