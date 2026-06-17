@@ -12,10 +12,10 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 
 /**
- * 数据源租户切换AOP�?
+ * 数据源租户切换AOP。
  *
- * <p>在常见数据库访问入口和Repository仓储入口前，根据请求头中的租户编码切换数据源�?
- * 执行完成后自动清理线程上下文�?/p>
+ * <p>在常见数据库访问入口和Repository仓储入口前，根据请求头中的租户编码切换数据源；
+ * 执行完成后自动清理线程上下文。</p>
  */
 @Aspect
 public class DataSourceTenantAspect {
@@ -27,10 +27,10 @@ public class DataSourceTenantAspect {
   private final PersistenceProperties properties;
 
   /**
-   * 构造数据源租户切面�?
+   * 构造数据源租户切面。
    *
    * @param context 数据源租户上下文
-   * @param properties 动态数据源配置，用于读取默认租�?
+   * @param properties 动态数据源配置，用于读取默认租户
    */
   public DataSourceTenantAspect(
       DataSourceTenantContext context,
@@ -45,16 +45,16 @@ public class DataSourceTenantAspect {
   }
 
   /**
-   * 在数据库访问入口周围切换租户数据源�?
+   * 在数据库访问入口周围切换租户数据源。
    *
-   * @param point AOP连接�?
-   * @return 原方法执行结�?
-   * @throws Throwable 原方法执行异常或数据源切换异�?
+   * @param point AOP连接点
+   * @return 原方法执行结果
+   * @throws Throwable 原方法执行异常或数据源切换异常
    */
   @Around("dataSourcePointCut()")
   public Object around(ProceedingJoinPoint point) throws Throwable {
     String tenantCode = resolveTenantCode();
-    logger.info("[DataSource] AOP切换租户数据�?tenant={}", tenantCode);
+    logger.info("[DataSource] AOP切换租户数据源 tenant={}", tenantCode);
     context.switchTenant(tenantCode);
     try {
       return point.proceed();

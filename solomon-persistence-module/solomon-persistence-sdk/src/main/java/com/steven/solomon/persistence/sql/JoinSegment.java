@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SQL 关联片段�? */
+ * SQL 关联片段。
+ */
 final class JoinSegment {
 
   private final JoinType joinType;

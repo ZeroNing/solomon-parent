@@ -3,8 +3,9 @@ package com.steven.solomon.persistence.sql;
 import java.util.List;
 
 /**
- * 实体 SQL 元数据缓存对象�? *
- * <p>集中保存表名、字段和主键信息，避免每次查询都重复反射解析�?/p>
+ * 实体 SQL 元数据缓存对象。
+ *
+ * <p>集中保存表名、字段和主键信息，避免每次查询都重复反射解析。</p>
  */
 class SqlEntityMetadata {
 

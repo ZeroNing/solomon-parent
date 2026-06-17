@@ -8,10 +8,10 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 /**
- * SQL注入防护工具�?
+ * SQL注入防护工具。
  *
  * <p>值参数必须通过命名参数绑定；表名、列名、排序、聚合函数名等不能参数化的位置，
- * 统一在这里做白名单和危险片段校验�?/p>
+ * 统一在这里做白名单和危险片段校验。</p>
  */
 public final class SqlInjectionGuard {
 
@@ -38,10 +38,10 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验原始SQL片段�?
+   * 校验原始SQL片段。
    *
-   * @param value SQL文本或片�?
-   * @param scene 使用场景，用于异常提�?
+   * @param value SQL文本或片段
+   * @param scene 使用场景，用于异常提示
    * @return 原始SQL片段
    */
   public static String validateRawSql(String value, String scene) {
@@ -54,11 +54,13 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验只读查询SQL�?   *
-   * <p>适用于自定义报表等只允许读取数据的入口，会拒绝写操作、DDL和存储过程调用�?/p>
+   * 校验只读查询SQL。
+   *
+   * <p>适用于自定义报表等只允许读取数据的入口，会拒绝写操作、DDL和存储过程调用。</p>
    *
    * @param value SQL文本
-   * @param scene 使用场景，用于异常提�?   * @return 原始SQL文本
+   * @param scene 使用场景，用于异常提示
+   * @return 原始SQL文本
    */
   public static String validateQuerySql(String value, String scene) {
     validateRawSql(value, scene);
@@ -73,11 +75,11 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验数据库标识符�?
+   * 校验数据库标识符。
    *
    * @param value 表名、列名或别名
-   * @param scene 使用场景，用于异常提�?
-   * @return 原始标识�?
+   * @param scene 使用场景，用于异常提示
+   * @return 原始标识符
    */
   public static String validateIdentifier(String value, String scene) {
     if (StrUtil.isBlank(value)) {
@@ -91,11 +93,11 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验带表别名或schema前缀的字段名�?
+   * 校验带表别名或schema前缀的字段名。
    *
    * @param value 字段名，例如 {@code id}、{@code u.id}
-   * @param scene 使用场景，用于异常提�?
-   * @return 原始字段�?
+   * @param scene 使用场景，用于异常提示
+   * @return 原始字段名
    */
   public static String validateQualifiedIdentifier(String value, String scene)
       {
@@ -110,11 +112,11 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验SQL表达式�?
+   * 校验SQL表达式。
    *
-   * @param value 字段、函数或简单表达式，例�?{@code COUNT(1)}、{@code SUM(o.amount)}
-   * @param scene 使用场景，用于异常提�?
-   * @return 原始表达�?
+   * @param value 字段、函数或简单表达式，例如 {@code COUNT(1)}、{@code SUM(o.amount)}
+   * @param scene 使用场景，用于异常提示
+   * @return 原始表达式
    */
   public static String validateExpression(String value, String scene) {
     if (StrUtil.isBlank(value)) {
@@ -129,10 +131,10 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验表表达式�?
+   * 校验表表达式。
    *
-   * @param value 表名或安全子查询表达�?
-   * @param scene 使用场景，用于异常提�?
+   * @param value 表名或安全子查询表达式
+   * @param scene 使用场景，用于异常提示
    * @return 原始表表达式
    */
   public static String validateTableExpression(String value, String scene)
@@ -149,11 +151,11 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验ORDER BY表达式�?
+   * 校验ORDER BY表达式。
    *
-   * @param value ORDER BY后面的排序表达式，不包含ORDER BY关键�?
-   * @param scene 使用场景，用于异常提�?
-   * @return 原始排序表达�?
+   * @param value ORDER BY后面的排序表达式，不包含ORDER BY关键字
+   * @param scene 使用场景，用于异常提示
+   * @return 原始排序表达式
    */
   public static String validateOrderBy(String value, String scene) {
     if (StrUtil.isBlank(value)) {
@@ -181,10 +183,10 @@ public final class SqlInjectionGuard {
   }
 
   /**
-   * 校验聚合函数名�?
+   * 校验聚合函数名。
    *
    * @param value 聚合函数名，例如COUNT、SUM、MAX、MIN、AVG
-   * @return 原始聚合函数�?
+   * @return 原始聚合函数名
    */
   public static String validateAggregateFunction(String value) {
     if (StrUtil.isBlank(value) || !AGGREGATE_FUNCTION.matcher(value.trim()).matches()) {

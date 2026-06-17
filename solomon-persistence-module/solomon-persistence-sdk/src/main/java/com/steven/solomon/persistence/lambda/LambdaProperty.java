@@ -10,8 +10,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Lambda 属性解析工具�? *
- * <p>只解�?Getter 方法引用，例�?{@code User::getName}、{@code User::isEnabled}�? * 解析结果会缓存，减少重复反射开销�?/p>
+ * Lambda 属性解析工具。
+ *
+ * <p>只解析 Getter 方法引用，例如 {@code User::getName}、{@code User::isEnabled}。
+ * 解析结果会缓存，减少重复反射开销。</p>
  */
 public final class LambdaProperty {
 
@@ -21,11 +23,13 @@ public final class LambdaProperty {
   }
 
   /**
-   * �?Getter 方法引用中解�?Java 属性名�?   *
+   * 从 Getter 方法引用中解析 Java 属性名。
+   *
    * @param function 字段方法引用
    * @param <T> 实体类型
    * @return Java 属性名
-   * @throws PersistenceException Lambda 不是 Getter 方法引用时抛�?   */
+   * @throws PersistenceException Lambda 不是 Getter 方法引用时抛出
+   */
   public static <T> String name(SFunction<T, ?> function) throws PersistenceException {
     if (ObjectUtil.isEmpty(function)) {
       throw new PersistenceException(PersistenceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND, "lambda");
@@ -34,10 +38,13 @@ public final class LambdaProperty {
   }
 
   /**
-   * �?Getter 方法引用中解析实体类型�?   *
+   * 从 Getter 方法引用中解析实体类型。
+   *
    * @param function 字段方法引用
    * @param <T> 实体类型
-   * @return Getter 所属实体类�?   * @throws PersistenceException Lambda 解析失败时抛�?   */
+   * @return Getter 所属实体类型
+   * @throws PersistenceException Lambda 解析失败时抛出
+   */
   public static <T> Class<?> owner(SFunction<T, ?> function) throws PersistenceException {
     if (ObjectUtil.isEmpty(function)) {
       throw new PersistenceException(PersistenceErrorCode.DATA_SOURCE_COLUMN_NOT_FOUND, "lambda");

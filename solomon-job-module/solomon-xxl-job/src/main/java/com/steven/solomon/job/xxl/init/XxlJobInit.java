@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
 import com.steven.solomon.annotation.XxlJobTask;
+import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.job.xxl.entity.XxlJobInfo;
 import com.steven.solomon.enums.JobRegisterFailureStrategy;
 import com.steven.solomon.enums.JobRegisterMode;

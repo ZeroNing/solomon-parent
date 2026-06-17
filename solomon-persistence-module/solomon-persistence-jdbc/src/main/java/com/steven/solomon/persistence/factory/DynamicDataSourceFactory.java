@@ -26,19 +26,19 @@ import java.util.function.Consumer;
 import javax.sql.DataSource;
 
 /**
- * 动态数据源工厂�?
+ * 动态数据源工厂。
  *
- * <p>职责只做一件事：把租户配置安全地转换成连接池实例。数据库类型、驱动、校�?SQL�?
- * Druid 防火�?dbType 都从 {@link DataBaseTypeEnum} 统一解析，避免不同连接池各写一套规则�?/p>
+ * <p>职责只做一件事：把租户配置安全地转换成连接池实例。数据库类型、驱动、校验 SQL、
+ * Druid 防火墙 dbType 都从 {@link DataBaseTypeEnum} 统一解析，避免不同连接池各写一套规则。</p>
  */
 public class DynamicDataSourceFactory {
 
   /**
-   * 根据单租户配置创建数据源�?
+   * 根据单租户配置创建数据源。
    *
    * @param properties 单租户数据源配置，包含连接池类型、数据库类型、JDBC 地址和连接池参数
-   * @return Hikari �?Druid 数据�?
-   * @throws PersistenceException 配置缺失、连接池类型不支持或数据库类型不支持时抛�?
+   * @return Hikari 或 Druid 数据源
+   * @throws PersistenceException 配置缺失、连接池类型不支持或数据库类型不支持时抛出
    */
   public DataSource createDataSource(TenantDataSourceProperties properties) throws PersistenceException {
     requireDataSourceConfig(properties);

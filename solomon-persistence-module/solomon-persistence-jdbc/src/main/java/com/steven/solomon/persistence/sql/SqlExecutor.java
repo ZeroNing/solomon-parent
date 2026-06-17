@@ -26,10 +26,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
- * SQL执行器�?
+ * SQL执行器。
  *
- * <p>统一执行命名参数SQL，支持普通查询、分页查询、游标分页和常用聚合函数。底层使�?
- * {@link NamedParameterJdbcTemplate}，数据源切换由动态数据源路由和租户上下文完成�?/p>
+ * <p>统一执行命名参数SQL，支持普通查询、分页查询、游标分页和常用聚合函数。底层使用
+ * {@link NamedParameterJdbcTemplate}，数据源切换由动态数据源路由和租户上下文完成。</p>
  */
 public class SqlExecutor {
 
@@ -42,11 +42,11 @@ public class SqlExecutor {
   private final SqlTypeConverterRegistry converterRegistry;
 
   /**
-   * 构造SQL执行器�?
+   * 构造SQL执行器。
    *
-   * @param jdbcTemplate Spring命名参数JDBC模板，用于执行SQL和绑定命名参�?
+   * @param jdbcTemplate Spring命名参数JDBC模板，用于执行SQL和绑定命名参数
    * @param properties 动态数据源配置，用于解析当前租户的数据类型和SQL方言
-   * @param context 数据源租户上下文，用于获取当前线程中的租户编�?
+   * @param context 数据源租户上下文，用于获取当前线程中的租户编码
    */
   public SqlExecutor(
       NamedParameterJdbcTemplate jdbcTemplate,
@@ -56,11 +56,11 @@ public class SqlExecutor {
   }
 
   /**
-   * 构造SQL执行器�?
+   * 构造SQL执行器。
    *
-   * @param jdbcTemplate Spring命名参数JDBC模板，用于执行SQL和绑定命名参�?
+   * @param jdbcTemplate Spring命名参数JDBC模板，用于执行SQL和绑定命名参数
    * @param properties 动态数据源配置，用于解析当前租户的数据库类型和SQL方言
-   * @param context 数据源租户上下文，用于获取当前线程中的租户编�?
+   * @param context 数据源租户上下文，用于获取当前线程中的租户编码
    * @param converterRegistry SQL类型转换器注册器，用于查询结果和写入参数转换
    */
   public SqlExecutor(
@@ -77,11 +77,11 @@ public class SqlExecutor {
   }
 
   /**
-   * 执行增删改SQL�?
+   * 执行增删改SQL。
    *
    * @param sql SQL对象，包含SQL文本和命名参数，参数占位符格式为 {@code :paramName}
    * @return 受影响的行数
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public int update(Sql sql) throws PersistenceException {
     try {
@@ -93,12 +93,12 @@ public class SqlExecutor {
   }
 
   /**
-   * 批量执行命名参数SQL�?
+   * 批量执行命名参数SQL。
    *
-   * @param sql SQL文本，参数占位符格式�?{@code :paramName}
-   * @param params 批量参数数组，每个Map表示一条SQL执行所需的命名参�?
+   * @param sql SQL文本，参数占位符格式为 {@code :paramName}
+   * @param params 批量参数数组，每个Map表示一条SQL执行所需的命名参数
    * @return 每条SQL对应的受影响行数
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public int[] batchUpdate(String sql, Map<String, ?>[] params) throws PersistenceException {
     try {
@@ -110,13 +110,13 @@ public class SqlExecutor {
   }
 
   /**
-   * 查询实体列表�?
+   * 查询实体列表。
    *
-   * @param sql SQL对象，包含查询SQL和命名参�?
+   * @param sql SQL对象，包含查询SQL和命名参数
    * @param resultType 返回结果类型，字段按 {@link BeanPropertyRowMapper} 规则映射
    * @param <T> 返回对象类型
    * @return 查询结果列表
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> List<T> query(Sql sql, Class<T> resultType) throws PersistenceException {
     if (converterRegistry.isSimpleValueType(resultType)) {
@@ -132,13 +132,13 @@ public class SqlExecutor {
   }
 
   /**
-   * 使用自定义行映射器查询列表�?
+   * 使用自定义行映射器查询列表。
    *
-   * @param sql SQL对象，包含查询SQL和命名参�?
+   * @param sql SQL对象，包含查询SQL和命名参数
    * @param rowMapper 自定义行映射器，用于将ResultSet行转换为业务对象
    * @param <T> 返回对象类型
    * @return 查询结果列表
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> List<T> query(Sql sql, RowMapper<T> rowMapper) throws PersistenceException {
     try {
@@ -150,11 +150,11 @@ public class SqlExecutor {
   }
 
   /**
-   * 查询Map列表�?
+   * 查询Map列表。
    *
-   * @param sql SQL对象，包含查询SQL和命名参�?
+   * @param sql SQL对象，包含查询SQL和命名参数
    * @return 查询结果列表，每行数据以列名为key
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public List<Map<String, Object>> queryForList(Sql sql) throws PersistenceException {
     try {
@@ -166,13 +166,13 @@ public class SqlExecutor {
   }
 
   /**
-   * 查询单个对象�?
+   * 查询单个对象。
    *
-   * @param sql SQL对象，包含查询SQL和命名参�?
+   * @param sql SQL对象，包含查询SQL和命名参数
    * @param resultType 返回结果类型，适合单列值或Spring可直接转换的类型
    * @param <T> 返回对象类型
    * @return 查询到的单个对象
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T queryForObject(Sql sql, Class<T> resultType) throws PersistenceException {
     try {
@@ -185,15 +185,15 @@ public class SqlExecutor {
   }
 
   /**
-   * 分页查询实体列表�?
+   * 分页查询实体列表。
    *
    * @param sql 原始查询SQL对象，不能包含数据库分页语句
    * @param pageNo 页码，从1开始，小于1时按1处理
-   * @param pageSize 每页条数，小�?时按1处理
+   * @param pageSize 每页条数，小于1时按1处理
    * @param resultType 返回结果类型，字段按 {@link BeanPropertyRowMapper} 规则映射
    * @param <T> 返回对象类型
-   * @return 分页结果，包含总数、当前页数据和是否有下一�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 分页结果，包含总数、当前页数据和是否有下一页
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> PageResult<T> page(Sql sql, int pageNo, int pageSize, Class<T> resultType)
       throws PersistenceException {
@@ -206,14 +206,14 @@ public class SqlExecutor {
   }
 
   /**
-   * 使用分页参数对象分页查询实体列表�?
+   * 使用分页参数对象分页查询实体列表。
    *
-   * @param sql 原始查询SQL对象，支�?{@link Sql#select(String...)} �?{@link Sql#New(String)} 两种写法
+   * @param sql 原始查询SQL对象，支持 {@link Sql#select(String...)} 和 {@link Sql#New(String)} 两种写法
    * @param param 分页参数对象，读取pageNo、pageSize和排序表达式
    * @param resultType 返回结果类型
    * @param <T> 返回对象类型
-   * @return 分页结果，包含总数、当前页数据和是否有下一�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 分页结果，包含总数、当前页数据和是否有下一页
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> PageResult<T> page(Sql sql, PersistencePageParam param, Class<T> resultType)
       throws PersistenceException {
@@ -230,13 +230,13 @@ public class SqlExecutor {
   }
 
   /**
-   * 分页查询Map列表�?
+   * 分页查询Map列表。
    *
    * @param sql 原始查询SQL对象，不能包含数据库分页语句
    * @param pageNo 页码，从1开始，小于1时按1处理
-   * @param pageSize 每页条数，小�?时按1处理
+   * @param pageSize 每页条数，小于1时按1处理
    * @return Map分页结果，每行数据以列名为key
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public PageResult<Map<String, Object>> page(Sql sql, int pageNo, int pageSize)
       throws PersistenceException {
@@ -249,12 +249,12 @@ public class SqlExecutor {
   }
 
   /**
-   * 使用分页参数对象分页查询Map列表�?
+   * 使用分页参数对象分页查询Map列表。
    *
-   * @param sql 原始查询SQL对象，支持手写SQL和结构化SQL构�?
+   * @param sql 原始查询SQL对象，支持手写SQL和结构化SQL构造
    * @param param 分页参数对象，读取pageNo、pageSize和排序表达式
    * @return Map分页结果
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public PageResult<Map<String, Object>> page(Sql sql, PersistencePageParam param)
       throws PersistenceException {
@@ -318,11 +318,11 @@ public class SqlExecutor {
   }
 
   /**
-   * 对任意查询SQL统计总数�?
+   * 对任意查询SQL统计总数。
    *
    * @param sql 原始查询SQL对象，会被包装为 {@code SELECT COUNT(1) FROM (...)}
-   * @return 总行�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 总行数
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public long count(Sql sql) throws PersistenceException {
     Sql countSql = sql.withoutOrderBy();
@@ -333,22 +333,22 @@ public class SqlExecutor {
   }
 
   /**
-   * 按实体表统计总数�?
+   * 按实体表统计总数。
    *
-   * @param entityClass 实体类型，实体类需要标�?{@code @Table}
-   * @return 总行�?
-   * @throws PersistenceException 表注解缺失或SQL执行失败时抛出的国际化业务异�?
+   * @param entityClass 实体类型，实体类需要标注 {@code @Table}
+   * @return 总行数
+   * @throws PersistenceException 表注解缺失或SQL执行失败时抛出的国际化业务异常
    */
   public long count(Class<?> entityClass) throws PersistenceException {
     return count(Sql.of("SELECT * FROM " + SqlMetadataUtils.tableName(entityClass)));
   }
 
   /**
-   * 按表统计总数�?
+   * 按表统计总数。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
-   * @return 总行�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
+   * @return 总行数
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public long count(String tableName) throws PersistenceException {
     SqlInjectionGuard.validateTableExpression(tableName, "countTable");
@@ -357,12 +357,12 @@ public class SqlExecutor {
   }
 
   /**
-   * 对指定表字段求和�?
+   * 对指定表字段求和。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
-   * @param columnName 求和字段名或表达�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
+   * @param columnName 求和字段名或表达式
    * @return 求和结果，数据库返回null时保持null
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public BigDecimal sum(String tableName, String columnName) throws PersistenceException {
     SqlInjectionGuard.validateTableExpression(tableName, "aggregateTable");
@@ -371,14 +371,14 @@ public class SqlExecutor {
   }
 
   /**
-   * 对指定表字段求最大值�?
+   * 对指定表字段求最大值。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
    * @param columnName 求最大值字段名或表达式
-   * @param resultType 返回值类�?
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
-   * @return 最大�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 最大值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T max(String tableName, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -388,14 +388,14 @@ public class SqlExecutor {
   }
 
   /**
-   * 对指定表字段求最小值�?
+   * 对指定表字段求最小值。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
    * @param columnName 求最小值字段名或表达式
-   * @param resultType 返回值类�?
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
-   * @return 最小�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 最小值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T min(String tableName, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -405,12 +405,12 @@ public class SqlExecutor {
   }
 
   /**
-   * 对指定表字段求平均值�?
+   * 对指定表字段求平均值。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
    * @param columnName 求平均值字段名或表达式
-   * @return 平均�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 平均值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public BigDecimal avg(String tableName, String columnName) throws PersistenceException {
     SqlInjectionGuard.validateTableExpression(tableName, "aggregateTable");
@@ -419,15 +419,15 @@ public class SqlExecutor {
   }
 
   /**
-   * 执行通用聚合函数�?
+   * 执行通用聚合函数。
    *
-   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可�?
+   * @param tableName 表名，会直接拼接到SQL中，调用方需要保证来源可信
    * @param functionName 聚合函数名，例如 {@code COUNT}、{@code SUM}、{@code MAX}
    * @param columnName 聚合字段名或表达式，例如 {@code "amount"}、{@code "1"}
-   * @param resultType 返回值类�?
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
    * @return 聚合结果
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T aggregate(String tableName, String functionName, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -439,15 +439,15 @@ public class SqlExecutor {
   }
 
   /**
-   * 对SQL查询结果执行聚合函数，适合连表查询后的聚合�?
+   * 对SQL查询结果执行聚合函数，适合连表查询后的聚合。
    *
    * @param sql SQL构造对象，会先构建为子查询
    * @param functionName 聚合函数名，例如 {@code COUNT}、{@code SUM}、{@code MAX}
-   * @param columnName 聚合字段名或表达式，基于子查询别�?{@code t} 的可见字�?
-   * @param resultType 返回值类�?
+   * @param columnName 聚合字段名或表达式，基于子查询别名 {@code t} 的可见字段
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
    * @return 聚合结果
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T aggregate(Sql sql, String functionName, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -460,26 +460,26 @@ public class SqlExecutor {
   }
 
   /**
-   * 对SQL查询结果求和�?
+   * 对SQL查询结果求和。
    *
    * @param sql SQL构造对象，会先构建为子查询
-   * @param columnName 求和字段名或表达�?
+   * @param columnName 求和字段名或表达式
    * @return 求和结果
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public BigDecimal sum(Sql sql, String columnName) throws PersistenceException {
     return aggregate(sql, "SUM", columnName, BigDecimal.class);
   }
 
   /**
-   * 对SQL查询结果求最大值�?
+   * 对SQL查询结果求最大值。
    *
    * @param sql SQL构造对象，会先构建为子查询
    * @param columnName 求最大值字段名或表达式
-   * @param resultType 返回值类�?
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
-   * @return 最大�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 最大值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T max(Sql sql, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -487,14 +487,14 @@ public class SqlExecutor {
   }
 
   /**
-   * 对SQL查询结果求最小值�?
+   * 对SQL查询结果求最小值。
    *
    * @param sql SQL构造对象，会先构建为子查询
    * @param columnName 求最小值字段名或表达式
-   * @param resultType 返回值类�?
+   * @param resultType 返回值类型
    * @param <T> 返回对象类型
-   * @return 最小�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 最小值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public <T> T min(Sql sql, String columnName, Class<T> resultType)
       throws PersistenceException {
@@ -502,21 +502,21 @@ public class SqlExecutor {
   }
 
   /**
-   * 对SQL查询结果求平均值�?
+   * 对SQL查询结果求平均值。
    *
    * @param sql SQL构造对象，会先构建为子查询
    * @param columnName 求平均值字段名或表达式
-   * @return 平均�?
-   * @throws PersistenceException SQL执行失败时抛出的国际化业务异�?
+   * @return 平均值
+   * @throws PersistenceException SQL执行失败时抛出的国际化业务异常
    */
   public BigDecimal avg(Sql sql, String columnName) throws PersistenceException {
     return aggregate(sql, "AVG", columnName, BigDecimal.class);
   }
 
   /**
-   * 转换命名SQL参数�?
+   * 转换命名SQL参数。
    *
-   * @param params 原始命名参数，key为参数名，value为Java参数�?
+   * @param params 原始命名参数，key为参数名，value为Java参数值
    * @return 转换后的JDBC参数，LocalDateTime、Date、枚举、集合等会被统一处理
    */
   private Map<String, Object> convertParams(Map<String, ?> params) {
@@ -531,7 +531,7 @@ public class SqlExecutor {
   }
 
   /**
-   * 转换批量SQL参数�?
+   * 转换批量SQL参数。
    *
    * @param params 原始批量参数数组，每个Map对应一次SQL执行
    * @return 转换后的批量参数数组

@@ -7,10 +7,13 @@ import com.steven.solomon.persistence.sql.param.PersistencePageParam;
 import com.steven.solomon.pojo.enums.OrderByEnum;
 
 /**
- * Lambda 分页参数�? *
- * <p>排序字段和深分页游标字段通过 Getter 方法引用指定，框架会按实体元数据映射为数据库列名�? * 避免前端或业务代码直接传入未校验的排序字段字符串�?/p>
+ * Lambda 分页参数。
  *
- * @param <TModel> Repository 绑定的实体类�? */
+ * <p>排序字段和深分页游标字段通过 Getter 方法引用指定，框架会按实体元数据映射为数据库列名，
+ * 避免前端或业务代码直接传入未校验的排序字段字符串。</p>
+ *
+ * @param <TModel> Repository 绑定的实体类型
+ */
 public class LambdaPageParam<TModel> extends PersistencePageParam {
 
   private static final long serialVersionUID = -1858836854823236919L;
@@ -18,7 +21,8 @@ public class LambdaPageParam<TModel> extends PersistencePageParam {
   private final Repository<TModel> repository;
 
   /**
-   * 构�?Lambda 分页参数�?   *
+   * 构造 Lambda 分页参数。
+   *
    * @param repository 当前仓储
    */
   public LambdaPageParam(Repository<TModel> repository) {
@@ -26,7 +30,8 @@ public class LambdaPageParam<TModel> extends PersistencePageParam {
   }
 
   /**
-   * 创建分页参数�?   *
+   * 创建分页参数。
+   *
    * @param repository 当前仓储
    * @param pageNo 页码
    * @param pageSize 每页条数

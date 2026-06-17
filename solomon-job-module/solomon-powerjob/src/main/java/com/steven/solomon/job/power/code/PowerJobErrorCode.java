@@ -1,4 +1,5 @@
 package com.steven.solomon.job.power.code;
+import com.steven.solomon.code.BaseExceptionCode;
 
 /**
  * PowerJob 模块错误码常量接口。

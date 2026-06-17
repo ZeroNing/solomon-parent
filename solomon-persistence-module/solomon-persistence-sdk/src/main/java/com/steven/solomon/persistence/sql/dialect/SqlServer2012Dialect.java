@@ -1,7 +1,7 @@
 package com.steven.solomon.persistence.sql.dialect;
 
 /**
- * SQL Server 2012及以上分页方言�?
+ * SQL Server 2012及以上分页方言。
  */
 public class SqlServer2012Dialect implements SqlDialect {
 

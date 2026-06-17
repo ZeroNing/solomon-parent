@@ -31,18 +31,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
- * 持久化动态数据源自动配置�? */
+ * 持久化动态数据源自动配置。
+ */
 @AutoConfiguration
 @EnableConfigurationProperties(PersistenceProperties.class)
 @ConditionalOnProperty(prefix = "persistence", name = "enabled", havingValue = "true",
     matchIfMissing = true)
-@AutoConfigureBefore(org.springframework.boot.autoconfigure.jdbc.PersistenceAutoConfiguration.class)
+@AutoConfigureBefore(org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class)
 public class PersistenceAutoConfiguration {
 
   private static final Logger log = LoggerFactory.getLogger(PersistenceAutoConfiguration.class);
 
   /**
-   * 创建动态数据源工厂�?
+   * 创建动态数据源工厂。
    *
    * @return 动态数据源工厂
    */
@@ -53,7 +54,7 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建数据源租户上下文�?
+   * 创建数据源租户上下文。
    *
    * @return 数据源租户上下文
    */
@@ -64,11 +65,11 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建数据源租户切面�?
+   * 创建数据源租户切面。
    *
    * @param context 数据源租户上下文
    * @param properties 动态数据源配置
-   * @return 数据源租户切�?
+   * @return 数据源租户切面
    */
   @Bean
   @ConditionalOnMissingBean
@@ -79,18 +80,19 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 将网关透传的租户编码绑定到当前请求的数据源上下文�?   */
+   * 将网关透传的租户编码绑定到当前请求的数据源上下文。
+   */
   @Bean
   public TenantRequestBinder dataSourceTenantRequestBinder(DataSourceTenantContext context) {
     return new DataSourceTenantRequestBinder(context);
   }
 
   /**
-   * 创建SQL类型转换器注册器�?
+   * 创建SQL类型转换器注册器。
    *
-   * <p>默认注册器内置常见时间、数字、枚举等类型转换；业务模块可以声�?
+   * <p>默认注册器内置常见时间、数字、枚举等类型转换；业务模块可以声明
    * {@link SqlTypeConverterCustomizer} Bean，通过 {@code registry.addConverter(...)}
-   * 追加自定义转换器�?/p>
+   * 追加自定义转换器。</p>
    *
    * @param customizers 业务侧提供的转换器自定义回调集合
    * @return SQL类型转换器注册器
@@ -109,12 +111,12 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建SQL执行器�?
+   * 创建SQL执行器。
    *
    * @param jdbcTemplate Spring命名参数JDBC模板
    * @param properties 动态数据源配置
    * @param context 数据源租户上下文
-   * @return SQL执行�?
+   * @return SQL执行器
    */
   @Bean
   @ConditionalOnMissingBean
@@ -127,7 +129,7 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建SQL脚本执行工具�?
+   * 创建SQL脚本执行工具。
    *
    * @param jdbcTemplate Spring命名参数JDBC模板
    * @param properties 动态数据源配置
@@ -144,12 +146,12 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建数据源租户运行时管理器�?
+   * 创建数据源租户运行时管理器。
    *
    * @param properties 动态数据源配置
-   * @param factory 数据源工�?
+   * @param factory 数据源工厂
    * @param context 数据源租户上下文
-   * @return 数据源租户运行时管理�?
+   * @return 数据源租户运行时管理器
    */
   @Bean
   @ConditionalOnMissingBean
@@ -161,10 +163,10 @@ public class PersistenceAutoConfiguration {
   }
 
   /**
-   * 创建Spring主数据源�?
+   * 创建Spring主数据源。
    *
    * @param properties 动态数据源配置，包含所有租户数据源
-   * @param factory 数据源工厂，用于创建Hikari或Druid连接�?
+   * @param factory 数据源工厂，用于创建Hikari或Druid连接池
    * @param context 数据源租户上下文，用于注册租户数据源
    * @return 动态路由数据源
    * @throws PersistenceException 配置缺失或数据源初始化失败时抛出
@@ -196,7 +198,7 @@ public class PersistenceAutoConfiguration {
         if (tenantCode.equals(defaultTenant)) {
           defaultTargetDataSource = dataSource;
         }
-        log.info("[DataSource] 注册租户数据源成�? tenant={}", tenantCode);
+        log.info("[DataSource] 注册租户数据源成功: tenant={}", tenantCode);
       } catch (PersistenceException e) {
         throw e;
       } catch (Exception e) {

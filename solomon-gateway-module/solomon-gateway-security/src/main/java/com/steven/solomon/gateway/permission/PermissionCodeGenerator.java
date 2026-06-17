@@ -50,7 +50,7 @@ public final class PermissionCodeGenerator {
                 continue;
             }
             // 路径变量 {id} -> ID
-            String cleaned = StrUtil.removeAll(segment, "{", "}");
+            String cleaned = segment.replace("{", "").replace("}", "");
             if (StrUtil.isBlank(cleaned)) {
                 continue;
             }

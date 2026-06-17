@@ -5,8 +5,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * SQL 结果映射元数据�? *
- * <p>缓存结果类型的无参构造器和字段映射表，避免每次创建行映射器都重复反射扫描�?/p>
+ * SQL 结果映射元数据。
+ *
+ * <p>缓存结果类型的无参构造器和字段映射表，避免每次创建行映射器都重复反射扫描。</p>
  */
 class SqlResultMetadata<T> {
 

@@ -20,9 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
-import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 /**
  * 权限扫描器。
@@ -148,17 +145,23 @@ public class PermissionScanner {
      */
     private void addSimpleMapping(Method method, Class<?> annotationType, String httpMethod,
                                   String basePath, List<PathMethod> result) {
-        Object annotation = AnnotationUtils.findAnnotation(method, annotationType);
-        if (annotation == null) {
-            return;
+        Object annotation = null;
+        for (java.lang.annotation.Annotation a : method.getAnnotations()) {
+            if (a.annotationType() == annotationType) { annotation = a; break; }
         }
-        String[] values = (String[]) AnnotationUtils.getValue(annotation);
-        if (values == null || values.length == 0) {
-            result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
-        } else {
-            for (String path : values) {
-                result.add(new PathMethod(joinPath(basePath, path), httpMethod));
+        if (annotation == null) { return; }
+        try {
+            java.lang.reflect.Method valueMethod = annotation.getClass().getMethod("value");
+            String[] values = (String[]) valueMethod.invoke(annotation);
+            if (values == null || values.length == 0) {
+                result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
+            } else {
+                for (String path : values) {
+                    result.add(new PathMethod(joinPath(basePath, path), httpMethod));
+                }
             }
+        } catch (Exception e) {
+            result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
         }
     }
 

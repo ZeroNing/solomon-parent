@@ -118,19 +118,34 @@ public class PermissionScanner {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     private void addSimpleMapping(Method method, Class<?> annotationType, String httpMethod,
                                   String basePath, List<PathMethod> result) {
-        Object annotation = AnnotationUtils.findAnnotation(method, annotationType);
+        // 用 Java 原生反射获取注解，避免 Spring AnnotationUtils 的泛型约束问题
+        Object annotation = null;
+        for (java.lang.annotation.Annotation a : method.getAnnotations()) {
+            if (a.annotationType() == annotationType) {
+                annotation = a;
+                break;
+            }
+        }
         if (annotation == null) {
             return;
         }
-        String[] values = (String[]) AnnotationUtils.getValue(annotation);
-        if (values == null || values.length == 0) {
-            result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
-        } else {
-            for (String path : values) {
-                result.add(new PathMethod(joinPath(basePath, path), httpMethod));
+        // 通过反射调用注解的 value() 方法获取路径
+        try {
+            java.lang.reflect.Method valueMethod = annotation.getClass().getMethod("value");
+            String[] values = (String[]) valueMethod.invoke(annotation);
+            if (values == null || values.length == 0) {
+                result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
+            } else {
+                for (String path : values) {
+                    result.add(new PathMethod(joinPath(basePath, path), httpMethod));
+                }
             }
+        } catch (Exception e) {
+            // 注解没有 value() 方法时，按空路径处理
+            result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
         }
     }
 

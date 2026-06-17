@@ -1,7 +1,8 @@
 package com.steven.solomon.persistence.properties;
 
 /**
- * Druid 连接池配置�? */
+ * Druid 连接池配置。
+ */
 public class DruidPoolProperties {
 
   private Integer initialSize;

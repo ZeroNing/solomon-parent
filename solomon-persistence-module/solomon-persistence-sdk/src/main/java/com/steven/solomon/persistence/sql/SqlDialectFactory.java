@@ -16,11 +16,11 @@ import java.util.EnumMap;
 import java.util.Map;
 
 /**
- * SQL 方言工厂�?
+ * SQL 方言工厂。
  *
- * <p>所有数据库分页方言统一在这里注册。新增数据库时优先复用标准方言�?
- * MySQL 协议族使�?LIMIT/OFFSET，PostgreSQL 协议族使�?LIMIT/OFFSET�?
- * SQL:2008 协议族使�?OFFSET/FETCH�?/p>
+ * <p>所有数据库分页方言统一在这里注册。新增数据库时优先复用标准方言：
+ * MySQL 协议族使用 LIMIT/OFFSET，PostgreSQL 协议族使用 LIMIT/OFFSET，
+ * SQL:2008 协议族使用 OFFSET/FETCH。</p>
  */
 public final class SqlDialectFactory {
 
@@ -64,7 +64,7 @@ public final class SqlDialectFactory {
   }
 
   /**
-   * 根据数据库类型获�?SQL 方言�?
+   * 根据数据库类型获取 SQL 方言。
    *
    * @param databaseType 数据库类型；为空或未知时默认使用 MySQL 方言
    * @return SQL 方言实现
@@ -74,10 +74,10 @@ public final class SqlDialectFactory {
   }
 
   /**
-   * 根据数据库类型和 SQL Server 版本获取 SQL 方言�?
+   * 根据数据库类型和 SQL Server 版本获取 SQL 方言。
    *
    * @param databaseType 数据库类型；为空或未知时默认使用 MySQL 方言
-   * @param sqlServerVersion SQL Server 版本，仅 databaseType �?SQL_SERVER 时生�?
+   * @param sqlServerVersion SQL Server 版本，仅 databaseType 为 SQL_SERVER 时生效
    * @return SQL 方言实现
    */
   public static SqlDialect getDialect(

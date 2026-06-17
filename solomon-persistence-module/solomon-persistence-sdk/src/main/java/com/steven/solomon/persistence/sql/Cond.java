@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * SQL条件对象�?
+ * SQL条件对象。
  *
- * <p>所有field参数都表示数据库字段名或SQL表达式，例如 {@code "u.id"}、{@code "COUNT(1)"}�?
- * value参数会自动绑定成命名参数；isRequired为false时，空值条件会被忽略并返回null�?/p>
+ * <p>所有field参数都表示数据库字段名或SQL表达式，例如 {@code "u.id"}、{@code "COUNT(1)"}；
+ * value参数会自动绑定成命名参数；isRequired为false时，空值条件会被忽略并返回null。</p>
  */
 public class Cond {
 
@@ -30,10 +30,10 @@ public class Cond {
   }
 
   /**
-   * 创建等于条件�?
+   * 创建等于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -42,10 +42,10 @@ public class Cond {
   }
 
   /**
-   * 创建等于条件，空值时忽略�?
+   * 创建等于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond eq(String field, Object value) {
@@ -87,10 +87,10 @@ public class Cond {
   }
 
   /**
-   * 创建不等于条件�?
+   * 创建不等于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -99,10 +99,10 @@ public class Cond {
   }
 
   /**
-   * 创建不等于条件，空值时忽略�?
+   * 创建不等于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond ne(String field, Object value) {
@@ -134,10 +134,10 @@ public class Cond {
   }
 
   /**
-   * 创建大于条件�?
+   * 创建大于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -146,10 +146,10 @@ public class Cond {
   }
 
   /**
-   * 创建大于条件，空值时忽略�?
+   * 创建大于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond gt(String field, Object value) {
@@ -165,10 +165,10 @@ public class Cond {
   }
 
   /**
-   * 创建大于等于条件�?
+   * 创建大于等于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -177,10 +177,10 @@ public class Cond {
   }
 
   /**
-   * 创建大于等于条件，空值时忽略�?
+   * 创建大于等于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond ge(String field, Object value) {
@@ -196,10 +196,10 @@ public class Cond {
   }
 
   /**
-   * 创建小于条件�?
+   * 创建小于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -208,10 +208,10 @@ public class Cond {
   }
 
   /**
-   * 创建小于条件，空值时忽略�?
+   * 创建小于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond lt(String field, Object value) {
@@ -227,10 +227,10 @@ public class Cond {
   }
 
   /**
-   * 创建小于等于条件�?
+   * 创建小于等于条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -239,10 +239,10 @@ public class Cond {
   }
 
   /**
-   * 创建小于等于条件，空值时忽略�?
+   * 创建小于等于条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value 条件�?
+   * @param field 字段名或SQL表达式
+   * @param value 条件值
    * @return 条件对象，可能为null
    */
   public static Cond le(String field, Object value) {
@@ -258,10 +258,10 @@ public class Cond {
   }
 
   /**
-   * 创建LIKE条件�?
+   * 创建LIKE条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value LIKE匹配值；调用方自行决定是否携�?{@code %}
+   * @param field 字段名或SQL表达式
+   * @param value LIKE匹配值；调用方自行决定是否携带 {@code %}
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -270,10 +270,10 @@ public class Cond {
   }
 
   /**
-   * 创建LIKE条件，空值时忽略�?
+   * 创建LIKE条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value LIKE匹配值；调用方自行决定是否携�?{@code %}
+   * @param field 字段名或SQL表达式
+   * @param value LIKE匹配值；调用方自行决定是否携带 {@code %}
    * @return 条件对象，可能为null
    */
   public static Cond like(String field, Object value) {
@@ -289,10 +289,10 @@ public class Cond {
   }
 
   /**
-   * 创建NOT LIKE条件�?
+   * 创建NOT LIKE条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value NOT LIKE匹配值；调用方自行决定是否携�?{@code %}
+   * @param field 字段名或SQL表达式
+   * @param value NOT LIKE匹配值；调用方自行决定是否携带 {@code %}
    * @param isRequired 是否强制生成条件；false时空值返回null
    * @return 条件对象，可能为null
    */
@@ -301,10 +301,10 @@ public class Cond {
   }
 
   /**
-   * 创建NOT LIKE条件，空值时忽略�?
+   * 创建NOT LIKE条件，空值时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param value NOT LIKE匹配值；调用方自行决定是否携�?{@code %}
+   * @param field 字段名或SQL表达式
+   * @param value NOT LIKE匹配值；调用方自行决定是否携带 {@code %}
    * @return 条件对象，可能为null
    */
   public static Cond notLike(String field, Object value) {
@@ -320,9 +320,9 @@ public class Cond {
   }
 
   /**
-   * 创建IN条件�?
+   * 创建IN条件。
    *
-   * @param field 字段名或SQL表达�?
+   * @param field 字段名或SQL表达式
    * @param values IN集合值，会由NamedParameterJdbcTemplate展开
    * @param isRequired 是否强制生成条件；false时空集合返回null
    * @return 条件对象，可能为null
@@ -332,10 +332,10 @@ public class Cond {
   }
 
   /**
-   * 创建IN条件，空集合时忽略�?
+   * 创建IN条件，空集合时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param values IN集合�?
+   * @param field 字段名或SQL表达式
+   * @param values IN集合值
    * @return 条件对象，可能为null
    */
   public static Cond in(String field, Collection<?> values) {
@@ -351,9 +351,9 @@ public class Cond {
   }
 
   /**
-   * 创建NOT IN条件�?
+   * 创建NOT IN条件。
    *
-   * @param field 字段名或SQL表达�?
+   * @param field 字段名或SQL表达式
    * @param values NOT IN集合值，会由NamedParameterJdbcTemplate展开
    * @param isRequired 是否强制生成条件；false时空集合返回null
    * @return 条件对象，可能为null
@@ -363,10 +363,10 @@ public class Cond {
   }
 
   /**
-   * 创建NOT IN条件，空集合时忽略�?
+   * 创建NOT IN条件，空集合时忽略。
    *
-   * @param field 字段名或SQL表达�?
-   * @param values NOT IN集合�?
+   * @param field 字段名或SQL表达式
+   * @param values NOT IN集合值
    * @return 条件对象，可能为null
    */
   public static Cond notIn(String field, Collection<?> values) {
@@ -382,9 +382,9 @@ public class Cond {
   }
 
   /**
-   * 创建EXISTS条件�?
+   * 创建EXISTS条件。
    *
-   * @param sql 子查询SQL，不需要包含外层括�?
+   * @param sql 子查询SQL，不需要包含外层括号
    * @return 条件对象，可能为null
    */
   public static Cond exists(String sql) {
@@ -393,9 +393,9 @@ public class Cond {
   }
 
   /**
-   * 创建NOT EXISTS条件�?
+   * 创建NOT EXISTS条件。
    *
-   * @param sql 子查询SQL，不需要包含外层括�?
+   * @param sql 子查询SQL，不需要包含外层括号
    * @return 条件对象，可能为null
    */
   public static Cond notExists(String sql) {
@@ -404,9 +404,9 @@ public class Cond {
   }
 
   /**
-   * 创建原始SQL条件�?
+   * 创建原始SQL条件。
    *
-   * @param text 条件SQL片段，不包含WHERE/AND/OR关键�?
+   * @param text 条件SQL片段，不包含WHERE/AND/OR关键字
    * @return 条件对象，可能为null
    */
   public static Cond raw(String text) {
@@ -418,10 +418,10 @@ public class Cond {
   }
 
   /**
-   * 创建带命名参数的原始SQL条件�?
+   * 创建带命名参数的原始SQL条件。
    *
-   * @param text 条件SQL片段，参数使�?{@code :paramName}
-   * @param params 命名参数集合；key为不带冒号的参数�?
+   * @param text 条件SQL片段，参数使用 {@code :paramName}
+   * @param params 命名参数集合；key为不带冒号的参数名
    * @return 条件对象，可能为null
    */
   public static Cond raw(String text, Map<String, Object> params) {
@@ -434,11 +434,11 @@ public class Cond {
   }
 
   /**
-   * 创建BETWEEN条件�?
+   * 创建BETWEEN条件。
    *
-   * @param field 字段名或SQL表达�?
-   * @param start 起始值；为空且end不为空时自动降级为小于等于条�?
-   * @param end 结束值；为空且start不为空时自动降级为大于等于条�?
+   * @param field 字段名或SQL表达式
+   * @param start 起始值；为空且end不为空时自动降级为小于等于条件
+   * @param end 结束值；为空且start不为空时自动降级为大于等于条件
    * @return 条件对象，start和end都为空时返回null
    */
   public static Cond between(String field, Object start, Object end) {
@@ -473,9 +473,9 @@ public class Cond {
   }
 
   /**
-   * 创建IS NULL条件�?
+   * 创建IS NULL条件。
    *
-   * @param field 字段名或SQL表达�?
+   * @param field 字段名或SQL表达式
    * @return 条件对象
    */
   public static Cond isNull(String field) {
@@ -492,9 +492,9 @@ public class Cond {
   }
 
   /**
-   * 创建IS NOT NULL条件�?
+   * 创建IS NOT NULL条件。
    *
-   * @param field 字段名或SQL表达�?
+   * @param field 字段名或SQL表达式
    * @return 条件对象
    */
   public static Cond isNotNull(String field) {
@@ -511,7 +511,7 @@ public class Cond {
   }
 
   /**
-   * 和另一个条件组合为AND条件�?
+   * 和另一个条件组合为AND条件。
    *
    * @param cond 需要组合的条件；为空时返回当前条件
    * @return 组合后的条件对象
@@ -521,7 +521,7 @@ public class Cond {
   }
 
   /**
-   * 和另一个条件组合为OR条件�?
+   * 和另一个条件组合为OR条件。
    *
    * @param cond 需要组合的条件；为空时返回当前条件
    * @return 组合后的条件对象
@@ -531,7 +531,7 @@ public class Cond {
   }
 
   /**
-   * 获取条件SQL片段�?
+   * 获取条件SQL片段。
    *
    * @return 条件SQL片段
    */
@@ -540,7 +540,7 @@ public class Cond {
   }
 
   /**
-   * 获取条件绑定的命名参数�?
+   * 获取条件绑定的命名参数。
    *
    * @return 命名参数集合
    */

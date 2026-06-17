@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * SQL元数据工具�?
+ * SQL元数据工具。
  */
 public class SqlMetadataUtils {
 
@@ -26,11 +26,11 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * 解析实体对应的表名�?
+   * 解析实体对应的表名。
    *
-   * @param entityClass 实体类型，必须标�?{@link Table}
-   * @return 数据库表�?
-   * @throws PersistenceException 未标注表注解时抛�?
+   * @param entityClass 实体类型，必须标注 {@link Table}
+   * @return 数据库表名
+   * @throws PersistenceException 未标注表注解时抛出
    */
   public static String tableName(Class<?> entityClass) throws PersistenceException {
     String tableName = metadata(entityClass).getTableName();
@@ -42,13 +42,13 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * 解析实体主键列名�?
+   * 解析实体主键列名。
    *
-   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上�?{@link Column#value()}�?
-   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}�?/p>
+   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上的 {@link Column#value()}，
+   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}。</p>
    *
-   * @param entityClass 实体类型，必须存�?{@link PrimaryKey} 字段
-   * @return 数据库主键列�?
+   * @param entityClass 实体类型，必须存在 {@link PrimaryKey} 字段
+   * @return 数据库主键列名
    * @throws PersistenceException 未找到主键注解时抛出
    */
   public static String primaryKeyName(Class<?> entityClass) throws PersistenceException {
@@ -56,12 +56,12 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * 解析实体主键字段元数据�?
+   * 解析实体主键字段元数据。
    *
-   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上�?{@link Column#value()}�?
-   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}�?/p>
+   * <p>{@link PrimaryKey} 只负责标记主键，列名优先使用同字段上的 {@link Column#value()}，
+   * 未填写列名时使用Java字段名的下划线格式，例如 {@code userId -> user_id}。</p>
    *
-   * @param entityClass 实体类型，必须存�?{@link PrimaryKey} 字段
+   * @param entityClass 实体类型，必须存在 {@link PrimaryKey} 字段
    * @return 主键字段映射信息
    * @throws PersistenceException 未找到主键注解时抛出
    */
@@ -75,11 +75,11 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * 解析实体可插入字段�?
+   * 解析实体可插入字段。
    *
    * @param entityClass 实体类型
-   * @return 可插入字段映射列�?
-   * @throws PersistenceException 未找到可插入字段时抛�?
+   * @return 可插入字段映射列表
+   * @throws PersistenceException 未找到可插入字段时抛出
    */
   public static List<ColumnField> insertFields(Class<?> entityClass) throws PersistenceException {
     List<ColumnField> fields = columnFields(entityClass, null, true);
@@ -91,12 +91,12 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * 解析实体可更新字段�?
+   * 解析实体可更新字段。
    *
    * @param entityClass 实体类型
    * @param includeFields 指定更新字段；支持Java字段名或数据库列名，空时返回所有可更新字段
-   * @return 可更新字段映射列表，不包含主键字�?
-   * @throws PersistenceException 未找到可更新字段时抛�?
+   * @return 可更新字段映射列表，不包含主键字段
+   * @throws PersistenceException 未找到可更新字段时抛出
    */
   public static List<ColumnField> updateFields(Class<?> entityClass, String... includeFields)
       throws PersistenceException {
@@ -109,10 +109,13 @@ public class SqlMetadataUtils {
   }
 
   /**
-   * �?Java 字段名解析为数据库列名�?   *
+   * 将 Java 字段名解析为数据库列名。
+   *
    * @param entityClass 实体类型
    * @param fieldName Java 字段名，也允许传入数据库列名
-   * @return 数据库列�?   * @throws PersistenceException 字段未在实体元数据中声明时抛�?   */
+   * @return 数据库列名
+   * @throws PersistenceException 字段未在实体元数据中声明时抛出
+   */
   public static String columnName(Class<?> entityClass, String fieldName)
       throws PersistenceException {
     if (StrUtil.isBlank(fieldName)) {

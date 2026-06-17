@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
 import com.steven.solomon.annotation.JobTask;
+import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.job.power.config.PowerJobCondition;
 import com.steven.solomon.job.power.entity.PowerJobRequestFactory;
 import com.steven.solomon.enums.JobRegisterFailureStrategy;

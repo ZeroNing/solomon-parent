@@ -1,9 +1,9 @@
 package com.steven.solomon.persistence.sql.dialect;
 
 /**
- * SQL Server 2005/2008分页方言�?
+ * SQL Server 2005/2008分页方言。
  *
- * <p>老版本不支持OFFSET FETCH，使用ROW_NUMBER包装查询�?/p>
+ * <p>老版本不支持OFFSET FETCH，使用ROW_NUMBER包装查询。</p>
  */
 public class SqlServerDialect implements SqlDialect {
 

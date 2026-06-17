@@ -9,8 +9,9 @@ import com.steven.solomon.persistence.exception.PersistenceException;
 import java.lang.reflect.Field;
 
 /**
- * 实体 SQL 元数据工具�? *
- * <p>集中处理实体表名、表别名和字段名解析，避�?Lambda 条件、JOIN 构建器重复写反射逻辑�?/p>
+ * 实体 SQL 元数据工具。
+ *
+ * <p>集中处理实体表名、表别名和字段名解析，避免 Lambda 条件、JOIN 构建器重复写反射逻辑。</p>
  */
 final class SqlLambdaMetadata {
 
@@ -18,9 +19,10 @@ final class SqlLambdaMetadata {
   }
 
   /**
-   * 解析实体表名�?   *
+   * 解析实体表名。
+   *
    * @param entityClass 实体类型
-   * @return 表名；优先读�?{@link Table}，未配置时使用类名下划线形式
+   * @return 表名；优先读取 {@link Table}，未配置时使用类名下划线形式
    */
   static String tableName(Class<?> entityClass) {
     if (ObjectUtil.isEmpty(entityClass)) {
@@ -38,19 +40,25 @@ final class SqlLambdaMetadata {
   }
 
   /**
-   * 使用实体表名生成默认别名�?   *
-   * <p>例如 {@code demo_user -> demoUser}、{@code sys_order_item -> sysOrderItem}�?/p>
+   * 使用实体表名生成默认别名。
+   *
+   * <p>例如 {@code demo_user -> demoUser}、{@code sys_order_item -> sysOrderItem}。</p>
    *
    * @param entityClass 实体类型
-   * @return 默认表别�?   */
+   * @return 默认表别名
+   */
   static String tableAlias(Class<?> entityClass) {
     return SqlInjectionGuard.validateIdentifier(underlineToCamel(tableName(entityClass)),
         "entityAlias");
   }
 
   /**
-   * 解析实体字段对应的数据库列名�?   *
-   * @param owner 字段所属实体类�?   * @param fieldName Java 字段�?   * @return 数据库列�?   */
+   * 解析实体字段对应的数据库列名。
+   *
+   * @param owner 字段所属实体类型
+   * @param fieldName Java 字段名
+   * @return 数据库列名
+   */
   static String columnName(Class<?> owner, String fieldName) {
     Field field = findField(owner, fieldName);
     Column column = field.getAnnotation(Column.class);
@@ -61,8 +69,11 @@ final class SqlLambdaMetadata {
   }
 
   /**
-   * 解析带默认表别名的数据库列名�?   *
-   * @param owner 字段所属实体类�?   * @param fieldName Java 字段�?   * @return 默认别名加列名，例如 {@code demoUser.id}
+   * 解析带默认表别名的数据库列名。
+   *
+   * @param owner 字段所属实体类型
+   * @param fieldName Java 字段名
+   * @return 默认别名加列名，例如 {@code demoUser.id}
    */
   static String qualifiedColumnName(Class<?> owner, String fieldName) {
     return tableAlias(owner) + "." + columnName(owner, fieldName);

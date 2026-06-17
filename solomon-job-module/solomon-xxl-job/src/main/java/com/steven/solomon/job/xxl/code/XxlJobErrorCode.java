@@ -1,4 +1,5 @@
 package com.steven.solomon.job.xxl.code;
+import com.steven.solomon.code.BaseExceptionCode;
 
 /**
  * XXL-JOB 模块错误码常量接口。

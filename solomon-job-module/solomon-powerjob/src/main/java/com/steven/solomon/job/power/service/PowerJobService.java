@@ -21,6 +21,8 @@ import com.steven.solomon.job.power.entity.PowerJobRequestFactory;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.job.power.properties.PowerJobRegisterProperties;
+import com.steven.solomon.service.JobService;
+import com.steven.solomon.service.JobLogSanitizer;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -35,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.steven.solomon.code.PowerJobErrorCode.*;
+import static com.steven.solomon.job.power.code.PowerJobErrorCode.*;
 
 /**
  * PowerJob 管理端 API 服务实现。

@@ -5,8 +5,9 @@ import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * 持久化模块配置�? *
- * <p>单租户与多租户共用一套模型：单租户仅配置一个默认租户，多租户按租户编码配置多个数据源�?/p>
+ * 持久化模块配置。
+ *
+ * <p>单租户与多租户共用一套模型：单租户仅配置一个默认租户，多租户按租户编码配置多个数据源。</p>
  */
 @ConfigurationProperties(prefix = "persistence")
 public class PersistenceProperties {

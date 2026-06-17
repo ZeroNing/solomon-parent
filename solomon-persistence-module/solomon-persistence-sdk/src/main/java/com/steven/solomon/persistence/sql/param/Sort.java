@@ -7,7 +7,8 @@ import com.steven.solomon.pojo.enums.OrderByEnum;
 import java.io.Serializable;
 
 /**
- * 分页排序字段�? */
+ * 分页排序字段。
+ */
 public class Sort implements Serializable {
 
   private static final long serialVersionUID = -8296450573572322078L;

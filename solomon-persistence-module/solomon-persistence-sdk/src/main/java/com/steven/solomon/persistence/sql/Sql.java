@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * SQL语句对象�?
+ * SQL语句对象。
  *
- * <p>同时支持手写SQL和结构化构建SQL。手写SQL适合复杂报表或历史代码，结构化构建SQL适合常规查询�?
- * 所有值参数都会进入命名参数集合，表名、字段名、排序、分组等不能参数化的位置会经�?
- * {@link SqlInjectionGuard} 白名单校验�?/p>
+ * <p>同时支持手写SQL和结构化构建SQL。手写SQL适合复杂报表或历史代码，结构化构建SQL适合常规查询。
+ * 所有值参数都会进入命名参数集合，表名、字段名、排序、分组等不能参数化的位置会经过
+ * {@link SqlInjectionGuard} 白名单校验。</p>
  */
 public class Sql {
 
@@ -50,16 +50,16 @@ public class Sql {
   private JoinSegment lastJoin;
 
   /**
-   * 创建空SQL对象�?
+   * 创建空SQL对象。
    */
   public Sql() {
     this.text = new StringBuilder();
   }
 
   /**
-   * 创建手写SQL对象�?
+   * 创建手写SQL对象。
    *
-   * @param text SQL文本；为空时按空字符串处�?
+   * @param text SQL文本；为空时按空字符串处理
    */
   public Sql(String text) {
     SqlInjectionGuard.validateRawSql(text, "sqlText");
@@ -67,10 +67,10 @@ public class Sql {
   }
 
   /**
-   * 创建命名参数SQL对象�?
+   * 创建命名参数SQL对象。
    *
    * @param text SQL文本，参数占位符使用 {@code :paramName}
-   * @param params 命名参数集合，key为不带冒号的参数名，value为参数�?
+   * @param params 命名参数集合，key为不带冒号的参数名，value为参数值
    */
   public Sql(String text, Map<String, Object> params) {
     this(text);
@@ -80,10 +80,10 @@ public class Sql {
   }
 
   /**
-   * 创建兼容问号占位符的SQL对象�?
+   * 创建兼容问号占位符的SQL对象。
    *
-   * @param text SQL文本，支�?{@code ?} 占位�?
-   * @param params 按顺序绑定的参数集合，会转换�?{@code :p1}、{@code :p2}
+   * @param text SQL文本，支持 {@code ?} 占位符
+   * @param params 按顺序绑定的参数集合，会转换为 {@code :p1}、{@code :p2}
    */
   public Sql(String text, Collection<?> params) {
     SqlInjectionGuard.validateRawSql(text, "sqlText");
@@ -126,7 +126,7 @@ public class Sql {
   }
 
   /**
-   * 创建SQL对象，保留历史项目中 {@code Sql.New(...)} 的写法�?
+   * 创建SQL对象，保留历史项目中 {@code Sql.New(...)} 的写法。
    *
    * @param text SQL文本
    * @return SQL对象
@@ -136,7 +136,7 @@ public class Sql {
   }
 
   /**
-   * 创建手写SQL对象�?
+   * 创建手写SQL对象。
    *
    * @param text SQL文本
    * @return SQL对象
@@ -146,7 +146,7 @@ public class Sql {
   }
 
   /**
-   * 创建命名参数SQL对象�?
+   * 创建命名参数SQL对象。
    *
    * @param text SQL文本，参数占位符使用 {@code :paramName}
    * @param params 命名参数集合
@@ -157,9 +157,9 @@ public class Sql {
   }
 
   /**
-   * 创建SELECT构建器�?
+   * 创建SELECT构建器。
    *
-   * @param columns 查询字段表达式；为空时最终生�?{@code SELECT *}
+   * @param columns 查询字段表达式；为空时最终生成 {@code SELECT *}
    * @return SQL对象
    */
   public static Sql select(String... columns) {
@@ -169,19 +169,19 @@ public class Sql {
   }
 
   /**
-   * 复制当前SQL对象�?
+   * 复制当前SQL对象。
    *
-   * @return 独立副本；修改副本不会影响当前对�?
+   * @return 独立副本；修改副本不会影响当前对象
    */
   public Sql copy() {
     return new Sql(this);
   }
 
   /**
-   * 复制当前SQL并清除结构化构建器中的ORDER BY�?
+   * 复制当前SQL并清除结构化构建器中的ORDER BY。
    *
-   * <p>主要用于分页统计总数，避免数据库在子查询COUNT时执行无意义排序。手写SQL无法可靠解析�?
-   * 因此只处理结构化构建模式中的排序字段�?/p>
+   * <p>主要用于分页统计总数，避免数据库在子查询COUNT时执行无意义排序。手写SQL无法可靠解析，
+   * 因此只处理结构化构建模式中的排序字段。</p>
    *
    * @return 清除排序后的SQL副本
    */
@@ -192,7 +192,7 @@ public class Sql {
   }
 
   /**
-   * 拼接SQL片段�?
+   * 拼接SQL片段。
    *
    * @param sql SQL片段，会按原样追加，不自动补空格
    * @return 当前SQL对象
@@ -204,7 +204,7 @@ public class Sql {
   }
 
   /**
-   * 拼接SQL片段并追加换行�?
+   * 拼接SQL片段并追加换行。
    *
    * @param sql SQL片段
    * @return 当前SQL对象
@@ -216,7 +216,7 @@ public class Sql {
   }
 
   /**
-   * 开启DISTINCT去重查询�?
+   * 开启DISTINCT去重查询。
    *
    * @return 当前SQL对象
    */
@@ -227,7 +227,7 @@ public class Sql {
   }
 
   /**
-   * 追加单个查询字段�?
+   * 追加单个查询字段。
    *
    * @param column 查询字段表达式，例如 {@code "u.id"}、{@code "COUNT(1) AS total"}
    * @return 当前SQL对象
@@ -242,9 +242,9 @@ public class Sql {
   }
 
   /**
-   * 批量追加查询字段�?
+   * 批量追加查询字段。
    *
-   * @param columns 查询字段表达式数�?
+   * @param columns 查询字段表达式数组
    * @return 当前SQL对象
    */
   public Sql columns(String... columns) {
@@ -257,7 +257,7 @@ public class Sql {
   }
 
   /**
-   * 设置主表�?
+   * 设置主表。
    *
    * @param table 表名或子查询表表达式
    * @return 当前SQL对象
@@ -270,7 +270,7 @@ public class Sql {
   }
 
   /**
-   * 设置主表和表别名�?
+   * 设置主表和表别名。
    *
    * @param table 表名或子查询表表达式
    * @param alias 表别名；为空时不拼接别名
@@ -286,8 +286,9 @@ public class Sql {
   }
 
   /**
-   * 设置主表，并使用实体表名的驼峰形式作为默认别名�?   *
-   * <p>例如实体表名 {@code demo_user} 会生�?{@code FROM demo_user demoUser}�?/p>
+   * 设置主表，并使用实体表名的驼峰形式作为默认别名。
+   *
+   * <p>例如实体表名 {@code demo_user} 会生成 {@code FROM demo_user demoUser}。</p>
    *
    * @param entityClass 实体类型
    * @return 当前SQL对象
@@ -297,11 +298,11 @@ public class Sql {
   }
 
   /**
-   * 追加INNER JOIN�?
+   * 追加INNER JOIN。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
-   * @param on ON条件表达�?
+   * @param on ON条件表达式
    * @return 当前SQL对象
    */
   public Sql join(String table, String alias, String on) {
@@ -309,16 +310,18 @@ public class Sql {
   }
 
   /**
-   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名�?   *
+   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
    * @param entityClass 关联实体类型
-   * @param on ON条件表达�?   * @return 当前SQL对象
+   * @param on ON条件表达式
+   * @return 当前SQL对象
    */
   public Sql join(Class<?> entityClass, String on) {
     return join(entityClass).on(on);
   }
 
   /**
-   * 追加INNER JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件�?
+   * 追加INNER JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
@@ -329,7 +332,8 @@ public class Sql {
   }
 
   /**
-   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名�?   *
+   * 追加INNER JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
    * @param entityClass 关联实体类型
    * @return 当前SQL对象
    */
@@ -338,11 +342,11 @@ public class Sql {
   }
 
   /**
-   * 追加LEFT JOIN�?
+   * 追加LEFT JOIN。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
-   * @param on ON条件表达�?
+   * @param on ON条件表达式
    * @return 当前SQL对象
    */
   public Sql leftJoin(String table, String alias, String on) {
@@ -350,16 +354,18 @@ public class Sql {
   }
 
   /**
-   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名�?   *
+   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
    * @param entityClass 关联实体类型
-   * @param on ON条件表达�?   * @return 当前SQL对象
+   * @param on ON条件表达式
+   * @return 当前SQL对象
    */
   public Sql leftJoin(Class<?> entityClass, String on) {
     return leftJoin(entityClass).on(on);
   }
 
   /**
-   * 追加LEFT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件�?
+   * 追加LEFT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
@@ -370,7 +376,8 @@ public class Sql {
   }
 
   /**
-   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名�?   *
+   * 追加LEFT JOIN，并使用实体表名的驼峰形式作为默认别名。
+   *
    * @param entityClass 关联实体类型
    * @return 当前SQL对象
    */
@@ -379,11 +386,11 @@ public class Sql {
   }
 
   /**
-   * 追加RIGHT JOIN�?
+   * 追加RIGHT JOIN。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
-   * @param on ON条件表达�?
+   * @param on ON条件表达式
    * @return 当前SQL对象
    */
   public Sql rightJoin(String table, String alias, String on) {
@@ -395,7 +402,7 @@ public class Sql {
   }
 
   /**
-   * 追加RIGHT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件�?
+   * 追加RIGHT JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
@@ -410,11 +417,11 @@ public class Sql {
   }
 
   /**
-   * 追加FULL JOIN�?
+   * 追加FULL JOIN。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
-   * @param on ON条件表达�?
+   * @param on ON条件表达式
    * @return 当前SQL对象
    */
   public Sql fullJoin(String table, String alias, String on) {
@@ -426,7 +433,7 @@ public class Sql {
   }
 
   /**
-   * 追加FULL JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件�?
+   * 追加FULL JOIN，并允许后续通过 {@link #on(String)} 继续追加多个ON条件。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
@@ -441,7 +448,7 @@ public class Sql {
   }
 
   /**
-   * 追加CROSS JOIN�?
+   * 追加CROSS JOIN。
    *
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
@@ -463,11 +470,12 @@ public class Sql {
   }
 
   /**
-   * 按指定关联类型追加JOIN�?   *
+   * 按指定关联类型追加JOIN。
+   *
    * @param joinType 关联类型
    * @param table 关联表名或子查询
    * @param alias 关联表别名；为空时不拼接别名
-   * @param on ON条件表达�?
+   * @param on ON条件表达式
    * @return 当前SQL对象
    */
   public Sql join(JoinType joinType, String table, String alias, String on) {
@@ -479,7 +487,7 @@ public class Sql {
   }
 
   /**
-   * 按指定关联类型追加JOIN，并允许后续继续追加多个ON条件�?
+   * 按指定关联类型追加JOIN，并允许后续继续追加多个ON条件。
    *
    * @param joinType 关联类型
    * @param table 关联表名或子查询
@@ -502,12 +510,12 @@ public class Sql {
   }
 
   /**
-   * 给最近一次JOIN追加AND ON条件�?
+   * 给最近一次JOIN追加AND ON条件。
    *
    * <p>适合一个关联表需要多个ON条件的场景，例如
-   * {@code leftJoin("sys_order", "o").on("o.user_id = u.id").on("o.status = 1")}�?/p>
+   * {@code leftJoin("sys_order", "o").on("o.user_id = u.id").on("o.status = 1")}。</p>
    *
-   * @param condition ON条件表达式，不要包含 {@code ON} 关键�?
+   * @param condition ON条件表达式，不要包含 {@code ON} 关键字
    * @return 当前SQL对象
    */
   public Sql on(String condition) {
@@ -515,8 +523,9 @@ public class Sql {
   }
 
   /**
-   * 给最近一次JOIN追加AND ON条件�?   *
-   * <p>支持 {@code Cond.eq("u", User::getDeptId, "d", Dept::getId)} 这类Lambda字段写法�?/p>
+   * 给最近一次JOIN追加AND ON条件。
+   *
+   * <p>支持 {@code Cond.eq("u", User::getDeptId, "d", Dept::getId)} 这类Lambda字段写法。</p>
    *
    * @param condition ON条件对象
    * @return 当前SQL对象
@@ -526,9 +535,9 @@ public class Sql {
   }
 
   /**
-   * 给最近一次JOIN追加OR ON条件�?
+   * 给最近一次JOIN追加OR ON条件。
    *
-   * @param condition ON条件表达式，不要包含 {@code ON} 关键�?
+   * @param condition ON条件表达式，不要包含 {@code ON} 关键字
    * @return 当前SQL对象
    */
   public Sql orOn(String condition) {
@@ -536,7 +545,8 @@ public class Sql {
   }
 
   /**
-   * 给最近一次JOIN追加OR ON条件�?   *
+   * 给最近一次JOIN追加OR ON条件。
+   *
    * @param condition ON条件对象
    * @return 当前SQL对象
    */
@@ -545,7 +555,7 @@ public class Sql {
   }
 
   /**
-   * 追加默认WHERE占位，主要用于手写SQL链式拼接�?
+   * 追加默认WHERE占位，主要用于手写SQL链式拼接。
    *
    * @return 当前SQL对象
    */
@@ -557,9 +567,9 @@ public class Sql {
   }
 
   /**
-   * 追加原始WHERE条件�?
+   * 追加原始WHERE条件。
    *
-   * @param condition WHERE条件片段，不要包�?{@code WHERE} 关键�?
+   * @param condition WHERE条件片段，不要包含 {@code WHERE} 关键字
    * @return 当前SQL对象
    */
   public Sql where(String condition) {
@@ -576,19 +586,23 @@ public class Sql {
   }
 
   /**
-   * 条件成立时追加原始WHERE条件�?   *
+   * 条件成立时追加原始WHERE条件。
+   *
    * @param condition 是否追加
-   * @param where WHERE条件片段，不包含WHERE关键�?   * @return 当前SQL对象
+   * @param where WHERE条件片段，不包含WHERE关键字
+   * @return 当前SQL对象
    */
   public Sql whereIf(boolean condition, String where) {
     return condition ? where(where) : this;
   }
 
   /**
-   * 追加带命名参数的原始WHERE条件�?   *
-   * <p>SQL片段只负责表达式，参数值统一进入命名参数集合，避免业务侧把值拼进SQL�?/p>
+   * 追加带命名参数的原始WHERE条件。
    *
-   * @param condition WHERE条件片段，不包含WHERE关键�?   * @param params 命名参数集合
+   * <p>SQL片段只负责表达式，参数值统一进入命名参数集合，避免业务侧把值拼进SQL。</p>
+   *
+   * @param condition WHERE条件片段，不包含WHERE关键字
+   * @param params 命名参数集合
    * @return 当前SQL对象
    */
   public Sql where(String condition, Map<String, Object> params) {
@@ -600,9 +614,11 @@ public class Sql {
   }
 
   /**
-   * 条件成立时追加带命名参数的原始WHERE条件�?   *
+   * 条件成立时追加带命名参数的原始WHERE条件。
+   *
    * @param matched 是否追加
-   * @param condition WHERE条件片段，不包含WHERE关键�?   * @param params 命名参数集合
+   * @param condition WHERE条件片段，不包含WHERE关键字
+   * @param params 命名参数集合
    * @return 当前SQL对象
    */
   public Sql whereIf(boolean matched, String condition, Map<String, Object> params) {
@@ -610,7 +626,7 @@ public class Sql {
   }
 
   /**
-   * 追加结构化WHERE条件�?
+   * 追加结构化WHERE条件。
    *
    * @param cond 条件对象；为空时忽略
    * @return 当前SQL对象
@@ -620,7 +636,7 @@ public class Sql {
   }
 
   /**
-   * 追加AND条件�?
+   * 追加AND条件。
    *
    * @param cond 条件对象；为空时忽略
    * @return 当前SQL对象
@@ -630,7 +646,7 @@ public class Sql {
   }
 
   /**
-   * 追加AND条件�?
+   * 追加AND条件。
    *
    * @param cond 条件对象；为空时忽略
    * @param isMoreCond 是否使用括号包裹条件
@@ -649,7 +665,7 @@ public class Sql {
   }
 
   /**
-   * 追加OR条件�?
+   * 追加OR条件。
    *
    * @param cond 条件对象；为空时忽略
    * @return 当前SQL对象
@@ -659,7 +675,7 @@ public class Sql {
   }
 
   /**
-   * 追加OR条件�?
+   * 追加OR条件。
    *
    * @param cond 条件对象；为空时忽略
    * @param isMoreCond 是否使用括号包裹条件
@@ -833,10 +849,10 @@ public class Sql {
   }
 
   /**
-   * 追加命名参数�?
+   * 追加命名参数。
    *
    * @param name 参数名，不带冒号
-   * @param value 参数�?
+   * @param value 参数值
    * @return 当前SQL对象
    */
   public Sql param(String name, Object value) {
@@ -846,7 +862,7 @@ public class Sql {
   }
 
   /**
-   * 追加多个命名参数�?
+   * 追加多个命名参数。
    *
    * @param params 命名参数集合
    * @return 当前SQL对象
@@ -859,9 +875,9 @@ public class Sql {
   }
 
   /**
-   * 追加ORDER BY排序�?
+   * 追加ORDER BY排序。
    *
-   * @param orderBy 排序表达式，不要包含 {@code ORDER BY} 关键�?
+   * @param orderBy 排序表达式，不要包含 {@code ORDER BY} 关键字
    * @return 当前SQL对象
    */
   public Sql orderBy(String orderBy) {
@@ -882,9 +898,9 @@ public class Sql {
   }
 
   /**
-   * 追加GROUP BY分组�?
+   * 追加GROUP BY分组。
    *
-   * @param groupBy 分组字段或表达式，多个字段建议使用可变参数重�?
+   * @param groupBy 分组字段或表达式，多个字段建议使用可变参数重载
    * @return 当前SQL对象
    */
   public Sql groupBy(String groupBy) {
@@ -914,7 +930,7 @@ public class Sql {
   }
 
   /**
-   * 追加结构化HAVING条件�?
+   * 追加结构化HAVING条件。
    *
    * @param cond HAVING条件对象；为空时忽略
    * @return 当前SQL对象
@@ -932,9 +948,9 @@ public class Sql {
   }
 
   /**
-   * 追加原始HAVING条件�?
+   * 追加原始HAVING条件。
    *
-   * @param having HAVING条件片段，不要包�?{@code HAVING} 关键�?
+   * @param having HAVING条件片段，不要包含 {@code HAVING} 关键字
    * @return 当前SQL对象
    */
   public Sql having(String having) {
@@ -1002,7 +1018,7 @@ public class Sql {
   }
 
   /**
-   * 追加ORDER BY排序�?
+   * 追加ORDER BY排序。
    *
    * @param fields 排序字段或表达式
    * @param orderByEnum 排序方向枚举
@@ -1025,7 +1041,7 @@ public class Sql {
   }
 
   /**
-   * 将构建器渲染为固定SQL�?
+   * 将构建器渲染为固定SQL。
    *
    * @return 当前SQL对象
    */
@@ -1040,10 +1056,10 @@ public class Sql {
   }
 
   /**
-   * 按指定数据库方言生成分页SQL�?
+   * 按指定数据库方言生成分页SQL。
    *
-   * @param databaseType 数据库类�?
-   * @param pageNo 页码，从1开�?
+   * @param databaseType 数据库类型
+   * @param pageNo 页码，从1开始
    * @param pageSize 每页条数
    * @return 新的分页SQL对象
    */
@@ -1055,9 +1071,9 @@ public class Sql {
   }
 
   /**
-   * 按指定数据库方言生成游标分页SQL�?
+   * 按指定数据库方言生成游标分页SQL。
    *
-   * @param databaseType 数据库类�?
+   * @param databaseType 数据库类型
    * @param seekColumn 游标字段
    * @param lastValue 上一页最后一条记录的游标值，第一页传null
    * @param asc 是否升序
@@ -1075,7 +1091,7 @@ public class Sql {
   }
 
   /**
-   * 按指定SQL方言生成游标分页SQL�?
+   * 按指定SQL方言生成游标分页SQL。
    *
    * @param dialect SQL方言实现
    * @param seekColumn 游标字段
@@ -1105,7 +1121,7 @@ public class Sql {
   }
 
   /**
-   * 获取SQL文本�?
+   * 获取SQL文本。
    *
    * @return SQL文本
    */
@@ -1114,9 +1130,9 @@ public class Sql {
   }
 
   /**
-   * 获取命名参数集合�?
+   * 获取命名参数集合。
    *
-   * @return 不可变参数集合，key为不带冒号的参数�?
+   * @return 不可变参数集合，key为不带冒号的参数名
    */
   public Map<String, Object> getParams() {
     return Collections.unmodifiableMap(render(null, null, null).params());

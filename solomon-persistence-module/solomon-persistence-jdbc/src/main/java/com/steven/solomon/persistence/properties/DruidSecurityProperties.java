@@ -1,7 +1,8 @@
 package com.steven.solomon.persistence.properties;
 
 /**
- * 单租�?Druid SQL 防火墙配置�? */
+ * 单租户 Druid SQL 防火墙配置。
+ */
 public class DruidSecurityProperties {
 
   private boolean enabled;

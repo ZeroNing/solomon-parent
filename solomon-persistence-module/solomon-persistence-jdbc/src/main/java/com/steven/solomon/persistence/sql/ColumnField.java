@@ -3,7 +3,8 @@ package com.steven.solomon.persistence.sql;
 import java.lang.reflect.Field;
 
 /**
- * 实体字段和数据库字段映射�? */
+ * 实体字段和数据库字段映射。
+ */
 public class ColumnField {
 
   private final Field field;

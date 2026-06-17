@@ -1,7 +1,7 @@
 package com.steven.solomon.persistence.sql;
 
 /**
- * SQL连表类型�?
+ * SQL连表类型。
  */
 public enum JoinType {
   JOIN("JOIN"),

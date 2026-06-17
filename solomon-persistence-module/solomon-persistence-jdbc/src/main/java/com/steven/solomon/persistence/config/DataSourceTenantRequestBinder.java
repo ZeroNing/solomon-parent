@@ -5,7 +5,8 @@ import com.steven.solomon.persistence.exception.PersistenceException;
 import com.steven.solomon.persistence.routing.DataSourceTenantContext;
 
 /**
- * 将网关透传的租户编码绑定到当前线程的数据源上下文�? */
+ * 将网关透传的租户编码绑定到当前线程的数据源上下文。
+ */
 public class DataSourceTenantRequestBinder implements TenantRequestBinder {
 
   private final DataSourceTenantContext context;

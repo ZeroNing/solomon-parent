@@ -1,7 +1,8 @@
 package com.steven.solomon.persistence.properties;
 
 /**
- * 深浅分页切换配置�? */
+ * 深浅分页切换配置。
+ */
 public class PaginationProperties {
 
   private boolean autoSeekEnabled = true;

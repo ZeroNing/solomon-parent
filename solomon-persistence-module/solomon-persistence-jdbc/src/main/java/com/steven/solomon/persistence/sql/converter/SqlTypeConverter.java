@@ -22,11 +22,11 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * SQL类型转换器�?
+ * SQL类型转换器。
  *
- * <p>统一处理数据库返回值到Java字段类型的转换，以及Java参数到JDBC友好类型的转换�?
- * 当前内置支持 {@link LocalDateTime}、{@link LocalDate}、{@link LocalTime}�?
- * {@link Date}、{@link Long}、常见数字类型、布尔类型、枚举和字符串�?/p>
+ * <p>统一处理数据库返回值到Java字段类型的转换，以及Java参数到JDBC友好类型的转换。
+ * 当前内置支持 {@link LocalDateTime}、{@link LocalDate}、{@link LocalTime}、
+ * {@link Date}、{@link Long}、常见数字类型、布尔类型、枚举和字符串。</p>
  */
 public final class SqlTypeConverter {
 
@@ -37,7 +37,7 @@ public final class SqlTypeConverter {
   }
 
   /**
-   * 判断目标类型是否可以按单列简单值读取�?
+   * 判断目标类型是否可以按单列简单值读取。
    *
    * @param type 目标Java类型
    * @return true表示可以直接按单列值读取并转换
@@ -61,9 +61,9 @@ public final class SqlTypeConverter {
   }
 
   /**
-   * 将数据库返回值转换为指定Java类型�?
+   * 将数据库返回值转换为指定Java类型。
    *
-   * @param value 数据库原始值，可能来自ResultSet或聚合函�?
+   * @param value 数据库原始值，可能来自ResultSet或聚合函数
    * @param targetType 目标Java类型，例如LocalDateTime、Date、Long
    * @param <T> 目标泛型类型
    * @return 转换后的Java值；value为null时返回null
@@ -152,7 +152,7 @@ public final class SqlTypeConverter {
   }
 
   /**
-   * 将Java参数转换为JDBC更稳定的参数类型�?
+   * 将Java参数转换为JDBC更稳定的参数类型。
    *
    * @param value Java原始参数，可能是LocalDateTime、Date、枚举或集合
    * @return 转换后的JDBC参数；集合会逐项转换

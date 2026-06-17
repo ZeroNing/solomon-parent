@@ -5,7 +5,8 @@ import com.steven.solomon.persistence.enums.DataSourcePoolTypeEnum;
 import com.steven.solomon.persistence.enums.SqlServerVersionEnum;
 
 /**
- * 单个租户的数据源配置�? */
+ * 单个租户的数据源配置。
+ */
 public class TenantDataSourceProperties {
 
   private DataSourcePoolTypeEnum poolType = DataSourcePoolTypeEnum.HIKARI;

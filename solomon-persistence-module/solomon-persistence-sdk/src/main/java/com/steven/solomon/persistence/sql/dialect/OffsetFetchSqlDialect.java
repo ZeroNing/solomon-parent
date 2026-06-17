@@ -1,9 +1,9 @@
 package com.steven.solomon.persistence.sql.dialect;
 
 /**
- * SQL:2008 OFFSET/FETCH 分页方言�?
+ * SQL:2008 OFFSET/FETCH 分页方言。
  *
- * <p>适用�?DB2、Oracle 12c+、SQL Server 2012+、达梦等支持标准 OFFSET/FETCH 的数据库�?/p>
+ * <p>适用于 DB2、Oracle 12c+、SQL Server 2012+、达梦等支持标准 OFFSET/FETCH 的数据库。</p>
  */
 public class OffsetFetchSqlDialect implements SqlDialect {
 

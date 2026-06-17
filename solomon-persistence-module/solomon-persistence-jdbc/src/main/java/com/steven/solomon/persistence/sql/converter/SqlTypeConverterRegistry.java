@@ -7,10 +7,10 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * SQL类型转换器注册器�?
+ * SQL类型转换器注册器。
  *
- * <p>注册器默认包�?{@link SqlTypeConverter} 提供的内置转换能力；业务侧可以通过
- * {@link #addConverter(SqlValueConverter)} 添加自定义转换器，自定义转换器会优先于默认转换器执行�?/p>
+ * <p>注册器默认包含 {@link SqlTypeConverter} 提供的内置转换能力；业务侧可以通过
+ * {@link #addConverter(SqlValueConverter)} 添加自定义转换器，自定义转换器会优先于默认转换器执行。</p>
  */
 public class SqlTypeConverterRegistry {
 
@@ -19,7 +19,7 @@ public class SqlTypeConverterRegistry {
   private final SqlValueConverter defaultConverter = new DefaultSqlValueConverter();
 
   /**
-   * 创建带默认转换器的注册器�?
+   * 创建带默认转换器的注册器。
    *
    * @return SQL类型转换器注册器
    */
@@ -28,12 +28,12 @@ public class SqlTypeConverterRegistry {
   }
 
   /**
-   * 添加自定义转换器�?
+   * 添加自定义转换器。
    *
    * <p>新添加的转换器会按添加顺序优先执行；如果所有自定义转换器都不支持当前值，
-   * 会继续走默认转换器�?/p>
+   * 会继续走默认转换器。</p>
    *
-   * @param converter 自定义SQL值转换器；为null时忽�?
+   * @param converter 自定义SQL值转换器；为null时忽略
    * @return 当前注册器，方便链式调用
    */
   public SqlTypeConverterRegistry addConverter(SqlValueConverter converter) {
@@ -44,7 +44,7 @@ public class SqlTypeConverterRegistry {
   }
 
   /**
-   * 判断目标类型是否可以按单列简单值读取�?
+   * 判断目标类型是否可以按单列简单值读取。
    *
    * @param type 目标Java类型
    * @return true表示可以直接按单列值读取并转换
@@ -54,12 +54,12 @@ public class SqlTypeConverterRegistry {
   }
 
   /**
-   * 将数据库返回值转换为指定Java类型�?
+   * 将数据库返回值转换为指定Java类型。
    *
-   * @param value 数据库原始�?
+   * @param value 数据库原始值
    * @param targetType 目标Java类型
    * @param <T> 目标泛型类型
-   * @return 转换后的Java�?
+   * @return 转换后的Java值
    * @throws PersistenceException 转换失败时抛出数据源异常
    */
   @SuppressWarnings("unchecked")
@@ -76,9 +76,9 @@ public class SqlTypeConverterRegistry {
   }
 
   /**
-   * 将Java参数转换为JDBC参数�?
+   * 将Java参数转换为JDBC参数。
    *
-   * @param value Java原始参数�?
+   * @param value Java原始参数值
    * @return 转换后的JDBC参数
    */
   public Object convertForJdbc(Object value) {

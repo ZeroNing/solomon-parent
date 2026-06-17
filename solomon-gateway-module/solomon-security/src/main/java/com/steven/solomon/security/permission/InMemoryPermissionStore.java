@@ -1,6 +1,7 @@
 package com.steven.solomon.security.permission;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +38,7 @@ public class InMemoryPermissionStore implements PermissionStore {
     public List<String> findAnonymousPaths() {
         List<String> paths = new ArrayList<>();
         for (PermissionInfo info : permissions) {
-            if (info.anonymous() && CollUtil.isNotEmpty(info.path())) {
+            if (info.anonymous() && StrUtil.isNotBlank(info.path())) {
                 paths.add(info.path());
             }
         }

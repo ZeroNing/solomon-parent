@@ -3,7 +3,8 @@ package com.steven.solomon.persistence.properties;
 import java.time.Duration;
 
 /**
- * HikariCP 连接池配置�? */
+ * HikariCP 连接池配置。
+ */
 public class HikariPoolProperties {
 
   private Integer maximumPoolSize;

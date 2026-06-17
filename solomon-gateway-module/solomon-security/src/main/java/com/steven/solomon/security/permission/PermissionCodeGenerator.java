@@ -38,7 +38,7 @@ public final class PermissionCodeGenerator {
             if (StrUtil.isBlank(segment)) {
                 continue;
             }
-            String cleaned = StrUtil.removeAll(segment, "{", "}");
+            String cleaned = segment.replace("{", "").replace("}", "");
             if (StrUtil.isBlank(cleaned)) {
                 continue;
             }

@@ -38,6 +38,13 @@
       <artifactId>hutool-jwt</artifactId>
       <version>${hutool.version}</version>
     </dependency>
+    <!-- Swagger OpenAPI 注解（optional），权限扫描器读取 @Operation.summary -->
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations-jakarta</artifactId>
+      <version>2.2.20</version>
+      <optional>true</optional>
+    </dependency>
 
     <!-- 测试依赖 -->
     <dependency>

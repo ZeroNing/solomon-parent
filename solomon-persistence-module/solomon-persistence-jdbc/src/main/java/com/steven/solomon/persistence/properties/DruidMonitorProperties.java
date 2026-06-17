@@ -1,7 +1,8 @@
 package com.steven.solomon.persistence.properties;
 
 /**
- * 单租�?Druid 监控配置�? */
+ * 单租户 Druid 监控配置。
+ */
 public class DruidMonitorProperties {
 
   private boolean enabled;

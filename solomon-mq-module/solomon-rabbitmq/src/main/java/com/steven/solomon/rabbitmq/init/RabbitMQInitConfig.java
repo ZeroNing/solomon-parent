@@ -3,6 +3,7 @@ package com.steven.solomon.rabbitmq.init;
 import cn.hutool.core.util.ObjectUtil;
 
 import cn.hutool.core.annotation.AnnotationUtil;
+import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.rabbitmq.annotation.MessageListener;
 import com.steven.solomon.rabbitmq.annotation.MessageListenerRetry;
 import com.steven.solomon.code.BaseCode;

@@ -10,19 +10,19 @@ import java.util.Deque;
 import javax.sql.DataSource;
 
 /**
- * 数据源租户上下文�?
+ * 数据源租户上下文。
  *
- * <p>保存当前线程正在使用的租户数据源，业务执行完成后必须清理，避免线程池复用导致串租户�?/p>
+ * <p>保存当前线程正在使用的租户数据源，业务执行完成后必须清理，避免线程池复用导致串租户。</p>
  */
 public class DataSourceTenantContext extends TenantContext<DataSource> {
 
-  /** 当前线程绑定的租户编码，便于日志输出和SQL方言判断�?*/
+  /** 当前线程绑定的租户编码，便于日志输出和SQL方言判断。 */
   private final ThreadLocal<Deque<String>> tenantCodeStack =
       ThreadLocal.withInitial(ArrayDeque::new);
 
-  /** 当前线程切换深度，用于支持AOP嵌套调用�?*/
+  /** 当前线程切换深度，用于支持AOP嵌套调用。 */
   /**
-   * 按租户编码切换数据源�?
+   * 按租户编码切换数据源。
    *
    * @param tenantCode 租户编码
    * @throws PersistenceException 数据源未注册时抛出国际化异常
@@ -37,11 +37,11 @@ public class DataSourceTenantContext extends TenantContext<DataSource> {
     }
     bindFactory(dataSource);
     tenantCodeStack.get().push(tenantCode);
-    logger.info("[DataSource] 切换租户数据源成�?tenant={}", tenantCode);
+    logger.info("[DataSource] 切换租户数据源成功 tenant={}", tenantCode);
   }
 
   /**
-   * 获取当前线程绑定的租户编码�?
+   * 获取当前线程绑定的租户编码。
    *
    * @return 当前租户编码；未切换时返回null
    */
@@ -50,7 +50,7 @@ public class DataSourceTenantContext extends TenantContext<DataSource> {
   }
 
   /**
-   * 获取当前租户标识，用于父类日志输出�?
+   * 获取当前租户标识，用于父类日志输出。
    *
    * @return 当前租户编码；未切换时返回unknown
    */
@@ -61,9 +61,9 @@ public class DataSourceTenantContext extends TenantContext<DataSource> {
   }
 
   /**
-   * 清理当前线程绑定的数据源�?
+   * 清理当前线程绑定的数据源。
    *
-   * <p>AOP嵌套调用时只减少切换深度，最外层调用结束后才真正清理�?/p>
+   * <p>AOP嵌套调用时只减少切换深度，最外层调用结束后才真正清理。</p>
    */
   @Override
   public void removeFactory() {

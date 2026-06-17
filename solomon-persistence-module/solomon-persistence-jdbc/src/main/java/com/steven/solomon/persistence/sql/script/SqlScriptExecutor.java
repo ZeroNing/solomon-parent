@@ -30,10 +30,10 @@ import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 /**
- * SQL脚本执行工具�?
+ * SQL脚本执行工具。
  *
- * <p>该工具会在当前租户数据源中维护一张脚本执行记录表，执行脚本前先检查脚本编码是否已经存在�?
- * 已执行过的脚本会自动跳过，避免重复执行建表、初始化数据或升级脚本�?/p>
+ * <p>该工具会在当前租户数据源中维护一张脚本执行记录表，执行脚本前先检查脚本编码是否已经存在。
+ * 已执行过的脚本会自动跳过，避免重复执行建表、初始化数据或升级脚本。</p>
  */
 public class SqlScriptExecutor {
 
@@ -46,9 +46,9 @@ public class SqlScriptExecutor {
   private final DataSourceTenantContext tenantContext;
 
   /**
-   * 构造SQL脚本执行工具�?
+   * 构造SQL脚本执行工具。
    *
-   * @param jdbcTemplate Spring命名参数JDBC模板，脚本执行会跟随动态数据源路由到当前租�?
+   * @param jdbcTemplate Spring命名参数JDBC模板，脚本执行会跟随动态数据源路由到当前租户
    * @param properties 数据源模块配置，用于读取默认租户、租户数据库类型和脚本记录表配置
    * @param tenantContext 数据源租户上下文，用于读取或切换当前租户编码
    */
@@ -62,11 +62,11 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 执行SQL脚本文本�?
+   * 执行SQL脚本文本。
    *
    * @param scriptCode 脚本编码，作为防重复执行的唯一键，例如 {@code V20260522_001_init_user}
    * @param scriptText SQL脚本文本，支持用分号分隔多条语句，SQL Server脚本也支持单独一行的 {@code GO}
-   * @return 脚本执行结果，包含是否跳过、执行语句数和脚本校验�?
+   * @return 脚本执行结果，包含是否跳过、执行语句数和脚本校验值
    * @throws PersistenceException 脚本为空、记录表初始化失败、脚本重复但内容变化或执行失败时抛出
    */
   public SqlScriptExecuteResult execute(String scriptCode, String scriptText)
@@ -75,12 +75,12 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 执行SQL脚本文本�?
+   * 执行SQL脚本文本。
    *
-   * @param scriptCode 脚本编码，作为防重复执行的唯一�?
+   * @param scriptCode 脚本编码，作为防重复执行的唯一键
    * @param scriptText SQL脚本文本，支持多语句
-   * @param scriptName 脚本名称，用于写入脚本记录表，便于排查执行历�?
-   * @param description 脚本说明，用于写入脚本记录表，允许为�?
+   * @param scriptName 脚本名称，用于写入脚本记录表，便于排查执行历史
+   * @param description 脚本说明，用于写入脚本记录表，允许为空
    * @return 脚本执行结果
    * @throws PersistenceException 脚本为空、记录表初始化失败、脚本重复但内容变化或执行失败时抛出
    */
@@ -134,13 +134,13 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 在指定租户数据源中执行SQL脚本�?
+   * 在指定租户数据源中执行SQL脚本。
    *
    * @param tenantCode 租户编码，会先切换到该租户的数据源再执行脚本
-   * @param scriptCode 脚本编码，作为防重复执行的唯一�?
+   * @param scriptCode 脚本编码，作为防重复执行的唯一键
    * @param scriptText SQL脚本文本
    * @return 脚本执行结果
-   * @throws PersistenceException 租户不存在、脚本为空或执行失败时抛�?
+   * @throws PersistenceException 租户不存在、脚本为空或执行失败时抛出
    */
   public SqlScriptExecuteResult executeForTenant(
       String tenantCode,
@@ -150,15 +150,15 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 在指定租户数据源中执行SQL脚本�?
+   * 在指定租户数据源中执行SQL脚本。
    *
    * @param tenantCode 租户编码，会先切换到该租户的数据源再执行脚本
-   * @param scriptCode 脚本编码，作为防重复执行的唯一�?
+   * @param scriptCode 脚本编码，作为防重复执行的唯一键
    * @param scriptText SQL脚本文本
    * @param scriptName 脚本名称，用于写入脚本记录表
-   * @param description 脚本说明，用于写入脚本记录表，允许为�?
+   * @param description 脚本说明，用于写入脚本记录表，允许为空
    * @return 脚本执行结果
-   * @throws PersistenceException 租户不存在、脚本为空或执行失败时抛�?
+   * @throws PersistenceException 租户不存在、脚本为空或执行失败时抛出
    */
   public SqlScriptExecuteResult executeForTenant(
       String tenantCode,
@@ -176,11 +176,11 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 执行Spring资源中的SQL脚本�?
+   * 执行Spring资源中的SQL脚本。
    *
-   * @param resource SQL脚本资源，例�?{@code classpath:db/init.sql}
+   * @param resource SQL脚本资源，例如 {@code classpath:db/init.sql}
    * @return 脚本执行结果，脚本编码默认使用资源文件名
-   * @throws PersistenceException 资源不可读、脚本为空或执行失败时抛�?
+   * @throws PersistenceException 资源不可读、脚本为空或执行失败时抛出
    */
   public SqlScriptExecuteResult executeResource(Resource resource) throws PersistenceException {
     String filename = ObjectUtil.isEmpty(resource) ? null : resource.getFilename();
@@ -188,14 +188,14 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 执行Spring资源中的SQL脚本�?
+   * 执行Spring资源中的SQL脚本。
    *
-   * @param scriptCode 脚本编码，作为防重复执行的唯一�?
-   * @param resource SQL脚本资源，例�?{@code classpath:db/init.sql}
+   * @param scriptCode 脚本编码，作为防重复执行的唯一键
+   * @param resource SQL脚本资源，例如 {@code classpath:db/init.sql}
    * @param scriptName 脚本名称，用于写入脚本记录表
-   * @param description 脚本说明，用于写入脚本记录表，允许为�?
+   * @param description 脚本说明，用于写入脚本记录表，允许为空
    * @return 脚本执行结果
-   * @throws PersistenceException 资源不可读、脚本为空或执行失败时抛�?
+   * @throws PersistenceException 资源不可读、脚本为空或执行失败时抛出
    */
   public SqlScriptExecuteResult executeResource(
       String scriptCode,
@@ -221,10 +221,10 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * 批量执行Spring资源中的SQL脚本�?
+   * 批量执行Spring资源中的SQL脚本。
    *
    * @param resources SQL脚本资源集合，执行顺序按集合迭代顺序
-   * @return 每个脚本对应的执行结�?
+   * @return 每个脚本对应的执行结果
    * @throws PersistenceException 任意脚本为空或执行失败时抛出
    */
   public List<SqlScriptExecuteResult> executeResources(Collection<Resource> resources)
@@ -390,13 +390,13 @@ public class SqlScriptExecutor {
         + "id " + idDefinition + columnComment(commentInColumn, "主键") + ", "
         + "create_time TIMESTAMP NOT NULL" + columnComment(commentInColumn, "创建时间") + ", "
         + "update_time TIMESTAMP NOT NULL" + columnComment(commentInColumn, "修改时间") + ", "
-        + "file_name VARCHAR(255) NOT NULL" + columnComment(commentInColumn, "SQL文件�?) + ", "
+        + "file_name VARCHAR(255) NOT NULL" + columnComment(commentInColumn, "SQL文件名") + ", "
         + "file_md5 VARCHAR(32) NOT NULL UNIQUE" + columnComment(commentInColumn, "SQL文件MD5，唯一校验") + ", "
         + "success BOOLEAN NOT NULL" + columnComment(commentInColumn, "是否执行成功") + ", "
         + "fail_reason " + textDefinition + columnComment(commentInColumn, "失败原因") + ", "
         + "tenant_code VARCHAR(100)" + columnComment(commentInColumn, "租户编码") + ", "
         + "statement_count INT" + columnComment(commentInColumn, "SQL语句数量") + ", "
-        + "execution_time_ms BIGINT" + columnComment(commentInColumn, "执行耗时，单位毫�?)
+        + "execution_time_ms BIGINT" + columnComment(commentInColumn, "执行耗时，单位毫秒")
         + ")";
   }
 
@@ -459,13 +459,13 @@ public class SqlScriptExecutor {
     comments.put("id", "主键");
     comments.put("create_time", "创建时间");
     comments.put("update_time", "修改时间");
-    comments.put("file_name", "SQL文件�?);
+    comments.put("file_name", "SQL文件名");
     comments.put("file_md5", "SQL文件MD5，唯一校验");
     comments.put("success", "是否执行成功");
     comments.put("fail_reason", "失败原因");
     comments.put("tenant_code", "租户编码");
     comments.put("statement_count", "SQL语句数量");
-    comments.put("execution_time_ms", "执行耗时，单位毫�?);
+    comments.put("execution_time_ms", "执行耗时，单位毫秒");
     return comments;
   }
 
@@ -538,10 +538,10 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * ClickHouse 没有传统 OLTP 数据库的自增主键和原�?UPDATE 语义�?
+   * ClickHouse 没有传统 OLTP 数据库的自增主键和原地 UPDATE 语义。
    *
-   * <p>脚本执行记录�?ClickHouse 中采用追加写入：同一�?file_md5 可能存在多条历史记录�?
-   * 查询时按 id 倒序取最新一条。这样既符合 ClickHouse 的列式写入特性，也不会影响其他数据库的更新逻辑�?/p>
+   * <p>脚本执行记录在 ClickHouse 中采用追加写入：同一个 file_md5 可能存在多条历史记录，
+   * 查询时按 id 倒序取最新一条。这样既符合 ClickHouse 的列式写入特性，也不会影响其他数据库的更新逻辑。</p>
    */
   private void saveClickHouseScriptRecord(String fileMd5, Map<String, Object> params) {
     params.put("id", nextClickHouseRecordId(fileMd5));
@@ -554,9 +554,9 @@ public class SqlScriptExecutor {
   }
 
   /**
-   * �?ClickHouse 生成近似递增的记�?ID�?
+   * 为 ClickHouse 生成近似递增的记录 ID。
    *
-   * <p>使用当前毫秒拼接文件 MD5 的稳定散列尾号，既避免额外依赖序列表，又能满�?MergeTree �?id 倒序取最新记录的需求�?/p>
+   * <p>使用当前毫秒拼接文件 MD5 的稳定散列尾号，既避免额外依赖序列表，又能满足 MergeTree 按 id 倒序取最新记录的需求。</p>
    */
   private long nextClickHouseRecordId(String fileMd5) {
     return System.currentTimeMillis() * 1000L + Math.abs(fileMd5.hashCode() % 1000);
