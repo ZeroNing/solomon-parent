@@ -9,18 +9,17 @@ import cn.hutool.jwt.signers.JWTSignerUtil;
 
 import com.steven.solomon.context.TenantModeProperties;
 import com.steven.solomon.context.TenantModeResolver;
-import com.steven.solomon.security.properties.SecurityJwtProperties;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.util.Date;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 
 /**
- * JWT 令牌服务，负责签发与解密令牌。
+ * JWT 令牌服务，负责签发与解密令牌。网关层和服务层共用。
  *
  * <p>基于 Hutool JWT 实现 HS256 签名，校验签名、签发方和过期时间。
- * 仅保存用户标识和租户编码两个声明，不承载角色/权限等敏感信息（这些由客户的
- * {@code AccessValidator} 实时查询），避免令牌过期前权限变更无法生效。</p>
+ * 仅保存用户标识和租户编码两个声明，不承载角色/权限等敏感信息
+ *（这些由客户的授权校验器实时查询），避免令牌过期前权限变更无法生效。</p>
  *
  * <p>安全约束：</p>
  * <ul>
@@ -41,10 +40,9 @@ public class JwtTokenService {
     private static final Pattern IDENTITY_PATTERN =
             Pattern.compile("[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}");
     private static final String TENANT_CODE_KEY = "tenantCode";
-    /** Bearer Token 前缀。 */
     private static final String BEARER_PREFIX = "Bearer ";
 
-    private final SecurityJwtProperties properties;
+    private final JwtTokenProperties properties;
     private final TenantModeResolver tenantModeResolver;
     private final JWTSigner signer;
 
@@ -54,14 +52,14 @@ public class JwtTokenService {
      * @param properties JWT 配置，密钥不可少于 32 字节
      * @throws IllegalArgumentException 密钥为空或过短、签发方为空、过期时间非正
      */
-    public JwtTokenService(SecurityJwtProperties properties) {
+    public JwtTokenService(JwtTokenProperties properties) {
         this(properties, new TenantModeResolver(new TenantModeProperties()));
     }
 
     /**
      * 指定租户模式解析器构造，用于多租户部署。
      */
-    public JwtTokenService(SecurityJwtProperties properties, TenantModeResolver tenantModeResolver) {
+    public JwtTokenService(JwtTokenProperties properties, TenantModeResolver tenantModeResolver) {
         if (properties == null || StrUtil.isBlank(properties.getSecret())) {
             throw new IllegalArgumentException("security.jwt.secret 不能为空");
         }

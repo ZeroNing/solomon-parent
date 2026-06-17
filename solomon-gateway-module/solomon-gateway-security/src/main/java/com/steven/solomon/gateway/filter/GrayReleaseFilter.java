@@ -2,7 +2,7 @@ package com.steven.solomon.gateway.filter;
 
 import cn.hutool.core.util.StrUtil;
 
-import com.steven.solomon.gateway.core.TokenClaims;
+import com.steven.solomon.security.core.TokenClaims;
 import com.steven.solomon.gateway.gray.GrayReleaseSelector;
 import com.steven.solomon.gateway.properties.GatewayGrayProperties;
 import com.steven.solomon.utils.logger.LoggerUtils;

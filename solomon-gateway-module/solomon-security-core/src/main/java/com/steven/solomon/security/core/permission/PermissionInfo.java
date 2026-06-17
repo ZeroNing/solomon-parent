@@ -1,4 +1,4 @@
-package com.steven.solomon.security.permission;
+package com.steven.solomon.security.core.permission;
 
 /**
  * 权限元数据，描述一个受保护接口的权限信息。

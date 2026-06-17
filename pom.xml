@@ -219,6 +219,11 @@
       </dependency>
       <dependency>
         <groupId>com.steven</groupId>
+        <artifactId>solomon-security-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.steven</groupId>
         <artifactId>solomon-utils-spring</artifactId>
         <version>${project.version}</version>
       </dependency>

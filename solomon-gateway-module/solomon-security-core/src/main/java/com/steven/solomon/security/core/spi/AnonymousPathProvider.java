@@ -1,4 +1,4 @@
-package com.steven.solomon.security.spi;
+package com.steven.solomon.security.core.spi;
 
 import java.util.List;
 

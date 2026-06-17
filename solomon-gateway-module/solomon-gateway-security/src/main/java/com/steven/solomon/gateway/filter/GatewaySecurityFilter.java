@@ -3,13 +3,14 @@ package com.steven.solomon.gateway.filter;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 
+import com.steven.solomon.gateway.code.GatewayErrorCode;
 import com.steven.solomon.gateway.constant.GatewayHeaders;
 import com.steven.solomon.gateway.core.GatewayResponseWriter;
-import com.steven.solomon.gateway.core.JwtTokenService;
-import com.steven.solomon.gateway.core.TokenClaims;
+import com.steven.solomon.security.core.JwtTokenService;
+import com.steven.solomon.security.core.TokenClaims;
 import com.steven.solomon.gateway.properties.GatewaySecurityProperties;
 import com.steven.solomon.gateway.properties.GatewayTenantProperties;
-import com.steven.solomon.gateway.spi.AnonymousPathProvider;
+import com.steven.solomon.security.core.spi.AnonymousPathProvider;
 import com.steven.solomon.gateway.spi.GatewayAccessValidator;
 import com.steven.solomon.gateway.spi.GatewayTenantValidator;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -58,10 +59,6 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
-    private static final String ERR_TOKEN_REQUIRED = "TOKEN_REQUIRED";
-    private static final String ERR_TOKEN_INVALID = "TOKEN_INVALID";
-    private static final String ERR_ACCESS_DENIED = "ACCESS_DENIED";
-    private static final String ERR_TENANT_INVALID = "TENANT_INVALID";
 
     private final JwtTokenService jwtTokenService;
     private final GatewayTenantProperties tenantProperties;
@@ -125,13 +122,11 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
         String authorization = exchange.getRequest().getHeaders().getFirst(GatewayHeaders.AUTHORIZATION);
         String token = jwtTokenService.resolveBearerToken(authorization);
         if (StrUtil.isBlank(token)) {
-            return responseWriter.writeError(exchange, HttpStatus.UNAUTHORIZED,
-                    ERR_TOKEN_REQUIRED, "缺少访问令牌，请先登录");
+            return responseWriter.writeError(exchange, HttpStatus.UNAUTHORIZED, GatewayErrorCode.TOKEN_REQUIRED);
         }
         TokenClaims claims = jwtTokenService.parseToken(token);
         if (claims == null) {
-            return responseWriter.writeError(exchange, HttpStatus.UNAUTHORIZED,
-                    ERR_TOKEN_INVALID, "访问令牌无效或已过期，请重新登录");
+            return responseWriter.writeError(exchange, HttpStatus.UNAUTHORIZED, GatewayErrorCode.TOKEN_INVALID);
         }
 
         // 保存声明到 exchange，供灰度过滤器复用
@@ -140,14 +135,12 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
         // 5. 授权校验：客户实现，默认拒绝
         final TokenClaims finalClaims = claims;
         if (accessValidator == null) {
-            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                    ERR_ACCESS_DENIED, "未配置授权校验器，请求被拒绝");
+            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.ACCESS_DENIED);
         }
         return accessValidator.validate(finalClaims, exchange)
                 .flatMap(allowed -> {
                     if (Boolean.FALSE.equals(allowed)) {
-                        return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                                ERR_ACCESS_DENIED, "无权访问该接口");
+                        return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.ACCESS_DENIED);
                     }
                     // 6. 写可信头，用新 exchange 继续链路（exchange 不可变，不能丢弃返回值）
                     ServerWebExchange securedExchange = writeTrustedHeaders(exchange, finalClaims);
@@ -155,8 +148,7 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
                 })
                 .onErrorResume(e -> {
                     logger.error("授权校验异常, 用户={}, 路径={}", finalClaims.userId(), path, e);
-                    return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                            ERR_ACCESS_DENIED, "授权校验失败，请求被拒绝");
+                    return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.ACCESS_DENIED);
                 });
     }
 
@@ -167,22 +159,19 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
         String tenantCode = exchange.getRequest().getHeaders().getFirst(GatewayHeaders.TENANT_CODE);
         // 校验租户编码格式（防注入）
         if (StrUtil.isNotBlank(tenantCode) && !jwtTokenService.isSafeIdentity(tenantCode.trim())) {
-            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                    ERR_TENANT_INVALID, "租户编码格式不合法");
+            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.TENANT_INVALID);
         }
         tenantCode = StrUtil.trim(tenantCode);
 
         // 调租户校验器（客户实现，默认拒绝）
         if (tenantValidator == null) {
-            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                    ERR_TENANT_INVALID, "未配置租户校验器，请求被拒绝");
+            return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.TENANT_INVALID);
         }
         String finalTenantCode = tenantCode;
         return tenantValidator.validate(tenantCode, exchange)
                 .flatMap(valid -> {
                     if (Boolean.FALSE.equals(valid)) {
-                        return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                                ERR_TENANT_INVALID, "租户不存在或未启用");
+                        return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.TENANT_INVALID);
                     }
                     // 公开路径先清理不可信头，再写入校验过的租户编码
                     ServerWebExchange cleaned = cleanUntrustedHeaders(exchange);
@@ -199,8 +188,7 @@ public class GatewaySecurityFilter implements GlobalFilter, Ordered {
                 })
                 .onErrorResume(e -> {
                     logger.error("租户校验异常, 租户={}", finalTenantCode, e);
-                    return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN,
-                            ERR_TENANT_INVALID, "租户校验失败，请求被拒绝");
+                    return responseWriter.writeError(exchange, HttpStatus.FORBIDDEN, GatewayErrorCode.TENANT_INVALID);
                 });
     }
 

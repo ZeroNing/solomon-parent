@@ -15,6 +15,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>solomon-security-core</module>
         <module>solomon-security</module>
         <module>solomon-gateway-security</module>
     </modules>

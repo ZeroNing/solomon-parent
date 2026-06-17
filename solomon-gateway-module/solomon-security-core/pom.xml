@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.steven</groupId>
+        <artifactId>solomon-gateway-module</artifactId>
+        <version>1.0</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>solomon-security-core</artifactId>
+    <name>Solomon Security Core</name>
+    <description>安全公共核心模块，承载与 WebFlux/Servlet 无关的安全 SPI：令牌声明、JWT 服务、权限注解/扫描/存储、灰度选择器。网关层和服务层共用。</description>
+
+    <dependencies>
+        <!-- 依赖常量模块，复用 BaseCode、TenantModeResolver、I18nUtils、LoggerUtils -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-constant-module</artifactId>
+        </dependency>
+        <!-- Hutool JWT，用于签发与解密令牌 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-jwt</artifactId>
+            <version>${hutool.version}</version>
+        </dependency>
+        <!-- Swagger OpenAPI 注解（optional），权限扫描器读取 @Operation.summary -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations-jakarta</artifactId>
+            <version>2.2.20</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- Spring 核心，用于 ApplicationContext（权限扫描器）和 @ConfigurationProperties -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+        </dependency>
+        <!-- Spring Web（optional），权限扫描器读取 @RequestMapping 等注解 -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

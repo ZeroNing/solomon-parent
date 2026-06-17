@@ -15,6 +15,11 @@
     <description>通用安全 SDK（Servlet MVC 版），提供 JWT、多租户、鉴权授权、灰度发布、权限扫描能力，业务逻辑通过 SPI 接口交由客户实现。</description>
 
     <dependencies>
+        <!-- 公共安全核心：TokenClaims/JwtTokenService/权限注解扫描存储/AnonymousPathProvider -->
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-security-core</artifactId>
+        </dependency>
         <!-- 依赖常量模块，复用 BaseCode、TenantModeResolver、LoggerUtils 等基础设施 -->
         <dependency>
             <groupId>com.steven</groupId>

@@ -4,7 +4,7 @@ package com.steven.solomon.security.core;
  * 令牌声明，承载从 JWT 解析出的用户标识与租户编码。
  *
  * <p>作为不可变记录，贯穿鉴权过滤器、授权校验器和灰度选择器，
- * 保证身份信息在处理链路中不被篡改。</p>
+ * 保证身份信息在处理链路中不被篡改。网关层（WebFlux）和服务层（Servlet）共用。</p>
  *
  * @param userId     用户标识
  * @param tenantCode 租户编码

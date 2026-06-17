@@ -2,12 +2,12 @@ package com.steven.solomon.security.autoconfigure;
 
 import com.steven.solomon.security.core.JwtTokenService;
 import com.steven.solomon.security.filter.SecurityAuthenticationFilter;
-import com.steven.solomon.security.spi.AnonymousPathProvider;
-import com.steven.solomon.security.permission.InMemoryPermissionStore;
-import com.steven.solomon.security.permission.PermissionScanner;
-import com.steven.solomon.security.permission.PermissionStore;
+import com.steven.solomon.security.core.spi.AnonymousPathProvider;
+import com.steven.solomon.security.core.permission.InMemoryPermissionStore;
+import com.steven.solomon.security.core.permission.PermissionScanner;
+import com.steven.solomon.security.core.permission.PermissionStore;
 import com.steven.solomon.security.properties.SecurityGrayProperties;
-import com.steven.solomon.security.properties.SecurityJwtProperties;
+import com.steven.solomon.security.core.JwtTokenProperties;
 import com.steven.solomon.security.properties.SecurityProperties;
 import com.steven.solomon.security.spi.AccessValidator;
 import com.steven.solomon.utils.logger.LoggerUtils;
@@ -39,7 +39,7 @@ import org.springframework.core.Ordered;
 @ConditionalOnProperty(name = "security.enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties({
         SecurityProperties.class,
-        SecurityJwtProperties.class,
+        JwtTokenProperties.class,
         SecurityGrayProperties.class
 })
 public class SecurityAutoConfiguration {
@@ -51,7 +51,7 @@ public class SecurityAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public JwtTokenService jwtTokenService(SecurityJwtProperties properties) {
+    public JwtTokenService jwtTokenService(JwtTokenProperties properties) {
         return new JwtTokenService(properties);
     }
 

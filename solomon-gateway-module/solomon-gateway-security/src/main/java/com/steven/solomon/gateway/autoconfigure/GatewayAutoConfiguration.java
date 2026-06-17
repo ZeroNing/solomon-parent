@@ -1,19 +1,19 @@
 package com.steven.solomon.gateway.autoconfigure;
 
 import com.steven.solomon.gateway.core.GatewayResponseWriter;
-import com.steven.solomon.gateway.core.JwtTokenService;
+import com.steven.solomon.security.core.JwtTokenService;
 import com.steven.solomon.gateway.filter.GatewaySecurityFilter;
 import com.steven.solomon.gateway.filter.GrayReleaseFilter;
 import com.steven.solomon.gateway.gray.GrayReleaseSelector;
-import com.steven.solomon.gateway.permission.InMemoryPermissionStore;
-import com.steven.solomon.gateway.permission.PermissionScanner;
-import com.steven.solomon.gateway.permission.PermissionStore;
+import com.steven.solomon.security.core.permission.InMemoryPermissionStore;
+import com.steven.solomon.security.core.permission.PermissionScanner;
+import com.steven.solomon.security.core.permission.PermissionStore;
 import com.steven.solomon.gateway.properties.GatewayGrayProperties;
-import com.steven.solomon.gateway.properties.GatewayJwtProperties;
+import com.steven.solomon.security.core.JwtTokenProperties;
 import com.steven.solomon.gateway.properties.GatewaySecurityProperties;
 import com.steven.solomon.gateway.properties.GatewaySwaggerProperties;
 import com.steven.solomon.gateway.properties.GatewayTenantProperties;
-import com.steven.solomon.gateway.spi.AnonymousPathProvider;
+import com.steven.solomon.security.core.spi.AnonymousPathProvider;
 import com.steven.solomon.gateway.spi.GatewayAccessValidator;
 import com.steven.solomon.gateway.spi.GatewayTenantValidator;
 import com.steven.solomon.gateway.swagger.SwaggerResourceProvider;
@@ -53,7 +53,7 @@ import org.springframework.context.annotation.Bean;
 @ConditionalOnProperty(name = "gateway.enabled", havingValue = "true", matchIfMissing = true)
 @EnableConfigurationProperties({
         GatewaySecurityProperties.class,
-        GatewayJwtProperties.class,
+        JwtTokenProperties.class,
         GatewayTenantProperties.class,
         GatewayGrayProperties.class,
         GatewaySwaggerProperties.class
@@ -67,7 +67,7 @@ public class GatewayAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public JwtTokenService jwtTokenService(GatewayJwtProperties properties) {
+    public JwtTokenService jwtTokenService(JwtTokenProperties properties) {
         return new JwtTokenService(properties);
     }
 

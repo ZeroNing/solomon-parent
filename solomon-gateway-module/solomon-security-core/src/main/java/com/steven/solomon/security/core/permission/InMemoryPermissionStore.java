@@ -1,4 +1,4 @@
-package com.steven.solomon.security.permission;
+package com.steven.solomon.security.core.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;

@@ -1,6 +1,6 @@
 package com.steven.solomon.gateway.spi;
 
-import com.steven.solomon.gateway.core.TokenClaims;
+import com.steven.solomon.security.core.TokenClaims;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 

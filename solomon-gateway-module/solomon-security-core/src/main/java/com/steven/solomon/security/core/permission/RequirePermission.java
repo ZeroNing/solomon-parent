@@ -1,4 +1,4 @@
-package com.steven.solomon.security.permission;
+package com.steven.solomon.security.core.permission;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

@@ -2,7 +2,7 @@ package com.steven.solomon.gateway.gray;
 
 import cn.hutool.core.util.StrUtil;
 
-import com.steven.solomon.gateway.core.TokenClaims;
+import com.steven.solomon.security.core.TokenClaims;
 import com.steven.solomon.gateway.properties.GatewayGrayProperties;
 import java.util.Objects;
 

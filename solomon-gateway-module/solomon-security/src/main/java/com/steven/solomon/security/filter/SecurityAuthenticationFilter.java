@@ -2,21 +2,30 @@ package com.steven.solomon.security.filter;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 
 import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.security.core.JwtTokenService;
 import com.steven.solomon.security.core.TokenClaims;
 import com.steven.solomon.security.properties.SecurityProperties;
 import com.steven.solomon.security.spi.AccessValidator;
-import com.steven.solomon.security.spi.AnonymousPathProvider;
+import com.steven.solomon.security.core.spi.AnonymousPathProvider;
+import com.steven.solomon.utils.i18n.I18nUtils;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
@@ -51,6 +60,10 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
     public static final String CLAIMS_ATTRIBUTE = "security.token.claims";
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
+    /** 服务标识，从 spring.application.id 读取，与 GlobalExceptionHandler 保持一致。 */
+    @Value("${spring.application.id:default}")
+    private String serverId;
 
     private final JwtTokenService jwtTokenService;
     private final SecurityProperties properties;
@@ -96,12 +109,12 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
         // 3. Token 鉴权：从 Authorization 头提取 Bearer Token
         String token = jwtTokenService.resolveBearerToken(request.getHeader("Authorization"));
         if (StrUtil.isBlank(token)) {
-            writeError(response, HttpStatus.UNAUTHORIZED, "TOKEN_REQUIRED", "缺少访问令牌，请先登录");
+            writeError(response, HttpStatus.UNAUTHORIZED, "TOKEN_REQUIRED");
             return;
         }
         TokenClaims claims = jwtTokenService.parseToken(token);
         if (claims == null) {
-            writeError(response, HttpStatus.UNAUTHORIZED, "TOKEN_INVALID", "访问令牌无效或已过期，请重新登录");
+            writeError(response, HttpStatus.UNAUTHORIZED, "TOKEN_INVALID");
             return;
         }
 
@@ -111,17 +124,17 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
 
         // 5. 授权校验（客户实现，默认拒绝）
         if (accessValidator == null) {
-            writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED", "未配置授权校验器，请求被拒绝");
+            writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
             return;
         }
         try {
             if (!accessValidator.validate(claims, request)) {
-                writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED", "无权访问该接口");
+                writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
                 return;
             }
         } catch (Exception e) {
             logger.error("授权校验异常, 用户={}, 路径={}", claims.userId(), path, e);
-            writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED", "授权校验失败，请求被拒绝");
+            writeError(response, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
             return;
         }
 
@@ -130,16 +143,26 @@ public class SecurityAuthenticationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 写入 JSON 错误响应。
+     * 写入 JSON 错误响应，结构严格对齐项目 BaseExceptionVO。
+     *
+     * <p>响应字段：status、errorCode、message、serverId、requestId。</p>
      */
-    private void writeError(HttpServletResponse response, HttpStatus status, String code, String message)
-            throws IOException {
+    private void writeError(HttpServletResponse response, HttpStatus status, String code) throws IOException {
+        // 通过 i18n 解析错误文案，根据请求语言环境返回中文或英文
+        String message = I18nUtils.getErrorMessage(code);
+        if (StrUtil.isBlank(message)) { message = code; }
         logger.warn("安全过滤拒绝请求: 状态={}, 错误码={}, 提示={}", status.value(), code, message);
         response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        String json = "{\"errorCode\":\"" + code + "\",\"message\":\"" + message + "\",\"status\":" + status.value() + "}";
-        response.getWriter().write(json);
+        // 严格对齐项目 BaseExceptionVO 的 JSON 结构
+        Map<String, Object> body = new LinkedHashMap<>(5);
+        body.put(BaseCode.HTTP_STATUS, status.value());
+        body.put(BaseCode.ERROR_CODE, code);
+        body.put(BaseCode.MESSAGE, message);
+        body.put(BaseCode.SERVER_ID, serverId);
+        body.put(BaseCode.REQUEST_ID, null);
+        response.getWriter().write(JSONUtil.toJsonStr(body));
     }
 
     private boolean matchesAny(List<String> patterns, String path) {

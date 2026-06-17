@@ -1,4 +1,4 @@
-package com.steven.solomon.gateway.permission;
+package com.steven.solomon.security.core.permission;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
@@ -28,12 +28,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
  * 结合 {@code @RequestMapping}/{@code @GetMapping} 等映射注解和 Swagger {@code @Operation}
  * 生成 {@link PermissionInfo}，同步到 {@link PermissionStore}。</p>
  *
- * <p>权限编码：注解 {@link RequirePermission#value()} 显式指定优先；未指定时由
- * {@link PermissionCodeGenerator#fromPath(String)} 按路径自动生成。</p>
- *
- * <p>权限名称：注解 {@link RequirePermission#name()} 优先；其次 Swagger
- * {@code @Operation.summary()}；最后回退方法名。</p>
- *
  * @author steven
  */
 public class PermissionScanner {
@@ -49,16 +43,12 @@ public class PermissionScanner {
     }
 
     /**
-     * 执行权限扫描。
+     * 执行权限扫描，返回扫描到的权限列表并保存到存储。
      *
-     * <p>遍历容器中所有 Controller Bean 的方法，提取 {@link RequirePermission} 注解信息，
-     * 生成权限元数据并保存到 {@link PermissionStore}。</p>
-     *
-     * @return 扫描到的权限列表
+     * @return 权限元数据列表
      */
     public List<PermissionInfo> scan() {
         Set<PermissionInfo> result = new LinkedHashSet<>();
-        // 遍历所有 Bean，找带 @RequirePermission 的方法
         String[] beanNames = applicationContext.getBeanDefinitionNames();
         for (String beanName : beanNames) {
             Class<?> beanType;
@@ -70,7 +60,6 @@ public class PermissionScanner {
             if (beanType == null) {
                 continue;
             }
-            // 获取类级别的 @RequestMapping 作为基础路径
             String basePath = extractBasePath(beanType);
             for (Method method : beanType.getDeclaredMethods()) {
                 RequirePermission annotation = AnnotationUtils.findAnnotation(method, RequirePermission.class);
@@ -98,9 +87,6 @@ public class PermissionScanner {
         return list;
     }
 
-    /**
-     * 提取类级别 @RequestMapping 的基础路径。
-     */
     private String extractBasePath(Class<?> beanType) {
         RequestMapping classMapping = AnnotationUtils.findAnnotation(beanType, RequestMapping.class);
         if (classMapping != null && classMapping.value().length > 0) {
@@ -109,29 +95,21 @@ public class PermissionScanner {
         return "";
     }
 
-    /**
-     * 提取方法级别的路径和 HTTP 方法映射。
-     */
     private List<PathMethod> extractPathMappings(Method method, String basePath) {
         List<PathMethod> result = new ArrayList<>();
-
-        // @RequestMapping
         RequestMapping reqMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
         if (reqMapping != null) {
             String[] paths = reqMapping.value().length > 0 ? reqMapping.value() : new String[]{basePath};
             for (String path : paths) {
-                for (RequestMethod rm : reqMapping.method()) {
-                    result.add(new PathMethod(joinPath(basePath, path), rm.name()));
-                }
-            }
-            // 如果没有指定 method，默认 GET
-            if (reqMapping.method().length == 0) {
-                for (String path : paths) {
+                if (reqMapping.method().length == 0) {
                     result.add(new PathMethod(joinPath(basePath, path), "GET"));
+                } else {
+                    for (RequestMethod rm : reqMapping.method()) {
+                        result.add(new PathMethod(joinPath(basePath, path), rm.name()));
+                    }
                 }
             }
         }
-        // 快捷映射注解
         addSimpleMapping(method, GetMapping.class, "GET", basePath, result);
         addSimpleMapping(method, PostMapping.class, "POST", basePath, result);
         addSimpleMapping(method, PutMapping.class, "PUT", basePath, result);
@@ -140,16 +118,21 @@ public class PermissionScanner {
         return result;
     }
 
-    /**
-     * 处理 @GetMapping/@PostMapping 等快捷注解。
-     */
+    @SuppressWarnings("unchecked")
     private void addSimpleMapping(Method method, Class<?> annotationType, String httpMethod,
                                   String basePath, List<PathMethod> result) {
+        // 用 Java 原生反射获取注解，避免 Spring AnnotationUtils 的泛型约束问题
         Object annotation = null;
         for (java.lang.annotation.Annotation a : method.getAnnotations()) {
-            if (a.annotationType() == annotationType) { annotation = a; break; }
+            if (a.annotationType() == annotationType) {
+                annotation = a;
+                break;
+            }
         }
-        if (annotation == null) { return; }
+        if (annotation == null) {
+            return;
+        }
+        // 通过反射调用注解的 value() 方法获取路径
         try {
             java.lang.reflect.Method valueMethod = annotation.getClass().getMethod("value");
             String[] values = (String[]) valueMethod.invoke(annotation);
@@ -161,13 +144,11 @@ public class PermissionScanner {
                 }
             }
         } catch (Exception e) {
+            // 注解没有 value() 方法时，按空路径处理
             result.add(new PathMethod(joinPath(basePath, ""), httpMethod));
         }
     }
 
-    /**
-     * 拼接基础路径和方法路径。
-     */
     private String joinPath(String basePath, String methodPath) {
         if (StrUtil.isBlank(methodPath)) {
             return StrUtil.isBlank(basePath) ? "/" : basePath;
@@ -180,9 +161,6 @@ public class PermissionScanner {
         return left + right;
     }
 
-    /**
-     * 解析权限展示名称：注解 > Swagger summary > 方法名。
-     */
     private String resolveDisplayName(RequirePermission annotation, Method method) {
         if (StrUtil.isNotBlank(annotation.name())) {
             return annotation.name();
@@ -194,7 +172,6 @@ public class PermissionScanner {
         return method.getName();
     }
 
-    /** 路径与HTTP方法的内部组合。 */
     private record PathMethod(String path, String method) {
     }
 }
