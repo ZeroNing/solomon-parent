@@ -1,3 +1,4 @@
 com.steven.solomon.job.xxl.config.XxlJobConfig
 com.steven.solomon.job.xxl.init.XxlJobInit
 com.steven.solomon.job.xxl.service.XxlJobService
+com.steven.solomon.job.xxl.config.XxlJobHealthAutoConfiguration

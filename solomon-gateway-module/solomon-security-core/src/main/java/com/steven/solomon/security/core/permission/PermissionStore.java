@@ -32,4 +32,44 @@ public interface PermissionStore {
      * @return 匿名路径列表
      */
     List<String> findAnonymousPaths();
+
+    /**
+     * Remove all cached/stored permission metadata.
+     *
+     * <p>Implementations backed by an external permission center should also invalidate any local permission
+     * decision cache in this method.</p>
+     */
+    default void invalidateAll() {
+        throw new UnsupportedOperationException("Permission cache invalidation is not supported");
+    }
+
+    /**
+     * Remove one permission by code and invalidate related permission decision cache.
+     *
+     * @param code permission code
+     * @return true if at least one permission entry was removed
+     */
+    default boolean invalidateByCode(String code) {
+        throw new UnsupportedOperationException("Permission cache invalidation by code is not supported");
+    }
+
+    /**
+     * Remove permissions bound to one HTTP path and invalidate related permission decision cache.
+     *
+     * @param path request path
+     * @param method HTTP method, blank means all methods under the path
+     * @return true if at least one permission entry was removed
+     */
+    default boolean invalidateByPath(String path, String method) {
+        throw new UnsupportedOperationException("Permission cache invalidation by path is not supported");
+    }
+
+    /**
+     * Monotonic version for cache consumers. A changed value means consumers should reload permission metadata.
+     *
+     * @return current permission metadata version
+     */
+    default long version() {
+        return 0L;
+    }
 }

@@ -23,6 +23,14 @@ import com.steven.solomon.lambda.Lambda;
 import com.steven.solomon.job.power.properties.PowerJobRegisterProperties;
 import com.steven.solomon.service.JobService;
 import com.steven.solomon.service.JobLogSanitizer;
+import com.steven.solomon.reliability.CircuitBreaker;
+import com.steven.solomon.reliability.RetryExecutor;
+import com.steven.solomon.utils.logger.LoggerUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
+import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
@@ -31,6 +39,7 @@ import tech.powerjob.common.request.http.SaveJobInfoRequest;
 import tech.powerjob.common.response.JobInfoDTO;
 import tech.powerjob.worker.autoconfigure.PowerJobProperties;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +59,12 @@ import static com.steven.solomon.job.power.code.PowerJobErrorCode.*;
 @Conditional(PowerJobCondition.class)
 public class PowerJobService implements JobService<SaveJobInfoRequest> {
 
+    private final Logger logger = LoggerUtils.logger(PowerJobService.class);
+
+    private final RetryExecutor retryExecutor = new RetryExecutor();
+
+    private final CircuitBreaker circuitBreaker = new CircuitBreaker();
+
     /** 自动注册配置。 */
     private final PowerJobRegisterProperties registerProperties;
 
@@ -62,10 +77,17 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
     /** 当前应用 ID（延迟加载）。 */
     private Integer appId;
 
+    private MeterRegistry meterRegistry;
+
     public PowerJobService(PowerJobRegisterProperties registerProperties, PowerJobProperties powerJobProperties) {
         this.registerProperties = registerProperties;
         this.powerJobProperties = powerJobProperties;
         this.adminAddresses = getUrl();
+    }
+
+    @Autowired(required = false)
+    public void setMeterRegistry(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -457,14 +479,77 @@ public class PowerJobService implements JobService<SaveJobInfoRequest> {
      * 获取接口返回的数据
      */
     private String execute(String cookie, String url,Method requestMethod,ContentType contentType, Map<String, Object> paramMap) throws BaseException {
+        try {
+            return circuitBreaker.execute("powerjob-admin",
+                    CircuitBreaker.Options.of(
+                            registerProperties.getAdminApiCircuitFailureThreshold(),
+                            registerProperties.getAdminApiCircuitOpenDurationMillis()),
+                    () -> retryExecutor.execute("powerjob-admin",
+                            RetryExecutor.RetryOptions.of(
+                                    registerProperties.getAdminApiMaxAttempts(),
+                                    registerProperties.getAdminApiBackoffMillis()),
+                            () -> executeOnce(cookie, url, requestMethod, contentType, paramMap)));
+        } catch (CircuitBreaker.CircuitBreakerOpenException exception) {
+            logger.warn("PowerJob admin circuit breaker open, method={}, path={}, remaining={}",
+                    requestMethod == null ? "unknown" : requestMethod.name(), adminPath(url), exception.getMessage());
+            throw new BaseException(exception);
+        } catch (BaseException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new BaseException(exception);
+        }
+    }
+
+    private String executeOnce(String cookie, String url,Method requestMethod,ContentType contentType, Map<String, Object> paramMap) throws BaseException {
+        Timer.Sample sample = meterRegistry == null ? null : Timer.start(meterRegistry);
+        String method = requestMethod == null ? "unknown" : requestMethod.name();
+        String path = adminPath(url);
+        String outcome = "success";
         try (HttpResponse response = executeResponse(cookie, url,requestMethod,contentType, paramMap)) {
             String body = response.body();
             if (!JSONUtil.isTypeJSON(body) || !body.trim().startsWith("{")) {
+                logger.debug("PowerJob admin request succeeded, method={}, path={}, status={}", method, path, response.getStatus());
                 return body;
             }
             Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
+            logger.debug("PowerJob admin request succeeded, method={}, path={}, status={}", method, path, response.getStatus());
             return ObjectUtil.isEmpty(resultMap.get("data")) ? body : resultMap.get("data").toString();
+        } catch (RuntimeException exception) {
+            outcome = "error";
+            logger.warn("PowerJob admin request error, method={}, path={}, params={}",
+                    method, path, JobLogSanitizer.sanitize(paramMap), exception);
+            throw exception;
+        } finally {
+            recordAdminRequest(sample, method, path, outcome);
         }
+    }
+
+    private void recordAdminRequest(Timer.Sample sample, String method, String path, String outcome) {
+        if (meterRegistry == null) {
+            return;
+        }
+        Tags tags = Tags.of(
+                "provider", "powerjob",
+                "method", safeTag(method),
+                "path", safeTag(path),
+                "outcome", safeTag(outcome));
+        meterRegistry.counter("solomon.job.admin.request.total", tags).increment();
+        if (sample != null) {
+            sample.stop(Timer.builder("solomon.job.admin.request.duration").tags(tags).register(meterRegistry));
+        }
+    }
+
+    private String adminPath(String url) {
+        try {
+            String path = URI.create(url).getPath();
+            return ObjectUtil.isEmpty(path) ? "unknown" : path;
+        } catch (RuntimeException ignored) {
+            return ObjectUtil.isEmpty(url) ? "unknown" : url;
+        }
+    }
+
+    private String safeTag(String value) {
+        return ObjectUtil.isEmpty(value) ? "unknown" : value;
     }
 
     /**

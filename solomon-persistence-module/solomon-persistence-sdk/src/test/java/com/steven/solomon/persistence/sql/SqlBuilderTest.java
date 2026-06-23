@@ -54,6 +54,23 @@ class SqlBuilderTest {
   }
 
   @Test
+  void shouldRejectWriteKeywordInRawCondition() {
+    Sql sql = Sql.select("*").from("demo_user");
+
+    assertThrows(PersistenceException.class,
+        () -> sql.where("id = :id OR EXISTS (DELETE FROM demo_user)"));
+  }
+
+  @Test
+  void shouldAllowTopLevelDmlButRejectDdl() {
+    assertEquals("UPDATE demo_user SET name = :name WHERE id = :id",
+        Sql.of("UPDATE demo_user SET name = :name WHERE id = :id").getText());
+
+    assertThrows(PersistenceException.class,
+        () -> Sql.of("DROP TABLE demo_user"));
+  }
+
+  @Test
   void shouldBuildConditionByLambdaGetter() {
     Cond cond = Cond.eq(UserEntity::getId, 123L);
 

@@ -30,8 +30,16 @@ public final class SqlInjectionGuard {
   private static final Pattern QUERY_START =
       Pattern.compile("^(SELECT|WITH|SHOW|DESC|DESCRIBE|EXPLAIN)\\b", Pattern.CASE_INSENSITIVE);
 
+  private static final Pattern STATEMENT_START =
+      Pattern.compile("^(SELECT|WITH|SHOW|DESC|DESCRIBE|EXPLAIN|INSERT|UPDATE|DELETE|MERGE)\\b",
+          Pattern.CASE_INSENSITIVE);
+
   private static final Pattern WRITE_KEYWORD =
       Pattern.compile("\\b(INSERT|UPDATE|DELETE|MERGE|DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|CALL|EXEC|EXECUTE)\\b",
+          Pattern.CASE_INSENSITIVE);
+
+  private static final Pattern FORBIDDEN_KEYWORD =
+      Pattern.compile("\\b(DROP|ALTER|TRUNCATE|CREATE|GRANT|REVOKE|CALL|EXEC|EXECUTE)\\b",
           Pattern.CASE_INSENSITIVE);
 
   private SqlInjectionGuard() {
@@ -50,6 +58,10 @@ public final class SqlInjectionGuard {
     }
     String text = value.trim();
     rejectDangerousToken(text, scene);
+    rejectForbiddenKeyword(text, scene);
+    if (!STATEMENT_START.matcher(text).find() && WRITE_KEYWORD.matcher(text).find()) {
+      throw risk(scene, value);
+    }
     return value;
   }
 
@@ -145,7 +157,7 @@ public final class SqlInjectionGuard {
     String text = value.trim();
     rejectDangerousToken(text, scene);
     if (text.startsWith("(")) {
-      return validateRawSql(text, scene);
+      return validateSubquery(text, scene);
     }
     return validateQualifiedIdentifier(value, scene);
   }
@@ -204,6 +216,21 @@ public final class SqlInjectionGuard {
         || lower.contains("\u0000")) {
       throw risk(scene, value);
     }
+  }
+
+  private static void rejectForbiddenKeyword(String value, String scene) {
+    if (FORBIDDEN_KEYWORD.matcher(value).find()) {
+      throw risk(scene, value);
+    }
+  }
+
+  private static String validateSubquery(String value, String scene) {
+    if (!value.endsWith(")")) {
+      throw risk(scene, value);
+    }
+    String inner = value.substring(1, value.length() - 1).trim();
+    validateQuerySql(inner, scene);
+    return value;
   }
 
   private static boolean hasMultiStatement(String value) {

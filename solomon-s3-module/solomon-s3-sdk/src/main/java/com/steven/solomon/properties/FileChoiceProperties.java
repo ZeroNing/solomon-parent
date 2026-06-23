@@ -2,7 +2,11 @@ package com.steven.solomon.properties;
 
 import com.steven.solomon.enums.FileChoiceEnum;
 import com.steven.solomon.enums.FileNamingMethodEnum;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 文件存储配置属性。
@@ -11,14 +15,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 包括供应商选择、访问凭证、存储桶、超时等参数。</p>
  */
 @ConfigurationProperties(prefix = "file")
+@Validated
 public class FileChoiceProperties {
 
   /** 默认地区名称（腾讯云广州）。 */
   private static final String DEFAULT_REGION_NAME = "ap-guangzhou";
 
   /** 文件服务供应商选择。 */
+  @NotNull(message = "file.choice must not be null")
   private FileChoiceEnum choice = FileChoiceEnum.DEFAULT;
   /** 文件命名规则方式。 */
+  @NotNull(message = "file.file-naming-method must not be null")
   private FileNamingMethodEnum fileNamingMethod = FileNamingMethodEnum.ORIGINAL;
 
   /** 服务端点地址（URL、域名、IPv4 或 IPv6 地址）。 */
@@ -44,12 +51,15 @@ public class FileChoiceProperties {
    *
    * <p>用于大文件分片上传时每个分片的大小。</p>
    */
+  @Min(value = 1, message = "file.part-size must be at least 1 MB")
   private Integer partSize = 5;
 
   /** 连接超时时间，单位毫秒，默认 60 秒。 */
+  @Min(value = 1, message = "file.connection-timeout must be at least 1 millisecond")
   private Integer connectionTimeout = 60000;
 
   /** Socket 读取超时时间，单位毫秒，默认 60 秒。 */
+  @Min(value = 1, message = "file.socket-timeout must be at least 1 millisecond")
   private Integer socketTimeout = 60000;
 
   /**
@@ -63,6 +73,17 @@ public class FileChoiceProperties {
 
   /** 默认桶不存在时是否自动创建。 */
   private boolean autoCreateBucket = true;
+
+  @AssertTrue(message = "file.endpoint, file.access-key, file.secret-key and file.bucket-name are required when file.choice is not DEFAULT")
+  public boolean isProviderConfigurationValid() {
+    return choice == null
+        || choice == FileChoiceEnum.DEFAULT
+        || (hasText(endpoint) && hasText(accessKey) && hasText(secretKey) && hasText(bucketName));
+  }
+
+  private boolean hasText(String value) {
+    return value != null && !value.trim().isEmpty();
+  }
 
   public boolean getCheckBucketOnStartup() {
     return checkBucketOnStartup;

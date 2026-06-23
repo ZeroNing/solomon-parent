@@ -7,6 +7,7 @@ import com.steven.solomon.init.AbstractMessageLineRunner;
 import com.steven.solomon.rabbitmq.annotation.MessageListener;
 import com.steven.solomon.rabbitmq.annotation.MessageListenerRetry;
 import com.steven.solomon.code.BaseCode;
+import com.steven.solomon.rabbitmq.config.RabbitRetryTopologyValidator;
 import com.steven.solomon.rabbitmq.consumer.AbstractConsumer;
 import com.steven.solomon.rabbitmq.properties.RabbitMqProperties;
 import com.steven.solomon.rabbitmq.service.*;
@@ -153,6 +154,7 @@ public class RabbitMQInitConfig extends AbstractMessageLineRunner<MessageListene
         container.setPrefetchCount(messageListener.prefetchCount());
         container.setAmqpAdmin(admin);
         MessageListenerRetry messageListenerRetry = AnnotationUtil.getAnnotation(abstractConsumer.getClass(), MessageListenerRetry.class);
+        RabbitRetryTopologyValidator.validate(properties, messageListener, messageListenerRetry, abstractConsumer.getClass());
         if (ObjectUtil.isNotEmpty(messageListenerRetry) && AbstractConsumer.class.isAssignableFrom(abstractConsumer.getClass())) {
             //设置重试机制
             container.setAdviceChain(setRabbitRetry (messageListenerRetry));

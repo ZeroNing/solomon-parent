@@ -33,6 +33,18 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webflux</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+
     <!-- API 文档（Knife4j + SpringDoc，原 solomon-base） -->
     <dependency>
       <groupId>com.github.xiaoymin</groupId>

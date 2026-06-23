@@ -1,6 +1,8 @@
 package com.steven.solomon.security.autoconfigure;
 
 import com.steven.solomon.security.core.JwtTokenService;
+import com.steven.solomon.security.core.InMemoryTokenRevocationStore;
+import com.steven.solomon.security.core.TokenRevocationStore;
 import com.steven.solomon.security.filter.SecurityAuthenticationFilter;
 import com.steven.solomon.security.core.spi.AnonymousPathProvider;
 import com.steven.solomon.security.core.permission.InMemoryPermissionStore;
@@ -51,8 +53,17 @@ public class SecurityAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public JwtTokenService jwtTokenService(JwtTokenProperties properties) {
-        return new JwtTokenService(properties);
+    public TokenRevocationStore tokenRevocationStore() {
+        return new InMemoryTokenRevocationStore();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtTokenService jwtTokenService(
+            JwtTokenProperties properties,
+            TokenRevocationStore tokenRevocationStore) {
+        return new JwtTokenService(properties, new com.steven.solomon.context.TenantModeResolver(
+                new com.steven.solomon.context.TenantModeProperties()), tokenRevocationStore);
     }
 
     /**

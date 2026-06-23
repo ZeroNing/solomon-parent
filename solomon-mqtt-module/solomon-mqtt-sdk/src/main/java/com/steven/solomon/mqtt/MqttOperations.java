@@ -1,5 +1,6 @@
 package com.steven.solomon.mqtt;
 
+import com.steven.solomon.context.ContextAwareCompletableFuture;
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 import java.util.concurrent.CompletableFuture;
 
@@ -20,7 +21,7 @@ public interface MqttOperations {
    */
   default CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
     prepareMessage(data);
-    return CompletableFuture.runAsync(() -> {
+    return ContextAwareCompletableFuture.runAsync(() -> {
       try {
         send(data);
       } catch (Exception e) {

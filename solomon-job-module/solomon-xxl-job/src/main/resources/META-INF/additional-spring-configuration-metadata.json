@@ -1,0 +1,28 @@
+{
+  "properties": [
+    {
+      "name": "xxl.register.admin-api-max-attempts",
+      "type": "java.lang.Integer",
+      "description": "Maximum attempts for each XXL-JOB admin API call. Values greater than 1 enable retry with linear backoff.",
+      "defaultValue": 1
+    },
+    {
+      "name": "xxl.register.admin-api-backoff-millis",
+      "type": "java.lang.Long",
+      "description": "Base retry backoff in milliseconds for XXL-JOB admin API calls. The effective wait is base backoff multiplied by the attempt number.",
+      "defaultValue": 0
+    },
+    {
+      "name": "xxl.register.admin-api-circuit-failure-threshold",
+      "type": "java.lang.Integer",
+      "description": "Number of failed XXL-JOB admin API operations that opens the circuit breaker.",
+      "defaultValue": 5
+    },
+    {
+      "name": "xxl.register.admin-api-circuit-open-duration-millis",
+      "type": "java.lang.Long",
+      "description": "How long the XXL-JOB admin API circuit breaker stays open before allowing a half-open probe.",
+      "defaultValue": 30000
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "spring.rabbitmq.reliability.require-dlx-for-retry",
+      "type": "java.lang.Boolean",
+      "description": "Fail startup when a @MessageListenerRetry consumer is missing a DLX binding. This turns retry topology warnings into a hard contract for production queues.",
+      "defaultValue": false
+    }
+  ]
+}

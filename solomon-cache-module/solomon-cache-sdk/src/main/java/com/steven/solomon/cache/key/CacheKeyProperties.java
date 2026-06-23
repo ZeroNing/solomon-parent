@@ -1,5 +1,9 @@
 package com.steven.solomon.cache.key;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 /**
  * 缓存 key 构建配置属性。
  *
@@ -9,12 +13,15 @@ package com.steven.solomon.cache.key;
 public class CacheKeyProperties {
 
   /** key 组装模式，默认 {@link CacheKeyMode#NONE}。 */
+  @NotNull(message = "cache key mode must not be null")
   private CacheKeyMode mode = CacheKeyMode.NONE;
 
   /** 全局前缀，用于区分不同应用或环境。 */
   private String globalPrefix;
 
   /** key 各部分之间的分隔符，默认为 ":"。 */
+  @NotBlank(message = "cache key separator must not be blank")
+  @Size(max = 8, message = "cache key separator must be no longer than 8 characters")
   private String separator = ":";
 
   /**

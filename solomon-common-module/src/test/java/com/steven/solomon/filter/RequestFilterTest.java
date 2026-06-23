@@ -8,6 +8,7 @@ import com.steven.solomon.code.BaseCode;
 import com.steven.solomon.context.TenantModeProperties;
 import com.steven.solomon.context.TenantModeResolver;
 import com.steven.solomon.context.TenantRequestBinder;
+import com.steven.solomon.exception.ExceptionUtil;
 import com.steven.solomon.holder.RequestHeaderHolder;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -78,6 +79,18 @@ class RequestFilterTest {
             assertEquals("default", RequestHeaderHolder.getTenantCode()));
 
     assertEquals("", RequestHeaderHolder.getTenantCode());
+  }
+
+  @Test
+  void preserveIncomingRequestId() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addHeader(BaseCode.REQUEST_ID, " request-upstream ");
+
+    new RequestFilter(List.of(), tenantModeResolver()).doFilter(request,
+        new MockHttpServletResponse(), (currentRequest, response) ->
+            assertEquals("request-upstream", ExceptionUtil.requestId.get()));
+
+    assertEquals(null, ExceptionUtil.requestId.get());
   }
 
   private TenantModeResolver tenantModeResolver() {

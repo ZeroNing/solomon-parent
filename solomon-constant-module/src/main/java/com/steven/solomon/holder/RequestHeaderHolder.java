@@ -98,6 +98,31 @@ public class RequestHeaderHolder {
     THREAD_LOCAL.remove();
   }
 
+  public static RequestHeader snapshot() {
+    return copyOf(THREAD_LOCAL.get());
+  }
+
+  public static void restore(RequestHeader requestHeader) {
+    if (requestHeader == null) {
+      remove();
+      return;
+    }
+    THREAD_LOCAL.set(copyOf(requestHeader));
+  }
+
+  public static Runnable wrap(Runnable task) {
+    RequestHeader captured = snapshot();
+    return () -> {
+      RequestHeader previous = snapshot();
+      try {
+        restore(captured);
+        task.run();
+      } finally {
+        restore(previous);
+      }
+    };
+  }
+
   /**
    * 空值默认处理，将 null 转为空字符串。
    *
@@ -106,5 +131,16 @@ public class RequestHeaderHolder {
    */
   private static String defaultString(String value) {
     return StrUtil.emptyToDefault(value, "");
+  }
+
+  private static RequestHeader copyOf(RequestHeader source) {
+    RequestHeader copy = new RequestHeader();
+    if (source != null) {
+      copy.setTimezone(source.getTimezone());
+      copy.setTenantId(source.getTenantId());
+      copy.setTenantCode(source.getTenantCode());
+      copy.setTenantName(source.getTenantName());
+    }
+    return copy;
   }
 }

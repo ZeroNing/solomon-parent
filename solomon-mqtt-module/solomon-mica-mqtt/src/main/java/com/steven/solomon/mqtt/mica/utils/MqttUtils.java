@@ -15,6 +15,7 @@ import com.steven.solomon.mqtt.model.MqttSubscriptionDescriptor;
 import com.steven.solomon.mqtt.support.MqttListenerRegistry;
 import com.steven.solomon.mq.SendService;
 import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.context.ContextAwareCompletableFuture;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -74,7 +75,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
   @Override
   public CompletableFuture<Void> sendAsync(MqttMessageModel<?> data) {
     prepareMessage(data);
-    return CompletableFuture.runAsync(() -> {
+    return ContextAwareCompletableFuture.runAsync(() -> {
       try {
         send(data);
       } catch (Exception e) {

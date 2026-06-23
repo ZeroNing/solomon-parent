@@ -5,13 +5,17 @@ import com.steven.solomon.cache.key.CacheKeyBuilder;
 import com.steven.solomon.cache.redis.connection.TenantAwareRedisConnectionFactory;
 import com.steven.solomon.cache.redis.context.RedisCacheTenantContext;
 import com.steven.solomon.cache.redis.factory.RedisConnectionFactoryBuilder;
+import com.steven.solomon.cache.redis.health.RedisCacheHealthIndicator;
 import com.steven.solomon.cache.redis.properties.RedisCacheProperties;
 import com.steven.solomon.cache.redis.service.RedisCacheService;
 import com.steven.solomon.cache.service.CacheService;
 import com.steven.solomon.context.TenantRequestBinder;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -157,8 +161,16 @@ public class RedisCacheAutoConfiguration {
   @ConditionalOnMissingBean
   public CacheService cacheService(
       @Qualifier("redisTemplate") RedisTemplate<String, Object> redisTemplate,
-      CacheKeyBuilder keyBuilder) {
-    return new RedisCacheService(redisTemplate, keyBuilder);
+      CacheKeyBuilder keyBuilder,
+      ObjectProvider<MeterRegistry> meterRegistry) {
+    return new RedisCacheService(redisTemplate, keyBuilder, meterRegistry.getIfAvailable());
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(name = "redisCacheHealthIndicator")
+  public HealthIndicator redisCacheHealthIndicator(
+      @Qualifier("redisConnectionFactory") RedisConnectionFactory connectionFactory) {
+    return new RedisCacheHealthIndicator(connectionFactory);
   }
 
   /**

@@ -48,7 +48,7 @@ public class RequestFilter extends OncePerRequestFilter {
       FilterChain chain) throws ServletException, IOException {
     TenantResourceScope tenantResourceScope = null;
     try {
-      ExceptionUtil.requestId.set(UUID.randomUUID().toString());
+      ExceptionUtil.requestId.set(resolveRequestId(request.getHeader(BaseCode.REQUEST_ID)));
       RequestHeaderHolder.setTimeZone(request.getHeader(BaseCode.TIMEZONE));
       RequestHeaderHolder.setTenantCode(
           tenantModeResolver.resolve(request.getHeader(BaseCode.TENANT_CODE)));
@@ -78,5 +78,12 @@ public class RequestFilter extends OncePerRequestFilter {
       return request;
     }
     return new ContentCachingRequestWrapper(request);
+  }
+
+  private String resolveRequestId(String requestId) {
+    if (requestId == null || requestId.isBlank()) {
+      return UUID.randomUUID().toString();
+    }
+    return requestId.trim();
   }
 }

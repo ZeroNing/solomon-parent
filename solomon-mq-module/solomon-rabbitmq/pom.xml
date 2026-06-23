@@ -22,6 +22,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-utils-spring</artifactId>
         </dependency>
@@ -29,6 +34,11 @@
         <dependency>
             <groupId>com.steven</groupId>
             <artifactId>solomon-mq-sdk</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
         </dependency>
 
     </dependencies>

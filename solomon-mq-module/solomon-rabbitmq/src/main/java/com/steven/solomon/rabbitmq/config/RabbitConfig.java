@@ -3,6 +3,8 @@ package com.steven.solomon.rabbitmq.config;
 import cn.hutool.core.util.ObjectUtil;
 
 import com.steven.solomon.rabbitmq.factory.RabbitMqTenantContext;
+import com.steven.solomon.rabbitmq.health.RabbitMqHealthIndicator;
+import com.steven.solomon.rabbitmq.properties.RabbitMqProperties;
 import com.steven.solomon.rabbitmq.properties.TenantRabbitMqProperties;
 import com.steven.solomon.rabbitmq.service.AbstractMQService;
 import com.steven.solomon.rabbitmq.service.DelayedMQService;
@@ -21,6 +23,7 @@ import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -53,7 +56,7 @@ import java.util.Map;
  * @author steven
  */
 @Configuration
-@EnableConfigurationProperties(value = {RabbitProperties.class, TenantRabbitMqProperties.class})
+@EnableConfigurationProperties(value = {RabbitProperties.class, RabbitMqProperties.class, TenantRabbitMqProperties.class})
 @Import(value = {RabbitUtils.class, DelayedMQService.class, DirectMQService.class,
         FanoutMQService.class, TopicMQService.class, HeadersMQService.class,
         RabbitAutoConfiguration.class, RabbitMqTenantContext.class})
@@ -149,5 +152,12 @@ public class RabbitConfig {
         rabbitAdmin.setAutoStartup(true);
         logger.info("RabbitAdmin 初始化完成, 启动时将自动声明队列与交换机");
         return rabbitAdmin;
+    }
+
+    @Bean("rabbitMqHealthIndicator")
+    @ConditionalOnMissingBean(name = "rabbitMqHealthIndicator")
+    @Conditional(RabbitCondition.class)
+    public HealthIndicator rabbitMqHealthIndicator(ConnectionFactory connectionFactory, RabbitMqProperties properties) {
+        return new RabbitMqHealthIndicator(connectionFactory, properties);
     }
 }

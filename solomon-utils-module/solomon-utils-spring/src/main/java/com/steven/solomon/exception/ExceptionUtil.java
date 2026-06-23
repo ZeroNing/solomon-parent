@@ -3,6 +3,7 @@ package com.steven.solomon.exception;
 import cn.hutool.core.util.ObjectUtil;
 
 import com.steven.solomon.code.BaseExceptionCode;
+import com.steven.solomon.context.RequestContextSnapshot;
 import com.steven.solomon.exception.handler.AbstractExceptionHandler;
 import com.steven.solomon.pojo.vo.BaseExceptionVO;
 import com.steven.solomon.spring.SpringUtil;
@@ -28,9 +29,13 @@ public class ExceptionUtil {
    *
    * <p>这里保留原有 public 字段以兼容旧代码；Web 请求结束时必须清理，避免线程池复用时串数据。</p>
    */
-  public static final ThreadLocal<String> requestId = new InheritableThreadLocal<>();
+  public static final ThreadLocal<String> requestId = new ThreadLocal<>();
 
   private ExceptionUtil() {
+  }
+
+  public static Runnable wrapContext(Runnable task) {
+    return RequestContextSnapshot.capture().wrap(task);
   }
 
   /**

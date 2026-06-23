@@ -1,3 +1,4 @@
 com.steven.solomon.job.power.init.PowerJobInit
 com.steven.solomon.job.power.service.PowerJobService
 com.steven.solomon.job.power.aspect.PowerJobAspect
+com.steven.solomon.job.power.config.PowerJobHealthAutoConfiguration

@@ -1,6 +1,10 @@
 package com.steven.solomon.gateway.properties;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 网关灰度发布配置属性。
@@ -11,21 +15,27 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author steven
  */
 @ConfigurationProperties(prefix = "gateway.gray")
+@Validated
 public class GatewayGrayProperties {
 
     /** 是否启用灰度发布。 */
     private boolean enabled = false;
 
     /** 灰度版本头名称，网关写入此头标识稳定版/候选版。 */
+    @NotBlank(message = "gateway.gray.header-name must not be blank")
     private String headerName = "X-Gray-Version";
 
     /** 稳定版本标识。 */
+    @NotBlank(message = "gateway.gray.stable-version must not be blank")
     private String stableVersion = "stable";
 
     /** 候选（灰度）版本标识。 */
+    @NotBlank(message = "gateway.gray.candidate-version must not be blank")
     private String candidateVersion = "gray";
 
     /** 候选版本流量占比（0-100），100 表示全部走候选。 */
+    @Min(value = 0, message = "gateway.gray.candidate-weight must be at least 0")
+    @Max(value = 100, message = "gateway.gray.candidate-weight must be at most 100")
     private int candidateWeight = 0;
 
     public boolean isEnabled() {

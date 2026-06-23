@@ -1,6 +1,11 @@
 package com.steven.solomon.clamav.properties;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 import xyz.capybara.clamav.Platform;
 
 /**
@@ -13,19 +18,32 @@ import xyz.capybara.clamav.Platform;
  * @author 创建者
  */
 @ConfigurationProperties("clamav")
+@Validated
 public class ClamAvProperties {
 
     /** ClamAV 服务器主机地址。 */
     private String host;
 
     /** ClamAV 服务器端口号。 */
+    @Min(value = 1, message = "clamav.port must be between 1 and 65535")
+    @Max(value = 65535, message = "clamav.port must be between 1 and 65535")
     private Integer port;
 
     /** 是否启用 ClamAV 病毒扫描，默认不启用。 */
     private boolean enabled = false;
 
     /** ClamAV 运行平台，默认为 UNIX。 */
+    @NotNull(message = "clamav.platform must not be null")
     private Platform platform = Platform.UNIX;
+
+    @AssertTrue(message = "clamav.host and clamav.port are required when clamav.enabled=true")
+    public boolean isEnabledConfigurationValid() {
+        return !enabled || (hasText(host) && port != null);
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
 
     /**
      * 获取运行平台。

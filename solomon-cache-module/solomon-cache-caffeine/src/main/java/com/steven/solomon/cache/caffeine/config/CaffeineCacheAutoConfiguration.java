@@ -1,14 +1,18 @@
 package com.steven.solomon.cache.caffeine.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.steven.solomon.cache.caffeine.health.CaffeineCacheHealthIndicator;
 import com.steven.solomon.cache.caffeine.model.CaffeineCacheValue;
 import com.steven.solomon.cache.caffeine.properties.CaffeineCacheProperties;
 import com.steven.solomon.cache.caffeine.service.CaffeineCacheService;
 import com.steven.solomon.cache.key.CacheKeyBuilder;
 import com.steven.solomon.cache.key.CacheKeyMode;
 import com.steven.solomon.cache.service.CacheService;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -81,10 +85,20 @@ public class CaffeineCacheAutoConfiguration {
   public CacheService caffeineCacheService(
       com.github.benmanes.caffeine.cache.Cache<String, CaffeineCacheValue> caffeineNativeCache,
       CacheKeyBuilder cacheKeyBuilder,
-      CaffeineCacheProperties properties) {
+      CaffeineCacheProperties properties,
+      ObjectProvider<MeterRegistry> meterRegistry) {
     return new CaffeineCacheService(
         caffeineNativeCache,
         cacheKeyBuilder,
-        properties.getDefaultExpire().toSeconds());
+        properties.getDefaultExpire().toSeconds(),
+        meterRegistry.getIfAvailable());
+  }
+
+  @Bean("caffeineCacheHealthIndicator")
+  @ConditionalOnMissingBean(name = "caffeineCacheHealthIndicator")
+  public HealthIndicator caffeineCacheHealthIndicator(
+      com.github.benmanes.caffeine.cache.Cache<String, CaffeineCacheValue> caffeineNativeCache,
+      CaffeineCacheProperties properties) {
+    return new CaffeineCacheHealthIndicator(caffeineNativeCache, properties);
   }
 }

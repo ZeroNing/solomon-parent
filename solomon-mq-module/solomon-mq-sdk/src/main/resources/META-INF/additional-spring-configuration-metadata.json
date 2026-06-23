@@ -1,0 +1,22 @@
+{
+  "properties": [
+    {
+      "name": "solomon.mq.idempotency.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable the starter-provided MessageIdempotencyExecutor. Keep this disabled unless consumers use stable msgId values and duplicate delivery should be skipped.",
+      "defaultValue": false
+    },
+    {
+      "name": "solomon.mq.idempotency.processing-ttl",
+      "type": "java.time.Duration",
+      "description": "How long a message id stays in the processing state before another delivery may retry it.",
+      "defaultValue": "10m"
+    },
+    {
+      "name": "solomon.mq.idempotency.consumed-ttl",
+      "type": "java.time.Duration",
+      "description": "How long a successfully consumed message id is remembered to suppress duplicate delivery. Provide a Redis or database MessageIdempotencyStore for production clusters.",
+      "defaultValue": "1d"
+    }
+  ]
+}

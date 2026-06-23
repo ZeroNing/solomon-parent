@@ -1,67 +1,78 @@
 package com.steven.solomon.mq.rocketmq;
 
 import cn.hutool.json.JSONUtil;
-
 import com.steven.solomon.mq.SendService;
 import com.steven.solomon.mq.model.BaseMq;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.apache.rocketmq.spring.support.RocketMQHeaders;
 import org.slf4j.Logger;
 import org.springframework.messaging.support.MessageBuilder;
 
-/**
- * RocketMQ 消息发送服务实现。
- *
- * <p>基于 {@link RocketMQTemplate} 实现即时发送、延时发送和过期发送。
- * 消息体统一封装为 {@link BaseMq}，租户编码通过消息头 {@code tenantCode} 透传，
- * 消费端据此完成多租户路由。</p>
- *
- * @param <T> 业务消息体类型
- * @author steven
- */
 public class RocketMqSendService<T> implements SendService<BaseMq<T>> {
 
     private static final Logger logger = LoggerUtils.logger(RocketMqSendService.class);
 
-    /** RocketMQ 发送模板，由 Spring 容器注入。 */
     private final RocketMQTemplate rocketMQTemplate;
+    private final MeterRegistry meterRegistry;
 
     public RocketMqSendService(RocketMQTemplate rocketMQTemplate) {
+        this(rocketMQTemplate, null);
+    }
+
+    public RocketMqSendService(RocketMQTemplate rocketMQTemplate, MeterRegistry meterRegistry) {
         this.rocketMQTemplate = rocketMQTemplate;
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
     public void send(BaseMq<T> data) throws Exception {
         String topic = resolveTopic(data);
-        doSend(topic, data, 0, 0);
-        logger.info("RocketMQ 即时发送成功, topic={}, 租户={}, 消息ID={}",
+        sendAndRecord("send", topic, data, 0, 0);
+        logger.info("RocketMQ send succeeded, operation=send, topic={}, tenant={}, msgId={}",
                 topic, data.getTenantCode(), data.getMsgId());
     }
 
     @Override
     public void sendDelay(BaseMq<T> data, long delay) throws Exception {
         String topic = resolveTopic(data);
-        // RocketMQ 延时级别（1-18），这里按毫秒就近映射到 delayLevel
         int delayLevel = calcDelayLevel(delay);
-        doSend(topic, data, delayLevel, 0);
-        logger.info("RocketMQ 延时发送成功, topic={}, 租户={}, 延时级别={}",
-                topic, data.getTenantCode(), delayLevel);
+        sendAndRecord("delay", topic, data, delayLevel, 0);
+        logger.info("RocketMQ send succeeded, operation=delay, topic={}, tenant={}, msgId={}, delayLevel={}",
+                topic, data.getTenantCode(), data.getMsgId(), delayLevel);
     }
 
     @Override
     public void sendExpiration(BaseMq<T> data, long expiration) throws Exception {
-        // RocketMQ 没有原生过期丢弃能力，这里用延时模拟：过期时间到达后投递
         String topic = resolveTopic(data);
         int delayLevel = calcDelayLevel(expiration);
-        doSend(topic, data, delayLevel, 0);
-        logger.info("RocketMQ 过期发送成功(按延时模拟), topic={}, 租户={}, 过期时间={}ms",
-                topic, data.getTenantCode(), expiration);
+        sendAndRecord("expiration", topic, data, delayLevel, 0);
+        logger.info("RocketMQ send succeeded, operation=expiration, topic={}, tenant={}, msgId={}, expirationMillis={}",
+                topic, data.getTenantCode(), data.getMsgId(), expiration);
     }
 
-    /**
-     * 执行实际发送，租户编码写入消息头供消费端路由。
-     */
+    protected String resolveTopic(BaseMq<T> data) {
+        return data.getClass().getSimpleName();
+    }
+
+    private void sendAndRecord(String operation, String topic, BaseMq<T> data, int delayLevel, long timeout) {
+        Timer.Sample sample = meterRegistry == null ? null : Timer.start(meterRegistry);
+        String outcome = "success";
+        try {
+            doSend(topic, data, delayLevel, timeout);
+        } catch (RuntimeException e) {
+            outcome = "error";
+            logger.error("RocketMQ send failed, operation={}, topic={}, tenant={}, msgId={}",
+                    operation, topic, data.getTenantCode(), data.getMsgId(), e);
+            throw e;
+        } finally {
+            recordMetrics(operation, topic, outcome, sample);
+        }
+    }
+
     private void doSend(String topic, BaseMq<T> data, int delayLevel, long timeout) {
         MessageBuilder<?> builder = MessageBuilder.withPayload(JSONUtil.toJsonStr(data))
                 .setHeader(RocketMQHeaders.KEYS, data.getMsgId());
@@ -75,18 +86,17 @@ public class RocketMqSendService<T> implements SendService<BaseMq<T>> {
         }
     }
 
-    /**
-     * 根据消息体推断目标 topic，默认使用消息模型中的 topic 字段或类名。
-     * 业务可重写以自定义 topic 命名规则。
-     */
-    protected String resolveTopic(BaseMq<T> data) {
-        return data.getClass().getSimpleName();
+    private void recordMetrics(String operation, String topic, String outcome, Timer.Sample sample) {
+        if (meterRegistry == null) {
+            return;
+        }
+        Tags tags = Tags.of("operation", operation, "topic", topic, "outcome", outcome);
+        meterRegistry.counter("solomon.mq.rocketmq.send.total", tags).increment();
+        if (sample != null) {
+            sample.stop(Timer.builder("solomon.mq.rocketmq.send.duration").tags(tags).register(meterRegistry));
+        }
     }
 
-    /**
-     * 将毫秒延时映射到 RocketMQ 的延时级别（18 个固定级别）。
-     * 级别说明：1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h。
-     */
     private int calcDelayLevel(long delayMillis) {
         long seconds = delayMillis / 1000;
         if (seconds < 5) return 1;

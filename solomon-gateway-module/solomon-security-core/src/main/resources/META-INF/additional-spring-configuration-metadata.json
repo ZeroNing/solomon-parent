@@ -1,0 +1,32 @@
+{
+  "properties": [
+    {
+      "name": "security.jwt.secret",
+      "type": "java.lang.String",
+      "description": "Legacy JWT HMAC signing secret. Prefer security.jwt.secrets plus security.jwt.key-id for key rotation. No default is provided; applications must configure a strong secret with at least 32 bytes."
+    },
+    {
+      "name": "security.jwt.key-id",
+      "type": "java.lang.String",
+      "description": "Active JWT signing key id written to the token kid header. The id must exist in security.jwt.secrets when multiple keys are configured.",
+      "defaultValue": "default"
+    },
+    {
+      "name": "security.jwt.secrets",
+      "type": "java.util.Map<java.lang.String,java.lang.String>",
+      "description": "JWT signing secrets keyed by key id. Keep old keys during rotation until previously issued tokens expire."
+    },
+    {
+      "name": "security.jwt.refresh-expire-seconds",
+      "type": "java.lang.Long",
+      "description": "Refresh token lifetime in seconds. Refresh tokens are type-bound and can be rotated or revoked through TokenRevocationStore.",
+      "defaultValue": 2592000
+    },
+    {
+      "name": "security.jwt.clock-skew-seconds",
+      "type": "java.lang.Long",
+      "description": "Allowed clock skew in seconds when verifying JWT exp/nbf claims.",
+      "defaultValue": 60
+    }
+  ]
+}

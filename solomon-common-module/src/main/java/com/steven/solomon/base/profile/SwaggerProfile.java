@@ -3,7 +3,11 @@ package com.steven.solomon.base.profile;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Solomon 接口文档配置项。
@@ -12,6 +16,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 仍然使用 {@code springdoc.*}，这里仅保存 Solomon 对接口文档做增强时需要的配置。</p>
  */
 @ConfigurationProperties("solomon.swagger")
+@Validated
 public class SwaggerProfile {
 
   /**
@@ -22,11 +27,13 @@ public class SwaggerProfile {
   /**
    * OpenAPI 文档标题。
    */
+  @NotBlank(message = "solomon.swagger.title must not be blank")
   private String title = "Solomon API";
 
   /**
    * OpenAPI 文档版本。
    */
+  @NotBlank(message = "solomon.swagger.version must not be blank")
   private String version = "1.0.0";
 
   /**
@@ -37,7 +44,7 @@ public class SwaggerProfile {
   /**
    * 需要写入每个接口的全局请求参数，例如 token、tenantCode、language。
    */
-  private List<DocRequestParameter> globalRequestParameters = new ArrayList<>();
+  private List<@Valid DocRequestParameter> globalRequestParameters = new ArrayList<>();
 
   public boolean isEnabled() {
     return enabled;
@@ -89,11 +96,13 @@ public class SwaggerProfile {
     /**
      * 参数名称，例如 token。
      */
+    @NotBlank(message = "solomon.swagger.global-request-parameters[].name must not be blank")
     private String name;
 
     /**
      * 参数位置，支持 header、query、path、cookie。
      */
+    @Pattern(regexp = "header|query|path|cookie", message = "solomon.swagger.global-request-parameters[].in must be one of header, query, path, cookie")
     private String in = "header";
 
     /**

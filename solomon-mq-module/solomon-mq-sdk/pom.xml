@@ -20,10 +20,22 @@
             <groupId>com.steven</groupId>
             <artifactId>solomon-constant-module</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils-spring</artifactId>
+        </dependency>
         <!-- Spring 上下文，用于自动配置与 Bean 管理 -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
         </dependency>
     </dependencies>
 

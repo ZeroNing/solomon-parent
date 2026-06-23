@@ -605,7 +605,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToInt(func).max().getAsInt();
+        return list.stream().filter(predicate).mapToInt(func).max().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -634,7 +635,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToLong(func).max().getAsLong();
+        return list.stream().filter(predicate).mapToLong(func).max().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -663,7 +665,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToDouble(func).max().getAsDouble();
+        return list.stream().filter(predicate).mapToDouble(func).max().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -706,7 +709,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToInt(func).min().getAsInt();
+        return list.stream().filter(predicate).mapToInt(func).min().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -735,7 +739,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToLong(func).min().getAsLong();
+        return list.stream().filter(predicate).mapToLong(func).min().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -764,7 +769,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToDouble(func).min().getAsDouble();
+        return list.stream().filter(predicate).mapToDouble(func).min().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -793,7 +799,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToInt(func).average().getAsDouble();
+        return list.stream().filter(predicate).mapToInt(func).average().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -822,7 +829,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToLong(func).average().getAsDouble();
+        return list.stream().filter(predicate).mapToLong(func).average().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**
@@ -851,7 +859,8 @@ public class Lambda {
             return null;
         }
 
-        return list.stream().filter(predicate).mapToDouble(func).average().getAsDouble();
+        return list.stream().filter(predicate).mapToDouble(func).average().stream().boxed().findFirst()
+                .orElse(null);
     }
 
     /**

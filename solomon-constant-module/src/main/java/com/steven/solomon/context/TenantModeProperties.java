@@ -1,15 +1,21 @@
 package com.steven.solomon.context;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /** 全局租户运行模式配置。 */
 @ConfigurationProperties("tenant")
+@Validated
 public class TenantModeProperties {
 
   /** 默认使用单租户模式，便于单机应用开箱即用。 */
+  @NotNull(message = "tenant.mode must not be null")
   private TenantMode mode = TenantMode.SINGLE;
 
   /** 单租户模式下使用的默认租户编码。 */
+  @NotBlank(message = "tenant.default-code must not be blank")
   private String defaultCode = "default";
 
   /** 多租户模式下是否强制要求请求携带租户编码。 */

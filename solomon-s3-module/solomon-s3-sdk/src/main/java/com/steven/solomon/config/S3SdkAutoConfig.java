@@ -6,10 +6,12 @@ import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.naming.rules.OriginalNamingRulesGenerationService;
 import com.steven.solomon.naming.rules.SnowflakeNamingRulesGenerationService;
 import com.steven.solomon.naming.rules.UUIDNamingRulesGenerationService;
+import com.steven.solomon.health.FileStorageHealthIndicator;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.service.DefaultService;
 import com.steven.solomon.service.FileServiceInterface;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import org.springframework.boot.actuate.health.HealthIndicator;
 import org.slf4j.Logger;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -78,5 +80,13 @@ public class S3SdkAutoConfig {
       FileNamingRulesGenerationService fileNamingRule,
       ClamAvUtils clamAvUtils) {
     return new DefaultService(properties, fileNamingRule, clamAvUtils);
+  }
+
+  @Bean
+  @ConditionalOnMissingBean(name = "fileStorageHealthIndicator")
+  public HealthIndicator fileStorageHealthIndicator(
+      FileChoiceProperties properties,
+      FileServiceInterface fileService) {
+    return new FileStorageHealthIndicator(properties, fileService);
   }
 }

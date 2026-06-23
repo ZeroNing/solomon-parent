@@ -1,0 +1,10 @@
+{
+  "properties": [
+    {
+      "name": "rocketmq.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Whether to enable the Solomon RocketMQ starter auto-configuration.",
+      "defaultValue": true
+    }
+  ]
+}

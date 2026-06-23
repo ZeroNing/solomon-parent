@@ -1,9 +1,14 @@
 package com.steven.solomon.job.xxl.properties;
 
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /** XXL-JOB Executor 启动配置。 */
 @ConfigurationProperties("xxl")
+@Validated
 public class XxlJobProperties {
 
     /** 是否启用 XXL-JOB Executor，默认启用。 */
@@ -25,16 +30,29 @@ public class XxlJobProperties {
     private String ip;
 
     /** 执行器注册端口。 */
+    @Min(value = 0, message = "xxl.port must be 0 or between 1 and 65535")
+    @Max(value = 65535, message = "xxl.port must be 0 or between 1 and 65535")
     private int port;
 
     /** 执行器日志路径。 */
     private String logPath;
 
     /** 日志保留天数，默认 30 天。 */
+    @Min(value = 1, message = "xxl.log-retention-days must be at least 1")
     private Integer logRetentionDays = 30;
 
     /** 任务执行超时时间，单位秒。 */
+    @Min(value = 1, message = "xxl.timeout must be at least 1 second")
     private Integer timeout;
+
+    @AssertTrue(message = "xxl.admin-addresses and xxl.app-name are required when xxl.enabled=true")
+    public boolean isEnabledConfigurationValid() {
+        return !enabled || (hasText(adminAddresses) && hasText(appName));
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
+    }
 
     public boolean getEnabled() {
         return enabled;

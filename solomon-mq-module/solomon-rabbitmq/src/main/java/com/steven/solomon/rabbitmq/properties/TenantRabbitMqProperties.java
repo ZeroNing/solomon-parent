@@ -3,6 +3,7 @@ package com.steven.solomon.rabbitmq.properties;
 import com.steven.solomon.context.AbstractTenantProperties;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * RabbitMQ 多租户配置。
@@ -22,5 +23,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author steven
  */
 @ConfigurationProperties(prefix = "rabbitmq")
+@Validated
 public class TenantRabbitMqProperties extends AbstractTenantProperties<RabbitProperties> {
 }

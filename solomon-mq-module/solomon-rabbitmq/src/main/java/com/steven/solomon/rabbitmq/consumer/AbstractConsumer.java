@@ -12,9 +12,12 @@ import com.steven.solomon.code.MqErrorCode;
 import com.steven.solomon.rabbitmq.entity.RabbitMqModel;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.holder.RequestHeaderHolder;
+import com.steven.solomon.mq.idempotency.DuplicateMessageException;
+import com.steven.solomon.mq.idempotency.MessageIdempotencyExecutor;
 import com.steven.solomon.mq.MessageListenerSpi;
 import com.steven.solomon.pojo.vo.ResultVO;
 import com.steven.solomon.rabbitmq.utils.RabbitUtils;
+import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import org.slf4j.Logger;
 import org.springframework.amqp.core.AcknowledgeMode;
@@ -64,6 +67,8 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
     /** 当前消息解析出的租户编码。 */
     protected String tenantCode;
 
+    private volatile MessageIdempotencyExecutor cachedMessageIdempotencyExecutor;
+
     protected AbstractConsumer(RabbitUtils rabbitUtils) {
         this.rabbitUtils = rabbitUtils;
         MessageListenerRetry messageListenerRetry = getClass().getAnnotation(MessageListenerRetry.class);
@@ -93,14 +98,28 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
             if (ObjectUtil.isNotEmpty(tenantCode)) {
                 RequestHeaderHolder.setTenantCode(tenantCode);
             }
-            // 交给子类处理业务逻辑
-            result = this.handleMessage(model.getBody());
+            MessageIdempotencyExecutor idempotencyExecutor = messageIdempotencyExecutor();
+            String idempotencyKey = messageIdempotencyKey(model);
+            if (idempotencyExecutor != null && StrUtil.isNotBlank(idempotencyKey)) {
+                RabbitMqModel<T> messageModel = model;
+                result = idempotencyExecutor.execute(idempotencyKey, () -> this.handleMessage(messageModel.getBody()));
+            } else {
+                result = this.handleMessage(model.getBody());
+            }
             // 非自动确认模式下，消费成功后手动 ACK
             if (!isAutoAck) {
                 channel.basicAck(messageProperties.getDeliveryTag(), false);
             }
             // RPC 场景：将处理结果回发到 replyTo 队列
             sendReplyTo(result);
+        } catch (DuplicateMessageException e) {
+            logger.info("RabbitMQ duplicate message skipped, tenant={}, msgId={}, deliveryTag={}",
+                    tenantCode, model == null ? null : model.getMsgId(), messageProperties.getDeliveryTag());
+            throwable = e;
+            if (!isAutoAck) {
+                channel.basicAck(messageProperties.getDeliveryTag(), false);
+            }
+            return;
         } catch (Throwable e) {
             // 失败时按重试次数决定 ACK/NACK 并更新重试计数
             saveFailNumber(channel, e);
@@ -165,5 +184,27 @@ public abstract class AbstractConsumer<T, R> extends MessageListenerAdapter impl
         Message replyMessage = MessageBuilder.withBody(JSONUtil.toJsonStr(resultVO).getBytes())
                 .andProperties(replyMessageProperties).build();
         rabbitUtils.sendReplyTo(messageProperties.getReplyTo(), replyMessage);
+    }
+
+    protected MessageIdempotencyExecutor messageIdempotencyExecutor() {
+        if (cachedMessageIdempotencyExecutor != null) {
+            return cachedMessageIdempotencyExecutor;
+        }
+        try {
+            cachedMessageIdempotencyExecutor =
+                    SpringUtil.getBeansOfType(MessageIdempotencyExecutor.class, null);
+            return cachedMessageIdempotencyExecutor;
+        } catch (Exception ex) {
+            return null;
+        }
+    }
+
+    protected String messageIdempotencyKey(RabbitMqModel<T> model) {
+        if (model == null || StrUtil.isBlank(model.getMsgId())) {
+            return null;
+        }
+        MessageListener listener = getClass().getAnnotation(MessageListener.class);
+        String queue = listener == null || listener.queues().length == 0 ? "unknown" : listener.queues()[0];
+        return String.join(":", "rabbitmq", queue, StrUtil.blankToDefault(tenantCode, "default"), model.getMsgId());
     }
 }

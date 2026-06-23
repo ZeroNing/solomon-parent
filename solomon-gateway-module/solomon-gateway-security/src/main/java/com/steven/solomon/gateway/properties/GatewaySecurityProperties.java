@@ -1,6 +1,8 @@
 package com.steven.solomon.gateway.properties;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 网关安全配置属性。
@@ -18,9 +20,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author steven
  */
 @ConfigurationProperties(prefix = "gateway.security")
+@Validated
 public class GatewaySecurityProperties {
 
     /** 部署模式，默认微服务模式。 */
+    @NotNull(message = "gateway.security.mode must not be null")
     private SecurityMode mode = SecurityMode.MICROSERVICE;
 
     /** 是否强制向下游透传可信头。未配置时按部署模式决定。 */

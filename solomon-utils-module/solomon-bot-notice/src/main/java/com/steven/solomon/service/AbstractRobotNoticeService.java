@@ -21,7 +21,7 @@ abstract class AbstractRobotNoticeService implements NoticeService {
         String webhookUrl = webhookUrl(message);
         if (StrUtil.isBlank(webhookUrl)) { logger.warn("{} 未配置 Webhook，跳过发送", getChannel().getName()); return false; }
         Map<String, Object> requestBody = buildRequestBody(message);
-        String response = HttpUtil.post(webhookUrl, JSONUtil.toJsonStr(requestBody));
+        String response = HttpUtil.post(webhookUrl, JSONUtil.toJsonStr(requestBody), properties.getSendTimeoutMillis());
         logger.info("{} 发送完成，响应：{}", getChannel().getName(), response);
         return true;
     }

@@ -1,12 +1,15 @@
 package com.steven.solomon.mqtt.vertx.profile;
 
-
+import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.mqtt.MqttClientOptions;
-
-import java.io.Serializable;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Vert.x MQTT 客户端连接配置模型。
@@ -22,12 +25,15 @@ public class MqttProfile {
   private String password;
 
   /** MQTT Broker 连接地址，多个地址以逗号分隔 */
+  @NotBlank(message = "mqtt.tenant[].url must not be blank")
   private String url;
 
   /** 客户端的标识（不可重复，为空时使用 UUID） */
+  @NotBlank(message = "mqtt.tenant[].client-id must not be blank")
   private String clientId;
 
   /** 连接超时（毫秒） */
+  @Min(value = 1, message = "mqtt.tenant[].completion-timeout must be at least 1 millisecond")
   private int completionTimeout = 30000;
 
   /** 是否自动重连 */
@@ -37,24 +43,30 @@ public class MqttProfile {
   private boolean cleanSession = false;
 
   /** 心跳时间（秒） */
+  @Min(value = 1, message = "mqtt.tenant[].keep-alive-interval must be at least 1 second")
   private int keepAliveInterval = MqttClientOptions.DEFAULT_KEEP_ALIVE_INTERVAL;
 
   /** 遗嘱消息配置 */
+  @Valid
   private MqttWill will;
 
   /** 最大未确认消息数量 */
+  @Min(value = 1, message = "mqtt.tenant[].max-inflight must be at least 1")
   private int maxInflight = MqttClientOptions.DEFAULT_MAX_INFLIGHT_QUEUE;
 
   /** 重连次数（-1 无限重连，0 不重连） */
+  @Min(value = -1, message = "mqtt.tenant[].reconnect-attempts must be -1 or greater")
   private int reconnectAttempts = -1;
 
   /** 重连间隔（毫秒） */
+  @Min(value = 1, message = "mqtt.tenant[].reconnect-interval must be at least 1 millisecond")
   private long reconnectInterval = 1000;
 
   /** SSL 连接是否验证证书 */
   private boolean verifyCertificate = false;
 
   /** Vert.x 实例配置 */
+  @Valid
   private VertxConfig vertx;
 
   /**
@@ -63,12 +75,16 @@ public class MqttProfile {
   public static class MqttWill implements Serializable {
 
     /** 遗嘱主题 */
+    @NotBlank(message = "mqtt.tenant[].will.topic must not be blank")
     private String topic;
 
     /** 遗嘱消息内容 */
+    @NotBlank(message = "mqtt.tenant[].will.message must not be blank")
     private String message;
 
     /** 遗嘱消息 QoS 等级 */
+    @Min(value = 0, message = "mqtt.tenant[].will.qos must be between 0 and 2")
+    @Max(value = 2, message = "mqtt.tenant[].will.qos must be between 0 and 2")
     private int qos;
 
     /** 是否保留消息 */
@@ -114,52 +130,63 @@ public class MqttProfile {
     /**
      * 事件循环线程池大小。默认值：2 * CPU 核心数。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.event-loop-pool-size must be at least 1")
     private int eventLoopPoolSize = VertxOptions.DEFAULT_EVENT_LOOP_POOL_SIZE;
 
     /**
      * Worker 线程池大小。默认值：20。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.worker-pool-size must be at least 1")
     private int workerPoolSize = VertxOptions.DEFAULT_WORKER_POOL_SIZE;
 
     /**
      * 内部阻塞线程池大小。默认值：20。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.internal-blocking-pool-size must be at least 1")
     private int internalBlockingPoolSize = VertxOptions.DEFAULT_INTERNAL_BLOCKING_POOL_SIZE;
 
     /**
      * 阻塞线程检查间隔（数值）。默认值：1（秒）。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.blocked-thread-check-interval must be at least 1")
     private long blockedThreadCheckInterval = 1L;
     /**
      * 阻塞线程检查间隔的时间单位。默认值：SECONDS。
      */
+    @NotNull(message = "mqtt.tenant[].vertx.blocked-thread-check-interval-unit must not be null")
     private TimeUnit blockedThreadCheckIntervalUnit = TimeUnit.SECONDS;
 
     /**
      * 事件循环线程最大执行时间（数值）。默认值：2（秒）。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.max-event-loop-execute-time must be at least 1")
     private long maxEventLoopExecuteTime = 2L;
     /**
      * 事件循环线程最大执行时间单位。默认值：SECONDS。
      */
+    @NotNull(message = "mqtt.tenant[].vertx.max-event-loop-execute-time-unit must not be null")
     private TimeUnit maxEventLoopExecuteTimeUnit = TimeUnit.SECONDS;
 
     /**
      * Worker 线程最大执行时间（数值）。默认值：60（秒）。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.max-worker-execute-time must be at least 1")
     private long maxWorkerExecuteTime = 60L;
     /**
      * Worker 线程最大执行时间单位。默认值：SECONDS。
      */
+    @NotNull(message = "mqtt.tenant[].vertx.max-worker-execute-time-unit must not be null")
     private TimeUnit maxWorkerExecuteTimeUnit = TimeUnit.SECONDS;
 
     /**
      * 警告异常时间（数值）。默认值：5（秒）。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.warning-exception-time must be at least 1")
     private long warningExceptionTime = 5L;
     /**
      * 警告异常时间单位。默认值：SECONDS。
      */
+    @NotNull(message = "mqtt.tenant[].vertx.warning-exception-time-unit must not be null")
     private TimeUnit warningExceptionTimeUnit = TimeUnit.SECONDS;
 
     // ==================== 高可用配置 ====================
@@ -172,11 +199,13 @@ public class MqttProfile {
     /**
      * 法定节点数。默认值：1。
      */
+    @Min(value = 1, message = "mqtt.tenant[].vertx.quorum-size must be at least 1")
     private int quorumSize = 1;
 
     /**
      * 高可用组名。默认值：__DEFAULT__。
      */
+    @NotBlank(message = "mqtt.tenant[].vertx.ha-group must not be blank")
     private String haGroup = "__DEFAULT__";
 
     // ==================== 高级配置 ====================

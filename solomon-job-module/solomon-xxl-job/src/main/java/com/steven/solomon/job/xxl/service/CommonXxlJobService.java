@@ -17,11 +17,18 @@ import com.steven.solomon.job.xxl.properties.XxlJobProperties;
 import com.steven.solomon.job.xxl.properties.XxlJobRegisterProperties;
 import com.steven.solomon.service.JobService;
 import com.steven.solomon.service.JobLogSanitizer;
+import com.steven.solomon.reliability.CircuitBreaker;
 import com.steven.solomon.spring.SpringUtil;
+import com.steven.solomon.reliability.RetryExecutor;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,11 +54,22 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
 
     private final Logger logger = LoggerUtils.logger(CommonXxlJobService.class);
 
+    private final RetryExecutor retryExecutor = new RetryExecutor();
+
+    private final CircuitBreaker circuitBreaker = new CircuitBreaker();
+
+    private MeterRegistry meterRegistry;
+
     protected CommonXxlJobService(XxlJobProperties profile, XxlJobRegisterProperties registerProperties, ApplicationContext applicationContext) {
         this.profile = profile;
         this.registerProperties = registerProperties;
         this.adminAddresses = getUrl();
         SpringUtil.setContext(applicationContext);
+    }
+
+    @Autowired(required = false)
+    public void setMeterRegistry(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
     }
 
     @Override
@@ -300,8 +318,28 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
      * @throws BaseException 请求失败时抛出
      */
     protected String execute(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
-        try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
-            return response.body();
+        try {
+            return circuitBreaker.execute("xxl-job-admin",
+                    CircuitBreaker.Options.of(
+                            registerProperties.getAdminApiCircuitFailureThreshold(),
+                            registerProperties.getAdminApiCircuitOpenDurationMillis()),
+                    () -> retryExecutor.execute("xxl-job-admin",
+                            RetryExecutor.RetryOptions.of(
+                                    registerProperties.getAdminApiMaxAttempts(),
+                                    registerProperties.getAdminApiBackoffMillis()),
+                            () -> {
+                                try (HttpResponse response = executeResponse(cookie, url, paramMap)) {
+                                    return response.body();
+                                }
+                            }));
+        } catch (CircuitBreaker.CircuitBreakerOpenException exception) {
+            logger.warn("XXL-JOB admin circuit breaker open, path={}, remaining={}",
+                    adminPath(url), exception.getMessage());
+            throw new BaseException(exception);
+        } catch (BaseException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new BaseException(exception);
         }
     }
 
@@ -315,34 +353,78 @@ public abstract class CommonXxlJobService implements JobService<XxlJobInfo>{
      * @throws BaseException 请求失败或返回状态异常时抛出
      */
     protected HttpResponse executeResponse(String cookie, String url, Map<String, Object> paramMap) throws BaseException {
+        Timer.Sample sample = meterRegistry == null ? null : Timer.start(meterRegistry);
+        String outcome = "success";
+        String path = adminPath(url);
         HttpRequest request = HttpUtil.createPost(url);
-        if (ObjectUtil.isNotEmpty(cookie)) {
-            request = request.header("Cookie", cookie);
-        }
-        if (ObjectUtil.isNotEmpty(profile.getAccessToken())) {
-            request = request.header("XXL-JOB-ACCESS-TOKEN", profile.getAccessToken());
-        }
-        if (ObjectUtil.isNotEmpty(paramMap)) {
-            request = request.form(paramMap);
-        }
-        HttpResponse response = request.execute();
-        String body = response.body();
-        String code = null;
-        String msg = null;
-        if (JSONUtil.isTypeJSON(body)) {
-            Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
-            Object codeValue = firstNotEmpty(resultMap, "code", "status");
-            code = ObjectUtil.isEmpty(codeValue) ? null : codeValue.toString();
-            Object msgValue = firstNotEmpty(resultMap, "msg", "message");
-            msg = ObjectUtil.isEmpty(msgValue) ? null : msgValue.toString();
-        }
+        try {
+            if (ObjectUtil.isNotEmpty(cookie)) {
+                request = request.header("Cookie", cookie);
+            }
+            if (ObjectUtil.isNotEmpty(profile.getAccessToken())) {
+                request = request.header("XXL-JOB-ACCESS-TOKEN", profile.getAccessToken());
+            }
+            if (ObjectUtil.isNotEmpty(paramMap)) {
+                request = request.form(paramMap);
+            }
+            HttpResponse response = request.execute();
+            String body = response.body();
+            String code = null;
+            String msg = null;
+            if (JSONUtil.isTypeJSON(body)) {
+                Map<String,Object> resultMap = JSONUtil.toBean(body, new TypeReference<Map<String, Object>>() {},true);
+                Object codeValue = firstNotEmpty(resultMap, "code", "status");
+                code = ObjectUtil.isEmpty(codeValue) ? null : codeValue.toString();
+                Object msgValue = firstNotEmpty(resultMap, "msg", "message");
+                msg = ObjectUtil.isEmpty(msgValue) ? null : msgValue.toString();
+            }
 
-        if (!response.isOk() || (ObjectUtil.isNotEmpty(code)
-                && !StrUtil.equalsIgnoreCase(code, "200")
-                && !StrUtil.equalsIgnoreCase(code, "0"))) {
-            throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url, JobLogSanitizer.sanitize(paramMap),msg);
+            if (!response.isOk() || (ObjectUtil.isNotEmpty(code)
+                    && !StrUtil.equalsIgnoreCase(code, "200")
+                    && !StrUtil.equalsIgnoreCase(code, "0"))) {
+                outcome = "error";
+                logger.warn("XXL-JOB admin request failed, path={}, status={}, code={}, params={}",
+                        path, response.getStatus(), code, JobLogSanitizer.sanitize(paramMap));
+                throw new BaseException(XxlJobErrorCode.XXL_JOB_EXECUTE_ERROR,url, JobLogSanitizer.sanitize(paramMap),msg);
+            }
+            logger.debug("XXL-JOB admin request succeeded, path={}, status={}", path, response.getStatus());
+            return response;
+        } catch (RuntimeException exception) {
+            outcome = "error";
+            logger.warn("XXL-JOB admin request error, path={}, params={}",
+                    path, JobLogSanitizer.sanitize(paramMap), exception);
+            throw exception;
+        } finally {
+            recordAdminRequest(sample, "POST", path, outcome);
         }
-        return response;
+    }
+
+    private void recordAdminRequest(Timer.Sample sample, String method, String path, String outcome) {
+        if (meterRegistry == null) {
+            return;
+        }
+        Tags tags = Tags.of(
+                "provider", "xxl-job",
+                "method", safeTag(method),
+                "path", safeTag(path),
+                "outcome", safeTag(outcome));
+        meterRegistry.counter("solomon.job.admin.request.total", tags).increment();
+        if (sample != null) {
+            sample.stop(Timer.builder("solomon.job.admin.request.duration").tags(tags).register(meterRegistry));
+        }
+    }
+
+    private String adminPath(String url) {
+        try {
+            String path = URI.create(url).getPath();
+            return ObjectUtil.isEmpty(path) ? "unknown" : path;
+        } catch (RuntimeException ignored) {
+            return ObjectUtil.isEmpty(url) ? "unknown" : url;
+        }
+    }
+
+    private String safeTag(String value) {
+        return ObjectUtil.isEmpty(value) ? "unknown" : value;
     }
 
     /**

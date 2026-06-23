@@ -3,8 +3,11 @@ package com.steven.solomon.cache.redis.properties;
 import com.steven.solomon.cache.key.CacheKeyProperties;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Redis 缓存模块配置属性。
@@ -13,6 +16,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * key 生成规则和多租户连接配置等。</p>
  */
 @ConfigurationProperties(prefix = "cache.redis")
+@Validated
 public class RedisCacheProperties extends RedisProperties {
 
   /**
@@ -23,17 +27,20 @@ public class RedisCacheProperties extends RedisProperties {
   /**
    * 默认租户编码，未显式切换租户时使用。
    */
+  @NotBlank(message = "cache.redis.default-tenant must not be blank")
   private String defaultTenant = "default";
 
   /**
    * 缓存 key 生成规则配置。
    */
+  @Valid
   private CacheKeyProperties key = new CacheKeyProperties();
 
   /**
    * 多租户 Redis 连接配置，key 为租户编码，value 为独立连接参数。
    */
-  private Map<String, RedisProperties> tenants = new LinkedHashMap<>();
+  private Map<@NotBlank(message = "cache.redis.tenants key must not be blank") String,
+      @Valid RedisProperties> tenants = new LinkedHashMap<>();
 
   public boolean isEnabled() {
     return enabled;

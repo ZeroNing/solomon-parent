@@ -15,6 +15,9 @@ import com.steven.solomon.model.FileUploadRequest;
 import com.steven.solomon.naming.rules.FileNamingRulesGenerationService;
 import com.steven.solomon.properties.FileChoiceProperties;
 import com.steven.solomon.utils.logger.LoggerUtils;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -25,6 +28,7 @@ import java.util.Set;
 import javax.imageio.ImageIO;
 import javax.imageio.stream.ImageOutputStream;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,6 +50,8 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   protected ClamAvUtils clamAvUtils;
 
+  protected MeterRegistry meterRegistry;
+
   public AbstractFileService(FileChoiceProperties properties,FileNamingRulesGenerationService fileNamingRulesGenerationService,ClamAvUtils clamAvUtils) {
     this.fileNamingRulesGenerationService = fileNamingRulesGenerationService;
     this.properties = properties;
@@ -60,6 +66,11 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   public AbstractFileService() {
     super();
+  }
+
+  @Autowired(required = false)
+  public void setMeterRegistry(MeterRegistry meterRegistry) {
+    this.meterRegistry = meterRegistry;
   }
 
   @Override
@@ -105,6 +116,10 @@ public abstract class AbstractFileService implements FileServiceInterface{
    * 使用统一请求对象执行上传，保留 contentType、metadata、tags 等高级参数。
    */
   protected FileUpload uploadFileRequest(FileUploadRequest request, MultipartFile file) throws Exception {
+    return recordStorageOperation("upload", request.getBucketName(), () -> uploadFileRequestInternal(request, file));
+  }
+
+  private FileUpload uploadFileRequestInternal(FileUploadRequest request, MultipartFile file) throws Exception {
     requireCapability(StorageCapability.UPLOAD);
     clamAvUtils.scanFile(file.getInputStream(), BaseExceptionCode.FILE_HIGH_RISK);
     // 上传前保证存储桶存在，减少业务侧重复判断。
@@ -153,27 +168,34 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public void deleteFile(String fileName, String bucketName) throws Exception {
-    requireCapability(StorageCapability.DELETE);
-    if (!bucketExists(bucketName) || ObjectUtil.isEmpty(fileName)) {
-      return;
-    }
-    delete(bucketName,getFilePath(fileName,properties));
+    recordStorageOperation("delete", bucketName, () -> {
+      requireCapability(StorageCapability.DELETE);
+      if (!bucketExists(bucketName) || ObjectUtil.isEmpty(fileName)) {
+        return null;
+      }
+      delete(bucketName,getFilePath(fileName,properties));
+      return null;
+    });
   }
 
   @Override
   public String share(String fileName, String bucketName, long expiry) throws Exception {
-    requireCapability(StorageCapability.SHARE_URL);
-    return shareUrl(bucketName,getFilePath(fileName,properties),expiry);
+    return recordStorageOperation("share", bucketName, () -> {
+      requireCapability(StorageCapability.SHARE_URL);
+      return shareUrl(bucketName,getFilePath(fileName,properties),expiry);
+    });
   }
 
   @Override
   public InputStream download(String fileName, String bucketName) throws Exception {
-    requireCapability(StorageCapability.DOWNLOAD);
-    String filePath = getFilePath(fileName,properties);
-    if (!objectExist(bucketName,filePath)) {
-      throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
-    }
-    return getObject(bucketName,filePath);
+    return recordStorageOperation("download", bucketName, () -> {
+      requireCapability(StorageCapability.DOWNLOAD);
+      String filePath = getFilePath(fileName,properties);
+      if (!objectExist(bucketName,filePath)) {
+        throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
+      }
+      return getObject(bucketName,filePath);
+    });
   }
 
   @Override
@@ -190,12 +212,14 @@ public abstract class AbstractFileService implements FileServiceInterface{
 
   @Override
   public boolean copyObject(String sourceBucket,String targetBucket,String sourceObjectName,String targetObjectName) throws Exception{
-    requireCapability(StorageCapability.COPY_OBJECT);
-    if (!objectExist(sourceBucket,sourceObjectName)) {
-      throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
-    }
-    copyFile(sourceBucket,targetBucket,getFilePath(sourceObjectName,properties),getFilePath(targetObjectName,properties));
-    return true;
+    return recordStorageOperation("copy", sourceBucket, () -> {
+      requireCapability(StorageCapability.COPY_OBJECT);
+      if (!objectExist(sourceBucket,sourceObjectName)) {
+        throw new BaseException(BaseExceptionCode.FILE_IS_NOT_EXIST_EXCEPTION_CODE);
+      }
+      copyFile(sourceBucket,targetBucket,getFilePath(sourceObjectName,properties),getFilePath(targetObjectName,properties));
+      return true;
+    });
   }
 
   @Override
@@ -358,6 +382,46 @@ public abstract class AbstractFileService implements FileServiceInterface{
   /**
    * 调用供应商能力前先校验，避免不支持能力时进入更深层异常。
    */
+  protected <T> T recordStorageOperation(String operation, String bucketName, StorageOperation<T> operationCall)
+      throws Exception {
+    Timer.Sample sample = meterRegistry == null ? null : Timer.start(meterRegistry);
+    String outcome = "success";
+    try {
+      return operationCall.call();
+    } catch (Exception e) {
+      outcome = "error";
+      logger.error("Object storage operation failed, provider={}, operation={}, bucket={}",
+          getClass().getSimpleName(), operation, safeBucket(bucketName), e);
+      throw e;
+    } finally {
+      recordStorageMetrics(operation, bucketName, outcome, sample);
+    }
+  }
+
+  private void recordStorageMetrics(String operation, String bucketName, String outcome, Timer.Sample sample) {
+    if (meterRegistry == null) {
+      return;
+    }
+    Tags tags = Tags.of(
+        "provider", getClass().getSimpleName(),
+        "operation", operation,
+        "bucket", safeBucket(bucketName),
+        "outcome", outcome);
+    meterRegistry.counter("solomon.s3.operation.total", tags).increment();
+    if (sample != null) {
+      sample.stop(Timer.builder("solomon.s3.operation.duration").tags(tags).register(meterRegistry));
+    }
+  }
+
+  private String safeBucket(String bucketName) {
+    return StrUtil.isBlank(bucketName) ? "unknown" : bucketName;
+  }
+
+  @FunctionalInterface
+  protected interface StorageOperation<T> {
+    T call() throws Exception;
+  }
+
   protected void requireCapability(StorageCapability capability) {
     if (!capabilities().contains(capability)) {
       throw new UnsupportedOperationException("当前对象存储实现不支持能力: " + capability);

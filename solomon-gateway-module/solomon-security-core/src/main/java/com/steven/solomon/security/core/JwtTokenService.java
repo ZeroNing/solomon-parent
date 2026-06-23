@@ -6,30 +6,16 @@ import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.RegisteredPayload;
 import cn.hutool.jwt.signers.JWTSigner;
 import cn.hutool.jwt.signers.JWTSignerUtil;
-
 import com.steven.solomon.context.TenantModeProperties;
 import com.steven.solomon.context.TenantModeResolver;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 
-/**
- * JWT 令牌服务，负责签发与解密令牌。网关层和服务层共用。
- *
- * <p>基于 Hutool JWT 实现 HS256 签名，校验签名、签发方和过期时间。
- * 仅保存用户标识和租户编码两个声明，不承载角色/权限等敏感信息
- *（这些由客户的授权校验器实时查询），避免令牌过期前权限变更无法生效。</p>
- *
- * <p>安全约束：</p>
- * <ul>
- *   <li>密钥不少于 32 字节，防止弱密钥被暴力破解。</li>
- *   <li>用户/租户标识只允许字母、数字及 {@code . _ : @ -}，最大 128 字符。</li>
- *   <li>单租户模式下租户编码为空时自动回退默认租户。</li>
- * </ul>
- *
- * @author steven
- */
 public class JwtTokenService {
 
     private static final Logger logger = LoggerUtils.logger(JwtTokenService.class);
@@ -41,73 +27,94 @@ public class JwtTokenService {
             Pattern.compile("[A-Za-z0-9][A-Za-z0-9._:@-]{0,127}");
     private static final String TENANT_CODE_KEY = "tenantCode";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String KEY_ID_HEADER = "kid";
+    private static final String TOKEN_ID_KEY = "jti";
+    private static final String TOKEN_TYPE_KEY = "typ";
+    private static final String ACCESS_TOKEN_TYPE = "access";
+    private static final String REFRESH_TOKEN_TYPE = "refresh";
 
     private final JwtTokenProperties properties;
     private final TenantModeResolver tenantModeResolver;
-    private final JWTSigner signer;
+    private final TokenRevocationStore revocationStore;
+    private final String activeKeyId;
+    private final Map<String, JWTSigner> signers;
 
-    /**
-     * 使用默认单租户解析器构造。
-     *
-     * @param properties JWT 配置，密钥不可少于 32 字节
-     * @throws IllegalArgumentException 密钥为空或过短、签发方为空、过期时间非正
-     */
     public JwtTokenService(JwtTokenProperties properties) {
-        this(properties, new TenantModeResolver(new TenantModeProperties()));
+        this(properties, new TenantModeResolver(new TenantModeProperties()), new InMemoryTokenRevocationStore());
     }
 
-    /**
-     * 指定租户模式解析器构造，用于多租户部署。
-     */
     public JwtTokenService(JwtTokenProperties properties, TenantModeResolver tenantModeResolver) {
-        if (properties == null || StrUtil.isBlank(properties.getSecret())) {
-            throw new IllegalArgumentException("security.jwt.secret 不能为空");
-        }
-        if (properties.getSecret().getBytes(CharsetUtil.CHARSET_UTF_8).length < MIN_SECRET_BYTES) {
-            throw new IllegalArgumentException("security.jwt.secret 长度不能小于 32 字节");
+        this(properties, tenantModeResolver, new InMemoryTokenRevocationStore());
+    }
+
+    public JwtTokenService(
+            JwtTokenProperties properties,
+            TenantModeResolver tenantModeResolver,
+            TokenRevocationStore revocationStore) {
+        if (properties == null) {
+            throw new IllegalArgumentException("security.jwt must not be null");
         }
         if (StrUtil.isBlank(properties.getIssuer())) {
-            throw new IllegalArgumentException("security.jwt.issuer 不能为空");
+            throw new IllegalArgumentException("security.jwt.issuer must not be blank");
         }
         if (properties.getExpireSeconds() <= 0) {
-            throw new IllegalArgumentException("security.jwt.expire-seconds 必须大于 0");
+            throw new IllegalArgumentException("security.jwt.expire-seconds must be greater than 0");
+        }
+        if (properties.getRefreshExpireSeconds() <= 0) {
+            throw new IllegalArgumentException("security.jwt.refresh-expire-seconds must be greater than 0");
+        }
+        if (properties.getClockSkewSeconds() < 0) {
+            throw new IllegalArgumentException("security.jwt.clock-skew-seconds must not be negative");
         }
         this.properties = properties;
         this.tenantModeResolver = tenantModeResolver;
-        this.signer = JWTSignerUtil.hs256(properties.getSecret().getBytes(CharsetUtil.CHARSET_UTF_8));
-        logger.info("JWT 令牌服务初始化完成, 签发方={}, 有效期={}秒", properties.getIssuer(), properties.getExpireSeconds());
+        this.revocationStore = revocationStore == null ? new InMemoryTokenRevocationStore() : revocationStore;
+        this.activeKeyId = resolveActiveKeyId(properties);
+        this.signers = buildSigners(properties, activeKeyId);
+        logger.info("JWT token service initialized, issuer={}, expireSeconds={}, refreshExpireSeconds={}, activeKeyId={}",
+                properties.getIssuer(), properties.getExpireSeconds(), properties.getRefreshExpireSeconds(), activeKeyId);
     }
 
-    /**
-     * 签发携带用户标识和租户编码的令牌。
-     *
-     * @param claims 令牌声明
-     * @return 已签名的 JWT 字符串
-     * @throws IllegalArgumentException 用户或租户标识格式非法
-     */
     public String createToken(TokenClaims claims) {
-        String tenantCode = claims == null ? null : tenantModeResolver.resolve(claims.tenantCode());
-        if (claims == null || !isSafeIdentity(claims.userId()) || !isSafeIdentity(tenantCode)) {
-            throw new IllegalArgumentException("用户标识或租户编码格式不正确");
-        }
-        long now = System.currentTimeMillis();
-        long expiresAt = now + properties.getExpireSeconds() * 1000L;
-        return JWT.create()
-                .setIssuer(properties.getIssuer())
-                .setSubject(StrUtil.trim(claims.userId()))
-                .setIssuedAt(new Date(now))
-                .setExpiresAt(new Date(expiresAt))
-                .setPayload(TENANT_CODE_KEY, StrUtil.trim(tenantCode))
-                .setSigner(signer)
-                .sign();
+        return createToken(claims, ACCESS_TOKEN_TYPE, properties.getExpireSeconds());
     }
 
-    /**
-     * 从 Authorization 头提取 Bearer Token。
-     *
-     * @param authorization Authorization 头值
-     * @return Token 字符串；非 Bearer 格式或为空时返回 null
-     */
+    public String createRefreshToken(TokenClaims claims) {
+        return createToken(claims, REFRESH_TOKEN_TYPE, properties.getRefreshExpireSeconds());
+    }
+
+    public TokenPair createTokenPair(TokenClaims claims) {
+        return new TokenPair(createToken(claims), createRefreshToken(claims));
+    }
+
+    public TokenPair refreshToken(String refreshToken) {
+        ParsedToken parsed = parse(refreshToken, REFRESH_TOKEN_TYPE);
+        if (parsed == null) {
+            return null;
+        }
+        revokeParsedToken(parsed);
+        return createTokenPair(parsed.claims());
+    }
+
+    public TokenClaims parseToken(String token) {
+        ParsedToken parsed = parse(token, ACCESS_TOKEN_TYPE);
+        return parsed == null ? null : parsed.claims();
+    }
+
+    public TokenClaims parseRefreshToken(String token) {
+        ParsedToken parsed = parse(token, REFRESH_TOKEN_TYPE);
+        return parsed == null ? null : parsed.claims();
+    }
+
+    public boolean revokeToken(String token) {
+        ParsedToken parsed = parse(token, null);
+        if (parsed == null) {
+            return false;
+        }
+        revokeParsedToken(parsed);
+        return true;
+    }
+
     public String resolveBearerToken(String authorization) {
         if (StrUtil.isBlank(authorization)
                 || !StrUtil.startWithIgnoreCase(authorization, BEARER_PREFIX)) {
@@ -116,44 +123,6 @@ public class JwtTokenService {
         return StrUtil.trim(authorization.substring(BEARER_PREFIX.length()));
     }
 
-    /**
-     * 解密并校验令牌。
-     *
-     * @param token JWT 字符串
-     * @return 解析出的令牌声明；令牌无效/过期/签名不符时返回 null
-     */
-    public TokenClaims parseToken(String token) {
-        if (StrUtil.isBlank(token) || token.length() > MAX_TOKEN_LENGTH) {
-            return null;
-        }
-        try {
-            JWT jwt = JWT.of(token).setSigner(signer);
-            if (!jwt.verify() || !jwt.validate(0)) {
-                logger.warn("令牌校验失败: 签名或过期时间无效");
-                return null;
-            }
-            String tokenIssuer = jwt.getPayload(RegisteredPayload.ISSUER).toString();
-            if (!StrUtil.equals(properties.getIssuer(), tokenIssuer)) {
-                logger.warn("令牌签发方不匹配, 期望={}, 实际={}", properties.getIssuer(), tokenIssuer);
-                return null;
-            }
-            String userId = String.valueOf(jwt.getPayload(RegisteredPayload.SUBJECT));
-            String tenantCode = tenantModeResolver.resolve(
-                    String.valueOf(jwt.getPayload(TENANT_CODE_KEY)));
-            if (!isSafeIdentity(userId) || !isSafeIdentity(tenantCode)) {
-                logger.warn("令牌声明包含非法标识, userId={}", userId);
-                return null;
-            }
-            return new TokenClaims(StrUtil.trim(userId), StrUtil.trim(tenantCode));
-        } catch (RuntimeException ex) {
-            logger.warn("令牌解析异常: {}", ex.getMessage());
-            return null;
-        }
-    }
-
-    /**
-     * 校验头值是否安全（非空、长度合法、无控制字符）。
-     */
     public boolean isSafeHeaderValue(String value) {
         if (StrUtil.isBlank(value) || value.length() > MAX_HEADER_VALUE_LENGTH) {
             return false;
@@ -166,10 +135,175 @@ public class JwtTokenService {
         return true;
     }
 
-    /**
-     * 校验用户/租户标识是否安全。
-     */
     public boolean isSafeIdentity(String value) {
         return isSafeHeaderValue(value) && IDENTITY_PATTERN.matcher(StrUtil.trim(value)).matches();
+    }
+
+    private String createToken(TokenClaims claims, String tokenType, long expireSeconds) {
+        String tenantCode = claims == null ? null : tenantModeResolver.resolve(claims.tenantCode());
+        if (claims == null || !isSafeIdentity(claims.userId()) || !isSafeIdentity(tenantCode)) {
+            throw new IllegalArgumentException("userId or tenantCode format is invalid");
+        }
+        long now = System.currentTimeMillis();
+        long expiresAt = now + expireSeconds * 1000L;
+        return JWT.create()
+                .setIssuer(properties.getIssuer())
+                .setSubject(StrUtil.trim(claims.userId()))
+                .setIssuedAt(new Date(now))
+                .setExpiresAt(new Date(expiresAt))
+                .setPayload(TENANT_CODE_KEY, StrUtil.trim(tenantCode))
+                .setPayload(TOKEN_ID_KEY, UUID.randomUUID().toString())
+                .setPayload(TOKEN_TYPE_KEY, tokenType)
+                .setHeader(KEY_ID_HEADER, activeKeyId)
+                .sign(currentSigner());
+    }
+
+    private ParsedToken parse(String token, String expectedType) {
+        if (StrUtil.isBlank(token) || token.length() > MAX_TOKEN_LENGTH) {
+            return null;
+        }
+        try {
+            JWT jwt = JWT.of(token);
+            JWTSigner tokenSigner = resolveSigner(jwt);
+            if (tokenSigner == null) {
+                logger.warn("JWT key id is unknown");
+                return null;
+            }
+            jwt.setSigner(tokenSigner);
+            if (!jwt.verify() || !jwt.validate(properties.getClockSkewSeconds())) {
+                logger.warn("JWT verification failed");
+                return null;
+            }
+            if (!isExpectedIssuer(jwt)) {
+                return null;
+            }
+            String tokenType = stringPayload(jwt, TOKEN_TYPE_KEY);
+            if (expectedType != null && StrUtil.isNotBlank(tokenType) && !expectedType.equals(tokenType)) {
+                logger.warn("JWT token type mismatch, expected={}, actual={}", expectedType, tokenType);
+                return null;
+            }
+            if (expectedType != null && StrUtil.isBlank(tokenType) && !ACCESS_TOKEN_TYPE.equals(expectedType)) {
+                logger.warn("JWT token type is missing");
+                return null;
+            }
+            String tokenId = stringPayload(jwt, TOKEN_ID_KEY);
+            if (StrUtil.isNotBlank(tokenId) && revocationStore.isRevoked(tokenId)) {
+                logger.warn("JWT has been revoked");
+                return null;
+            }
+            TokenClaims claims = parseClaims(jwt);
+            if (claims == null) {
+                return null;
+            }
+            return new ParsedToken(claims, tokenId, expiresAtMillis(jwt), tokenType);
+        } catch (RuntimeException ex) {
+            logger.warn("JWT parse failed: {}", ex.getMessage());
+            return null;
+        }
+    }
+
+    private boolean isExpectedIssuer(JWT jwt) {
+        Object issuer = jwt.getPayload(RegisteredPayload.ISSUER);
+        if (issuer == null || !StrUtil.equals(properties.getIssuer(), issuer.toString())) {
+            logger.warn("JWT issuer mismatch, expected={}", properties.getIssuer());
+            return false;
+        }
+        return true;
+    }
+
+    private TokenClaims parseClaims(JWT jwt) {
+        Object subject = jwt.getPayload(RegisteredPayload.SUBJECT);
+        Object tenantPayload = jwt.getPayload(TENANT_CODE_KEY);
+        String userId = subject == null ? null : subject.toString();
+        String tenantCode = tenantModeResolver.resolve(tenantPayload == null ? null : tenantPayload.toString());
+        if (!isSafeIdentity(userId) || !isSafeIdentity(tenantCode)) {
+            logger.warn("JWT contains invalid identity, userId={}", userId);
+            return null;
+        }
+        return new TokenClaims(StrUtil.trim(userId), StrUtil.trim(tenantCode));
+    }
+
+    private void revokeParsedToken(ParsedToken parsed) {
+        if (parsed == null || StrUtil.isBlank(parsed.tokenId())) {
+            return;
+        }
+        revocationStore.revoke(parsed.tokenId(), parsed.expiresAtMillis());
+    }
+
+    private long expiresAtMillis(JWT jwt) {
+        Object value = jwt.getPayload(RegisteredPayload.EXPIRES_AT);
+        if (value instanceof Date date) {
+            return date.getTime();
+        }
+        if (value instanceof Number number) {
+            long raw = number.longValue();
+            return raw < 10_000_000_000L ? raw * 1000L : raw;
+        }
+        return System.currentTimeMillis() + properties.getClockSkewSeconds() * 1000L;
+    }
+
+    private String stringPayload(JWT jwt, String key) {
+        Object value = jwt.getPayload(key);
+        return value == null ? null : value.toString();
+    }
+
+    private String resolveActiveKeyId(JwtTokenProperties properties) {
+        return StrUtil.blankToDefault(properties.getKeyId(), "default");
+    }
+
+    private Map<String, JWTSigner> buildSigners(JwtTokenProperties properties, String activeKeyId) {
+        Map<String, String> secrets = new LinkedHashMap<>();
+        if (properties.getSecrets() != null) {
+            secrets.putAll(properties.getSecrets());
+        }
+        if (StrUtil.isNotBlank(properties.getSecret())) {
+            secrets.put(activeKeyId, properties.getSecret());
+        }
+        if (secrets.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "security.jwt.secret or security.jwt.secrets must be configured");
+        }
+        if (!secrets.containsKey(activeKeyId)) {
+            throw new IllegalArgumentException("security.jwt.key-id must exist in security.jwt.secrets");
+        }
+        Map<String, JWTSigner> result = new LinkedHashMap<>();
+        secrets.forEach((keyId, secret) -> result.put(validateKeyId(keyId), createSigner(secret)));
+        return Map.copyOf(result);
+    }
+
+    private String validateKeyId(String keyId) {
+        if (!isSafeIdentity(keyId)) {
+            throw new IllegalArgumentException("security.jwt key id format is invalid");
+        }
+        return StrUtil.trim(keyId);
+    }
+
+    private JWTSigner createSigner(String secret) {
+        if (StrUtil.isBlank(secret)) {
+            throw new IllegalArgumentException("security.jwt secret must not be blank");
+        }
+        if (secret.getBytes(CharsetUtil.CHARSET_UTF_8).length < MIN_SECRET_BYTES) {
+            throw new IllegalArgumentException("security.jwt secret must be at least 32 bytes");
+        }
+        return JWTSignerUtil.hs256(secret.getBytes(CharsetUtil.CHARSET_UTF_8));
+    }
+
+    private JWTSigner currentSigner() {
+        return signers.get(activeKeyId);
+    }
+
+    private JWTSigner resolveSigner(JWT jwt) {
+        Object keyId = jwt.getHeader(KEY_ID_HEADER);
+        if (keyId == null || StrUtil.isBlank(keyId.toString())) {
+            return currentSigner();
+        }
+        return signers.get(keyId.toString());
+    }
+
+    private record ParsedToken(
+            TokenClaims claims,
+            String tokenId,
+            long expiresAtMillis,
+            String tokenType) {
     }
 }

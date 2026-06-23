@@ -1,6 +1,10 @@
 package com.steven.solomon.mqtt.v3.profile;
 
 import java.io.Serializable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 
 /**
@@ -17,12 +21,15 @@ public class MqttProfile {
   private String password;
 
   /** MQTT Broker 连接地址，多个地址以逗号分隔 */
+  @NotBlank(message = "mqtt.tenant[].url must not be blank")
   private String url;
 
   /** 客户端的标识（不可重复，为空时使用 UUID） */
+  @NotBlank(message = "mqtt.tenant[].client-id must not be blank")
   private String clientId;
 
   /** 连接超时（秒） */
+  @Min(value = 1, message = "mqtt.tenant[].completion-timeout must be at least 1 second")
   private int completionTimeout = 30;
 
   /** 是否自动重连 */
@@ -32,21 +39,27 @@ public class MqttProfile {
   private boolean cleanSession = false;
 
   /** 心跳时间（秒） */
+  @Min(value = 1, message = "mqtt.tenant[].keep-alive-interval must be at least 1 second")
   private int keepAliveInterval = 60;
 
   /** 遗嘱消息配置 */
+  @Valid
   private MqttWill will;
 
   /** 最大未确认消息数量 */
+  @Min(value = 1, message = "mqtt.tenant[].max-inflight must be at least 1")
   private int maxInflight = 10;
 
   /** 重新连接之间等待的最长时间（毫秒） */
+  @Min(value = 1, message = "mqtt.tenant[].max-reconnect-delay must be at least 1 millisecond")
   private int maxReconnectDelay = 12800;
 
   /** 连接超时值（秒），0 表示禁用超时 */
+  @Min(value = 0, message = "mqtt.tenant[].connection-timeout must not be negative")
   private int connectionTimeout = MqttConnectOptions.CONNECTION_TIMEOUT_DEFAULT;
 
   /** 执行器服务终止前等待的时间（秒） */
+  @Min(value = 1, message = "mqtt.tenant[].executor-service-timeout must be at least 1 second")
   private int executorServiceTimeout = 1;
 
   /** SSL 连接是否验证证书 */
@@ -59,6 +72,8 @@ public class MqttProfile {
    * {@link org.eclipse.paho.client.mqttv3.MqttConnectOptions#MQTT_VERSION_3_1_1}。
    * 默认值 0 表示由客户端自动选择。</p>
    */
+  @Min(value = 0, message = "mqtt.tenant[].mqtt-version must be 0, 3, or 4")
+  @Max(value = 4, message = "mqtt.tenant[].mqtt-version must be 0, 3, or 4")
   private int mqttVersion = 0;
 
   /**
@@ -67,12 +82,16 @@ public class MqttProfile {
   public static class MqttWill implements Serializable {
 
     /** 遗嘱主题 */
+    @NotBlank(message = "mqtt.tenant[].will.topic must not be blank")
     private String topic;
 
     /** 遗嘱消息内容 */
+    @NotBlank(message = "mqtt.tenant[].will.message must not be blank")
     private String message;
 
     /** 遗嘱消息 QoS 等级 */
+    @Min(value = 0, message = "mqtt.tenant[].will.qos must be between 0 and 2")
+    @Max(value = 2, message = "mqtt.tenant[].will.qos must be between 0 and 2")
     private int qos;
 
     /** 是否保留消息 */

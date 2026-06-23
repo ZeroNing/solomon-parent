@@ -1,7 +1,9 @@
 package com.steven.solomon.gateway.autoconfigure;
 
 import com.steven.solomon.gateway.core.GatewayResponseWriter;
+import com.steven.solomon.security.core.InMemoryTokenRevocationStore;
 import com.steven.solomon.security.core.JwtTokenService;
+import com.steven.solomon.security.core.TokenRevocationStore;
 import com.steven.solomon.gateway.filter.GatewaySecurityFilter;
 import com.steven.solomon.gateway.filter.GrayReleaseFilter;
 import com.steven.solomon.gateway.gray.GrayReleaseSelector;
@@ -67,8 +69,17 @@ public class GatewayAutoConfiguration {
      */
     @Bean
     @ConditionalOnMissingBean
-    public JwtTokenService jwtTokenService(JwtTokenProperties properties) {
-        return new JwtTokenService(properties);
+    public TokenRevocationStore tokenRevocationStore() {
+        return new InMemoryTokenRevocationStore();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public JwtTokenService jwtTokenService(
+            JwtTokenProperties properties,
+            TokenRevocationStore tokenRevocationStore) {
+        return new JwtTokenService(properties, new com.steven.solomon.context.TenantModeResolver(
+                new com.steven.solomon.context.TenantModeProperties()), tokenRevocationStore);
     }
 
     /**

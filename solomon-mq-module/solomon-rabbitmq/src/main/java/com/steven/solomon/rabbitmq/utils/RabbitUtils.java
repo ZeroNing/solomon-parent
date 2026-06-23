@@ -19,6 +19,9 @@ import com.steven.solomon.spring.SpringUtil;
 import com.steven.solomon.utils.logger.LoggerUtils;
 import com.steven.solomon.mq.model.BaseMq;
 import com.steven.solomon.mq.SendService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.Timer;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -32,6 +35,8 @@ import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.AbstractMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.DirectMessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -48,11 +53,25 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
     private final RabbitTemplate rabbitTemplate;
 
     private final boolean enabled;
+    private final MeterRegistry meterRegistry;
 
     public RabbitUtils(RabbitMqProperties rabbitMqProperties, ApplicationContext context) {
+        this(rabbitMqProperties, context, null);
+    }
+
+    @Autowired
+    public RabbitUtils(RabbitMqProperties rabbitMqProperties, ApplicationContext context,
+                       ObjectProvider<MeterRegistry> meterRegistryProvider) {
         SpringUtil.setContext(context);
         this.enabled = rabbitMqProperties.getEnabled();
         this.rabbitTemplate = !enabled ? null : SpringUtil.getBean(RabbitTemplate.class);
+        this.meterRegistry = meterRegistryProvider == null ? null : meterRegistryProvider.getIfAvailable();
+    }
+
+    RabbitUtils(RabbitTemplate rabbitTemplate, boolean enabled, MeterRegistry meterRegistry) {
+        this.rabbitTemplate = rabbitTemplate;
+        this.enabled = enabled;
+        this.meterRegistry = meterRegistry;
     }
 
     /**
@@ -64,7 +83,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
-        if (!convertAndSend(mq, 0, false)) {
+        if (!sendWithMetrics("send", mq, 0, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
     }
@@ -78,7 +97,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
-        if (!convertAndSend(mq, delay, true)) {
+        if (!sendWithMetrics("delay", mq, delay, true)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
     }
@@ -92,7 +111,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             logger.error("Rabbitmq不开启,禁止使用该功能");
             return;
         }
-        if (!convertAndSend(mq, expiration, false)) {
+        if (!sendWithMetrics("expiration", mq, expiration, false)) {
             throw new BaseException(BaseExceptionCode.BASE_EXCEPTION_CODE);
         }
     }
@@ -175,7 +194,7 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
 //    return allQueueContainerMap;
 //  }
 
-    private boolean convertAndSend(BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
+    private boolean convertAndSend(String operation, BaseMq<?> baseMq, long expiration, boolean isDelayed) throws BaseException {
         if (!enabled) {
             logger.error("rabbitmq没开启,不发送消息");
             return false;
@@ -206,6 +225,55 @@ public class RabbitUtils implements SendService<RabbitMqModel<?>> {
             return msg;
         }, new CorrelationData());
         return true;
+    }
+
+    private boolean sendWithMetrics(String operation, RabbitMqModel<?> model, long expiration, boolean delayed)
+            throws BaseException {
+        Timer.Sample sample = meterRegistry == null ? null : Timer.start(meterRegistry);
+        String outcome = "success";
+        try {
+            boolean sent = convertAndSend(operation, model, expiration, delayed);
+            outcome = sent ? "success" : "failure";
+            if (sent) {
+                logger.info("RabbitMQ send succeeded, operation={}, exchange={}, routingKey={}, tenant={}, msgId={}",
+                        operation, safeTag(model.getExchange()), safeTag(model.getRoutingKey()),
+                        safeTag(model.getTenantCode()), safeTag(model.getMsgId()));
+            }
+            return sent;
+        } catch (RuntimeException e) {
+            outcome = "error";
+            logger.error("RabbitMQ send failed, operation={}, exchange={}, routingKey={}, tenant={}, msgId={}",
+                    operation, model == null ? "unknown" : safeTag(model.getExchange()),
+                    model == null ? "unknown" : safeTag(model.getRoutingKey()),
+                    model == null ? "unknown" : safeTag(model.getTenantCode()),
+                    model == null ? "unknown" : safeTag(model.getMsgId()), e);
+            throw e;
+        } finally {
+            recordSendMetrics(operation,
+                    model == null ? "unknown" : model.getExchange(),
+                    model == null ? "unknown" : model.getRoutingKey(),
+                    outcome,
+                    sample);
+        }
+    }
+
+    private void recordSendMetrics(String operation, String exchange, String routingKey, String outcome, Timer.Sample sample) {
+        if (meterRegistry == null) {
+            return;
+        }
+        Tags tags = Tags.of(
+                "operation", safeTag(operation),
+                "exchange", safeTag(exchange),
+                "routingKey", safeTag(routingKey),
+                "outcome", outcome);
+        meterRegistry.counter("solomon.mq.rabbitmq.send.total", tags).increment();
+        if (sample != null) {
+            sample.stop(Timer.builder("solomon.mq.rabbitmq.send.duration").tags(tags).register(meterRegistry));
+        }
+    }
+
+    private String safeTag(String value) {
+        return StrUtil.isBlank(value) ? "unknown" : value;
     }
 
     public Collection<AbstractMessageListenerContainer> getAllQueueContainerList() {

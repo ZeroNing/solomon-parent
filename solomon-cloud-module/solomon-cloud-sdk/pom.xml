@@ -20,6 +20,10 @@
             <groupId>com.steven</groupId>
             <artifactId>solomon-constant-module</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.steven</groupId>
+            <artifactId>solomon-utils-spring</artifactId>
+        </dependency>
         <!-- Spring Web，提供拦截器与请求头操作 -->
         <dependency>
             <groupId>org.springframework</groupId>

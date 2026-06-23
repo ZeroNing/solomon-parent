@@ -2,7 +2,10 @@ package com.steven.solomon.gateway.properties;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * 网关多租户配置属性。
@@ -19,17 +22,18 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author steven
  */
 @ConfigurationProperties(prefix = "gateway.tenant")
+@Validated
 public class GatewayTenantProperties {
 
     /** 是否启用租户校验。 */
     private boolean enabled = true;
 
     /** 完全跳过鉴权的路径模式列表。 */
-    private List<String> ignoredPaths = new ArrayList<>(List.of(
+    private List<@NotBlank(message = "gateway.tenant.ignored-paths item must not be blank") String> ignoredPaths = new ArrayList<>(List.of(
             "/actuator/health", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-resources/**"));
 
     /** 公开租户路径列表（登录等，需校验租户但不需要 Token）。 */
-    private List<String> publicTenantPaths = new ArrayList<>();
+    private List<@NotBlank(message = "gateway.tenant.public-tenant-paths item must not be blank") String> publicTenantPaths = new ArrayList<>();
 
     public boolean isEnabled() {
         return enabled;
@@ -70,5 +74,13 @@ public class GatewayTenantProperties {
                         "公开租户路径 " + publicPath + " 必须同时配置在 ignored-paths 中");
             }
         }
+    }
+
+    @AssertTrue(message = "gateway.tenant.public-tenant-paths must also be present in gateway.tenant.ignored-paths")
+    public boolean isPublicTenantPathConfigValid() {
+        if (publicTenantPaths == null || publicTenantPaths.isEmpty()) {
+            return true;
+        }
+        return ignoredPaths != null && ignoredPaths.containsAll(publicTenantPaths);
     }
 }

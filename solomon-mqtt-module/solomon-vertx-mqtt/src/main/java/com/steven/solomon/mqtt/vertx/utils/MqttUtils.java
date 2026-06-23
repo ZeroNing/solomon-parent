@@ -5,7 +5,8 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.steven.solomon.mqtt.vertx.consumer.AbstractConsumer;
+import com.steven.solomon.context.ContextAwareCompletableFuture;
+import com.steven.solomon.context.RequestContextSnapshot;
 import com.steven.solomon.exception.BaseException;
 import com.steven.solomon.mqtt.AbstractMqttClientRegistry;
 import com.steven.solomon.mqtt.MqttOperations;
@@ -13,6 +14,7 @@ import com.steven.solomon.mqtt.code.MqttErrorCodes;
 import com.steven.solomon.mqtt.model.MqttMessageModel;
 import com.steven.solomon.mqtt.model.MqttSubscriptionDescriptor;
 import com.steven.solomon.mqtt.support.MqttListenerRegistry;
+import com.steven.solomon.mqtt.vertx.consumer.AbstractConsumer;
 import com.steven.solomon.mqtt.vertx.profile.MqttProfile;
 import com.steven.solomon.mq.SendService;
 import com.steven.solomon.spring.SpringUtil;
@@ -94,9 +96,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
     } catch (Exception e) {
       logger.error("Vert.x MQTT 消息发送失败, tenant={}, topic={}, payload={}",
           data.getTenantCode(), data.getTopic(), json, e);
-      CompletableFuture<Void> future = new CompletableFuture<>();
-      future.completeExceptionally(e);
-      return future;
+      return ContextAwareCompletableFuture.failedFuture(e);
     }
   }
 
@@ -256,6 +256,7 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
    * @return 异步发送结果
    */
   private CompletableFuture<Void> publishAsync(MqttMessageModel<?> data, String json) throws Exception {
+    RequestContextSnapshot snapshot = RequestContextSnapshot.capture();
     CompletableFuture<Void> future = new CompletableFuture<>();
     getClient(data.getTenantCode()).publish(
         data.getTopic(),
@@ -264,12 +265,12 @@ public class MqttUtils extends AbstractMqttClientRegistry<MqttClient, MqttClient
         data.getRetained(),
         false).onComplete(result -> {
           if (result.succeeded()) {
-            future.complete(null);
+            ContextAwareCompletableFuture.complete(future, null, snapshot);
             return;
           }
           logger.error("Vert.x MQTT 异步发送失败, tenant={}, topic={}, payload={}",
               data.getTenantCode(), data.getTopic(), json, result.cause());
-          future.completeExceptionally(result.cause());
+          ContextAwareCompletableFuture.completeExceptionally(future, result.cause(), snapshot);
         });
     return future;
   }

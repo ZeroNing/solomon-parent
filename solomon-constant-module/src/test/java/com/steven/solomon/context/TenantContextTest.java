@@ -6,9 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.steven.solomon.holder.RequestHeaderHolder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +31,7 @@ class TenantContextTest {
     @AfterEach
     void tearDown() {
         context.removeFactory();
+        RequestHeaderHolder.remove();
     }
 
     // ========== registerFactory 测试 ==========
@@ -263,6 +266,26 @@ class TenantContextTest {
     }
 
     // ========== 测试用实现类 ==========
+
+    @Test
+    void requestHeaderHolderWrapPropagatesAndRestoresContext() throws InterruptedException {
+        RequestHeaderHolder.setTenantCode("tenant-main");
+        Runnable wrapped = RequestHeaderHolder.wrap(() -> {
+            assertEquals("tenant-main", RequestHeaderHolder.getTenantCode());
+            RequestHeaderHolder.setTenantCode("tenant-worker");
+        });
+        AtomicReference<String> tenantAfterTask = new AtomicReference<>();
+
+        Thread thread = new Thread(() -> {
+            wrapped.run();
+            tenantAfterTask.set(RequestHeaderHolder.getTenantCode());
+        });
+        thread.start();
+        thread.join();
+
+        assertEquals("", tenantAfterTask.get());
+        assertEquals("tenant-main", RequestHeaderHolder.getTenantCode());
+    }
 
     private static class TestTenantContext extends TenantContext<String> {
         // 使用String作为工厂类型进行测试

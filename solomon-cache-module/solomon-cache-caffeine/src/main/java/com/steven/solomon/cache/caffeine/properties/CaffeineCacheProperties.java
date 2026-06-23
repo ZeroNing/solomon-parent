@@ -2,7 +2,11 @@ package com.steven.solomon.cache.caffeine.properties;
 
 import com.steven.solomon.cache.key.CacheKeyProperties;
 import java.time.Duration;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * Caffeine 本地缓存配置属性。
@@ -11,6 +15,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 默认不启用，需设置 {@code cache.caffeine.enabled=true}。</p>
  */
 @ConfigurationProperties(prefix = "cache.caffeine")
+@Validated
 public class CaffeineCacheProperties {
 
   /**
@@ -21,16 +26,20 @@ public class CaffeineCacheProperties {
   /**
    * 最大缓存条目数。
    */
+  @Min(value = 1, message = "cache.caffeine.maximum-size must be at least 1")
   private long maximumSize = 10_000;
 
   /**
    * 默认过期时间，业务没有通过 {@link com.steven.solomon.cache.annotation.CacheResult#expireSeconds()} 指定时使用此值。
    */
+  @NotNull(message = "cache.caffeine.default-expire must not be null")
   private Duration defaultExpire = Duration.ofMinutes(30);
 
   /**
    * 缓存 key 生成规则配置。
    */
+  @Valid
+  @NotNull(message = "cache.caffeine.key must not be null")
   private CacheKeyProperties key = new CacheKeyProperties();
 
   public boolean isEnabled() {
