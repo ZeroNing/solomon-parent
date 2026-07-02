@@ -1,0 +1,17 @@
+# Vault 开发模式：启动后立即可用，仅供本地开发，数据不会持久化。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Vault 本地开发令牌和端口
+services:
+  vault:
+    image: hashicorp/vault:1.18
+    container_name: vault
+    cap_add:
+      - IPC_LOCK
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      VAULT_DEV_ROOT_TOKEN_ID: "Solomon@2026!"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+    ports:
+      - "8200:8200"
+    restart: unless-stopped

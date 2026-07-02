@@ -1,0 +1,39 @@
+# Consul 三服务端集群：使用 Raft 自动选主，任一节点故障后仍可形成多数派。
+# 数据中心、节点名和端口均直接配置在本文件中。
+x-consul-common: &consul-common
+  image: hashicorp/consul:1.21
+  command: agent -server -bootstrap-expect=3 -client=0.0.0.0 -datacenter=dc1 -retry-join=consul1
+  networks:
+    - consul-cluster
+  restart: unless-stopped
+
+services:
+  consul1:
+    <<: *consul-common
+    container_name: consul1
+    hostname: consul1
+    command: agent -server -bootstrap-expect=3 -client=0.0.0.0 -ui -datacenter=dc1 -node=consul1
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    volumes: ["./data/1:/consul/data"]
+
+  consul2:
+    <<: *consul-common
+    container_name: consul2
+    hostname: consul2
+    command: agent -server -bootstrap-expect=3 -client=0.0.0.0 -datacenter=dc1 -node=consul2 -retry-join=consul1
+    ports: ["8510:8500"]
+    volumes: ["./data/2:/consul/data"]
+
+  consul3:
+    <<: *consul-common
+    container_name: consul3
+    hostname: consul3
+    command: agent -server -bootstrap-expect=3 -client=0.0.0.0 -datacenter=dc1 -node=consul3 -retry-join=consul1
+    ports: ["8520:8500"]
+    volumes: ["./data/3:/consul/data"]
+
+networks:
+  consul-cluster:
+    driver: bridge

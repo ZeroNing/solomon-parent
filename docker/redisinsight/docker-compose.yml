@@ -1,0 +1,11 @@
+# RedisInsight：Redis 官方图形化管理与性能分析工具。
+# 配置方式：启动后访问 5540 端口，在界面中添加 Redis 连接。
+services:
+  redisinsight:
+    image: redis/redisinsight:2.70
+    container_name: redisinsight
+    ports:
+      - "5540:5540"
+    volumes:
+      - ./data:/data
+    restart: unless-stopped

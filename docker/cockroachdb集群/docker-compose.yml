@@ -1,0 +1,43 @@
+# CockroachDB 三节点无主集群：使用 Raft 复制数据并由初始化容器自动建制。
+# 节点地址、SQL 端口和管理端口均直接配置在本文件中；仅适合本地无 TLS 联调。
+x-cockroach-common: &cockroach-common
+  image: cockroachdb/cockroach:v24.3.0
+  command: start --insecure --join=cockroach1,cockroach2,cockroach3 --cache=.25 --max-sql-memory=.25
+  networks:
+    - cockroach-cluster
+  restart: unless-stopped
+
+services:
+  cockroach1:
+    <<: *cockroach-common
+    container_name: cockroach1
+    hostname: cockroach1
+    ports: ["26257:26257", "8082:8080"]
+    volumes: ["./data/1:/cockroach/cockroach-data"]
+
+  cockroach2:
+    <<: *cockroach-common
+    container_name: cockroach2
+    hostname: cockroach2
+    ports: ["26258:26257", "8083:8080"]
+    volumes: ["./data/2:/cockroach/cockroach-data"]
+
+  cockroach3:
+    <<: *cockroach-common
+    container_name: cockroach3
+    hostname: cockroach3
+    ports: ["26259:26257", "8084:8080"]
+    volumes: ["./data/3:/cockroach/cockroach-data"]
+
+  cockroach-init:
+    image: cockroachdb/cockroach:v24.3.0
+    container_name: cockroach-init
+    depends_on: [cockroach1, cockroach2, cockroach3]
+    command: init --insecure --host=cockroach1:26257
+    networks:
+      - cockroach-cluster
+    restart: "no"
+
+networks:
+  cockroach-cluster:
+    driver: bridge

@@ -1,0 +1,163 @@
+# Apache Pulsar 本地高可用集群：3 ZooKeeper、3 BookKeeper、2 Broker 和 1 Proxy。
+# 集群名称、元数据地址、内存和端口均直接配置在本文件中。
+x-pulsar-common: &pulsar-common
+  image: apachepulsar/pulsar:4.0.2
+  networks:
+    - pulsar-cluster
+  restart: unless-stopped
+
+x-zookeeper-common: &zookeeper-common
+  <<: *pulsar-common
+  command: bin/pulsar zookeeper
+  environment:
+    PULSAR_MEM: "-Xms256m -Xmx256m"
+
+x-bookie-common: &bookie-common
+  <<: *pulsar-common
+  command: bin/pulsar bookie
+  environment:
+    clusterName: solomon-pulsar
+    zkServers: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    metadataServiceUri: metadata-store:zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
+
+x-broker-common: &broker-common
+  <<: *pulsar-common
+  command: bin/pulsar broker
+  environment:
+    clusterName: solomon-pulsar
+    zookeeperServers: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    metadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    configurationMetadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+    managedLedgerDefaultEnsembleSize: "3"
+    managedLedgerDefaultWriteQuorum: "3"
+    managedLedgerDefaultAckQuorum: "2"
+    PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
+
+services:
+  zookeeper1:
+    <<: *zookeeper-common
+    container_name: pulsar-zookeeper1
+    hostname: zookeeper1
+    environment:
+      PULSAR_MEM: "-Xms256m -Xmx256m"
+      PULSAR_PREFIX_server.1: zookeeper1:2888:3888
+      PULSAR_PREFIX_server.2: zookeeper2:2888:3888
+      PULSAR_PREFIX_server.3: zookeeper3:2888:3888
+      PULSAR_PREFIX_myid: "1"
+    volumes: ["./data/zookeeper1:/pulsar/data/zookeeper"]
+
+  zookeeper2:
+    <<: *zookeeper-common
+    container_name: pulsar-zookeeper2
+    hostname: zookeeper2
+    environment:
+      PULSAR_MEM: "-Xms256m -Xmx256m"
+      PULSAR_PREFIX_server.1: zookeeper1:2888:3888
+      PULSAR_PREFIX_server.2: zookeeper2:2888:3888
+      PULSAR_PREFIX_server.3: zookeeper3:2888:3888
+      PULSAR_PREFIX_myid: "2"
+    volumes: ["./data/zookeeper2:/pulsar/data/zookeeper"]
+
+  zookeeper3:
+    <<: *zookeeper-common
+    container_name: pulsar-zookeeper3
+    hostname: zookeeper3
+    environment:
+      PULSAR_MEM: "-Xms256m -Xmx256m"
+      PULSAR_PREFIX_server.1: zookeeper1:2888:3888
+      PULSAR_PREFIX_server.2: zookeeper2:2888:3888
+      PULSAR_PREFIX_server.3: zookeeper3:2888:3888
+      PULSAR_PREFIX_myid: "3"
+    volumes: ["./data/zookeeper3:/pulsar/data/zookeeper"]
+
+  pulsar-metadata-init:
+    <<: *pulsar-common
+    container_name: pulsar-metadata-init
+    depends_on: [zookeeper1, zookeeper2, zookeeper3]
+    command: >
+      bin/pulsar initialize-cluster-metadata
+      --cluster solomon-pulsar
+      --zookeeper zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      --configuration-store zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      --web-service-url http://broker1:8080
+      --web-service-url-tls https://broker1:8443
+      --broker-service-url pulsar://broker1:6650
+      --broker-service-url-tls pulsar+ssl://broker1:6651
+    restart: "no"
+
+  bookie1:
+    <<: *bookie-common
+    container_name: pulsar-bookie1
+    depends_on:
+      pulsar-metadata-init:
+        condition: service_completed_successfully
+    volumes: ["./data/bookie1:/pulsar/data/bookkeeper"]
+
+  bookie2:
+    <<: *bookie-common
+    container_name: pulsar-bookie2
+    depends_on:
+      pulsar-metadata-init:
+        condition: service_completed_successfully
+    volumes: ["./data/bookie2:/pulsar/data/bookkeeper"]
+
+  bookie3:
+    <<: *bookie-common
+    container_name: pulsar-bookie3
+    depends_on:
+      pulsar-metadata-init:
+        condition: service_completed_successfully
+    volumes: ["./data/bookie3:/pulsar/data/bookkeeper"]
+
+  broker1:
+    <<: *broker-common
+    container_name: pulsar-broker1
+    hostname: broker1
+    environment:
+      clusterName: solomon-pulsar
+      zookeeperServers: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      metadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      configurationMetadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      managedLedgerDefaultEnsembleSize: "3"
+      managedLedgerDefaultWriteQuorum: "3"
+      managedLedgerDefaultAckQuorum: "2"
+      advertisedAddress: broker1
+      PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
+    depends_on: [bookie1, bookie2, bookie3]
+    ports: ["6650:6650", "8085:8080"]
+
+  broker2:
+    <<: *broker-common
+    container_name: pulsar-broker2
+    hostname: broker2
+    environment:
+      clusterName: solomon-pulsar
+      zookeeperServers: zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      metadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      configurationMetadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      managedLedgerDefaultEnsembleSize: "3"
+      managedLedgerDefaultWriteQuorum: "3"
+      managedLedgerDefaultAckQuorum: "2"
+      advertisedAddress: broker2
+      PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
+    depends_on: [bookie1, bookie2, bookie3]
+    ports: ["6651:6650", "8086:8080"]
+
+  proxy:
+    <<: *pulsar-common
+    container_name: pulsar-proxy
+    command: bin/pulsar proxy
+    environment:
+      clusterName: solomon-pulsar
+      metadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      configurationMetadataStoreUrl: zk:zookeeper1:2181,zookeeper2:2181,zookeeper3:2181
+      servicePort: "6650"
+      webServicePort: "8080"
+      PULSAR_MEM: "-Xms256m -Xmx256m"
+    depends_on: [broker1, broker2]
+    ports: ["6652:6650", "8087:8080"]
+
+networks:
+  pulsar-cluster:
+    driver: bridge

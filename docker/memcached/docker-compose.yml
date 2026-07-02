@@ -1,0 +1,16 @@
+# Memcached 单机缓存：适合简单的分布式键值缓存场景。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Memcached 资源和端口配置
+services:
+  memcached:
+    image: memcached:1.6-alpine
+    container_name: memcached
+    command:
+      - memcached
+      - --memory-limit=128
+      - --conn-limit=1024
+      - --threads=4
+    ports:
+      - "11211:11211"
+    restart: unless-stopped

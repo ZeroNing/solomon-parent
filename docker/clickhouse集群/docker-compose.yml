@@ -1,0 +1,89 @@
+# ClickHouse 高可用集群：2 分片 × 2 副本，并由 3 个 ClickHouse Keeper 节点提供协调服务。
+# 数据库账号、密码、节点端口和全部集群配置均位于本部署单元内。
+x-keeper-common: &keeper-common
+  image: clickhouse/clickhouse-keeper:24.8
+  networks:
+    - clickhouse-cluster
+  restart: unless-stopped
+
+x-clickhouse-common: &clickhouse-common
+  image: clickhouse/clickhouse-server:24.8
+  environment:
+    CLICKHOUSE_DB: default
+    CLICKHOUSE_USER: admin
+    # ClickHouse 登录密码，生产环境必须修改。
+    CLICKHOUSE_PASSWORD: "Solomon@2026!"
+    CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+  depends_on:
+    - keeper1
+    - keeper2
+    - keeper3
+  networks:
+    - clickhouse-cluster
+  ulimits:
+    nofile:
+      soft: 262144
+      hard: 262144
+  restart: unless-stopped
+
+services:
+  keeper1:
+    <<: *keeper-common
+    container_name: clickhouse-keeper1
+    volumes:
+      - ./config/keeper1.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./data/keeper1:/var/lib/clickhouse
+
+  keeper2:
+    <<: *keeper-common
+    container_name: clickhouse-keeper2
+    volumes:
+      - ./config/keeper2.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./data/keeper2:/var/lib/clickhouse
+
+  keeper3:
+    <<: *keeper-common
+    container_name: clickhouse-keeper3
+    volumes:
+      - ./config/keeper3.xml:/etc/clickhouse-keeper/keeper_config.xml:ro
+      - ./data/keeper3:/var/lib/clickhouse
+
+  clickhouse1:
+    <<: *clickhouse-common
+    container_name: clickhouse1
+    ports: ["8123:8123", "9000:9000"]
+    volumes:
+      - ./config/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+      - ./config/macros1.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./data/clickhouse1:/var/lib/clickhouse
+
+  clickhouse2:
+    <<: *clickhouse-common
+    container_name: clickhouse2
+    ports: ["8124:8123", "9001:9000"]
+    volumes:
+      - ./config/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+      - ./config/macros2.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./data/clickhouse2:/var/lib/clickhouse
+
+  clickhouse3:
+    <<: *clickhouse-common
+    container_name: clickhouse3
+    ports: ["8125:8123", "9002:9000"]
+    volumes:
+      - ./config/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+      - ./config/macros3.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./data/clickhouse3:/var/lib/clickhouse
+
+  clickhouse4:
+    <<: *clickhouse-common
+    container_name: clickhouse4
+    ports: ["8126:8123", "9003:9000"]
+    volumes:
+      - ./config/cluster.xml:/etc/clickhouse-server/config.d/cluster.xml:ro
+      - ./config/macros4.xml:/etc/clickhouse-server/config.d/macros.xml:ro
+      - ./data/clickhouse4:/var/lib/clickhouse
+
+networks:
+  clickhouse-cluster:
+    driver: bridge

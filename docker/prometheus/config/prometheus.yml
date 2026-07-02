@@ -1,0 +1,11 @@
+# Prometheus 全局采集配置。
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# 默认采集 Prometheus 自身；其他应用可按相同格式增加 job。
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - localhost:9090

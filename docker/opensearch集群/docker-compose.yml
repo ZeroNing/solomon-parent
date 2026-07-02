@@ -1,0 +1,51 @@
+# OpenSearch 三节点集群：三个集群管理节点候选组成法定多数。
+# 集群名、节点名、JVM 内存和端口均直接配置在本文件中。
+x-opensearch-common: &opensearch-common
+  image: opensearchproject/opensearch:2.19.3
+  environment: &opensearch-environment
+    cluster.name: solomon-opensearch
+    discovery.seed_hosts: opensearch1,opensearch2,opensearch3
+    cluster.initial_cluster_manager_nodes: opensearch1,opensearch2,opensearch3
+    bootstrap.memory_lock: "true"
+    DISABLE_INSTALL_DEMO_CONFIG: "true"
+    DISABLE_SECURITY_PLUGIN: "true"
+    OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+  networks:
+    - opensearch-cluster
+  restart: unless-stopped
+
+services:
+  opensearch1:
+    <<: *opensearch-common
+    container_name: opensearch1
+    environment:
+      <<: *opensearch-environment
+      node.name: opensearch1
+    ports: ["9201:9200"]
+    volumes: ["./data/1:/usr/share/opensearch/data"]
+
+  opensearch2:
+    <<: *opensearch-common
+    container_name: opensearch2
+    environment:
+      <<: *opensearch-environment
+      node.name: opensearch2
+    ports: ["9211:9200"]
+    volumes: ["./data/2:/usr/share/opensearch/data"]
+
+  opensearch3:
+    <<: *opensearch-common
+    container_name: opensearch3
+    environment:
+      <<: *opensearch-environment
+      node.name: opensearch3
+    ports: ["9221:9200"]
+    volumes: ["./data/3:/usr/share/opensearch/data"]
+
+networks:
+  opensearch-cluster:
+    driver: bridge

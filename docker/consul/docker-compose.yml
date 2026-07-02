@@ -1,0 +1,21 @@
+# Consul 单节点服务端：启用服务发现、KV 存储和 Web 管理界面。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Consul HTTP 和 DNS 端口
+services:
+  consul:
+    image: hashicorp/consul:1.20
+    container_name: consul
+    command:
+      - agent
+      - -server
+      - -bootstrap-expect=1
+      - -ui
+      - -client=0.0.0.0
+      - -data-dir=/consul/data
+    ports:
+      - "8500:8500"
+      - "8600:8600/udp"
+    volumes:
+      - ./data:/consul/data
+    restart: unless-stopped

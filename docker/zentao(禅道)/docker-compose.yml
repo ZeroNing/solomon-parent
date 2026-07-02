@@ -1,15 +1,24 @@
-version: '3'
-services:  # 定义服务，这里只有一个名为 'zentao' 的服务
-  zentao:  # 服务名称，容器的名称将在 Docker 中是 'zentao'
-    image: easysoft/zentao:latest  # 使用 'easysoft/zentao' 镜像的最新版本来启动容器
-    container_name: zentao  # 指定容器的名称为 'zentao'
+# 禅道单机应用：使用外部 MySQL，连接信息直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# 禅道外部 MySQL 和访问端口
+services:
+  zentao:
+    image: easysoft/zentao:latest
+    container_name: zentao
+    environment:
+      ZT_MYSQL_HOST: "host.docker.internal"
+      ZT_MYSQL_PORT: "3306"
+      ZT_MYSQL_USER: "zentao"
+      # 敏感配置：生产环境必须修改此示例值。
+      ZT_MYSQL_PASSWORD: "Solomon@2026!"
+      ZT_MYSQL_DB: "zentao"
+      MYSQL_INTERNAL: "false"
+      LOG_PATH: /var/www/html/log
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
-      - "80:80"  # 将宿主机的 80 端口映射到容器的 80 端口，用于访问禅道的 Web 应用
-    environment:  # 设置环境变量，以便容器内的应用可以读取
-      - ZT_MYSQL_HOST=[外部数据库URL]  # 设置 MySQL 主机地址，指向外部 MySQL 数据库
-      - ZT_MYSQL_PORT=[外部数据库端口]  # 设置 MySQL 端口号，默认为 3306
-      - ZT_MYSQL_USER=[数据库账号]  # 设置连接 MySQL 的用户名为 'root'
-      - ZT_MYSQL_PASSWORD=[数据库密码]  # 设置连接 MySQL 的密码为 'root'
-      - ZT_MYSQL_DB=[数据库库名]  # 设置要连接的 MySQL 数据库名称为 'zentao'
-      - LOG_PATH=/var/www/html/log  # 设置容器内日志文件的存储路径
-      - MYSQL_INTERNAL=false  # 设置为 false，表示不使用容器内的 MySQL，而是连接外部的 MySQL 实例
+      - "8088:80"
+    volumes:
+      - ./pms:/www/zentaopms
+    restart: unless-stopped

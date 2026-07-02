@@ -1,4 +1,7 @@
-version: '3.8'  # Docker Compose 文件版本，可以根据需要调整
+# InStock 股票系统：外部数据库连接信息直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# InStock 外部数据库连接
 services:
   instock:
     image: mayanghua/instock:latest  # 使用的镜像
@@ -6,10 +9,11 @@ services:
     ports:
       - "9988:9988"                 # 端口映射：宿主机:容器
     environment:
-      db_host: 192.168.8.96            # 数据库主机
-      db_user: root                 # 数据库用户名
-      db_password: root             # 数据库密码
-      db_database: instockdb        # 数据库名称
-      db_port: "3306"               # 数据库端口
+      db_host: "host.docker.internal"
+      db_user: "root"
+      db_password: "Solomon@2026!"
+      db_database: "instockdb"
+      db_port: "3306"
     stdin_open: true                # 等价于 `-i`，保持标准输入打开
     tty: true                       # 等价于 `-t`，分配终端
+    restart: unless-stopped

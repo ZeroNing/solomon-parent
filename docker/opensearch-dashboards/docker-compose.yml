@@ -1,0 +1,16 @@
+# OpenSearch Dashboards：连接关闭安全插件的外部 OpenSearch 单节点。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# OpenSearch Dashboards 后端地址和端口
+services:
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.19.1
+    container_name: opensearch-dashboards
+    environment:
+      OPENSEARCH_HOSTS: '["http://host.docker.internal:9201"]'
+      DISABLE_SECURITY_DASHBOARDS_PLUGIN: "true"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "5602:5601"
+    restart: unless-stopped

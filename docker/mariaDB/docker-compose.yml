@@ -1,18 +1,22 @@
-version: '3.9' # 定义 Docker Compose 文件的版本
-
-services: # 定义服务
-  mariadb: # MariaDB 服务
-    image: mariadb:latest # 使用最新版本的 MariaDB 镜像
-    container_name: mariadb # 设置容器名称为 'mariadb'
-    environment: # 设置环境变量，用于 MariaDB 初始化配置
-      MYSQL_ROOT_PASSWORD: root # 设置 MariaDB 的 root 用户密码为 'root'
-      MYSQL_DATABASE: admin # 创建一个名为 'admin' 的数据库
-      MYSQL_USER: admin # 创建一个名为 'admin' 的普通用户
-      MYSQL_PASSWORD: admin # 为 'admin' 用户设置密码为 'admin'
+# MariaDB 单机部署：初始化账号和密码直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# MariaDB 初始化账号和端口
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      MARIADB_ROOT_PASSWORD: "Solomon@2026!"
+      MARIADB_DATABASE: "admin"
+      MARIADB_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      MARIADB_PASSWORD: "Solomon@2026!"
     ports:
-      - "3306:3306" # 将容器内的 3306 端口映射到主机的 3306 端口，使数据库服务能在主机上访问
+      - "3307:3306"
     volumes:
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-      - ./data:/var/lib/mysql # 将容器内的数据目录映射到主机的 './data' 目录，确保数据持久化
-      - ./logs:/var/log/mysql # 将容器内的日志目录映射到主机的 './logs' 目录，方便查看日志
-    restart: always # 设置容器总是自动重启，确保高可用性
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/var/lib/mysql
+      - ./logs:/var/log/mysql
+    restart: unless-stopped

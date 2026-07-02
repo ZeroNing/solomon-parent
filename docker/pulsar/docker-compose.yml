@@ -1,0 +1,17 @@
+# Apache Pulsar 单机模式：包含 Broker、BookKeeper 和 ZooKeeper，适合本地开发。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Pulsar 单机资源和端口
+services:
+  pulsar:
+    image: apachepulsar/pulsar:4.0.2
+    container_name: pulsar
+    command: ["bin/pulsar", "standalone"]
+    environment:
+      PULSAR_MEM: "-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m"
+    ports:
+      - "6650:6650"
+      - "8085:8080"
+    volumes:
+      - ./data:/pulsar/data
+    restart: unless-stopped

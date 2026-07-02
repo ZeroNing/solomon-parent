@@ -1,0 +1,15 @@
+# Kafka UI：Kafka 集群的主题、消费者、消息和配置管理界面。
+# 配置方式：默认连接宿主机 9092 端口；Kafka 在其他地址时修改 bootstrapServers。
+services:
+  kafka-ui:
+    image: provectuslabs/kafka-ui:v0.7.2
+    container_name: kafka-ui
+    environment:
+      # UI 中显示的集群名称。
+      KAFKA_CLUSTERS_0_NAME: solomon-local
+      # Kafka Broker 地址，Docker Desktop 可通过 host.docker.internal 访问宿主机。
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: host.docker.internal:9092
+      DYNAMIC_CONFIG_ENABLED: "true"
+    ports:
+      - "8087:8080"
+    restart: unless-stopped

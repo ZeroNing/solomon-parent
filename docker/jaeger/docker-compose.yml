@@ -1,0 +1,15 @@
+# Jaeger All-in-One：适合本地开发的分布式链路追踪。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Jaeger UI 和 OTLP 接收端口
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.64.0
+    container_name: jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
+    restart: unless-stopped

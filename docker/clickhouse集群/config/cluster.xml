@@ -1,0 +1,22 @@
+<!-- ClickHouse 2 分片 2 副本拓扑，以及 3 节点 Keeper 地址。 -->
+<clickhouse>
+    <remote_servers>
+        <solomon_cluster>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica><host>clickhouse1</host><port>9000</port></replica>
+                <replica><host>clickhouse2</host><port>9000</port></replica>
+            </shard>
+            <shard>
+                <internal_replication>true</internal_replication>
+                <replica><host>clickhouse3</host><port>9000</port></replica>
+                <replica><host>clickhouse4</host><port>9000</port></replica>
+            </shard>
+        </solomon_cluster>
+    </remote_servers>
+    <zookeeper>
+        <node><host>keeper1</host><port>9181</port></node>
+        <node><host>keeper2</host><port>9181</port></node>
+        <node><host>keeper3</host><port>9181</port></node>
+    </zookeeper>
+</clickhouse>

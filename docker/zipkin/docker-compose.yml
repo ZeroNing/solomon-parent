@@ -1,0 +1,11 @@
+# Zipkin 单节点链路追踪：提供采集接口和 Web 查询界面。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Zipkin HTTP 端口
+services:
+  zipkin:
+    image: openzipkin/zipkin:3
+    container_name: zipkin
+    ports:
+      - "9411:9411"
+    restart: unless-stopped

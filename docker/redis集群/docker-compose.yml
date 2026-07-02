@@ -1,0 +1,104 @@
+# Redis Cluster：六节点组成 3 主 3 从，节点向客户端公布宿主机可达地址。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Redis Cluster 密码、宿主机可达地址和节点端口
+x-redis-node: &redis-node
+  image: redis:latest
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  networks:
+    - redis-cluster
+  restart: unless-stopped
+
+services:
+  redis-node1:
+    <<: *redis-node
+    container_name: redis-cluster-node1
+    command: ["redis-server", "--port", "7001", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7001", "--cluster-announce-bus-port", "17001"]
+    ports:
+      - "7001:7001"
+      - "17001:17001"
+    volumes:
+      - ./data/1:/data
+
+  redis-node2:
+    <<: *redis-node
+    container_name: redis-cluster-node2
+    command: ["redis-server", "--port", "7002", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7002", "--cluster-announce-bus-port", "17002"]
+    ports:
+      - "7002:7002"
+      - "17002:17002"
+    volumes:
+      - ./data/2:/data
+
+  redis-node3:
+    <<: *redis-node
+    container_name: redis-cluster-node3
+    command: ["redis-server", "--port", "7003", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7003", "--cluster-announce-bus-port", "17003"]
+    ports:
+      - "7003:7003"
+      - "17003:17003"
+    volumes:
+      - ./data/3:/data
+
+  redis-node4:
+    <<: *redis-node
+    container_name: redis-cluster-node4
+    command: ["redis-server", "--port", "7004", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7004", "--cluster-announce-bus-port", "17004"]
+    ports:
+      - "7004:7004"
+      - "17004:17004"
+    volumes:
+      - ./data/4:/data
+
+  redis-node5:
+    <<: *redis-node
+    container_name: redis-cluster-node5
+    command: ["redis-server", "--port", "7005", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7005", "--cluster-announce-bus-port", "17005"]
+    ports:
+      - "7005:7005"
+      - "17005:17005"
+    volumes:
+      - ./data/5:/data
+
+  redis-node6:
+    <<: *redis-node
+    container_name: redis-cluster-node6
+    command: ["redis-server", "--port", "7006", "--cluster-enabled", "yes", "--cluster-config-file", "nodes.conf", "--cluster-node-timeout", "5000", "--appendonly", "yes", "--requirepass", "Solomon@2026!", "--masterauth", "Solomon@2026!", "--cluster-announce-ip", "host.docker.internal", "--cluster-announce-port", "7006", "--cluster-announce-bus-port", "17006"]
+    ports:
+      - "7006:7006"
+      - "17006:17006"
+    volumes:
+      - ./data/6:/data
+
+  redis-cluster-init:
+    image: redis:latest
+    container_name: redis-cluster-init
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      REDIS_PASSWORD: "Solomon@2026!"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        until redis-cli -h redis-node1 -p 7001 -a "$${REDIS_PASSWORD}" ping >/dev/null 2>&1; do sleep 2; done
+        if redis-cli -h redis-node1 -p 7001 -a "$${REDIS_PASSWORD}" cluster info 2>/dev/null | grep -q 'cluster_state:ok'; then
+          exit 0
+        fi
+        printf 'yes\n' | redis-cli --cluster create \
+          redis-node1:7001 redis-node2:7002 redis-node3:7003 \
+          redis-node4:7004 redis-node5:7005 redis-node6:7006 \
+          --cluster-replicas 1 -a "$${REDIS_PASSWORD}"
+    networks:
+      - redis-cluster
+    restart: "no"
+
+networks:
+  redis-cluster:
+    driver: bridge

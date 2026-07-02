@@ -1,16 +1,19 @@
-version: '3'
-
+# PostgreSQL 单机部署：初始化数据库和凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# PostgreSQL 初始化账号和端口
 services:
   postgres:
     image: postgres:latest
     container_name: postgres
     environment:
-      POSTGRES_USER: admin          # PostgreSQL 用户名
-      POSTGRES_PASSWORD: admin  # PostgreSQL 用户密码
-      POSTGRES_DB: default        # 默认数据库名
+      POSTGRES_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      POSTGRES_PASSWORD: "Solomon@2026!"
+      POSTGRES_DB: "default"
     ports:
-      - "5432:5432"                  # 映射端口
+      - "5432:5432"
     volumes:
       - ./data:/var/lib/postgresql/data  # 数据持久化
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart:  always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

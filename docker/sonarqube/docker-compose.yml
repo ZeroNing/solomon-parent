@@ -1,5 +1,7 @@
-version: '3.7'
-
+# SonarQube 单机部署：数据库连接信息直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# SonarQube 外部 PostgreSQL 连接
 services:
   sonarqube:
     image: sonarqube:9.9.6-community
@@ -7,14 +9,14 @@ services:
     ports:
       - "9020:9000"
     environment:
-      - SONAR_JDBC_URL=jdbc:postgresql://127.0.0.1:5432/sonar #数据库连接
-      - SONAR_JDBC_USERNAME=admin #数据库账号
-      - SONAR_JDBC_PASSWORD=admin #数据库密码
+      - SONAR_JDBC_URL=jdbc:postgresql://host.docker.internal:5432/sonar
+      - SONAR_JDBC_USERNAME=admin
+      - SONAR_JDBC_PASSWORD=Solomon@2026!
     volumes:
       - ./data:/opt/sonarqube/data
       - ./extensions:/opt/sonarqube/extensions
       - ./plugins:/opt/sonarqube/lib/bundled-plugins
       - ./logs:/opt/sonarqube/logs
       - ./pdf:/opt/sonarqube/pdf-files
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart:  always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

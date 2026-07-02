@@ -1,0 +1,24 @@
+# Apache Cassandra 单节点宽列数据库：适合功能验证和客户端联调。
+# 配置方式：集群名、数据中心、机架和 JVM 内存均直接写在本文件中。
+services:
+  cassandra:
+    image: cassandra:5.0
+    container_name: cassandra
+    environment:
+      CASSANDRA_CLUSTER_NAME: solomon
+      CASSANDRA_DC: dc1
+      CASSANDRA_RACK: rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      MAX_HEAP_SIZE: 1G
+      HEAP_NEWSIZE: 256M
+    ports:
+      - "9042:9042"
+    volumes:
+      - ./data:/var/lib/cassandra
+    healthcheck:
+      test: ["CMD-SHELL", "cqlsh -e 'DESCRIBE CLUSTER' localhost 9042"]
+      interval: 20s
+      timeout: 10s
+      retries: 15
+      start_period: 60s
+    restart: unless-stopped

@@ -1,42 +1,19 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# 安装 wget
-if ! command -v wget &> /dev/null
-then
-    echo "wget not found, installing..."
-    apt-get update && apt-get install -y wget
-    if [ $? -ne 0 ]; then
-        echo "Failed to install wget"
-        exit 1
-    fi
-else
-    echo "wget is already installed"
+# 下载与 RabbitMQ 3.13 配套的延迟消息插件，离线启用后启动服务。
+set -euo pipefail
+
+plugin_version="3.13.0"
+plugin_file="/plugins/rabbitmq_delayed_message_exchange-${plugin_version}.ez"
+plugin_url="https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v${plugin_version}/rabbitmq_delayed_message_exchange-${plugin_version}.ez"
+
+if [[ ! -f "${plugin_file}" ]]; then
+  apt-get update
+  apt-get install -y --no-install-recommends curl ca-certificates
+  curl --fail --location --retry 3 --output "${plugin_file}" "${plugin_url}"
+  rm -rf /var/lib/apt/lists/*
 fi
 
-# 创建插件目录，如果不存在的话
-mkdir -p /plugins
-
-# 下载 RabbitMQ 延迟消息插件
-if [ ! -f /plugins/rabbitmq_delayed_message_exchange-3.13.0.ez ]; then
-    echo "Downloading rabbitmq_delayed_message_exchange plugin..."
-    wget -O /plugins/rabbitmq_delayed_message_exchange-3.13.0.ez \
-    https://github.com/rabbitmq/rabbitmq-delayed-message-exchange/releases/download/v3.13.0/rabbitmq_delayed_message_exchange-3.13.0.ez
-    if [ $? -ne 0 ]; then
-        echo "Failed to download rabbitmq_delayed_message_exchange plugin"
-        exit 1
-    fi
-else
-    echo "Plugin already downloaded"
-fi
-
-# 修改插件文件权限
-echo "Setting permissions for the plugin..."
-chmod 644 /plugins/rabbitmq_delayed_message_exchange-3.13.0.ez
-
-# 启用插件
-echo "Enabling the plugin..."
-rabbitmq-plugins enable rabbitmq_delayed_message_exchange
-
-# 启动 RabbitMQ 服务
-echo "Starting RabbitMQ server..."
-rabbitmq-server
+chmod 0644 "${plugin_file}"
+rabbitmq-plugins enable --offline rabbitmq_delayed_message_exchange
+exec docker-entrypoint.sh rabbitmq-server

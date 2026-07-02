@@ -1,0 +1,15 @@
+# Docker Compose 临时覆盖文件。
+compose.override.yml
+docker-compose.override.yml
+
+# 容器运行时生成的数据和日志，配置文件不放在这些目录中。
+**/data/**
+**/logs/**
+**/home/**
+**/pms/**
+
+# 保留仓库中已有的占位文件和离线插件。
+!**/data/**/未命名.txt
+!**/logs/**/未命名.txt
+!**/home/**/未命名.txt
+!**/pms/**/未命名.txt

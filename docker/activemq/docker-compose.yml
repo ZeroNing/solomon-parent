@@ -1,9 +1,11 @@
-version: '3.9' # 定义 Docker Compose 文件的版本
-
-services: # 定义服务
-  activemq: # ActiveMQ 服务
-    image: rmohr/activemq:latest # 使用最新版本的 ActiveMQ 镜像
-    container_name: activemq # 设置容器名称为 'activemq'
+# ActiveMQ 单机部署：管理凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# ActiveMQ 管理账号配置
+services:
+  activemq:
+    image: rmohr/activemq:latest
+    container_name: activemq
     ports:
       - "8161:8161" # 管理界面
       - "61616:61616" # 消息传输
@@ -11,6 +13,7 @@ services: # 定义服务
       - ./data:/opt/activemq/data # 持久化数据到主机的 'data' 目录
       - ./logs:/opt/activemq/logs # 持久化日志到主机的 'logs' 目录
     environment:
-      ACTIVEMQ_ADMIN_LOGIN: admin # 设置管理界面的用户名
-      ACTIVEMQ_ADMIN_PASSWORD: admin # 设置管理界面的密码
-    restart: always # 设置容器总是自动重启，确保高可用性
+      ACTIVEMQ_ADMIN_LOGIN: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      ACTIVEMQ_ADMIN_PASSWORD: "Solomon@2026!"
+    restart: unless-stopped

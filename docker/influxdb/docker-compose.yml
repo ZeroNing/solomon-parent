@@ -1,0 +1,23 @@
+# InfluxDB 2.x 单节点时序数据库：首次启动自动创建组织、存储桶和管理员。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# InfluxDB 首次初始化参数
+services:
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      DOCKER_INFLUXDB_INIT_PASSWORD: "Solomon@2026!"
+      DOCKER_INFLUXDB_INIT_ORG: "solomon"
+      DOCKER_INFLUXDB_INIT_BUCKET: "default"
+      # 敏感配置：生产环境必须修改此示例值。
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: "Solomon@2026!"
+    ports:
+      - "8086:8086"
+    volumes:
+      - ./data:/var/lib/influxdb2
+      - ./config:/etc/influxdb2
+    restart: unless-stopped

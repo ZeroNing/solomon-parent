@@ -1,0 +1,50 @@
+# Elasticsearch 三节点集群：三个主节点候选组成法定多数，任一节点故障后仍可服务。
+# 集群名、节点名、JVM 内存和端口均直接配置在本文件中。
+x-elasticsearch-common: &elasticsearch-common
+  image: docker.elastic.co/elasticsearch/elasticsearch:8.19.0
+  environment: &elasticsearch-environment
+    cluster.name: solomon-es-cluster
+    discovery.seed_hosts: es1,es2,es3
+    cluster.initial_master_nodes: es1,es2,es3
+    bootstrap.memory_lock: "true"
+    xpack.security.enabled: "false"
+    ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+  ulimits:
+    memlock:
+      soft: -1
+      hard: -1
+  networks:
+    - elasticsearch-cluster
+  restart: unless-stopped
+
+services:
+  es1:
+    <<: *elasticsearch-common
+    container_name: es1
+    environment:
+      <<: *elasticsearch-environment
+      node.name: es1
+    ports: ["9200:9200"]
+    volumes: ["./data/1:/usr/share/elasticsearch/data"]
+
+  es2:
+    <<: *elasticsearch-common
+    container_name: es2
+    environment:
+      <<: *elasticsearch-environment
+      node.name: es2
+    ports: ["9201:9200"]
+    volumes: ["./data/2:/usr/share/elasticsearch/data"]
+
+  es3:
+    <<: *elasticsearch-common
+    container_name: es3
+    environment:
+      <<: *elasticsearch-environment
+      node.name: es3
+    ports: ["9202:9200"]
+    volumes: ["./data/3:/usr/share/elasticsearch/data"]
+
+networks:
+  elasticsearch-cluster:
+    driver: bridge

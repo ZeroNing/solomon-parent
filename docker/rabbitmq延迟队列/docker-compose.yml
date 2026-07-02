@@ -1,13 +1,22 @@
-version: '3'
+# RabbitMQ 延迟队列：构建自定义镜像并在构建阶段安装插件。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# 构建版 RabbitMQ 延迟队列账号和端口
 services:
   rabbitmq:
-    hostname: rabbitmq
-    container_name: rabbitmq
-    build: .
+    build:
+      context: .
+    image: solomon/rabbitmq-delayed:3.13
+    container_name: rabbitmq-delayed
+    hostname: rabbitmq-delayed
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      RABBITMQ_DEFAULT_PASS: "Solomon@2026!"
     ports:
-      - 15672:15672
-      - 5672:5672
+      - "5674:5672"
+      - "15674:15672"
     volumes:
-      - ./data:/usr/etc/rabbitmq/data
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart: always
+      - ./data:/var/lib/rabbitmq
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

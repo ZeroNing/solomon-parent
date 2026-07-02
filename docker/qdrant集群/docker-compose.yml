@@ -1,0 +1,39 @@
+# Qdrant 三节点集群：通过 P2P 自动加入，集合可配置分片和副本数。
+# API Key、节点 URI 与端口均直接配置在本文件中；生产环境必须修改示例密钥。
+x-qdrant-common: &qdrant-common
+  image: qdrant/qdrant:v1.14.1
+  environment:
+    # 敏感配置：生产环境必须修改此示例值。
+    QDRANT__SERVICE__API_KEY: "Solomon-Qdrant-Key-2026"
+    QDRANT__CLUSTER__ENABLED: "true"
+  networks:
+    - qdrant-cluster
+  restart: unless-stopped
+
+services:
+  qdrant1:
+    <<: *qdrant-common
+    container_name: qdrant1
+    command: ["./qdrant", "--uri", "http://qdrant1:6335"]
+    ports: ["6333:6333", "6334:6334"]
+    volumes: ["./data/1:/qdrant/storage"]
+
+  qdrant2:
+    <<: *qdrant-common
+    container_name: qdrant2
+    command: ["./qdrant", "--bootstrap", "http://qdrant1:6335", "--uri", "http://qdrant2:6335"]
+    depends_on: [qdrant1]
+    ports: ["6343:6333", "6344:6334"]
+    volumes: ["./data/2:/qdrant/storage"]
+
+  qdrant3:
+    <<: *qdrant-common
+    container_name: qdrant3
+    command: ["./qdrant", "--bootstrap", "http://qdrant1:6335", "--uri", "http://qdrant3:6335"]
+    depends_on: [qdrant1]
+    ports: ["6353:6333", "6354:6334"]
+    volumes: ["./data/3:/qdrant/storage"]
+
+networks:
+  qdrant-cluster:
+    driver: bridge

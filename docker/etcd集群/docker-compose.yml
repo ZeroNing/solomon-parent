@@ -1,0 +1,54 @@
+# etcd 三节点集群：通过 Raft 提供一致性、选主和故障恢复。
+# 节点名称、集群令牌与端口均直接配置在本文件中。
+x-etcd-common: &etcd-common
+  image: quay.io/coreos/etcd:v3.5.21
+  networks:
+    - etcd-cluster
+  restart: unless-stopped
+
+services:
+  etcd1:
+    <<: *etcd-common
+    container_name: etcd1
+    command: >
+      /usr/local/bin/etcd --name etcd1 --data-dir /etcd-data
+      --listen-client-urls http://0.0.0.0:2379
+      --advertise-client-urls http://etcd1:2379
+      --listen-peer-urls http://0.0.0.0:2380
+      --initial-advertise-peer-urls http://etcd1:2380
+      --initial-cluster etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      --initial-cluster-state new --initial-cluster-token solomon-etcd
+    ports: ["2379:2379"]
+    volumes: ["./data/1:/etcd-data"]
+
+  etcd2:
+    <<: *etcd-common
+    container_name: etcd2
+    command: >
+      /usr/local/bin/etcd --name etcd2 --data-dir /etcd-data
+      --listen-client-urls http://0.0.0.0:2379
+      --advertise-client-urls http://etcd2:2379
+      --listen-peer-urls http://0.0.0.0:2380
+      --initial-advertise-peer-urls http://etcd2:2380
+      --initial-cluster etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      --initial-cluster-state new --initial-cluster-token solomon-etcd
+    ports: ["2381:2379"]
+    volumes: ["./data/2:/etcd-data"]
+
+  etcd3:
+    <<: *etcd-common
+    container_name: etcd3
+    command: >
+      /usr/local/bin/etcd --name etcd3 --data-dir /etcd-data
+      --listen-client-urls http://0.0.0.0:2379
+      --advertise-client-urls http://etcd3:2379
+      --listen-peer-urls http://0.0.0.0:2380
+      --initial-advertise-peer-urls http://etcd3:2380
+      --initial-cluster etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+      --initial-cluster-state new --initial-cluster-token solomon-etcd
+    ports: ["2382:2379"]
+    volumes: ["./data/3:/etcd-data"]
+
+networks:
+  etcd-cluster:
+    driver: bridge

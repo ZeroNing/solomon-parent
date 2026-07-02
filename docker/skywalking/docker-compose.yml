@@ -1,0 +1,35 @@
+# SkyWalking 本地部署：OAP 使用内置 H2，UI 连接同一 Compose 网络中的 OAP。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# SkyWalking OAP 内存和访问端口
+services:
+  skywalking-oap:
+    image: apache/skywalking-oap-server:10.1.0
+    container_name: skywalking-oap
+    environment:
+      SW_STORAGE: h2
+      SW_HEALTH_CHECKER: default
+      JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "11800:11800"
+      - "12800:12800"
+    networks:
+      - skywalking
+    restart: unless-stopped
+
+  skywalking-ui:
+    image: apache/skywalking-ui:10.1.0
+    container_name: skywalking-ui
+    depends_on:
+      - skywalking-oap
+    environment:
+      SW_OAP_ADDRESS: http://skywalking-oap:12800
+    ports:
+      - "8089:8080"
+    networks:
+      - skywalking
+    restart: unless-stopped
+
+networks:
+  skywalking:
+    driver: bridge

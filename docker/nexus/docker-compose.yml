@@ -1,10 +1,13 @@
-version: '3.2'
+# Nexus Repository：用于 Maven、npm 和 Docker 等制品仓库。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Nexus HTTP 端口
 services:
-  nexus3:
+  nexus:
     image: sonatype/nexus3:latest
     container_name: nexus
-    restart: always
     ports:
       - "8081:8081"
     volumes:
       - ./data:/nexus-data
+    restart: unless-stopped

@@ -1,0 +1,25 @@
+# ClickHouse 单节点分析数据库：同时开放 HTTP 和原生客户端端口。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# ClickHouse 初始化账号和端口
+services:
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.8
+    container_name: clickhouse
+    environment:
+      CLICKHOUSE_DB: "default"
+      CLICKHOUSE_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      CLICKHOUSE_PASSWORD: "Solomon@2026!"
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: "1"
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./data:/var/lib/clickhouse
+      - ./logs:/var/log/clickhouse-server
+    ulimits:
+      nofile:
+        soft: 262144
+        hard: 262144
+    restart: unless-stopped

@@ -1,0 +1,102 @@
+# MongoDB 三节点副本集：一个初始化主节点、两个副本节点，启用内部 Keyfile 认证。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# MongoDB 副本集管理员、内部 Keyfile 和端口
+x-mongodb-node: &mongodb-node
+  image: mongo:latest
+  command: ["mongod", "--replSet", "rs0", "--bind_ip_all", "--keyFile", "/etc/mongo-keyfile/keyfile"]
+  volumes:
+    - mongo-keyfile:/etc/mongo-keyfile:ro
+  networks:
+    - mongodb-replica
+  restart: unless-stopped
+
+services:
+  mongodb-keyfile:
+    image: alpine:3.21
+    container_name: mongodb-keyfile-init
+    environment:
+      MONGODB_REPLICA_KEY: "c29sb21vbi1tb25nb2RiLXJlcGxpY2Eta2V5LTIwMjY="
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        printf '%s' "$${MONGODB_REPLICA_KEY}" > /keyfile/keyfile
+        chmod 0400 /keyfile/keyfile
+        chown 999:999 /keyfile/keyfile
+    volumes:
+      - mongo-keyfile:/keyfile
+    restart: "no"
+
+  mongodb1:
+    <<: *mongodb-node
+    container_name: mongodb-replica1
+    hostname: mongodb1
+    depends_on:
+      mongodb-keyfile:
+        condition: service_completed_successfully
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      # 敏感配置：生产环境必须修改此示例值。
+      MONGO_INITDB_ROOT_PASSWORD: "Solomon@2026!"
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/1:/data/db
+      - mongo-keyfile:/etc/mongo-keyfile:ro
+
+  mongodb2:
+    <<: *mongodb-node
+    container_name: mongodb-replica2
+    hostname: mongodb2
+    depends_on:
+      mongodb-keyfile:
+        condition: service_completed_successfully
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./data/2:/data/db
+      - mongo-keyfile:/etc/mongo-keyfile:ro
+
+  mongodb3:
+    <<: *mongodb-node
+    container_name: mongodb-replica3
+    hostname: mongodb3
+    depends_on:
+      mongodb-keyfile:
+        condition: service_completed_successfully
+    ports:
+      - "27019:27017"
+    volumes:
+      - ./data/3:/data/db
+      - mongo-keyfile:/etc/mongo-keyfile:ro
+
+  mongodb-replica-init:
+    image: mongo:latest
+    container_name: mongodb-replica-init
+    depends_on:
+      - mongodb1
+      - mongodb2
+      - mongodb3
+    environment:
+      MONGODB_ROOT_USERNAME: "root"
+      # 敏感配置：生产环境必须修改此示例值。
+      MONGODB_ROOT_PASSWORD: "Solomon@2026!"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        until mongosh --host mongodb1 --username "$${MONGODB_ROOT_USERNAME}" --password "$${MONGODB_ROOT_PASSWORD}" --authenticationDatabase admin --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1; do sleep 3; done
+        if mongosh --host mongodb1 --username "$${MONGODB_ROOT_USERNAME}" --password "$${MONGODB_ROOT_PASSWORD}" --authenticationDatabase admin --quiet --eval "rs.status().ok" 2>/dev/null | grep -q 1; then
+          exit 0
+        fi
+        mongosh --host mongodb1 --username "$${MONGODB_ROOT_USERNAME}" --password "$${MONGODB_ROOT_PASSWORD}" --authenticationDatabase admin --eval \
+          "rs.initiate({_id:'rs0',members:[{_id:0,host:'mongodb1:27017'},{_id:1,host:'mongodb2:27017'},{_id:2,host:'mongodb3:27017'}]})"
+    networks:
+      - mongodb-replica
+    restart: "no"
+
+volumes:
+  mongo-keyfile:
+
+networks:
+  mongodb-replica:
+    driver: bridge

@@ -1,0 +1,20 @@
+# Keycloak 开发模式：提供 OAuth 2.0、OpenID Connect 和统一身份认证。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Keycloak 初始管理员和端口
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.1
+    container_name: keycloak
+    command: ["start-dev"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      KC_BOOTSTRAP_ADMIN_PASSWORD: "Solomon@2026!"
+      KC_HTTP_PORT: "8080"
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      - "8180:8080"
+    volumes:
+      - ./data:/opt/keycloak/data
+    restart: unless-stopped

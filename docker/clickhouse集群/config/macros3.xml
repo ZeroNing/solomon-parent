@@ -1,0 +1,2 @@
+<!-- 分片 2、副本 1。 -->
+<clickhouse><macros><cluster>solomon_cluster</cluster><shard>02</shard><replica>clickhouse3</replica></macros></clickhouse>

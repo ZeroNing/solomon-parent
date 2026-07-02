@@ -1,0 +1,71 @@
+# MySQL 8.4 主从复制：一个主节点、一个只读副本，使用 GTID 自动定位。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# MySQL 主从复制账号和端口
+services:
+  mysql-master:
+    image: mysql:8.4
+    container_name: mysql-master
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      MYSQL_ROOT_PASSWORD: "Solomon@2026!"
+      MYSQL_DATABASE: "admin"
+      MYSQL_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      MYSQL_PASSWORD: "Solomon@2026!"
+      # 敏感配置：生产环境必须修改此示例值。
+      MYSQL_REPLICATION_PASSWORD: "Solomon@2026!"
+    command:
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./data/master:/var/lib/mysql
+      - ./init/master-init.sh:/docker-entrypoint-initdb.d/10-replication-user.sh:ro
+    networks:
+      - mysql-replication
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  mysql-replica:
+    image: mysql:8.4
+    container_name: mysql-replica
+    depends_on:
+      mysql-master:
+        condition: service_healthy
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      MYSQL_ROOT_PASSWORD: "Solomon@2026!"
+      # 敏感配置：生产环境必须修改此示例值。
+      MYSQL_REPLICATION_PASSWORD: "Solomon@2026!"
+    command:
+      - --server-id=2
+      - --relay-log=mysql-relay-bin
+      - --read-only=ON
+      - --gtid-mode=ON
+      - --enforce-gtid-consistency=ON
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data/replica:/var/lib/mysql
+      - ./init/replica-init.sh:/docker-entrypoint-initdb.d/20-start-replication.sh:ro
+    networks:
+      - mysql-replication
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+networks:
+  mysql-replication:
+    driver: bridge

@@ -1,0 +1,17 @@
+# Tempo 单节点链路存储：接收 OTLP gRPC/HTTP 数据并写入本地磁盘。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Tempo HTTP 和 OTLP 端口
+services:
+  tempo:
+    image: grafana/tempo:2.7.1
+    container_name: tempo
+    command: ["-config.file=/etc/tempo/tempo.yml"]
+    ports:
+      - "3200:3200"
+      - "14317:4317"
+      - "14318:4318"
+    volumes:
+      - ./config/tempo.yml:/etc/tempo/tempo.yml:ro
+      - ./data:/var/tempo
+    restart: unless-stopped

@@ -1,0 +1,14 @@
+# Nginx Web 服务：挂载默认站点配置和访问日志。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Nginx HTTP 端口
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./conf/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./logs:/var/log/nginx
+    restart: unless-stopped

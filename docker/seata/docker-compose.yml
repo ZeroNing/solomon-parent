@@ -1,0 +1,19 @@
+# Seata Server 单机文件模式：适合本地分布式事务联调。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Seata 对外地址、内存和端口
+services:
+  seata:
+    image: apache/seata-server:2.2.0
+    container_name: seata
+    environment:
+      SEATA_PORT: "8091"
+      STORE_MODE: file
+      SEATA_IP: "host.docker.internal"
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    ports:
+      - "8091:8091"
+      - "7091:7091"
+    volumes:
+      - ./logs:/root/logs/seata
+    restart: unless-stopped

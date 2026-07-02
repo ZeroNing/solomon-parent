@@ -1,13 +1,16 @@
-version: '3'
-
+# Portainer CE：通过宿主机 Docker Socket 管理本机容器。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Portainer HTTPS 和 Edge 端口
 services:
   portainer:
     image: portainer/portainer-ce:latest
     container_name: portainer
     ports:
-      - "9000:9000"
+      - "8000:8000"
+      - "9443:9443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart:  always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

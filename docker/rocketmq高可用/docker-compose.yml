@@ -1,0 +1,116 @@
+# RocketMQ 高可用部署：2 NameServer、3 Broker DLedger 副本和 1 Dashboard。
+# 集群名、DLedger 节点、对外端口和 JVM 内存均直接配置在本文件中。
+x-nameserver-common: &nameserver-common
+  image: apache/rocketmq:5.3.2
+  command: sh mqnamesrv
+  environment:
+    JAVA_OPT_EXT: "-Xms256m -Xmx256m"
+  networks:
+    - rocketmq-ha
+  restart: unless-stopped
+
+x-broker-common: &broker-common
+  image: apache/rocketmq:5.3.2
+  environment:
+    NAMESRV_ADDR: nameserver1:9876;nameserver2:9876
+    JAVA_OPT_EXT: "-Xms512m -Xmx512m"
+  networks:
+    - rocketmq-ha
+  restart: unless-stopped
+
+services:
+  nameserver1:
+    <<: *nameserver-common
+    container_name: rocketmq-nameserver1
+    ports: ["9876:9876"]
+    volumes: ["./logs/nameserver1:/home/rocketmq/logs"]
+
+  nameserver2:
+    <<: *nameserver-common
+    container_name: rocketmq-nameserver2
+    ports: ["9877:9876"]
+    volumes: ["./logs/nameserver2:/home/rocketmq/logs"]
+
+  broker1:
+    <<: *broker-common
+    container_name: rocketmq-broker1
+    hostname: broker1
+    depends_on: [nameserver1, nameserver2]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        printf '%s\n' \
+          'brokerClusterName=solomon-cluster' \
+          'brokerName=broker-a' \
+          'brokerId=-1' \
+          'listenPort=10911' \
+          'brokerIP1=broker1' \
+          'enableDLegerCommitLog=true' \
+          'dLegerGroup=broker-a' \
+          'dLegerPeers=n0-broker1:40911;n1-broker2:40911;n2-broker3:40911' \
+          'dLegerSelfId=n0' \
+          'sendMessageThreadPoolNums=4' > /tmp/broker.conf
+        exec sh mqbroker -c /tmp/broker.conf
+    ports: ["10911:10911"]
+    volumes: ["./data/broker1:/home/rocketmq/store", "./logs/broker1:/home/rocketmq/logs"]
+
+  broker2:
+    <<: *broker-common
+    container_name: rocketmq-broker2
+    hostname: broker2
+    depends_on: [nameserver1, nameserver2]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        printf '%s\n' \
+          'brokerClusterName=solomon-cluster' \
+          'brokerName=broker-a' \
+          'brokerId=-1' \
+          'listenPort=10911' \
+          'brokerIP1=broker2' \
+          'enableDLegerCommitLog=true' \
+          'dLegerGroup=broker-a' \
+          'dLegerPeers=n0-broker1:40911;n1-broker2:40911;n2-broker3:40911' \
+          'dLegerSelfId=n1' \
+          'sendMessageThreadPoolNums=4' > /tmp/broker.conf
+        exec sh mqbroker -c /tmp/broker.conf
+    ports: ["10912:10911"]
+    volumes: ["./data/broker2:/home/rocketmq/store", "./logs/broker2:/home/rocketmq/logs"]
+
+  broker3:
+    <<: *broker-common
+    container_name: rocketmq-broker3
+    hostname: broker3
+    depends_on: [nameserver1, nameserver2]
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        printf '%s\n' \
+          'brokerClusterName=solomon-cluster' \
+          'brokerName=broker-a' \
+          'brokerId=-1' \
+          'listenPort=10911' \
+          'brokerIP1=broker3' \
+          'enableDLegerCommitLog=true' \
+          'dLegerGroup=broker-a' \
+          'dLegerPeers=n0-broker1:40911;n1-broker2:40911;n2-broker3:40911' \
+          'dLegerSelfId=n2' \
+          'sendMessageThreadPoolNums=4' > /tmp/broker.conf
+        exec sh mqbroker -c /tmp/broker.conf
+    ports: ["10913:10911"]
+    volumes: ["./data/broker3:/home/rocketmq/store", "./logs/broker3:/home/rocketmq/logs"]
+
+  dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rocketmq-ha-dashboard
+    depends_on: [broker1, broker2, broker3]
+    environment:
+      JAVA_OPTS: "-Drocketmq.namesrv.addr=nameserver1:9876;nameserver2:9876"
+    ports: ["8080:8080"]
+    networks:
+      - rocketmq-ha
+    restart: unless-stopped
+
+networks:
+  rocketmq-ha:
+    driver: bridge

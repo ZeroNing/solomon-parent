@@ -1,17 +1,20 @@
-version:  '3'
+# EMQX 单机部署：提供 MQTT、WebSocket 和管理控制台。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# EMQX 单节点端口和集群 Cookie
 services:
-    emqx:
-      image:  emqx/emqx:latest
-      container_name:  emqx
-      ports:
-        -  "1883:1883"  #  MQTT  客户端连接端口
-        -  "8083:8083"  #  HTTP  API  端口
-        -  "18083:18083"  #  Dashboard  端口
-      environment:
-        - EMQX_LOADED_PLUGINS="emqx_dashboard,emqx_retainer,emqx_webhook,emqx_rule_engine"
-        - EMQX_PLUGINS__LOADED_FILE=/opt/emqx/data/loaded_plugins
-      volumes:
-        - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-        - ./data:/opt/emqx/data  #  挂载数据卷
-        - ./logs:/opt/emqx/logs  #  挂载日志卷
-      restart:  always
+  emqx:
+    image: emqx/emqx:latest
+    container_name: emqx
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      EMQX_NODE__COOKIE: "solomon-cluster-cookie-2026-change-in-production"
+    ports:
+      - "1883:1883"
+      - "8083:8083"
+      - "18083:18083"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./data:/opt/emqx/data
+      - ./logs:/opt/emqx/log
+    restart: unless-stopped

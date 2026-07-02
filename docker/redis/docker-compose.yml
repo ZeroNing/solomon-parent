@@ -1,13 +1,20 @@
-version:  '3'
+# Redis 单机部署：启用 AOF 持久化和密码认证。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Redis 单机密码和端口
 services:
   redis:
-    image:  redis:latest
-    container_name:  redis
+    image: redis:latest
+    container_name: redis
     ports:
-      -  6379:6379
+      - "6379:6379"
     volumes:
-      -  ./data:/data
-      - ./config/redis.conf:/usr/local/etc/redis/redis.conf
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    command: [ "redis-server", "/usr/local/etc/redis/redis.conf" ]
-    restart:  always
+      - ./data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+      - /etc/localtime:/etc/localtime:ro
+    command:
+      - redis-server
+      - /usr/local/etc/redis/redis.conf
+      - --requirepass
+      - "Solomon@2026!"
+    restart: unless-stopped

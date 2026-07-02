@@ -1,13 +1,16 @@
-version: '3.8'
+# ClamAV 病毒扫描服务：自动更新病毒库，并将 /scandir 作为待扫描目录。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# ClamAV 服务端口
 services:
   clamav:
     image: clamav/clamav:latest
     container_name: clamav
-    volumes:
-      - ./data:/var/lib/clamav  # 病毒库持久化
-      - ./scan:/scandir         # 待扫描目录
+    environment:
+      CLAMAV_NO_FRESHCLAMD: "false"
     ports:
       - "3310:3310"
-#    environment:
-#      - CLAMAV_NO_FRESHCLAMD=false        # 开启自动更新
+    volumes:
+      - ./data:/var/lib/clamav
+      - ./scan:/scandir
     restart: unless-stopped

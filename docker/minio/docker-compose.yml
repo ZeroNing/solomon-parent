@@ -1,5 +1,7 @@
-version: '3'
-
+# MinIO 对象存储：管理凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# MinIO 根账号和访问端口
 services:
   minio:
     image: minio/minio:latest
@@ -8,10 +10,11 @@ services:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ACCESS_KEY: admin
-      MINIO_SECRET_KEY: admin12345678
+      MINIO_ROOT_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      MINIO_ROOT_PASSWORD: "Solomon@2026!"
     volumes:
       - ./data:/data
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+      - /etc/localtime:/etc/localtime:ro
     command: server /data --console-address ":9001"
-    restart:  always
+    restart: unless-stopped

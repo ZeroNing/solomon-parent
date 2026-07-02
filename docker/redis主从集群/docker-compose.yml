@@ -1,44 +1,70 @@
-version: '3.8'  # 定义 Docker Compose 文件的版本
+# Redis 主从部署：一个主节点、两个只读副本，不包含 Sentinel。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Redis 主从密码和端口
+x-redis-common: &redis-common
+  image: redis:latest
+  restart: unless-stopped
+  networks:
+    - redis-replication
 
 services:
   redis-master:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-master  # 设置容器名称为 redis-master
+    <<: *redis-common
+    container_name: redis-master
     ports:
-      - 6379:6379  # 暴露 Redis 主节点的默认端口 6379
+      - "6379:6379"
     volumes:
-      - ./data/1:/data  # 将主机的 ./data/1 目录挂载到容器的 /data 目录，实现数据持久化
-    networks:
-      redis-network:
-        aliases:
-          - master.redis.com  # 设置网络别名为 master.redis.com，便于从节点连接
+      - ./data/1:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - "Solomon@2026!"
 
-  redis-slave1:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-slave1  # 设置容器名称为 redis-slave1
+  redis-replica1:
+    <<: *redis-common
+    container_name: redis-replica1
+    depends_on:
+      - redis-master
     ports:
-      - 6380:6379  # 把 Redis 从节点的端口 6379 映射到主机的 6380 端口
-    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点，连接到主节点 master.redis.com 的 6379 端口
+      - "6380:6379"
     volumes:
-      - ./data/2:/data  # 将主机的 ./data/2 目录挂载到容器的 /data 目录，实现数据持久化
-    networks:
-      redis-network:
-        aliases:
-          - slave1.redis.com  # 设置网络别名为 slave1.redis.com
+      - ./data/2:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --replicaof
+      - redis-master
+      - "6379"
+      - --masterauth
+      - "Solomon@2026!"
+      - --requirepass
+      - "Solomon@2026!"
 
-  redis-slave2:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-slave2  # 设置容器名称为 redis-slave2
+  redis-replica2:
+    <<: *redis-common
+    container_name: redis-replica2
+    depends_on:
+      - redis-master
     ports:
-      - 6381:6379  # 把 Redis 从节点的端口 6379 映射到主机的 6381 端口
-    command: ["redis-server", "--slaveof", "master.redis.com", "6379"]  # 配置从节点，连接到主节点 master.redis.com 的 6379 端口
+      - "6381:6379"
     volumes:
-      - ./data/3:/data  # 将主机的 ./data/3 目录挂载到容器的 /data 目录，实现数据持久化
-    networks:
-      redis-network:
-        aliases:
-          - slave2.redis.com  # 设置网络别名为 slave2.redis.com
+      - ./data/3:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --replicaof
+      - redis-master
+      - "6379"
+      - --masterauth
+      - "Solomon@2026!"
+      - --requirepass
+      - "Solomon@2026!"
 
 networks:
-  redis-network:
-    driver: bridge  # 使用 bridge 网络驱动，创建一个独立的网络供 Redis 主从节点通信
+  redis-replication:
+    driver: bridge

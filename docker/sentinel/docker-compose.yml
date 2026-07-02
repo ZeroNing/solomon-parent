@@ -1,5 +1,7 @@
-version: '3'
-
+# Sentinel 控制台：登录凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Sentinel Dashboard 登录账号
 services:
   sentinel-dashboard:
     image: bladex/sentinel-dashboard:latest
@@ -7,9 +9,9 @@ services:
     ports:
       - "8858:8858" #默认8858端口 挂载8858端口
     environment:
-      - sentinel.dashboard.auth.username=sentinel #账号
-      - sentinel.dashboard.auth.password=sentinel #密码
+      - sentinel.dashboard.auth.username=sentinel
+      - sentinel.dashboard.auth.password=Solomon@2026!
     volumes:
       - ./logs:/root/logs/csp #挂载日志
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart : always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

@@ -1,0 +1,17 @@
+# Qdrant 单节点向量数据库：提供 HTTP 与 gRPC 接口。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Qdrant API 密钥和端口
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.13.2
+    container_name: qdrant
+    environment:
+      # 敏感配置：生产环境必须修改此示例值。
+      QDRANT__SERVICE__API_KEY: "Solomon@2026!"
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - ./data:/qdrant/storage
+    restart: unless-stopped

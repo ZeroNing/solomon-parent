@@ -1,13 +1,17 @@
-version: '3.8'
-
+# ZooKeeper 单机部署。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# ZooKeeper 客户端端口
 services:
   zookeeper:
     image: zookeeper:latest
     container_name: zookeeper
+    environment:
+      ZOO_4LW_COMMANDS_WHITELIST: "ruok,srvr,mntr"
     ports:
       - "2181:2181"
     volumes:
       - ./data:/data
       - ./logs:/datalog
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart: always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

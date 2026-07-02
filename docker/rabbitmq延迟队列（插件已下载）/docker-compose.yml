@@ -1,16 +1,23 @@
-version: '3.8'
-
+# RabbitMQ 延迟队列：使用仓库中已下载的 3.13.0 插件，启动时离线启用。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# 本地插件版 RabbitMQ 延迟队列账号和端口
 services:
   rabbitmq:
-    image: rabbitmq:management
-    container_name: rabbitmq
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq-delayed-local
+    hostname: rabbitmq-delayed-local
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      RABBITMQ_DEFAULT_PASS: "Solomon@2026!"
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "5675:5672"
+      - "15675:15672"
     volumes:
-      - ./data:/usr/etc/rabbitmq/data
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-      - ./plugins/rabbitmq_delayed_message_exchange-3.13.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.13.0.ez
-      - ./init.sh:/usr/local/bin/init.sh
-    command: ["/bin/bash", "-c", "chmod +x /usr/local/bin/init.sh && /usr/local/bin/init.sh"]
-    restart: always
+      - ./data:/var/lib/rabbitmq
+      - ./plugins/rabbitmq_delayed_message_exchange-3.13.0.ez:/plugins/rabbitmq_delayed_message_exchange-3.13.0.ez:ro
+      - ./init.sh:/usr/local/bin/init-delayed-plugin.sh:ro
+      - /etc/localtime:/etc/localtime:ro
+    command: ["/bin/bash", "/usr/local/bin/init-delayed-plugin.sh"]
+    restart: unless-stopped

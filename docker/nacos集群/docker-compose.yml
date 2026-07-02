@@ -1,119 +1,77 @@
-version: '3'
-# 指定 Docker Compose 配置文件的版本，这里使用的是版本 3。
+# Nacos 三节点集群：依赖外部 MySQL，所有节点共享鉴权和数据源配置。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Nacos 集群鉴权、外部 MySQL 和节点端口
+x-nacos-environment: &nacos-environment
+  MODE: cluster
+  # 敏感配置：生产环境必须修改此示例值。
+  NACOS_AUTH_ENABLE: "true"
+  # 敏感配置：生产环境必须修改此示例值。
+  NACOS_AUTH_TOKEN: "c29sb21vbi1uYWNvcy1hdXRoLXRva2VuLWNoYW5nZS1tZS0yMDI2"
+  # 敏感配置：生产环境必须修改此示例值。
+  NACOS_AUTH_IDENTITY_KEY: "Solomon@2026!"
+  # 敏感配置：生产环境必须修改此示例值。
+  NACOS_AUTH_IDENTITY_VALUE: "Solomon@2026!"
+  NACOS_SERVERS: "nacos1:8848 nacos2:8848 nacos3:8848"
+  SPRING_DATASOURCE_PLATFORM: mysql
+  MYSQL_SERVICE_HOST: "host.docker.internal"
+  MYSQL_SERVICE_PORT: "3306"
+  MYSQL_SERVICE_DB_NAME: "nacos"
+  MYSQL_SERVICE_USER: "nacos"
+  # 敏感配置：生产环境必须修改此示例值。
+  MYSQL_SERVICE_PASSWORD: "Solomon@2026!"
+  MYSQL_SERVICE_DB_PARAM: "characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&serverTimezone=Asia/Shanghai"
+  JVM_XMS: "512m"
+  JVM_XMX: "512m"
+  JVM_XMN: "256m"
+
+x-nacos-common: &nacos-common
+  image: nacos/nacos-server:latest
+  environment:
+    <<: *nacos-environment
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  networks:
+    - nacos-cluster
+  restart: unless-stopped
+
 services:
-  # 定义了三个 Nacos 服务实例 nacos1、nacos2 和 nacos3。
   nacos1:
-    image: nacos/nacos-server:latest
-    # 使用最新版本的 Nacos 镜像。
+    <<: *nacos-common
     container_name: nacos1
-    # 指定容器名称为 nacos1。
     ports:
       - "8848:8848"
       - "9848:9848"
       - "9849:9849"
-    # 将容器内部的 8848、9848 和 9849 端口映射到宿主机的相同端口。
-    environment:
-      - MODE=cluster
-      # 设定 Nacos 运行在集群模式。
-      - NACOS_AUTH_ENABLE=true
-      # 是否开启鉴权功能。
-      - NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789
-      # 鉴权密钥，需用 Base64 加密。如果不知道该值，可以使用旧版本的值（有安全问题）。
-      - NACOS_AUTH_IDENTITY_KEY=identity
-      # 自定义身份键。旧版本默认是 serverIdentity，但不建议使用旧版本默认值（有安全问题）。
-      - NACOS_AUTH_IDENTITY_VALUE=security
-      # 自定义身份键值。旧版本默认是 security，但不建议使用旧版本默认值（有安全问题）。
-      - NACOS_SERVERS=nacos1:8848,nacos2:8848,nacos3:8848
-      # 指定集群中所有 Nacos 服务的地址和端口。
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      # 数据源平台为 MySQL。
-      - MYSQL_SERVICE_HOST=${数据库IP}
-      - MYSQL_SERVICE_PORT=${数据库端口}
-      - MYSQL_SERVICE_DB_NAME=${数据库库名}
-      - MYSQL_SERVICE_USER=${数据库账号}
-      - MYSQL_SERVICE_PASSWORD=${数据库密码}
-      # MySQL 数据库的连接信息，包括主机、端口、数据库名称、用户名和密码。
-      - MYSQL_DB_PARAM=characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&serverTimezone=Asia/Shanghai
-      # 连接 MySQL 的额外参数。
-      - JAVA_OPT=-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m
     volumes:
       - ./data/1:/home/nacos/data
       - ./logs/1:/home/nacos/logs
-      - /etc/localtime:/etc/localtime
-    # 挂载本地目录到容器内，保存数据和日志，并保持宿主机和容器的时间同步。
-    networks:
-      nacos-bridge:
-        aliases:
-          - node1.nacos.com
-    # 连接到名为 nacos-bridge 的网络，并设置网络别名。
-
-    restart: always
-    # 配置容器总是重启。
+      - /etc/localtime:/etc/localtime:ro
 
   nacos2:
-    image: nacos/nacos-server:latest
+    <<: *nacos-common
     container_name: nacos2
     ports:
       - "8858:8848"
       - "9858:9848"
       - "9859:9849"
-    environment:
-      - MODE=cluster
-      - NACOS_AUTH_ENABLE=true
-      - NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789
-      - NACOS_AUTH_IDENTITY_KEY=identity
-      - NACOS_AUTH_IDENTITY_VALUE=security
-      - NACOS_SERVERS=nacos1:8848,nacos2:8848,nacos3:8848
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=${数据库IP}
-      - MYSQL_SERVICE_PORT=${数据库端口}
-      - MYSQL_SERVICE_DB_NAME=${数据库库名}
-      - MYSQL_SERVICE_USER=${数据库账号}
-      - MYSQL_SERVICE_PASSWORD=${数据库密码}
-      - MYSQL_DB_PARAM=characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&serverTimezone=Asia/Shanghai
-      - JAVA_OPT=-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m
     volumes:
       - ./data/2:/home/nacos/data
       - ./logs/2:/home/nacos/logs
-      - /etc/localtime:/etc/localtime
-    networks:
-      nacos-bridge:
-        aliases:
-          - node2.nacos.com
-    restart: always
+      - /etc/localtime:/etc/localtime:ro
 
   nacos3:
-    image: nacos/nacos-server:latest
+    <<: *nacos-common
     container_name: nacos3
     ports:
       - "8868:8848"
       - "9868:9848"
       - "9869:9849"
-    environment:
-      - MODE=cluster
-      - NACOS_AUTH_ENABLE=true
-      - NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789
-      - NACOS_AUTH_IDENTITY_KEY=identity
-      - NACOS_AUTH_IDENTITY_VALUE=security
-      - NACOS_SERVERS=nacos1:8848,nacos2:8848,nacos3:8848
-      - SPRING_DATASOURCE_PLATFORM=mysql
-      - MYSQL_SERVICE_HOST=${数据库IP}
-      - MYSQL_SERVICE_PORT=${数据库端口}
-      - MYSQL_SERVICE_DB_NAME=${数据库库名}
-      - MYSQL_SERVICE_USER=${数据库账号}
-      - MYSQL_SERVICE_PASSWORD=${数据库密码}
-      - MYSQL_DB_PARAM=characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&serverTimezone=Asia/Shanghai
-      - JAVA_OPT=-Xms2g -Xmx2g -Xmn1g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m
     volumes:
       - ./data/3:/home/nacos/data
       - ./logs/3:/home/nacos/logs
-      - /etc/localtime:/etc/localtime
-    networks:
-      nacos-bridge:
-        aliases:
-          - node3.nacos.com
-    restart: always
+      - /etc/localtime:/etc/localtime:ro
+
 networks:
-  nacos-bridge:
+  nacos-cluster:
     driver: bridge
-    # 定义名为 nacos-bridge 的桥接网络。

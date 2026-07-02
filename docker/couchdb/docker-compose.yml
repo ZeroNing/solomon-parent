@@ -1,0 +1,16 @@
+# CouchDB 单机文档数据库：提供 HTTP API 和 Fauxton 管理界面。
+# 配置方式：管理员账号、密码和端口均在本文件中；生产环境必须修改密码。
+services:
+  couchdb:
+    image: couchdb:3.4
+    container_name: couchdb
+    environment:
+      # CouchDB 管理员账号。
+      COUCHDB_USER: admin
+      # CouchDB 管理员密码，生产环境必须修改。
+      COUCHDB_PASSWORD: "Solomon@2026!"
+    ports:
+      - "5984:5984"
+    volumes:
+      - ./data:/opt/couchdb/data
+    restart: unless-stopped

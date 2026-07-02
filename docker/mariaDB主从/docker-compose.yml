@@ -1,0 +1,66 @@
+# MariaDB 主从复制：一个主节点、一个只读副本，使用 GTID 自动定位。
+# 账号、密码和端口均直接配置在本文件中；生产环境必须修改示例密码。
+x-mariadb-common: &mariadb-common
+  image: mariadb:11.8
+  environment:
+    # 敏感配置：生产环境必须修改此示例值。
+    MARIADB_ROOT_PASSWORD: "Solomon@2026!"
+    MARIADB_DATABASE: admin
+    MARIADB_USER: admin
+    # 敏感配置：生产环境必须修改此示例值。
+    MARIADB_PASSWORD: "Solomon@2026!"
+    MARIADB_REPLICATION_USER: replicator
+    # 敏感配置：生产环境必须修改此示例值。
+    MARIADB_REPLICATION_PASSWORD: "SolomonReplica@2026!"
+  networks:
+    - mariadb-replication
+  restart: unless-stopped
+
+services:
+  mariadb-primary:
+    <<: *mariadb-common
+    container_name: mariadb-primary
+    command:
+      - --server-id=1
+      - --log-bin=mysql-bin
+      - --binlog-format=ROW
+      - --gtid-strict-mode=ON
+    ports:
+      - "3310:3306"
+    volumes:
+      - ./data/primary:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh --connect --innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  mariadb-replica:
+    <<: *mariadb-common
+    container_name: mariadb-replica
+    depends_on:
+      mariadb-primary:
+        condition: service_healthy
+    command:
+      - --server-id=2
+      - --relay-log=mysql-relay-bin
+      - --read-only=ON
+      - --gtid-strict-mode=ON
+    ports:
+      - "3311:3306"
+    volumes:
+      - ./data/replica:/var/lib/mysql
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        docker-entrypoint.sh mariadbd &
+        pid=$$!
+        until mariadb-admin ping -h 127.0.0.1 -uroot -p"$${MARIADB_ROOT_PASSWORD}" --silent; do sleep 2; done
+        mariadb -uroot -p"$${MARIADB_ROOT_PASSWORD}" -e \
+          "CHANGE MASTER TO MASTER_HOST='mariadb-primary', MASTER_USER='$${MARIADB_REPLICATION_USER}', MASTER_PASSWORD='$${MARIADB_REPLICATION_PASSWORD}', MASTER_USE_GTID=slave_pos; START SLAVE;"
+        wait $$pid
+
+networks:
+  mariadb-replication:
+    driver: bridge

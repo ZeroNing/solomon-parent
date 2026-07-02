@@ -1,0 +1,19 @@
+# Grafana 单节点可视化平台：首次登录后可添加 Prometheus、Loki 等数据源。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Grafana 管理账号和端口
+services:
+  grafana:
+    image: grafana/grafana:11.5.1
+    container_name: grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      GF_SECURITY_ADMIN_PASSWORD: "Solomon@2026!"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      TZ: Asia/Shanghai
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/var/lib/grafana
+    restart: unless-stopped

@@ -1,0 +1,40 @@
+# Cassandra 三节点集群：无主架构，任意节点均可承担读写请求。
+# 集群名、数据中心、种子节点和内存均直接配置在本文件中。
+x-cassandra-common: &cassandra-common
+  image: cassandra:5.0
+  environment:
+    CASSANDRA_CLUSTER_NAME: solomon
+    CASSANDRA_DC: dc1
+    CASSANDRA_RACK: rack1
+    CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+    CASSANDRA_SEEDS: cassandra1
+    MAX_HEAP_SIZE: 1G
+    HEAP_NEWSIZE: 256M
+  networks:
+    - cassandra-cluster
+  restart: unless-stopped
+
+services:
+  cassandra1:
+    <<: *cassandra-common
+    container_name: cassandra1
+    ports: ["9042:9042"]
+    volumes: ["./data/1:/var/lib/cassandra"]
+
+  cassandra2:
+    <<: *cassandra-common
+    container_name: cassandra2
+    depends_on: [cassandra1]
+    ports: ["9043:9042"]
+    volumes: ["./data/2:/var/lib/cassandra"]
+
+  cassandra3:
+    <<: *cassandra-common
+    container_name: cassandra3
+    depends_on: [cassandra1]
+    ports: ["9044:9042"]
+    volumes: ["./data/3:/var/lib/cassandra"]
+
+networks:
+  cassandra-cluster:
+    driver: bridge

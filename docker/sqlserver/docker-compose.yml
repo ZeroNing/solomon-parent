@@ -1,0 +1,19 @@
+# SQL Server 2022 开发版：接受微软 EULA 后启动，管理员密码直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# SQL Server 版本、管理员密码和端口
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+      # 敏感配置：生产环境必须修改此示例值。
+      MSSQL_SA_PASSWORD: "Solomon@2026!"
+      TZ: Asia/Shanghai
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./data:/var/opt/mssql
+    restart: unless-stopped

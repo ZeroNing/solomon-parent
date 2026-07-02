@@ -1,0 +1,23 @@
+# Eclipse Mosquitto：轻量 MQTT Broker，适合本地开发和物联网联调。
+# 配置方式：本地模式允许匿名连接；生产环境应改为密码文件并启用 TLS。
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: mosquitto
+    command:
+      - /bin/sh
+      - -c
+      - |
+        printf '%s\n' \
+          'listener 1883' \
+          'allow_anonymous true' \
+          'persistence true' \
+          'persistence_location /mosquitto/data/' \
+          'log_dest stdout' > /tmp/mosquitto.conf
+        exec mosquitto -c /tmp/mosquitto.conf
+    ports:
+      - "1884:1883"
+    volumes:
+      - ./data:/mosquitto/data
+      - ./logs:/mosquitto/log
+    restart: unless-stopped

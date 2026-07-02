@@ -1,0 +1,28 @@
+# Weaviate 单机向量数据库：启用 API Key 鉴权和 RBAC，开放 HTTP 与 gRPC。
+# 配置方式：API Key 和用户直接写在本文件中；生产环境必须修改示例密钥。
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.38.1
+    container_name: weaviate
+    environment:
+      QUERY_DEFAULTS_LIMIT: "25"
+      PERSISTENCE_DATA_PATH: /var/lib/weaviate
+      CLUSTER_HOSTNAME: node1
+      # 敏感配置：生产环境必须修改此示例值。
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "false"
+      # 敏感配置：生产环境必须修改此示例值。
+      AUTHENTICATION_APIKEY_ENABLED: "true"
+      # API 访问密钥，生产环境必须修改。
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS: "Solomon-Weaviate-Key-2026"
+      # 敏感配置：生产环境必须修改此示例值。
+      AUTHENTICATION_APIKEY_USERS: admin
+      # 敏感配置：生产环境必须修改此示例值。
+      AUTHORIZATION_ENABLE_RBAC: "true"
+      # 敏感配置：生产环境必须修改此示例值。
+      AUTHORIZATION_RBAC_ROOT_USERS: admin
+    ports:
+      - "8088:8080"
+      - "50051:50051"
+    volumes:
+      - ./data:/var/lib/weaviate
+    restart: unless-stopped

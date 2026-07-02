@@ -1,14 +1,16 @@
-version: '3'
-
+# H2 数据库：提供 Web 控制台和 TCP 连接，适合本地开发测试。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# H2 Web 控制台和 TCP 端口
 services:
   h2:
     image: oscarfonts/h2
-    container_name: h2_database
-    ports:
-      - "81:81"  # 显式绑定 Web 控制台端口
-      - "1521:1521"  # TCP 端口
+    container_name: h2
     environment:
-      - H2_OPTIONS=-tcp -tcpAllowOthers -web -webAllowOthers -ifNotExists
+      H2_OPTIONS: "-tcp -tcpAllowOthers -web -webAllowOthers -ifNotExists"
+    ports:
+      - "81:81"
+      - "1521:1521"
     volumes:
       - ./data:/opt/h2-data
-    restart: always
+    restart: unless-stopped

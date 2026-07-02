@@ -1,0 +1,19 @@
+# pgAdmin 4：PostgreSQL 官方生态中常用的 Web 管理工具。
+# 配置方式：账号、密码和端口均在本文件中；生产环境请修改示例密码。
+services:
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: pgadmin
+    environment:
+      # Web 控制台登录邮箱。
+      PGADMIN_DEFAULT_EMAIL: admin@solomon.local
+      # Web 控制台登录密码，生产环境必须修改。
+      PGADMIN_DEFAULT_PASSWORD: "Solomon@2026!"
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      # 敏感配置：生产环境必须修改此示例值。
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    ports:
+      - "5050:80"
+    volumes:
+      - ./data:/var/lib/pgadmin
+    restart: unless-stopped

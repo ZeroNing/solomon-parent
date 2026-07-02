@@ -1,0 +1,33 @@
+# NATS 三节点 JetStream 集群：三个节点互联并使用副本机制保存消息。
+# 集群名、路由和端口均直接配置在本文件中。
+x-nats-common: &nats-common
+  image: nats:2.11-alpine
+  networks:
+    - nats-cluster
+  restart: unless-stopped
+
+services:
+  nats1:
+    <<: *nats-common
+    container_name: nats1
+    command: ["--name=nats1", "--jetstream", "--store_dir=/data", "--cluster_name=solomon", "--cluster=nats://0.0.0.0:6222", "--routes=nats://nats2:6222,nats://nats3:6222", "--http_port=8222"]
+    ports: ["4222:4222", "8222:8222"]
+    volumes: ["./data/1:/data"]
+
+  nats2:
+    <<: *nats-common
+    container_name: nats2
+    command: ["--name=nats2", "--jetstream", "--store_dir=/data", "--cluster_name=solomon", "--cluster=nats://0.0.0.0:6222", "--routes=nats://nats1:6222,nats://nats3:6222", "--http_port=8222"]
+    ports: ["4223:4222", "8223:8222"]
+    volumes: ["./data/2:/data"]
+
+  nats3:
+    <<: *nats-common
+    container_name: nats3
+    command: ["--name=nats3", "--jetstream", "--store_dir=/data", "--cluster_name=solomon", "--cluster=nats://0.0.0.0:6222", "--routes=nats://nats1:6222,nats://nats2:6222", "--http_port=8222"]
+    ports: ["4224:4222", "8224:8222"]
+    volumes: ["./data/3:/data"]
+
+networks:
+  nats-cluster:
+    driver: bridge

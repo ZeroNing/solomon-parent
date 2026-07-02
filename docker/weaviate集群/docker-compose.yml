@@ -1,0 +1,64 @@
+# Weaviate 三节点集群：使用 Raft 元数据共识并支持集合级副本。
+# API Key、Raft 成员和集群端口均直接配置在本文件中；生产环境必须修改示例密钥。
+x-weaviate-common: &weaviate-common
+  image: cr.weaviate.io/semitechnologies/weaviate:1.38.1
+  environment: &weaviate-environment
+    QUERY_DEFAULTS_LIMIT: "25"
+    PERSISTENCE_DATA_PATH: /var/lib/weaviate
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "false"
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHENTICATION_APIKEY_ENABLED: "true"
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHENTICATION_APIKEY_ALLOWED_KEYS: "Solomon-Weaviate-Key-2026"
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHENTICATION_APIKEY_USERS: admin
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHORIZATION_ENABLE_RBAC: "true"
+    # 敏感配置：生产环境必须修改此示例值。
+    AUTHORIZATION_RBAC_ROOT_USERS: admin
+    RAFT_JOIN: node1,node2,node3
+    RAFT_BOOTSTRAP_EXPECT: "3"
+  networks:
+    - weaviate-cluster
+  restart: unless-stopped
+
+services:
+  weaviate1:
+    <<: *weaviate-common
+    container_name: weaviate1
+    environment:
+      <<: *weaviate-environment
+      CLUSTER_HOSTNAME: node1
+      CLUSTER_GOSSIP_BIND_PORT: "7100"
+      CLUSTER_DATA_BIND_PORT: "7101"
+    ports: ["8088:8080", "50051:50051"]
+    volumes: ["./data/1:/var/lib/weaviate"]
+
+  weaviate2:
+    <<: *weaviate-common
+    container_name: weaviate2
+    environment:
+      <<: *weaviate-environment
+      CLUSTER_HOSTNAME: node2
+      CLUSTER_GOSSIP_BIND_PORT: "7102"
+      CLUSTER_DATA_BIND_PORT: "7103"
+      CLUSTER_JOIN: weaviate1:7100
+    ports: ["8089:8080", "50052:50051"]
+    volumes: ["./data/2:/var/lib/weaviate"]
+
+  weaviate3:
+    <<: *weaviate-common
+    container_name: weaviate3
+    environment:
+      <<: *weaviate-environment
+      CLUSTER_HOSTNAME: node3
+      CLUSTER_GOSSIP_BIND_PORT: "7104"
+      CLUSTER_DATA_BIND_PORT: "7105"
+      CLUSTER_JOIN: weaviate1:7100
+    ports: ["8090:8080", "50053:50051"]
+    volumes: ["./data/3:/var/lib/weaviate"]
+
+networks:
+  weaviate-cluster:
+    driver: bridge

@@ -1,0 +1,60 @@
+# PostgreSQL 主从复制：一个主节点、一个热备只读副本。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# PostgreSQL 主从复制账号和端口
+services:
+  postgres-primary:
+    image: postgres:17
+    container_name: postgres-primary
+    environment:
+      POSTGRES_USER: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      POSTGRES_PASSWORD: "Solomon@2026!"
+      POSTGRES_DB: "default"
+      # 敏感配置：生产环境必须修改此示例值。
+      POSTGRES_REPLICATION_PASSWORD: "Solomon@2026!"
+    command:
+      - postgres
+      - -c
+      - wal_level=replica
+      - -c
+      - max_wal_senders=10
+      - -c
+      - max_replication_slots=10
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/primary:/var/lib/postgresql/data
+      - ./init/primary-init.sh:/docker-entrypoint-initdb.d/10-replication.sh:ro
+    networks:
+      - postgres-replication
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  postgres-replica:
+    image: postgres:17
+    container_name: postgres-replica
+    depends_on:
+      postgres-primary:
+        condition: service_healthy
+    environment:
+      PGDATA: /var/lib/postgresql/data
+      # 敏感配置：生产环境必须修改此示例值。
+      POSTGRES_REPLICATION_PASSWORD: "Solomon@2026!"
+    entrypoint: ["/bin/bash", "/usr/local/bin/replica-entrypoint.sh"]
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data/replica:/var/lib/postgresql/data
+      - ./init/replica-entrypoint.sh:/usr/local/bin/replica-entrypoint.sh:ro
+    networks:
+      - postgres-replication
+    restart: unless-stopped
+
+networks:
+  postgres-replication:
+    driver: bridge

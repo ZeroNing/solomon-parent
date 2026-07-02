@@ -1,5 +1,7 @@
-version: '3'
-
+# MongoDB 单机部署：管理员凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# MongoDB 管理员和端口
 services:
   mongodb:
     image: mongo:latest
@@ -8,8 +10,9 @@ services:
       - "27017:27017"
     volumes:
       - ./data:/data/db
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
+      - /etc/localtime:/etc/localtime:ro
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root #账号
-      MONGO_INITDB_ROOT_PASSWORD: root #密码
-    restart:  always
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      # 敏感配置：生产环境必须修改此示例值。
+      MONGO_INITDB_ROOT_PASSWORD: "Solomon@2026!"
+    restart: unless-stopped

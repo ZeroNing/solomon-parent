@@ -1,0 +1,13 @@
+# Adminer 通用数据库管理工具：支持 MySQL、MariaDB、PostgreSQL、SQLite 等数据库。
+# 配置方式：端口直接在本文件中配置；登录时填写目标数据库地址和账号。
+services:
+  adminer:
+    image: adminer:5
+    container_name: adminer
+    environment:
+      # 默认展示简体中文界面。
+      ADMINER_DEFAULT_SERVER: host.docker.internal
+      ADMINER_DESIGN: pepa-linha-dark
+    ports:
+      - "8086:8080"
+    restart: unless-stopped

@@ -1,0 +1,19 @@
+# CockroachDB 单节点非安全模式：适合本地开发，不应用于生产环境。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# CockroachDB SQL 和管理端口
+services:
+  cockroachdb:
+    image: cockroachdb/cockroach:v24.3.0
+    container_name: cockroachdb
+    command:
+      - start-single-node
+      - --insecure
+      - --store=/cockroach/cockroach-data
+      - --advertise-addr=cockroachdb
+    ports:
+      - "26257:26257"
+      - "8082:8080"
+    volumes:
+      - ./data:/cockroach/cockroach-data
+    restart: unless-stopped

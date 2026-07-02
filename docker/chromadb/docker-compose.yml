@@ -1,0 +1,15 @@
+# Chroma 单机向量数据库：提供 HTTP API 并将数据持久化到当前目录。
+# 配置方式：服务端口和遥测开关均直接写在本文件中。
+services:
+  chromadb:
+    image: chromadb/chroma:1.0.20
+    container_name: chromadb
+    environment:
+      IS_PERSISTENT: "TRUE"
+      PERSIST_DIRECTORY: /chroma/chroma
+      ANONYMIZED_TELEMETRY: "FALSE"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/chroma/chroma
+    restart: unless-stopped

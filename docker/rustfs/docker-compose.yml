@@ -1,17 +1,20 @@
-version: '3.8'
-
+# RustFS 对象存储：访问凭据直接配置在本文件中。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# RustFS 访问密钥和端口
 services:
   rustfs:
     image: rustfs/rustfs:latest
     container_name: rustfs
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "9100:9000"
+      - "9101:9001"
     environment:
-      RUSTFS_ACCESS_KEY: admin
-      RUSTFS_SECRET_KEY: admin12345678
+      RUSTFS_ACCESS_KEY: "admin"
+      # 敏感配置：生产环境必须修改此示例值。
+      RUSTFS_SECRET_KEY: "Solomon@2026!"
     volumes:
       - ./data:/data
       - ./logs:/app/logs
-      - /etc/localtime:/etc/localtime # 容器与宿主机时间同步
-    restart:  always
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped

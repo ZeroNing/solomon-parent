@@ -1,99 +1,116 @@
-version: '3.8'  # 定义 Docker Compose 文件的版本
+# Redis 高可用部署：一个主节点、两个副本、三个 Sentinel。
+# 配置方式：环境变量、端口和外部地址均在本文件中直接配置，无需 .env 文件。
+# 生产部署前请修改示例密码、令牌、对外地址，并按需调整宿主机端口。
+# Redis 主从加哨兵密码和端口
+x-redis-common: &redis-common
+  image: redis:latest
+  restart: unless-stopped
+  networks:
+    - redis-ha
+
+x-sentinel-common: &sentinel-common
+  image: redis:latest
+  restart: unless-stopped
+  environment:
+    # 敏感配置：生产环境必须修改此示例值。
+    REDIS_PASSWORD: "Solomon@2026!"
+  networks:
+    - redis-ha
+  depends_on:
+    - redis-master
+    - redis-replica1
+    - redis-replica2
+  entrypoint:
+    - /bin/sh
+    - -c
+  command:
+    - |
+      cat > /tmp/sentinel.conf <<EOF
+      port 26379
+      dir /tmp
+      sentinel monitor mymaster redis-master 6379 2
+      sentinel auth-pass mymaster $${REDIS_PASSWORD}
+      sentinel down-after-milliseconds mymaster 5000
+      sentinel parallel-syncs mymaster 1
+      sentinel failover-timeout mymaster 10000
+      EOF
+      exec redis-sentinel /tmp/sentinel.conf
 
 services:
   redis-master:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-master  # 设置容器名称为 redis-master
+    <<: *redis-common
+    container_name: redis-ha-master
     ports:
-      - 6379:6379  # 将主机的 6379 端口映射到容器的 6379 端口
+      - "6379:6379"
     volumes:
-      - ./data/1:/data  # 将主机的 ./data/1 目录挂载到容器的 /data 目录中
-    networks:
-      redis-network:
-        aliases:
-          - redis-master  # 为主节点设置网络别名
-    command: ["redis-server", "--appendonly", "yes"]  # 启动 Redis 并开启持久化 (AOF 模式)
+      - ./data/1:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --requirepass
+      - "Solomon@2026!"
 
   redis-replica1:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-replica1  # 设置容器名称为 redis-replica1
+    <<: *redis-common
+    container_name: redis-ha-replica1
+    depends_on:
+      - redis-master
     ports:
-      - 6380:6379  # 将主机的 6380 端口映射到容器的 6379 端口
+      - "6380:6379"
     volumes:
-      - ./data/2:/data  # 将主机的 ./data/2 目录挂载到容器的 /data 目录中
-    networks:
-      redis-network:
-        aliases:
-          - redis-replica1  # 为从节点1设置网络别名
-    command: ["redis-server", "--replicaof", "redis-master", "6379"]  # 启动 Redis 并配置为从节点，连接到主节点 redis-master
+      - ./data/2:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --replicaof
+      - redis-master
+      - "6379"
+      - --masterauth
+      - "Solomon@2026!"
+      - --requirepass
+      - "Solomon@2026!"
 
   redis-replica2:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-replica2  # 设置容器名称为 redis-replica2
+    <<: *redis-common
+    container_name: redis-ha-replica2
+    depends_on:
+      - redis-master
     ports:
-      - 6381:6379  # 将主机的 6381 端口映射到容器的 6379 端口
+      - "6381:6379"
     volumes:
-      - ./data/3:/data  # 将主机的 ./data/3 目录挂载到容器的 /data 目录中
-    networks:
-      redis-network:
-        aliases:
-          - redis-replica2  # 为从节点2设置网络别名
-    command: ["redis-server", "--replicaof", "redis-master", "6379"]  # 启动 Redis 并配置为从节点，连接到主节点 redis-master
+      - ./data/3:/data
+    command:
+      - redis-server
+      - --appendonly
+      - "yes"
+      - --replicaof
+      - redis-master
+      - "6379"
+      - --masterauth
+      - "Solomon@2026!"
+      - --requirepass
+      - "Solomon@2026!"
 
   redis-sentinel1:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-sentinel1  # 设置容器名称为 redis-sentinel1
+    <<: *sentinel-common
+    container_name: redis-ha-sentinel1
     ports:
-      - 26379:26379  # 将主机的 26379 端口映射到容器的 26379 端口
-    networks:
-      redis-network:
-        aliases:
-          - redis-sentinel1  # 为哨兵1设置网络别名
-    depends_on:
-      - redis-master
-      - redis-replica1
-      - redis-replica2  # 确保哨兵在 Redis 节点启动后再启动
-    command: >
-      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
-    volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
+      - "26379:26379"
 
   redis-sentinel2:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-sentinel2  # 设置容器名称为 redis-sentinel2
+    <<: *sentinel-common
+    container_name: redis-ha-sentinel2
     ports:
-      - 26380:26379  # 将主机的 26380 端口映射到容器的 26379 端口
-    networks:
-      redis-network:
-        aliases:
-          - redis-sentinel2  # 为哨兵2设置网络别名
-    depends_on:
-      - redis-master
-      - redis-replica1
-      - redis-replica2  # 确保哨兵在 Redis 节点启动后再启动
-    command: >
-      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
-    volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
+      - "26380:26379"
 
   redis-sentinel3:
-    image: redis:latest  # 使用最新版本的 Redis 镜像
-    container_name: redis-sentinel3  # 设置容器名称为 redis-sentinel3
+    <<: *sentinel-common
+    container_name: redis-ha-sentinel3
     ports:
-      - 26381:26379  # 将主机的 26381 端口映射到容器的 26379 端口
-    networks:
-      redis-network:
-        aliases:
-          - redis-sentinel3  # 为哨兵3设置网络别名
-    depends_on:
-      - redis-master
-      - redis-replica1
-      - redis-replica2  # 确保哨兵在 Redis 节点启动后再启动
-    command: >
-      redis-sentinel /etc/sentinel.conf  # 启动 Redis 哨兵并使用配置文件 /etc/sentinel.conf
-    volumes:
-      - ./sentinel/sentinel.conf:/etc/sentinel.conf  # 将主机的 sentinel.conf 文件挂载到容器的 /etc/sentinel.conf 中
+      - "26381:26379"
 
 networks:
-  redis-network:
-    driver: bridge  # 使用 bridge 模式创建 Docker 网络
+  redis-ha:
+    driver: bridge
